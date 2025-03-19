@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wizard's Choice</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="loading-screen">
+            <h1>Wizard's Choice</h1>
+            <p>Loading...</p>
+        </div>
+        <div id="main-menu" class="hidden">
+            <h1>Wizard's Choice</h1>
+            <button id="start-game">Start New Duel</button>
+            <button id="options">Options</button>
+        </div>
+        <div id="game-ui" class="hidden">
+            <div id="player-info">
+                <div id="player-health"></div>
+                <div id="player-mana"></div>
+            </div>
+            <div id="opponent-info">
+                <div id="opponent-health"></div>
+                <div id="opponent-mana"></div>
+            </div>
+            <div id="battle-scene"></div>
+            <div id="spell-choices"></div>
+            <div id="battle-log"></div>
+        </div>
+        <div id="game-over" class="hidden">
+            <h2 id="result-message"></h2>
+            <div id="battle-stats"></div>
+            <button id="play-again">Play Again</button>
+            <button id="return-to-menu">Return to Menu</button>
+        </div>
+    </div>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

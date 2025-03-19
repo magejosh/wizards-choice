@@ -1,0 +1,25 @@
+{
+  "name": "wizards-choice",
+  "version": "1.0.0",
+  "description": "A quick, choice-driven wizard duel game where strategic spell selection shapes your path to magical supremacy.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "start": "webpack serve --open",
+    "watch": "webpack --watch"
+  },
+  "keywords": [
+    "game",
+    "wizard",
+    "duel",
+    "threejs",
+    "choice-based",
+    "strategy"
+  ],
+  "author": "",
+  "license": "ISC"
+}

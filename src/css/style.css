@@ -1,0 +1,245 @@
+/* Main Styles for Wizard's Choice */
+
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #0a0a1a;
+    color: #e0e0ff;
+    overflow: hidden;
+}
+
+/* Game Container */
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Loading Screen */
+#loading-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+}
+
+#loading-screen h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #9050ff;
+    text-shadow: 0 0 10px #5000ff;
+}
+
+/* Main Menu */
+#main-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+#main-menu h1 {
+    font-size: 4rem;
+    margin-bottom: 2rem;
+    color: #9050ff;
+    text-shadow: 0 0 15px #5000ff;
+}
+
+button {
+    background-color: #4020a0;
+    color: #ffffff;
+    border: none;
+    padding: 1rem 2rem;
+    margin: 0.5rem;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #6030d0;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(80, 0, 255, 0.4);
+}
+
+/* Game UI */
+#game-ui {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 10% 70% 20%;
+    grid-template-columns: 20% 60% 20%;
+    grid-template-areas:
+        "player-info battle-scene opponent-info"
+        "battle-log battle-scene battle-log"
+        "spell-choices spell-choices spell-choices";
+}
+
+#player-info {
+    grid-area: player-info;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+#opponent-info {
+    grid-area: opponent-info;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    text-align: right;
+}
+
+#battle-scene {
+    grid-area: battle-scene;
+    position: relative;
+}
+
+#spell-choices {
+    grid-area: spell-choices;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    background-color: rgba(20, 10, 40, 0.8);
+}
+
+#battle-log {
+    grid-area: battle-log;
+    padding: 1rem;
+    overflow-y: auto;
+    background-color: rgba(10, 5, 20, 0.7);
+    font-size: 0.9rem;
+}
+
+/* Health and Mana Bars */
+.health-bar, .mana-bar {
+    height: 20px;
+    margin: 5px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #333;
+}
+
+.health-fill {
+    height: 100%;
+    background-color: #50c878;
+    transition: width 0.5s ease;
+}
+
+.mana-fill {
+    height: 100%;
+    background-color: #5050ff;
+    transition: width 0.5s ease;
+}
+
+/* Spell Choice Buttons */
+.spell-button {
+    background-color: #302060;
+    border: 2px solid #6040a0;
+    padding: 0.8rem 1.5rem;
+    margin: 0 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.spell-button:hover {
+    background-color: #403080;
+    transform: translateY(-3px);
+    box-shadow: 0 0 15px rgba(100, 50, 255, 0.6);
+}
+
+.spell-button.fire {
+    border-color: #ff5030;
+}
+
+.spell-button.water {
+    border-color: #3080ff;
+}
+
+.spell-button.earth {
+    border-color: #80c040;
+}
+
+.spell-button.air {
+    border-color: #c0c0ff;
+}
+
+.spell-button.arcane {
+    border-color: #a050ff;
+}
+
+/* Game Over Screen */
+#game-over {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background-color: rgba(10, 10, 30, 0.9);
+}
+
+#game-over h2 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 10px #ffffff;
+}
+
+#battle-stats {
+    margin: 2rem 0;
+    padding: 1rem;
+    background-color: rgba(40, 20, 80, 0.7);
+    border-radius: 10px;
+    width: 80%;
+    max-width: 600px;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #game-ui {
+        grid-template-rows: 10% 50% 40%;
+        grid-template-columns: 50% 50%;
+        grid-template-areas:
+            "player-info opponent-info"
+            "battle-scene battle-scene"
+            "spell-choices spell-choices";
+    }
+    
+    #battle-log {
+        display: none;
+    }
+    
+    button {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    #main-menu h1 {
+        font-size: 3rem;
+    }
+}

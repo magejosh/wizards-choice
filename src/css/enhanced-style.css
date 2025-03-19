@@ -1,0 +1,699 @@
+/* Enhanced Styles for Wizard's Choice */
+
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #0a0a1a;
+    color: #e0e0ff;
+    overflow: hidden;
+    transition: background-color 0.5s ease;
+}
+
+/* Game Container */
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Loading Screen */
+#loading-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #1a1a4a 0%, #0a0a1a 100%);
+}
+
+#loading-screen h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #9050ff;
+    text-shadow: 0 0 10px #5000ff;
+    animation: pulse 2s infinite;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(80, 0, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #9050ff;
+    animation: spin 1s ease-in-out infinite;
+    margin-top: 20px;
+}
+
+/* Main Menu */
+#main-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background: radial-gradient(circle, #1a1a4a 0%, #0a0a1a 100%);
+}
+
+#main-menu h1 {
+    font-size: 4rem;
+    margin-bottom: 2rem;
+    color: #9050ff;
+    text-shadow: 0 0 15px #5000ff;
+    animation: float 6s ease-in-out infinite;
+}
+
+button {
+    background-color: #4020a0;
+    color: #ffffff;
+    border: none;
+    padding: 1rem 2rem;
+    margin: 0.5rem;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+button:hover {
+    background-color: #6030d0;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(80, 0, 255, 0.4);
+}
+
+button:hover::after {
+    animation: ripple 1s ease-out;
+}
+
+/* Game UI */
+#game-ui {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 10% 70% 20%;
+    grid-template-columns: 20% 60% 20%;
+    grid-template-areas:
+        "player-info battle-scene opponent-info"
+        "battle-log battle-scene battle-log"
+        "spell-choices spell-choices spell-choices";
+    background: linear-gradient(to bottom, #0a0a1a, #1a1a4a);
+}
+
+#player-info {
+    grid-area: player-info;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background-color: rgba(20, 10, 40, 0.7);
+    border-radius: 10px;
+    margin: 0.5rem;
+    box-shadow: 0 0 10px rgba(80, 0, 255, 0.3);
+}
+
+#opponent-info {
+    grid-area: opponent-info;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    text-align: right;
+    background-color: rgba(40, 10, 20, 0.7);
+    border-radius: 10px;
+    margin: 0.5rem;
+    box-shadow: 0 0 10px rgba(255, 50, 50, 0.3);
+}
+
+#battle-scene {
+    grid-area: battle-scene;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(80, 0, 255, 0.5);
+    margin: 0.5rem;
+}
+
+#spell-choices {
+    grid-area: spell-choices;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    background-color: rgba(20, 10, 40, 0.8);
+    border-top: 2px solid #4020a0;
+}
+
+#battle-log {
+    grid-area: battle-log;
+    padding: 1rem;
+    overflow-y: auto;
+    background-color: rgba(10, 5, 20, 0.7);
+    font-size: 0.9rem;
+    border-radius: 10px;
+    margin: 0.5rem;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Health and Mana Bars */
+.health-bar, .mana-bar {
+    height: 20px;
+    margin: 5px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #333;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.health-fill {
+    height: 100%;
+    background: linear-gradient(to right, #50c878, #70e898);
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.health-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, 
+                rgba(255, 255, 255, 0.3) 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(0, 0, 0, 0.1) 51%, 
+                rgba(0, 0, 0, 0.2) 100%);
+}
+
+.mana-fill {
+    height: 100%;
+    background: linear-gradient(to right, #5050ff, #7070ff);
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.mana-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, 
+                rgba(255, 255, 255, 0.3) 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(0, 0, 0, 0.1) 51%, 
+                rgba(0, 0, 0, 0.2) 100%);
+}
+
+/* Spell Choice Buttons */
+.spell-button {
+    display: flex;
+    align-items: center;
+    background-color: #302060;
+    border: 2px solid #6040a0;
+    padding: 0.8rem 1.5rem;
+    margin: 0 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+.spell-button:hover {
+    background-color: #403080;
+    transform: translateY(-3px);
+    box-shadow: 0 0 15px rgba(100, 50, 255, 0.6);
+}
+
+.spell-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background-color: #4020a0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 5px rgba(100, 50, 255, 0.6);
+}
+
+.spell-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.spell-name {
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.spell-cost {
+    font-size: 0.8rem;
+    color: #a0a0ff;
+}
+
+.spell-button.fire {
+    border-color: #ff5030;
+}
+
+.fire-icon {
+    background: radial-gradient(circle, #ff7030 0%, #ff3000 100%);
+}
+
+.spell-button.water {
+    border-color: #3080ff;
+}
+
+.water-icon {
+    background: radial-gradient(circle, #50a0ff 0%, #1060ff 100%);
+}
+
+.spell-button.earth {
+    border-color: #80c040;
+}
+
+.earth-icon {
+    background: radial-gradient(circle, #a0e060 0%, #60a020 100%);
+}
+
+.spell-button.air {
+    border-color: #c0c0ff;
+}
+
+.air-icon {
+    background: radial-gradient(circle, #e0e0ff 0%, #a0a0ff 100%);
+}
+
+.spell-button.arcane {
+    border-color: #a050ff;
+}
+
+.arcane-icon {
+    background: radial-gradient(circle, #c070ff 0%, #8030ff 100%);
+}
+
+.spell-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Choice Buttons */
+.choice-button {
+    display: flex;
+    flex-direction: column;
+    background-color: #302060;
+    border: 2px solid #6040a0;
+    padding: 0.8rem 1.5rem;
+    margin: 0 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    animation: fadeIn 0.3s ease-out forwards;
+    text-align: center;
+    min-width: 200px;
+}
+
+.choice-button:hover {
+    background-color: #403080;
+    transform: translateY(-3px);
+    box-shadow: 0 0 15px rgba(100, 50, 255, 0.6);
+}
+
+.choice-name {
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.choice-description {
+    font-size: 0.8rem;
+    color: #a0a0ff;
+}
+
+/* Battle Log Entries */
+.log-entry {
+    margin: 5px 0;
+    padding: 5px;
+    border-left: 3px solid #4020a0;
+    background-color: rgba(30, 15, 60, 0.3);
+    border-radius: 0 5px 5px 0;
+    transition: all 0.3s ease;
+}
+
+.log-entry-new {
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Game Over Screen */
+#game-over {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background: radial-gradient(circle, rgba(10, 10, 30, 0.9) 0%, rgba(5, 5, 15, 0.95) 100%);
+}
+
+#game-over h2 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 10px #ffffff;
+}
+
+.victory-text {
+    color: #50c878;
+    animation: victoryPulse 2s infinite;
+}
+
+.defeat-text {
+    color: #ff5050;
+    animation: defeatPulse 2s infinite;
+}
+
+#battle-stats {
+    margin: 2rem 0;
+    padding: 1rem;
+    background-color: rgba(40, 20, 80, 0.7);
+    border-radius: 10px;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0 0 20px rgba(80, 0, 255, 0.3);
+}
+
+.stat-item {
+    margin: 10px 0;
+    padding: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-item-enter {
+    animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.new-spell {
+    color: #ffcc00;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
+    background-color: rgba(60, 30, 100, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+/* Notifications */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 5px;
+    background-color: rgba(40, 20, 80, 0.9);
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+}
+
+.notification-info {
+    border-left: 5px solid #3080ff;
+}
+
+.notification-success {
+    border-left: 5px solid #50c878;
+}
+
+.notification-warning {
+    border-left: 5px solid #ffcc00;
+}
+
+.notification-error {
+    border-left: 5px solid #ff5050;
+}
+
+.notification-show {
+    transform: translateX(0);
+}
+
+.notification-hide {
+    transform: translateX(120%);
+}
+
+/* Spell Effects */
+.spell-effect {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.fire-effect {
+    background: radial-gradient(circle, rgba(255, 80, 0, 0.3) 0%, rgba(255, 0, 0, 0) 70%);
+    animation: fireEffect 1s ease-out forwards;
+}
+
+.water-effect {
+    background: radial-gradient(circle, rgba(0, 128, 255, 0.3) 0%, rgba(0, 0, 255, 0) 70%);
+    animation: waterEffect 1s ease-out forwards;
+}
+
+.earth-effect {
+    background: radial-gradient(circle, rgba(128, 192, 64, 0.3) 0%, rgba(64, 128, 32, 0) 70%);
+    animation: earthEffect 1s ease-out forwards;
+}
+
+.air-effect {
+    background: radial-gradient(circle, rgba(192, 192, 255, 0.3) 0%, rgba(128, 128, 255, 0) 70%);
+    animation: airEffect 1s ease-out forwards;
+}
+
+.arcane-effect {
+    background: radial-gradient(circle, rgba(160, 80, 255, 0.3) 0%, rgba(80, 0, 255, 0) 70%);
+    animation: arcaneEffect 1s ease-out forwards;
+}
+
+/* Screen Transitions */
+.screen-enter {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.screen-exit {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+.choices-enter {
+    animation: slideUp 0.5s ease-out forwards;
+}
+
+.choices-exit {
+    animation: slideDown 0.3s ease-out forwards;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+.pulse-animation {
+    animation: pulse 1s infinite;
+}
+
+.spell-selected {
+    animation: spellSelected 0.3s ease-out;
+}
+
+.choice-selected {
+    animation: choiceSelected 0.3s ease-out;
+}
+
+.button-hover {
+    animation: buttonHover 0.3s ease-out;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideDown {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(20px); opacity: 0; }
+}
+
+@keyframes fadeInUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes spellSelected {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(100, 50, 255, 0.8); }
+    100% { transform: scale(1); }
+}
+
+@keyframes choiceSelected {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(100, 50, 255, 0.8); }
+    100% { transform: scale(1); }
+}
+
+@keyframes buttonHover {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(20, 20);
+        opacity: 0;
+    }
+}
+
+@keyframes victoryPulse {
+    0% { text-shadow: 0 0 10px rgba(80, 200, 120, 0.5); }
+    50% { text-shadow: 0 0 20px rgba(80, 200, 120, 1); }
+    100% { text-shadow: 0 0 10px rgba(80, 200, 120, 0.5); }
+}
+
+@keyframes defeatPulse {
+    0% { text-shadow: 0 0 10px rgba(255, 80, 80, 0.5); }
+    50% { text-shadow: 0 0 20px rgba(255, 80, 80, 1); }
+    100% { text-shadow: 0 0 10px rgba(255, 80, 80, 0.5); }
+}
+
+@keyframes fireEffect {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.5); }
+}
+
+@keyframes waterEffect {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.5); }
+}
+
+@keyframes earthEffect {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.5); }
+}
+
+@keyframes airEffect {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.5); }
+}
+
+@keyframes arcaneEffect {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #game-ui {
+        grid-template-rows: 10% 50% 40%;
+        grid-template-columns: 50% 50%;
+        grid-template-areas:
+            "player-info opponent-info"
+            "battle-scene battle-scene"
+            "spell-choices spell-choices";
+    }
+    
+    #battle-log {
+        display: none;
+    }
+    
+    button {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    #main-menu h1 {
+        font-size: 3rem;
+    }
+    
+    .spell-button, .choice-button {
+        margin: 0.3rem;
+        padding: 0.6rem 1rem;
+    }
+    
+    #battle-stats {
+        width: 90%;
+    }
+}

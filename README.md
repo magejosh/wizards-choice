@@ -1,8 +1,6 @@
-# Wizard's Choice - README
+# Wizard's Choice Web Application
 
-## Overview
-
-Wizard's Choice is a tactical choice-driven wizard duel game where strategic spell selection shapes your path to magical supremacy. This browser-based game features fast decisions, spell progression trees, and engaging magical battles with responsive visuals powered by ThreeJS.
+This is the web version of the Wizard's Choice game, a tactical choice-driven wizard duel game where strategic spell selection shapes your path to magical supremacy.
 
 ## Features
 
@@ -12,84 +10,45 @@ Wizard's Choice is a tactical choice-driven wizard duel game where strategic spe
 - **Immersive Visuals**: Experience magical duels with ThreeJS-powered visuals and spell effects
 - **Achievement System**: Earn achievements by accomplishing specific goals in the game
 
-## Installation
+## Technologies Used
 
-1. Clone the repository:
-```
-git clone https://github.com/yourusername/wizards-choice.git
-```
+- **Next.js**: React framework for production-ready applications
+- **ThreeJS**: 3D rendering library for immersive visuals
+- **Tailwind CSS**: Utility-first CSS framework for responsive design
+- **Cloudflare Workers**: For serverless deployment and global distribution
 
-2. Navigate to the project directory:
-```
-cd wizards-choice
-```
+## Getting Started
 
-3. Install dependencies:
-```
+### Development
+
+1. Clone the repository
+2. Install dependencies:
+```bash
 npm install
 ```
-
-4. Start the development server:
-```
+3. Start the development server:
+```bash
 npm run dev
 ```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-5. Open your browser and navigate to `http://localhost:8080`
+### Production Build
 
-## Building for Production
-
-To build the project for production:
-
-```
+```bash
 npm run build
 ```
 
-The built files will be in the `dist` directory.
+## Deployment
+
+This application is configured for deployment on Cloudflare Pages. See the [deployment guide](./docs/deployment_guide.md) for detailed instructions.
 
 ## Documentation
 
-- [Game Design Document](./docs/game_design_document.md): Detailed design specifications
-- [Code Documentation](./docs/code_documentation.md): Technical documentation of the codebase
-- [User Guide](./docs/user_guide.md): Instructions for players
-
-## Project Structure
-
-```
-wizards-choice/
-├── src/
-│   ├── js/
-│   │   ├── core/           # Core game mechanics
-│   │   ├── managers/       # Game management systems
-│   │   ├── ui/             # User interface components
-│   │   ├── testing/        # Testing and debugging utilities
-│   │   └── main.js         # Main entry point
-│   ├── css/                # Styling
-│   ├── assets/             # Game assets
-│   └── index.html          # Main HTML file
-├── docs/                   # Documentation
-└── package.json            # Project configuration
-```
-
-## Technologies Used
-
-- **ThreeJS**: For 3D rendering and visual effects
-- **JavaScript (ES6+)**: Core programming language
-- **HTML5/CSS3**: For structure and styling
-- **Webpack**: For bundling and building
-
-## Future Development
-
-The game is designed with future expansion in mind:
-- Multiplayer functionality
-- Additional spell elements and tiers
-- Tournament mode
-- Custom spell creation
+- [Game Design Document](./docs/game_design_document.md)
+- [Code Documentation](./docs/code_documentation.md)
+- [User Guide](./docs/user_guide.md)
+- [Deployment Guide](./docs/deployment_guide.md)
 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Inspired by choice-driven tactical games like Reigns
-- Special thanks to the ThreeJS community for their excellent documentation and examples

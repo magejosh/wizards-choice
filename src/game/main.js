@@ -1,11 +1,11 @@
 // Main entry point for Wizard's Choice game
 
-import { GameManager } from './managers/GameManager.js';
-import EnhancedUIManager from './ui/EnhancedUIManager.js';
+import { AudioManager } from './managers/AudioManager.js';
+import { GameStateManager } from './managers/GameStateManager.js';
+import { ProgressionSystem } from './core/ProgressionSystem.js';
 import { SceneManager } from './managers/SceneManager.js';
 import EnhancedSpellSystem from './core/EnhancedSpellSystem.js';
-import { AudioManager } from './managers/AudioManager.js';
-import { ProgressionSystem } from './core/ProgressionSystem.js';
+import EnhancedUIManager from './ui/EnhancedUIManager.js';
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Initializing game...');
         
         // Initialize game managers
-        const gameManager = new GameManager();
+        const gameStateManager = new GameStateManager();
         const uiManager = new EnhancedUIManager();
         const sceneManager = new SceneManager();
         const spellSystem = new EnhancedSpellSystem();
@@ -104,10 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const progressionSystem = new ProgressionSystem(spellSystem);
         
         // Expose game manager for debugging
-        window.gameManager = gameManager;
+        window.gameStateManager = gameStateManager;
         
         // Connect managers
-        gameManager.init(uiManager, sceneManager, spellSystem, audioManager, progressionSystem);
+        gameStateManager.init(uiManager, sceneManager, spellSystem, progressionSystem);
         
         // Show loading screen
         uiManager.showScreen('loading-screen');
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Set up event listeners for main menu
             document.getElementById('start-game').addEventListener('click', () => {
-                gameManager.startNewGame();
+                gameStateManager.startNewGame();
             });
             
             document.getElementById('options').addEventListener('click', () => {

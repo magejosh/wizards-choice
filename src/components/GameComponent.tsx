@@ -16,7 +16,7 @@ export default function GameComponent() {
   const [gameState, setGameState] = useState({
     isInitialized: false,
     currentScreen: 'loading',
-    gameManager: null as any | null,
+    gameStateManager: null as any | null,
     sceneManager: null as any | null,
     uiManager: null as any | null,
     spellSystem: null as any | null,
@@ -38,7 +38,7 @@ export default function GameComponent() {
         }
         
         // Create managers
-        const gameManager = new (await import('../game/managers/GameManager')).default()
+        const gameStateManager = new (await import('../game/managers/GameStateManager')).default()
         const sceneManager = new (await import('../game/managers/SceneManager')).SceneManager()
         const uiManager = new (await import('../game/ui/EnhancedUIManager')).default()
         const spellSystem = new (await import('../game/core/EnhancedSpellSystem')).default()
@@ -56,11 +56,11 @@ export default function GameComponent() {
         // Initialize progression system
         await progressionSystem.init(spellSystem)
         
-        // Initialize game manager with all dependencies
-        await gameManager.init(uiManager, sceneManager, spellSystem, progressionSystem, battleSceneContainer)
+        // Initialize game state manager with all dependencies
+        await gameStateManager.init(uiManager, sceneManager, spellSystem, progressionSystem, battleSceneContainer)
         
         // Set up state change handler
-        gameManager.onStateChange = (newState: string) => {
+        gameStateManager.onStateChange = (newState: string) => {
           console.log(`Game state changed to: ${newState}`)
           if (newState === 'battle' || newState === 'spell-cast' || newState === 'turn-end') {
             // Update player spells when battle starts, a spell is cast, or turn ends (new card drawn)
@@ -87,7 +87,7 @@ export default function GameComponent() {
         
         // Make game instance available globally for debugging
         window.gameInstance = {
-          gameManager,
+          gameStateManager,
           sceneManager,
           uiManager,
           spellSystem,
@@ -98,7 +98,7 @@ export default function GameComponent() {
         setGameState({
           isInitialized: true,
           currentScreen: 'main-menu',
-          gameManager,
+          gameStateManager,
           sceneManager,
           uiManager,
           spellSystem,
@@ -142,9 +142,9 @@ export default function GameComponent() {
 
   // Effect to connect spell buttons after component renders
   useEffect(() => {
-    if (gameState.isInitialized && gameState.gameManager) {
+    if (gameState.isInitialized && gameState.gameStateManager) {
       // Connect UI elements
-      gameState.gameManager.setupEventListeners()
+      gameState.gameStateManager.setupEventListeners()
       
       // Add click event listeners to spell buttons
       const spellButtons = document.querySelectorAll('.spell-button')
@@ -152,11 +152,11 @@ export default function GameComponent() {
         button.addEventListener('click', (e) => {
           const target = e.currentTarget as HTMLElement
           const spellId = target.getAttribute('data-spell-id')
-          if (spellId && gameState.gameManager) {
+          if (spellId && gameState.gameStateManager) {
             console.log(`Attempting to cast spell with ID: ${spellId}`);
             console.log(`Current player spells in React state:`, gameState.playerSpells);
             console.log(`Current player spell hand in SpellSystem:`, gameState.spellSystem.getPlayerSpellHand());
-            gameState.gameManager.playerCastSpell(spellId)
+            gameState.gameStateManager.playerCastSpell(spellId)
           }
         })
       })
@@ -179,7 +179,7 @@ export default function GameComponent() {
       }
       
       // Update spell button states initially
-      gameState.gameManager.updateSpellButtonStates()
+      gameState.gameStateManager.updateSpellButtonStates()
     }
   }, [gameState.isInitialized, gameState.playerSpells])
 

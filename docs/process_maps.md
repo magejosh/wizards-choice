@@ -7,19 +7,19 @@ This document contains process maps for the Wizard's Choice game, visualizing th
 ```mermaid
 graph TD
     A[Main Entry] --> B[GameManager]
-    B --> C[SpellSystem]
+    B --> C[EnhancedSpellSystem]
     B --> D[UIManager]
     B --> E[SceneManager]
     B --> F[AudioManager]
     B --> G[ProgressionSystem]
     
-    C --> C1[Spell Definitions]
-    C --> C2[Spell Hand Management]
-    C --> C3[Progression Tracking]
+    C --> C1[SpellDefinitions]
+    C --> C2[SpellHandManager]
+    C --> C3[SpellProgressionTracker]
     
-    D --> D1[Screen Management]
-    D --> D2[UI Elements]
-    D --> D3[Event Listeners]
+    D --> D1[ScreenManager]
+    D --> D2[UIElementManager]
+    D --> D3[UIEventManager]
     
     E --> E1[ThreeJS Scene]
     E --> E2[Visual Effects]
@@ -48,25 +48,36 @@ graph TD
 sequenceDiagram
     participant Main as main.js
     participant GM as GameManager
-    participant UI as UIManager
-    participant SS as SpellSystem
+    participant UI as EnhancedUIManager
+    participant SS as EnhancedSpellSystem
+    participant SD as SpellDefinitions
+    participant SH as SpellHandManager
+    participant SP as SpellProgressionTracker
     participant PS as ProgressionSystem
     participant SM as SceneManager
     participant AM as AudioManager
     
     Main->>GM: new GameManager()
-    Main->>UI: new UIManager()
+    Main->>UI: new EnhancedUIManager()
     Main->>SM: new SceneManager()
-    Main->>SS: new SpellSystem()
+    Main->>SS: new EnhancedSpellSystem()
     Main->>AM: new AudioManager()
     Main->>PS: new ProgressionSystem(spellSystem)
     
-    Main->>GM: init(uiManager, sceneManager, spellSystem, audioManager, progressionSystem)
+    SS->>SD: new SpellDefinitions()
+    SS->>SS: Initialize internal components
+    
+    Main->>GM: init(uiManager, sceneManager, spellSystem, progressionSystem)
     Main->>UI: showScreen('loading-screen')
     
     par Initialize Assets
         Main->>SM: init()
         Main->>SS: init()
+        SS->>SD: init()
+        SS->>SP: new SpellProgressionTracker(spellDefinitions)
+        SS->>SH: new SpellHandManager(spellDefinitions)
+        SS->>SP: init()
+        SS->>SS: loadProgress()
         Main->>AM: init()
     end
     
@@ -117,50 +128,53 @@ stateDiagram-v2
 
 ```mermaid
 flowchart TD
-    A[Initialize Spell System] --> B[Define Spells]
-    B --> C[Load Player Progress]
-    C --> D{First Time?}
-    D -->|Yes| E[Unlock Starter Spells]
-    D -->|No| F[Restore Saved Spells]
+    A[Initialize EnhancedSpellSystem] --> B[Initialize SpellDefinitions]
+    B --> C[Define Spells]
+    C --> D[Initialize SpellProgressionTracker]
+    D --> E[Initialize SpellHandManager]
+    E --> F[Load Player Progress]
+    F --> G{First Time?}
+    G -->|Yes| H[Unlock Starter Spells]
+    G -->|No| I[Restore Saved Spells]
     
-    E --> G[Start Battle]
-    F --> G
+    H --> J[Start Battle]
+    I --> J
     
-    G --> H[Select Battle Spells]
-    H --> I[Initialize Spell Hand]
-    I --> J[Player's Turn]
+    J --> K[Select Battle Spells]
+    K --> L[Initialize Spell Hand]
+    L --> M[Player's Turn]
     
-    J --> K[Cast Spell]
-    K --> L[Remove from Hand]
-    L --> M[Apply Spell Effects]
-    M --> N[End Turn]
+    M --> N[Cast Spell]
+    N --> O[Remove from Hand]
+    O --> P[Apply Spell Effects]
+    P --> Q[End Turn]
     
-    N --> O{Hand Size < 3?}
-    O -->|Yes| P[Draw New Spell]
-    O -->|No| Q[AI Turn]
+    Q --> R{Hand Size < 3?}
+    R -->|Yes| S[Draw New Spell]
+    R -->|No| T[AI Turn]
     
-    P --> Q
-    Q --> R[AI Cast Spell]
-    R --> S[AI End Turn]
+    S --> T
+    T --> U[AI Cast Spell]
+    U --> V[AI End Turn]
     
-    S --> T{Player's Hand Size < 3?}
-    T -->|Yes| U[Draw New Spell]
-    T -->|No| V[New Turn]
+    V --> W{Player's Hand Size < 3?}
+    W -->|Yes| X[Draw New Spell]
+    W -->|No| Y[New Turn]
     
-    U --> V
-    V --> W{Battle End?}
-    W -->|No| J
-    W -->|Yes| X[Process Battle Result]
+    X --> Y
+    Y --> Z{Battle End?}
+    Z -->|No| M
+    Z -->|Yes| AA[Process Battle Result]
     
-    X --> Y[Award XP]
-    Y --> Z[Unlock New Spells]
-    Z --> AA[Return to Menu]
+    AA --> AB[Award XP]
+    AB --> AC[Unlock New Spells]
+    AC --> AD[Return to Menu]
     
     style A fill:#f9f,stroke:#333,stroke-width:2px
-    style G fill:#bbf,stroke:#333,stroke-width:2px
-    style J fill:#bfb,stroke:#333,stroke-width:2px
-    style Q fill:#fbf,stroke:#333,stroke-width:2px
-    style X fill:#bbf,stroke:#333,stroke-width:2px
+    style J fill:#bbf,stroke:#333,stroke-width:2px
+    style M fill:#bfb,stroke:#333,stroke-width:2px
+    style T fill:#fbf,stroke:#333,stroke-width:2px
+    style AA fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
 ## UI System Process
@@ -300,23 +314,63 @@ graph TD
 
 ```mermaid
 graph TD
-    A[Duplicate Code] --> B[src/game/* vs src/js/*]
-    A --> C[Redundant Logic in GameManager]
-    A --> D[Overlapping UI Management]
+    A[Completed Refactoring] --> B[Removed src/js/* duplication]
+    A --> C[Modularized GameManager]
+    A --> D[Modularized EnhancedSpellSystem]
+    A --> E[Modularized UIManager]
     
-    E[Code Bloat] --> F[EnhancedSpellSystem.js - 964 lines]
-    E --> G[GameManager.js - 1440 lines]
-    E --> H[EnhancedUIManager.js - 886 lines]
+    F[Remaining Code Improvements] --> G[Unused functions and variables]
+    F --> H[Commented-out code]
+    F --> I[Duplicate logic across components]
+    F --> J[Large functions to break down]
     
-    I[Disconnected Components] --> J[Unused Files in src/js]
-    I --> K[Duplicate HTML Structure]
+    K[Performance Optimizations] --> L[ThreeJS rendering]
+    K --> M[Asset preloading]
+    K --> N[Spell effect animations]
+    K --> O[Memory management]
     
-    L[Refactoring Opportunities] --> M[Split EnhancedSpellSystem]
-    L --> N[Modularize GameManager]
-    L --> O[Consolidate UI Logic]
+    P[Documentation Updates] --> Q[Code documentation]
+    P --> R[JSDoc comments]
+    P --> S[User guide improvements]
+    P --> T[Developer documentation]
     
-    style A fill:#f99,stroke:#333,stroke-width:2px
-    style E fill:#f99,stroke:#333,stroke-width:2px
-    style I fill:#f99,stroke:#333,stroke-width:2px
-    style L fill:#9f9,stroke:#333,stroke-width:2px
+    style A fill:#9f9,stroke:#333,stroke-width:2px
+    style F fill:#f99,stroke:#333,stroke-width:2px
+    style K fill:#f99,stroke:#333,stroke-width:2px
+    style P fill:#f99,stroke:#333,stroke-width:2px
 ```
+
+## Completed Refactoring Structure
+
+```mermaid
+graph TD
+    A[Main Entry] --> B[GameStateManager]
+    B --> C[BattleManager]
+    B --> D[PlayerManager]
+    
+    E[EnhancedSpellSystem] --> F[SpellDefinitions]
+    E --> G[SpellHandManager]
+    E --> H[SpellProgressionTracker]
+    
+    I[EnhancedUIManager] --> J[ScreenManager]
+    I --> K[UIElementManager]
+    I --> L[UIEventManager]
+    
+    B --> E
+    B --> I
+    B --> M[SceneManager]
+    B --> N[AudioManager]
+    B --> O[ProgressionSystem]
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#bbf,stroke:#333,stroke-width:2px
+    style C fill:#bfb,stroke:#333,stroke-width:2px
+    style D fill:#bfb,stroke:#333,stroke-width:2px
+    style E fill:#fbf,stroke:#333,stroke-width:2px
+    style F fill:#dfd,stroke:#333,stroke-width:2px
+    style G fill:#dfd,stroke:#333,stroke-width:2px
+    style H fill:#dfd,stroke:#333,stroke-width:2px
+    style I fill:#fbb,stroke:#333,stroke-width:2px
+    style J fill:#fdd,stroke:#333,stroke-width:2px
+    style K fill:#fdd,stroke:#333,stroke-width:2px
+    style L fill:#fdd,stroke:#333,stroke-width:2px

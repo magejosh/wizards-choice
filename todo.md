@@ -1,86 +1,56 @@
-# Wizard's Choice Game Development Todo
+# Wizard's Choice - Sequential Implementation Plan
 
-## Completed Tasks
-- [x] Create basic directory structure
-- [x] Initialize package.json and install dependencies
-- [x] Set up ThreeJS
-- [x] Create initial HTML, CSS, and JS files
-- [x] Set up development environment
-- [x] Write game overview and concept
-- [x] Define core mechanics
-- [x] Design spell system
-- [x] Create progression system
-- [x] Document UI/UX design
-- [x] Plan for future multiplayer expansion
-- [x] Implement game state management
-- [x] Create duel system
-- [x] Implement choice-based gameplay
-- [x] Add basic game loop
-- [x] Design main game interface
-- [x] Create wizard character visuals
-- [x] Implement spell effects
-- [x] Design responsive layout
-- [x] Implement spell trees
-- [x] Create spell selection interface
-- [x] Add progression based on duel outcomes
-- [x] Balance spell effectiveness
-- [x] Create AI decision-making logic
-- [x] Implement different AI difficulty levels
-- [x] Add variety to AI strategies
-- [x] Test game mechanics
-- [x] Debug UI issues
-- [x] Test on different browsers
-- [x] Optimize performance
-- [x] Complete code documentation
-- [x] Finalize game design document
-- [x] Create user guide
-- [x] Prepare for delivery
-
-## Current Priority Tasks (Spell System and Battle Flow)
-
-### 1. Fix Spell Selection and Hand Management
-- [x] Fix the spell selection screen to properly allow players to select 3 spells for battle
-- [x] Ensure selected spells are correctly added to the player's hand at battle start
-- [x] Fix the UI to display only the spells in the player's current hand
-
-### 2. Implement Card Drawing Mechanics
-- [x] Implement drawing a new card at the beginning of each turn if hand size < 3
-- [x] Ensure spells are properly removed from hand after casting
-- [x] Implement reshuffling of discarded spells back into the deck
-
-### 3. Fix Experience and Level-Up System
-- [x] Implement proper experience gain based on difficulty (10x for easy, 25x for normal, 50x for hard)
-- [x] Create level-up notification and spell selection screen
-- [x] Implement offering 3 new spells to learn (1 from defeated enemy, 2 random)
-- [x] Allow improving existing spells if player selects a spell they already know
-
-### 4. UI Improvements
-- [x] Add visual indicators for card drawing and discarding
-- [x] Improve battle log to show spell casting and effects clearly
-- [x] Add turn indicators and mana regeneration notifications
-- [ ] Add level-up and experience gain animations
-
-### 5. Bug Fixes
-- [x] Fix "Spell not in player's hand" error
-- [x] Ensure proper initialization of spell hand at battle start
-- [x] Fix any issues with spell casting and effect application
-- [x] Ensure proper state management between battles
-
-### 7. Testing and Refinement
-- [ ] Test the full game flow from start to finish
-- [ ] Test level-up and spell selection mechanics
-- [ ] Test spell improvement mechanics
-- [ ] Ensure proper difficulty scaling
-
-### 8. Code Refactoring and Cleanup
-- [x] Remove duplicate files in src/js/core in favor of src/game/core
-- [x] Create redirection from src/js/main.js to src/game/main.js for HTML compatibility
-- [x] Remove duplicate files in src/js/ui in favor of src/game/ui
-- [x] Create redirection from src/js/ui files to their corresponding src/game/ui files
-- [ ] Standardize import paths across the codebase
-- [ ] Remove any unused code and files
-
-### 6. Documentation Updates
-- [ ] Update code documentation to reflect changes
-- [ ] Update user guide with clearer instructions on spell selection and battle flow
-- [ ] Add debugging information for common issues
+1. [x] Create list of all files in src/js/* directories
+2. [x] Verify that all functionality in src/js/* is already present in corresponding src/game/* files
+3. [x] Find and update all import statements throughout the codebase to reference src/game/* paths instead of src/js/* paths
+4. [x] Test application to ensure all functionality works after import path updates
+5. [x] Remove all src/js/* directories and files after verifying functionality
+6. [x] Update build process to reflect the consolidated structure
+7. [ ] Define import standards (e.g., absolute vs. relative paths)
+8. [ ] Update all import paths to follow the defined standard
+9. [ ] Split EnhancedSpellSystem.js into:
+   - [ ] SpellDefinitions.js - spell catalog and attributes
+   - [ ] SpellHandManager.js - deck and hand management
+   - [ ] SpellProgressionTracker.js - unlocking and improvement
+10. [ ] Update imports for the new modular spell system
+11. [ ] Split GameManager.js into:
+    - [ ] BattleManager.js - battle flow and turn processing
+    - [ ] PlayerManager.js - player state and actions
+    - [ ] GameStateManager.js - overall game state
+12. [ ] Update imports for the new modular game management system
+13. [ ] Refactor EnhancedUIManager.js into:
+    - [ ] ScreenManager.js - screen transitions
+    - [ ] UIElementManager.js - UI element creation and updating
+    - [ ] UIEventManager.js - event handling for UI elements
+14. [ ] Update imports for the new modular UI system
+15. [ ] Identify unused functions and variables using static analysis
+16. [ ] Remove or comment unused code
+17. [ ] Remove commented-out code that is no longer needed
+18. [ ] Identify and remove duplicate logic across components
+19. [ ] Optimize large functions by breaking them into smaller, focused functions
+20. [ ] Apply consistent code style across all files
+21. [ ] Design level-up animation storyboard
+22. [ ] Create CSS keyframes for level-up animation
+23. [ ] Implement level-up notification with animation in UIManager
+24. [ ] Design experience gain animation storyboard
+25. [ ] Create CSS keyframes for experience gain animation
+26. [ ] Implement experience gain animation in ProgressionSystem
+27. [ ] Connect animation triggers to relevant game events
+28. [ ] Test animations on different screen sizes
+29. [ ] Optimize animation performance
+30. [ ] Profile application to identify performance bottlenecks
+31. [ ] Optimize ThreeJS rendering in SceneManager
+32. [ ] Implement asset preloading for faster transitions
+33. [ ] Optimize spell effect animations for better performance
+34. [ ] Implement memory management improvements
+35. [ ] Test and optimize for mobile devices
+36. [ ] Add performance monitoring metrics
+37. [ ] Update code documentation with new modular structure
+38. [ ] Add JSDoc comments to all functions in refactored files
+39. [ ] Update user guide with clear instructions on spell selection
+40. [ ] Add visual guides to user documentation
+41. [ ] Create debugging section in documentation
+42. [ ] Document common issues and their solutions
+43. [ ] Update deployment guide with new build process
+44. [ ] Create developer onboarding documentation
+45. [ ] Update process maps to reflect new structure

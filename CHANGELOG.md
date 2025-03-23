@@ -7,6 +7,8 @@
 - Spell improvement system for already known spells
 - Experience gain based on difficulty (10x for easy, 25x for normal, 50x for hard)
 - Card drawing at the beginning of each turn to refill player's hand
+- Comprehensive process maps in Mermaid diagram format to visualize game architecture
+- Restructured todo.md with a sequential implementation plan for remaining tasks
 
 ### Changed
 - Refactored project structure to remove duplicate files in src/js/core and src/js/ui

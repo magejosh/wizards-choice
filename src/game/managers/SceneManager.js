@@ -43,9 +43,13 @@ export class SceneManager {
             preserveDrawingBuffer: true
         });
         
-        // Get initial container dimensions
-        const containerWidth = container ? container.clientWidth : 800;
-        const containerHeight = container ? container.clientHeight : 600;
+        // Get initial container dimensions with fallbacks
+        let containerWidth = container && container.clientWidth ? container.clientWidth : 800;
+        let containerHeight = container && container.clientHeight ? container.clientHeight : 600;
+        
+        // Enforce minimum dimensions
+        containerWidth = Math.max(containerWidth, 300);
+        containerHeight = Math.max(containerHeight, 200);
         
         // Set initial size based on container dimensions
         this.renderer.setSize(containerWidth, containerHeight, true);
@@ -175,27 +179,61 @@ export class SceneManager {
     
     // Add a method to resize the renderer based on the container
     resizeRenderer() {
-        // Get the actual dimensions of the container
-        const containerWidth = this.container ? this.container.clientWidth : window.innerWidth * 0.6;
-        const containerHeight = this.container ? this.container.clientHeight : window.innerHeight * 0.6;
-        
-        // Only resize if dimensions are valid
-        if (containerWidth > 0 && containerHeight > 0) {
-            console.log(`Resizing renderer to ${containerWidth}x${containerHeight}`);
-            
-            // Update camera aspect ratio
-            this.camera.aspect = containerWidth / containerHeight;
-            this.camera.updateProjectionMatrix();
-            
-            // Set renderer size to match container
-            this.renderer.setSize(containerWidth, containerHeight, true);
-            
-            // Ensure the pixel ratio is set correctly for high-DPI displays
-            const pixelRatio = window.devicePixelRatio || 1;
-            this.renderer.setPixelRatio(pixelRatio);
-        } else {
-            console.warn('Battle scene container has invalid dimensions');
+        // Safety check - do nothing if renderer or camera isn't initialized
+        if (!this.renderer || !this.camera) {
+            console.warn('Cannot resize: renderer or camera not initialized');
+            return;
         }
+        
+        // Get the actual dimensions of the container with fallbacks
+        let containerWidth = 800;
+        let containerHeight = 600;
+        
+        if (this.container) {
+            // Only use clientWidth/Height if they exist and are positive numbers
+            if (this.container.clientWidth && this.container.clientWidth > 0) {
+                containerWidth = this.container.clientWidth;
+            } else {
+                containerWidth = window.innerWidth * 0.6;
+                console.warn('Invalid container width, using fallback: ' + containerWidth);
+            }
+            
+            if (this.container.clientHeight && this.container.clientHeight > 0) {
+                containerHeight = this.container.clientHeight;
+            } else {
+                containerHeight = window.innerHeight * 0.6;
+                console.warn('Invalid container height, using fallback: ' + containerHeight);
+            }
+        } else {
+            // If no container, use default sizes
+            containerWidth = window.innerWidth * 0.6;
+            containerHeight = window.innerHeight * 0.6;
+        }
+        
+        // Enforce minimum dimensions to prevent rendering issues
+        containerWidth = Math.max(containerWidth, 300);
+        containerHeight = Math.max(containerHeight, 200);
+        
+        // Set a fixed size for battle scenes for consistency
+        if (this.container && this.container.id === 'battle-scene') {
+            const aspectRatio = 16 / 9;
+            containerHeight = Math.min(containerHeight, containerWidth / aspectRatio);
+            containerWidth = containerHeight * aspectRatio;
+        }
+        
+        // Debug logging
+        console.log(`Resizing renderer to ${containerWidth}x${containerHeight}`);
+        
+        // Update camera aspect ratio
+        this.camera.aspect = containerWidth / containerHeight;
+        this.camera.updateProjectionMatrix();
+        
+        // Set renderer size to match container
+        this.renderer.setSize(containerWidth, containerHeight, true);
+        
+        // Ensure the pixel ratio is set correctly for high-DPI displays
+        const pixelRatio = window.devicePixelRatio || 1;
+        this.renderer.setPixelRatio(pixelRatio);
     }
     
     createPlayerWizard() {

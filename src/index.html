@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
     <title>Wizard's Choice</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/enhanced-style.css">
 </head>
 <body>
     <div id="game-container">
@@ -27,8 +29,30 @@
                 <div id="opponent-mana"></div>
             </div>
             <div id="battle-scene"></div>
+            <div id="battle-info" class="battle-info">
+                <h3>Battle Info</h3>
+                <div class="info-row">
+                    <span class="info-label">Turn:</span>
+                    <span class="info-value" id="turn-counter">1</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Spells Cast:</span>
+                    <span class="info-value" id="spells-cast">0</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Last Action:</span>
+                    <span class="info-value" id="last-action">Battle started</span>
+                </div>
+            </div>
             <div id="spell-choices"></div>
             <div id="battle-log"></div>
+            <div id="menu-button-container">
+                <button id="menu-button" class="menu-button" aria-label="Menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
         <div id="game-over" class="hidden">
             <h2 id="result-message"></h2>
@@ -36,7 +60,62 @@
             <button id="play-again">Play Again</button>
             <button id="return-to-menu">Return to Menu</button>
         </div>
+        <div id="spell-selection-screen" class="hidden">
+            <h2>Choose Your Spells</h2>
+            <p>Select 3 spells to add to your hand for this battle:</p>
+            <div id="available-spells-container" class="horizontal-cards"></div>
+            <div class="spell-selection-footer">
+                <span id="spells-selected-counter">0/3 Spells Selected</span>
+                <button id="start-battle-button" disabled>Start Battle</button>
+            </div>
+        </div>
+        <div id="results-screen" class="hidden">
+            <h2>Battle Results</h2>
+            <div id="result-content"></div>
+            <div id="experience-gained"></div>
+            <div id="level-progress" class="level-progress">
+                <div class="xp-bar">
+                    <div class="xp-fill"></div>
+                </div>
+                <div class="level-label">Level: <span id="current-level">1</span></div>
+            </div>
+            <div id="unlocked-spells"></div>
+            <button id="continue-button">Continue</button>
+        </div>
+        
+        <div id="level-up-spell-selection" class="hidden">
+            <h2>Level Up!</h2>
+            <p>You've reached level <span id="new-level">2</span>! Choose a new spell to learn:</p>
+            <div id="new-spell-options" class="horizontal-cards"></div>
+            <div class="spell-selection-footer">
+                <button id="confirm-spell-selection" disabled>Learn Spell</button>
+            </div>
+        </div>
+        <div id="settings-screen" class="hidden">
+            <div class="settings-content">
+                <h2>Settings</h2>
+                <div class="settings-options">
+                    <div class="setting-option">
+                        <label for="music-volume">Music Volume:</label>
+                        <input type="range" id="music-volume" name="music-volume" min="0" max="100" value="50">
+                    </div>
+                    <div class="setting-option">
+                        <label for="sfx-volume">Sound Effects Volume:</label>
+                        <input type="range" id="sfx-volume" name="sfx-volume" min="0" max="100" value="70">
+                    </div>
+                    <div class="setting-option">
+                        <label for="difficulty-select">Difficulty:</label>
+                        <select id="difficulty-select" name="difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="close-settings-btn" class="menu-button">Back to Menu</button>
+            </div>
+        </div>
     </div>
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="game/main.js"></script>
 </body>
 </html>

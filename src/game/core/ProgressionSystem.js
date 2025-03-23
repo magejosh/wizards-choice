@@ -39,7 +39,7 @@ export class ProgressionSystem {
     }
     
     getCurrentTier() {
-        const wins = this.spellSystem.getPlayerProgress().wins;
+        const wins = this.getPlayerProgress().stats?.wins || 0;
         
         // Find the highest tier the player qualifies for
         for (let i = this.progressionTiers.length - 1; i >= 0; i--) {
@@ -70,7 +70,7 @@ export class ProgressionSystem {
             return 0; // Already at max tier
         }
         
-        const wins = this.spellSystem.getPlayerProgress().wins;
+        const wins = this.getPlayerProgress().stats?.wins || 0;
         return nextTier.requiredWins - wins;
     }
     
@@ -86,6 +86,32 @@ export class ProgressionSystem {
         // Update win streak
         if (won) {
             this.currentWinStreak++;
+            
+            // Calculate experience gain based on difficulty
+            const playerLevel = this.spellSystem.getPlayerProgress().level || 1;
+            let experienceGained = 0;
+            
+            switch (difficulty) {
+                case 'easy':
+                    experienceGained = 10 * playerLevel;
+                    break;
+                case 'normal':
+                    experienceGained = 25 * playerLevel;
+                    break;
+                case 'hard':
+                    experienceGained = 50 * playerLevel;
+                    break;
+                default:
+                    experienceGained = 25 * playerLevel; // Default to normal
+            }
+            
+            console.log(`Player earned ${experienceGained} experience points from ${difficulty} difficulty battle`);
+            
+            // Add experience to player
+            const leveledUp = this.spellSystem.addExperience(experienceGained);
+            if (leveledUp) {
+                console.log('Player leveled up!');
+            }
         } else {
             this.currentWinStreak = 0;
         }
@@ -125,11 +151,11 @@ export class ProgressionSystem {
     
     checkAchievements(won) {
         this.newlyUnlockedAchievements = [];
-        const progress = this.spellSystem.getPlayerProgress();
+        const progress = this.getPlayerProgress();
         const unlockedSpells = this.spellSystem.getUnlockedSpells();
         
         // Check first win achievement
-        if (won && progress.wins === 1) {
+        if (won && progress.stats?.wins === 1) {
             this.unlockAchievement('first_win');
         }
         
@@ -256,7 +282,7 @@ export class ProgressionSystem {
     }
     
     getProgressSummary() {
-        const progress = this.spellSystem.getPlayerProgress();
+        const progress = this.getPlayerProgress();
         const currentTier = this.getCurrentTier();
         const nextTier = this.getNextTier();
         const unlockedSpells = this.spellSystem.getUnlockedSpells();
@@ -264,10 +290,10 @@ export class ProgressionSystem {
         
         return {
             tier: currentTier.name,
-            wins: progress.wins,
-            losses: progress.losses,
-            winRate: progress.wins + progress.losses > 0 
-                ? Math.round((progress.wins / (progress.wins + progress.losses)) * 100) 
+            wins: progress.stats?.wins || 0,
+            losses: progress.stats?.losses || 0,
+            winRate: (progress.stats?.wins || 0) + (progress.stats?.losses || 0) > 0 
+                ? Math.round(((progress.stats?.wins || 0) / ((progress.stats?.wins || 0) + (progress.stats?.losses || 0))) * 100) 
                 : 0,
             spellsUnlocked: unlockedSpells.length,
             totalSpells: Object.keys(this.spellSystem.spells).length,
@@ -277,5 +303,10 @@ export class ProgressionSystem {
             winsUntilNextTier: this.getWinsUntilNextTier(),
             currentWinStreak: this.currentWinStreak
         };
+    }
+    
+    // Get the player progress data from the spell system
+    getPlayerProgress() {
+        return this.spellSystem.getPlayerProgress();
     }
 }

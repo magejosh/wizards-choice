@@ -9,18 +9,23 @@ This document provides comprehensive documentation for the Wizard's Choice game 
 ```
 wizards-choice/
 ├── src/
+│   ├── game/
+│   │   ├── core/          # Core game systems (spell, progression)
+│   │   ├── managers/      # Game managers (game, scene, UI, audio)
+│   │   ├── ui/            # UI-related components
+│   │   └── main.js        # Main entry point for the game
+│   ├── css/               # CSS files for styling
 │   ├── js/
-│   │   ├── core/           # Core game mechanics
-│   │   ├── managers/       # Game management systems
-│   │   ├── ui/             # User interface components
-│   │   ├── testing/        # Testing and debugging utilities
-│   │   └── main.js         # Main entry point
-│   ├── css/                # Styling
-│   ├── assets/             # Game assets
-│   └── index.html          # Main HTML file
+│   │   └── main.js        # Redirection to game/main.js for HTML compatibility
+│   ├── assets/            # Game assets (images, sounds)
+│   ├── styles/            # Additional CSS styles
+│   ├── index.html         # Main HTML file
+│   └── debug.html         # Debug version with additional tools
 ├── docs/                   # Documentation
 └── package.json            # Project configuration
 ```
+
+> Note: The `src/js/core` and `src/js/ui` directories have been refactored to use the files in `src/game/core` and `src/game/ui` respectively, with redirection files in place to maintain compatibility.
 
 ## Core Modules
 
@@ -66,15 +71,21 @@ The `GameLoop` class ties all systems together and provides the foundation for t
 
 ### EnhancedSpellSystem.js
 
-The `EnhancedSpellSystem` class handles spell creation, selection, progression, and unlocking.
+The `EnhancedSpellSystem` class handles spell creation, selection, progression, unlocking, and card drawing mechanics.
 
 **Key Methods:**
 - `init()`: Initializes the spell system
-- `initializeSpellTypes()`: Defines all available spells
-- `initializeSpellTrees()`: Sets up progression paths for spells
-- `unlockNewSpell(difficulty)`: Unlocks a new spell based on difficulty
+- `defineSpells()`: Defines all available spells
 - `getSpellById(spellId)`: Retrieves a spell by its ID
+- `unlockSpell(spellId)`: Unlocks a new spell or improves an existing one
+- `improveSpell(spellId)`: Improves an existing spell by reducing mana cost or increasing effects
 - `saveProgress()`: Saves player progress to local storage
+- `initializeSpellHand()`: Sets up the initial spell hand for battle
+- `refillSpellHand()`: Draws cards to fill the player's hand to maximum size
+- `drawSpellFromDeck()`: Draws a random spell from the deck
+- `removeSpellFromHand(spellId)`: Removes a spell from hand after casting
+- `isSpellInHand(spellId)`: Checks if a spell is in the player's hand
+- `getSpellOptionsForLevelUp(defeatedEnemySpells)`: Gets spell options for level-up (1 from defeated enemy, 2 random)
 
 ### ProgressionSystem.js
 
@@ -83,9 +94,72 @@ The `ProgressionSystem` class manages player progression, spell unlocking, and d
 **Key Methods:**
 - `init(spellSystem)`: Initializes the progression system
 - `getCurrentTier()`: Gets the player's current progression tier
-- `processBattleResult(won, difficulty, usedSpells)`: Processes battle outcomes
+- `processBattleResult(won, difficulty, usedSpells)`: Processes battle outcomes and awards experience based on difficulty
+- `startNewDuel()`: Resets tracking for a new duel
 - `checkAchievements(won)`: Checks for unlocked achievements
+- `unlockAchievement(achievementId)`: Unlocks a specific achievement
 - `getProgressSummary()`: Returns a summary of player progress
+- `getPlayerProgress()`: Gets the player's current progress data
+
+## Managers
+
+### GameManager.js
+
+The `GameManager` class controls game state, battle flow, turn processing, and spell selection.
+
+**Key Methods:**
+- `init()`: Initializes the game manager with all dependencies
+- `startBattle()`: Starts a new battle
+- `showSpellSelectionScreen()`: Shows the spell selection screen before battle
+- `startBattleWithSelectedSpells()`: Starts battle with player's selected spells
+- `playerCastSpell(spellId)`: Handles player casting a spell
+- `processTurnEnd()`: Processes end of turn, including drawing new cards
+- `endBattle(playerWon)`: Handles battle end, rewards, and experience gain
+- `showLevelUpSpellSelection()`: Shows the level-up spell selection screen with options
+- `saveGameState()`: Saves the current game state to local storage
+- `updateBattleUI()`: Updates battle UI elements and renders the player's spell hand during battle
+
+### SceneManager.js
+
+The `SceneManager` class handles 3D scene rendering using ThreeJS.
+
+**Key Methods:**
+- `init()`: Initializes the scene manager
+- `setupBattleScene(player, opponent)`: Sets up the 3D battle scene
+- `playSpellAnimation(caster, spellType)`: Plays a spell casting animation
+- `createImpactEffect(target, effect)`: Creates a spell impact effect
+- `dispose()`: Cleans up resources when scene is no longer needed
+
+### UIManager.js
+
+The `UIManager` class manages UI screens, elements, and interactions.
+
+**Key Methods:**
+- `init()`: Initializes the UI manager
+- `showScreen(screenId)`: Shows a specific screen
+- `hideScreen(screenId)`: Hides a specific screen
+- `updateHealthBars(playerHealth, opponentHealth)`: Updates health bar displays
+- `showNotification(message, type)`: Displays a notification to the player
+
+### AudioManager.js
+
+The `AudioManager` class controls game audio and sound effects.
+
+**Key Methods:**
+- `init()`: Initializes the audio manager
+- `playSound(soundId)`: Plays a sound effect
+- `stopSound(soundId)`: Stops a sound effect
+- `updateVolume(volume)`: Updates the audio volume
+
+### SpellManager.js
+
+The `SpellManager` class manages spell data and availability.
+
+**Key Methods:**
+- `init()`: Initializes the spell manager
+- `getSpellById(spellId)`: Retrieves a spell by its ID
+- `unlockNewSpell(difficulty)`: Unlocks a new spell based on difficulty
+- `saveProgress()`: Saves player progress to local storage
 
 ## AI System
 

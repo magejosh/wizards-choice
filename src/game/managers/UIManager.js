@@ -6,7 +6,9 @@ export class UIManager {
             'loading-screen',
             'main-menu',
             'game-ui',
-            'game-over'
+            'game-over',
+            'spell-selection-screen',
+            'results-screen'
         ];
     }
     

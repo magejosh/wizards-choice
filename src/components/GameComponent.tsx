@@ -21,7 +21,8 @@ export default function GameComponent() {
     uiManager: null as any | null,
     spellSystem: null as any | null,
     progressionSystem: null as any | null,
-    playerSpells: [] as any[]
+    playerSpells: [] as any[],
+    showMenu: false
   })
 
   useEffect(() => {
@@ -61,11 +62,13 @@ export default function GameComponent() {
         // Set up state change handler
         gameManager.onStateChange = (newState: string) => {
           console.log(`Game state changed to: ${newState}`)
-          if (newState === 'battle') {
-            // Update player spells when battle starts
+          if (newState === 'battle' || newState === 'spell-cast' || newState === 'turn-end') {
+            // Update player spells when battle starts, a spell is cast, or turn ends (new card drawn)
+            const playerHand = spellSystem.getPlayerSpellHand();
+            console.log('Updating UI with player hand:', playerHand);
             setGameState(prevState => ({
               ...prevState,
-              playerSpells: spellSystem.getSpellsForDisplay()
+              playerSpells: playerHand
             }))
           }
         }
@@ -100,7 +103,8 @@ export default function GameComponent() {
           uiManager,
           spellSystem,
           progressionSystem,
-          playerSpells: spellSystem.getSpellsForDisplay()
+          playerSpells: [], // Will be populated when battle starts
+          showMenu: false
         })
         
         // Show main menu screen after initialization
@@ -123,6 +127,19 @@ export default function GameComponent() {
     }
   }, [])
 
+  useEffect(() => {
+    // Set up event listeners
+    if (typeof window !== 'undefined') {
+      const menuBtn = document.getElementById('menu-btn');
+      if (menuBtn) {
+        menuBtn.addEventListener('click', () => {
+          // Show a small menu popup
+          setGameState(prevState => ({ ...prevState, showMenu: !prevState.showMenu }));
+        });
+      }
+    }
+  }, [])
+
   // Effect to connect spell buttons after component renders
   useEffect(() => {
     if (gameState.isInitialized && gameState.gameManager) {
@@ -136,6 +153,9 @@ export default function GameComponent() {
           const target = e.currentTarget as HTMLElement
           const spellId = target.getAttribute('data-spell-id')
           if (spellId && gameState.gameManager) {
+            console.log(`Attempting to cast spell with ID: ${spellId}`);
+            console.log(`Current player spells in React state:`, gameState.playerSpells);
+            console.log(`Current player spell hand in SpellSystem:`, gameState.spellSystem.getPlayerSpellHand());
             gameState.gameManager.playerCastSpell(spellId)
           }
         })
@@ -228,16 +248,34 @@ export default function GameComponent() {
           <h1>Settings</h1>
           <div className="settings-options">
             <div className="setting-option">
-              <label>Music Volume</label>
-              <input type="range" min="0" max="100" defaultValue="50" />
+              <label htmlFor="music-volume">Music Volume:</label>
+              <input 
+                type="range" 
+                id="music-volume" 
+                name="music-volume"
+                min="0" 
+                max="100" 
+                defaultValue="50" 
+              />
             </div>
             <div className="setting-option">
-              <label>Sound Effects Volume</label>
-              <input type="range" min="0" max="100" defaultValue="70" />
+              <label htmlFor="sfx-volume">Sound Effects Volume:</label>
+              <input 
+                type="range" 
+                id="sfx-volume" 
+                name="sfx-volume"
+                min="0" 
+                max="100" 
+                defaultValue="70" 
+              />
             </div>
             <div className="setting-option">
-              <label>Difficulty</label>
-              <select defaultValue="normal">
+              <label htmlFor="difficulty-select">Difficulty:</label>
+              <select 
+                id="difficulty-select" 
+                name="difficulty" 
+                defaultValue="normal"
+              >
                 <option value="easy">Easy</option>
                 <option value="normal">Normal</option>
                 <option value="hard">Hard</option>
@@ -294,26 +332,24 @@ export default function GameComponent() {
             <div className="player-stats">
               <div className="player-name">Your Wizard</div>
               <div id="player-health" className="health-bar">
-                <div className="health-label">Health</div>
+                <div className="bar-header">
+                  <span className="bar-label">Health</span>
+                  <span className="bar-value">100/100</span>
+                </div>
                 <div className="health-bar-container">
                   <div className="health-fill"></div>
                   <div className="health-text">100/100</div>
                 </div>
               </div>
               <div id="player-mana" className="mana-bar">
-                <div className="mana-label">Mana</div>
+                <div className="bar-header">
+                  <span className="bar-label">Mana</span>
+                  <span className="bar-value">100/100</span>
+                </div>
                 <div className="mana-bar-container">
                   <div className="mana-fill"></div>
                   <div className="mana-text">100/100</div>
                 </div>
-              </div>
-              <div className="player-level">
-                <span>Level: </span>
-                <span id="player-level-value">1</span>
-              </div>
-              <div className="player-spells-known">
-                <span>Spells Known: </span>
-                <span id="player-spells-count">{gameState.playerSpells.length}</span>
               </div>
             </div>
           </div>
@@ -326,22 +362,28 @@ export default function GameComponent() {
             <div className="opponent-stats">
               <div className="opponent-name">Enemy Wizard</div>
               <div id="opponent-health" className="health-bar">
-                <div className="health-label">Health</div>
+                <div className="bar-header">
+                  <span className="bar-label">Health</span>
+                  <span className="bar-value">100/100</span>
+                </div>
                 <div className="health-bar-container">
                   <div className="health-fill"></div>
                   <div className="health-text">100/100</div>
                 </div>
               </div>
               <div id="opponent-mana" className="mana-bar">
-                <div className="mana-label">Mana</div>
+                <div className="bar-header">
+                  <span className="bar-label">Mana</span>
+                  <span className="bar-value">100/100</span>
+                </div>
                 <div className="mana-bar-container">
                   <div className="mana-fill"></div>
                   <div className="mana-text">100/100</div>
                 </div>
               </div>
-              <div className="opponent-level">
-                <span>Difficulty: </span>
-                <span id="opponent-difficulty">Normal</span>
+              <div className="opponent-difficulty">
+                <span className="difficulty-label">Difficulty:</span>
+                <span id="opponent-difficulty" className="difficulty-value">Normal</span>
               </div>
             </div>
           </div>
@@ -368,16 +410,17 @@ export default function GameComponent() {
                 <div className="log-entry">Battle begins! Choose your spell...</div>
               </div>
             </div>
-            <button id="return-to-menu-btn" className="small-button">Menu</button>
           </div>
           
           {/* Spell Choices */}
           <div id="spell-choices" className="spell-choices">
-            <div className="spells-header">Your Spells</div>
+            <div className="spells-header">
+              <span>Your Spells: <span className="spells-known-count"><span id="player-spells-count">{gameState.playerSpells.length}</span> Known</span></span>
+            </div>
             <div className="spells-list">
               {gameState.playerSpells.map((spell, index) => (
                 <div 
-                  key={spell.id} 
+                  key={spell.instanceId || `${spell.id}_${index}`} 
                   className="spell-button" 
                   data-spell-id={spell.id}
                   style={{ borderColor: getElementColor(spell.element) }}
@@ -397,6 +440,42 @@ export default function GameComponent() {
               ))}
             </div>
           </div>
+        </div>
+        
+        {/* Menu Button (bottom right corner) - smaller icon only version */}
+        <div className="corner-button menu-button-container">
+          <button id="menu-btn" className="icon-button" onClick={() => setGameState(prevState => ({ ...prevState, showMenu: !prevState.showMenu }))}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+            </svg>
+          </button>
+          
+          {/* Menu Popup */}
+          {gameState.showMenu && (
+            <div className="menu-popup">
+              <button className="menu-popup-item" onClick={() => {
+                // Return to main menu
+                setGameState(prevState => ({ ...prevState, showMenu: false }));
+                document.getElementById('main-menu')?.classList.remove('hidden');
+                document.getElementById('game-ui')?.classList.add('hidden');
+              }}>
+                Return to Main Menu
+              </button>
+              <button className="menu-popup-item" onClick={() => {
+                // Toggle sound
+                setGameState(prevState => ({ ...prevState, showMenu: false }));
+                // Sound toggle logic would go here
+              }}>
+                Toggle Sound
+              </button>
+              <button className="menu-popup-item" onClick={() => {
+                // Close menu
+                setGameState(prevState => ({ ...prevState, showMenu: false }));
+              }}>
+                Close Menu
+              </button>
+            </div>
+          )}
         </div>
       </div>
       

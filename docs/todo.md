@@ -29,10 +29,11 @@
 - [x] Add loading states and indicators
 
 ## Game Features
-- [ ] Implement AI for enemy wizards
+- [x] Implement AI for enemy wizards
 - [ ] Create procedural content generation
 - [ ] Develop loot system
-- [ ] Implement deck builder
+- [x] Implement deck builder
+- [x] Implement deck management system
 - [x] Create How to Play section
 - [ ] Implement multiple difficulty levels
 

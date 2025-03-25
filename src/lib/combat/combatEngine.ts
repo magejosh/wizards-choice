@@ -1,6 +1,7 @@
 // src/lib/combat/combatEngine.ts
 import { CombatState, CombatWizard, Wizard, Spell, SpellEffect, ActiveEffect, CombatLogEntry } from '../types';
 import { calculateWizardStats } from '../wizard/wizardUtils';
+import { getAISpellSelection } from './aiEngine';
 
 /**
  * Initialize a new combat state
@@ -493,11 +494,10 @@ function advanceTurn(state: CombatState): CombatState {
 }
 
 /**
- * Get AI spell selection based on difficulty
- * @param state The current combat state
- * @returns The selected spell or null for mystic punch
+ * This function is deprecated. Use getAISpellSelection from aiEngine.ts instead.
+ * @deprecated
  */
-export function getAISpellSelection(state: CombatState): Spell | null {
+export function _legacyGetAISpellSelection(state: CombatState): Spell | null {
   const enemyWizard = state.enemyWizard.wizard;
   const availableSpells = enemyWizard.equippedSpells.filter(
     spell => spell.manaCost <= state.enemyWizard.currentMana

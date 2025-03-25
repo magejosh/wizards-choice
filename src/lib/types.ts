@@ -67,6 +67,17 @@ export interface Wizard {
   equippedSpells: Spell[]; // Spells selected for battle (max 3)
   equipment: Partial<Record<EquipmentSlot, Equipment>>;
   levelUpPoints: number;
+  decks: Deck[]; // Collection of saved decks
+  activeDeckId: string | null; // Currently active deck ID
+}
+
+// Deck Management Types
+export interface Deck {
+  id: string;
+  name: string;
+  spells: Spell[];
+  dateCreated: string;
+  lastModified: string;
 }
 
 // Combat Types

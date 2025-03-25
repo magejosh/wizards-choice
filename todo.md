@@ -1,6 +1,9 @@
 # Wizard's Choice - Next Steps
 
 ## Recently Completed
+- ✅ Implemented battle system with 3D effects 
+- ✅ Implemented AI for enemy wizards using strategy patterns
+- ✅ Created deck builder functionality with filtering and sorting
 - ✅ Fixed duplicate identifier errors in imports
 - ✅ Implemented secure password hashing with bcryptjs
 - ✅ Added IndexedDB integration for persistent storage
@@ -9,9 +12,6 @@
 - ✅ Added unique save game persistence per user
 
 ## Up Next
-- [ ] Implement AI for enemy wizards
-- [ ] Create deck builder functionality
-- [ ] Develop battle system with 3D effects
 - [ ] Add missing spell implementations
 - [ ] Implement equipment screens and functionality
 - [ ] Add proper unit testing 

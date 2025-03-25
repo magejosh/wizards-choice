@@ -8,12 +8,13 @@
 5. [Game State Management](#game-state-management)
 6. [Spell System](#spell-system)
 7. [Combat Engine](#combat-engine)
-8. [Equipment System](#equipment-system)
-9. [UI Components](#ui-components)
-10. [Best Practices](#best-practices)
-11. [Deployment Guide](#deployment-guide)
-12. [Admin Guide](#admin-guide)
-13. [Future Development](#future-development)
+8. [3D Battle System](#3d-battle-system)
+9. [Equipment System](#equipment-system)
+10. [UI Components](#ui-components)
+11. [Best Practices](#best-practices)
+12. [Deployment Guide](#deployment-guide)
+13. [Admin Guide](#admin-guide)
+14. [Future Development](#future-development)
 
 ## Introduction
 
@@ -112,10 +113,49 @@ The combat engine handles turn-based duels between wizards with:
 4. AI opponent decision making
 5. Combat resolution
 
+### AI System
+
+Enemy wizards utilize a sophisticated AI system with three distinct strategies:
+
+1. **Defensive Strategy**: Prioritizes healing and buffs when health is low, with selective use of damage spells.
+2. **Aggressive Strategy**: Focuses on high-damage spells and debuffs, with minimal health management.
+3. **Balanced Strategy**: Adaptively chooses spells based on the combat situation, with a mix of all spell types.
+
+The AI system implements the Strategy pattern, allowing for easy expansion with new strategies.
+
 ### Best Practices
 - **AXIOM 11**: Separate combat logic from visual effects for cleaner code and easier testing.
 - **AXIOM 12**: Implement AI difficulty levels through strategy patterns rather than hardcoded behaviors.
 - **AXIOM 13**: Use event-based systems for combat effects to allow for extensibility.
+
+## 3D Battle System
+
+The battle system provides an immersive 3D experience using Three.js via React Three Fiber.
+
+### Components
+1. **BattleScene**: Manages the overall 3D scene, including lighting, environment, and camera.
+2. **WizardModel**: Renders 3D wizard models with health bars and animations.
+3. **SpellEffect3D**: Creates dynamic spell effects based on spell type and element.
+
+### Key Features
+- **Real-time Animations**: Wizards and spells animate based on battle state and actions.
+- **Element-based Effects**: Spell effects are visually distinct based on their elemental type.
+- **Visual Feedback**: Damage and healing numbers appear and float upward for clear feedback.
+- **Health Visualization**: Health bars dynamically update with color coding for remaining health.
+- **Turn Indicators**: Visual cues show which wizard is actively taking their turn.
+
+### Technical Implementation
+- Three.js is used for 3D rendering through React Three Fiber
+- useFrame hook manages animations and effect lifetimes
+- Component-based architecture for reusable 3D elements
+- GPU-accelerated particle effects for spell casting
+- Dynamic lighting and environment settings
+
+### Best Practices
+- **AXIOM 31**: Batch 3D model updates to minimize render calls and optimize performance.
+- **AXIOM 32**: Use instanced meshes for particle effects to improve rendering efficiency.
+- **AXIOM 33**: Implement proper cleanup for 3D effects to prevent memory leaks.
+- **AXIOM 34**: Scale visual complexity based on device performance capabilities.
 
 ## Equipment System
 
@@ -140,8 +180,37 @@ UI components are built with React and styled for a responsive, engaging experie
 - Battle Arena
 - Wizard's Study
 - Spell Cards
+- Deck Builder
 - Status Bars
 - Settings Panel
+
+### Deck Builder
+The deck builder provides an intuitive interface for managing spells with:
+- Filtering by spell type and element
+- Sorting by various attributes (mana cost, tier, etc.)
+- Visual indication of equipped spells with slot numbers
+- Minimum of five spells required per deck
+- Immediate feedback on spell selection and equipment
+- Responsive layout adapting to different screen sizes
+
+#### Deck Management System
+The deck management system allows players to:
+- Create multiple named decks for different strategies
+- Save and load decks
+- Equip a specific deck for combat
+- Delete unwanted decks
+- View all spells in their collection
+- Track which deck is currently active
+- Automatically save deck changes to persistent storage
+
+#### Draw Mechanics
+The deck system uses a discard pile mechanic:
+- When a spell is cast, it goes to the discard pile
+- Cards in the discard pile remain there until after the next draw step
+- At the end of the draw step, cards in the discard pile are shuffled back into the deck
+- Players and enemies then cast their first spell of the turn
+
+Each deck requires a minimum of 5 spells to ensure the player maintains sufficient spell options throughout combat. Players start with a "Starter Deck" containing their first 5 spells, and can customize their decks as they collect more spells throughout the game.
 
 ### Best Practices
 - **AXIOM 17**: Use the 'use client' directive for all components that use client-side hooks or interactivity.

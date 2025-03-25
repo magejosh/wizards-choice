@@ -49,6 +49,7 @@ interface GameStateStore {
   spendLevelUpPoints: (stat: 'health' | 'mana' | 'manaRegen', amount: number) => boolean;
   setCurrentLocation: (location: 'wizardStudy' | 'duel' | 'levelUp') => void;
   resetState: () => void;
+  updateGameState: (partialState: Partial<GameState>) => void;
 }
 
 // Create the game state store with persistence
@@ -64,8 +65,21 @@ export const useGameStateStore = create<GameStateStore>()(
         // Add default spells to the wizard
         defaultWizard.spells = defaultSpells;
         
-        // Equip the first three spells by default
-        defaultWizard.equippedSpells = defaultSpells.slice(0, 3);
+        // Equip all default spells (player starts with the full deck equipped)
+        defaultWizard.equippedSpells = defaultSpells;
+        
+        // Create a default deck
+        const defaultDeck = {
+          id: 'default-deck-' + Date.now(),
+          name: 'Starter Deck',
+          spells: defaultSpells, // Include all default spells in the deck
+          dateCreated: new Date().toISOString(),
+          lastModified: new Date().toISOString()
+        };
+        
+        // Add the default deck to the wizard
+        defaultWizard.decks = [defaultDeck];
+        defaultWizard.activeDeckId = defaultDeck.id;
         
         const saveSlots = [...get().gameState.saveSlots];
         saveSlots[saveSlotId] = {
@@ -346,6 +360,15 @@ export const useGameStateStore = create<GameStateStore>()(
       resetState: () => {
         // Reset to initial state
         set({ gameState: initialGameState });
+      },
+
+      updateGameState: (partialState: Partial<GameState>) => {
+        set({
+          gameState: {
+            ...get().gameState,
+            ...partialState,
+          },
+        });
       },
     }),
     {

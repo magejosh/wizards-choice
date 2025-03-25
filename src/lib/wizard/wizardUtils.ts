@@ -22,6 +22,8 @@ export function generateDefaultWizard(name: string): Wizard {
     equippedSpells: [], // Will be populated with 3 selected spells
     equipment: {}, // No equipment at start
     levelUpPoints: 0,
+    decks: [], // Will be populated with default deck
+    activeDeckId: null, // Will be set to default deck ID
   };
 }
 

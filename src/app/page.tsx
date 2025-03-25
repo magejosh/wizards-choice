@@ -7,6 +7,7 @@ import Settings from '../lib/ui/components/Settings';
 import HowToPlay from '../lib/ui/components/HowToPlay';
 import WizardStudy from '../lib/ui/components/WizardStudy';
 import Login from '../lib/ui/components/Login';
+import DeckBuilder from '../lib/ui/components/DeckBuilder';
 import { useGameStateStore } from '../lib/game-state/gameStateStore';
 import authService from '../lib/auth/authService';
 import '../lib/ui/styles/main.css';
@@ -15,6 +16,7 @@ export default function Home() {
   const [showSettings, setShowSettings] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showNameInput, setShowNameInput] = useState(false);
+  const [showDeckBuilder, setShowDeckBuilder] = useState(false);
   const [playerName, setPlayerName] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -142,7 +144,21 @@ export default function Home() {
   
   const handleOpenDeckBuilder = () => {
     console.log('Opening deck builder');
-    alert('Deck builder would open here');
+    setShowDeckBuilder(true);
+  };
+  
+  const handleCloseDeckBuilder = async () => {
+    // Save the game state when closing the deck builder
+    // to persist any changes to equipped spells
+    setIsLoading(true);
+    try {
+      await authService.saveGameState();
+      setShowDeckBuilder(false);
+    } catch (error) {
+      console.error('Error saving deck changes:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const handleOpenEquipment = () => {
@@ -236,15 +252,20 @@ export default function Home() {
         </>
       ) : (
         // The game has started, render the appropriate component based on current location
-        gameState.gameProgress.currentLocation === 'wizardStudy' && (
-          <WizardStudy 
-            onStartDuel={handleStartDuel}
-            onOpenDeckBuilder={handleOpenDeckBuilder}
-            onOpenEquipment={handleOpenEquipment}
-            onOpenSpellbook={handleOpenSpellbook}
-            onReturnToMainMenu={handleReturnToMainMenu}
-          />
-        )
+        <>
+          {gameState.gameProgress.currentLocation === 'wizardStudy' && (
+            <WizardStudy 
+              onStartDuel={handleStartDuel}
+              onOpenDeckBuilder={handleOpenDeckBuilder}
+              onOpenEquipment={handleOpenEquipment}
+              onOpenSpellbook={handleOpenSpellbook}
+              onReturnToMainMenu={handleReturnToMainMenu}
+            />
+          )}
+          
+          {/* Overlay components that can appear in game */}
+          {showDeckBuilder && <DeckBuilder onClose={handleCloseDeckBuilder} />}
+        </>
       )}
     </div>
   );

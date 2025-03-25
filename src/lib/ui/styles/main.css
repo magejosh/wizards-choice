@@ -308,15 +308,22 @@ button:disabled {
 .spell-card__image-container {
   position: relative;
   height: 100px;
-  margin-bottom: var(--spacing-sm);
-  border-radius: var(--radius-md);
   overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .spell-card__image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.spell-card:hover .spell-card__image {
+  transform: scale(1.05);
 }
 
 .spell-card__element-badge {
@@ -397,9 +404,15 @@ button:disabled {
 }
 
 .battle-arena__canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
+  width: 100%;
+  height: 500px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+}
+
+.battle-arena__canvas canvas {
   width: 100%;
   height: 100%;
 }
@@ -412,150 +425,185 @@ button:disabled {
   height: 100%;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  padding: var(--spacing-md);
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 0 0 10px 10px;
 }
 
 .battle-arena__top-bar {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(26, 26, 46, 0.8);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-sm) var(--spacing-md);
-  margin-bottom: var(--spacing-md);
+  justify-content: space-between;
+  margin-bottom: 1rem;
 }
 
-.battle-arena__turn-info {
-  margin-right: var(--spacing-md);
+.battle-arena__turn-info, 
+.battle-arena__last-action {
+  font-family: 'Cinzel', serif;
+  color: #ffffff;
 }
 
 .battle-arena__turn-number {
-  color: var(--primary-main);
   font-weight: bold;
+  color: #6a3de8;
 }
 
 .battle-arena__action-text {
-  color: var(--primary-light);
   font-style: italic;
+  color: #b3b3cc;
 }
 
 .battle-arena__player-stats,
 .battle-arena__enemy-stats {
-  background-color: rgba(26, 26, 46, 0.8);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  width: 250px;
-  pointer-events: auto;
-}
-
-.battle-arena__player-stats {
-  position: absolute;
-  top: 80px;
-  left: var(--spacing-md);
-}
-
-.battle-arena__enemy-stats {
-  position: absolute;
-  top: 80px;
-  right: var(--spacing-md);
+  margin-bottom: 1rem;
 }
 
 .battle-arena__player-name,
 .battle-arena__enemy-name {
-  margin-top: 0;
-  margin-bottom: var(--spacing-sm);
-  color: var(--primary-light);
-}
-
-.battle-arena__enemy-name {
-  color: var(--secondary-main);
+  font-family: 'Cinzel', serif;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
 }
 
 .battle-arena__spell-selection {
-  position: absolute;
-  bottom: var(--spacing-md);
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(26, 26, 46, 0.8);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  width: 80%;
-  max-width: 800px;
-  pointer-events: auto;
+  margin-top: 1rem;
 }
 
 .battle-arena__spells-header {
-  margin-bottom: var(--spacing-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .battle-arena__spells-container {
-  display: flex;
-  gap: var(--spacing-md);
-  overflow-x: auto;
-  padding-bottom: var(--spacing-sm);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
 }
 
 .battle-arena__mystic-punch,
 .battle-arena__skip-turn {
-  min-width: 150px;
-  height: 200px;
-  background-color: var(--ui-card);
-  border: 2px solid var(--ui-card-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-sm);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  background-color: #272640;
+  border: 2px solid #4a4a82;
+  border-radius: 8px;
+  padding: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .battle-arena__mystic-punch:hover,
 .battle-arena__skip-turn:hover {
+  border-color: #6a3de8;
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-.battle-arena__mystic-punch {
-  background-color: rgba(255, 61, 61, 0.2);
+.battle-arena__mystic-punch h3,
+.battle-arena__skip-turn h3 {
+  font-family: 'Cinzel', serif;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
 }
 
-.battle-arena__skip-turn {
-  background-color: rgba(59, 122, 255, 0.2);
+.battle-arena__mystic-punch p,
+.battle-arena__skip-turn p {
+  font-family: 'Raleway', sans-serif;
+  color: #b3b3cc;
+  font-size: 0.875rem;
 }
 
 .battle-arena__battle-result {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(26, 26, 46, 0.9);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
   text-align: center;
-  pointer-events: auto;
+  padding: 2rem;
+  animation: fadeIn 0.5s ease-in;
 }
 
-.battle-arena__battle-result--playerWon h2 {
-  color: var(--primary-main);
+.battle-arena__battle-result--playerWon {
+  color: #4caf50;
 }
 
-.battle-arena__battle-result--enemyWon h2 {
-  color: var(--secondary-main);
+.battle-arena__battle-result--enemyWon {
+  color: #f44336;
 }
 
 .battle-arena__continue-button {
-  background-color: var(--primary-main);
-  color: var(--primary-contrast);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  font-size: var(--font-size-lg);
-  margin-top: var(--spacing-md);
+  background-color: #6a3de8;
+  color: #ffffff;
+  font-family: 'Cinzel', serif;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .battle-arena__continue-button:hover {
-  background-color: var(--primary-light);
+  background-color: #8c65f7;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* spell effect ripples */
+.battle-arena__effect-ripple {
+  position: absolute;
+  border-radius: 50%;
+  animation: ripple 1s ease-out forwards;
+  opacity: 0.6;
+  z-index: 5;
+}
+
+.battle-arena__effect-ripple--fire {
+  box-shadow: 0 0 20px 5px #ff5722;
+  border: 2px solid #ff5722;
+}
+
+.battle-arena__effect-ripple--water {
+  box-shadow: 0 0 20px 5px #2196f3;
+  border: 2px solid #2196f3;
+}
+
+.battle-arena__effect-ripple--earth {
+  box-shadow: 0 0 20px 5px #8bc34a;
+  border: 2px solid #8bc34a;
+}
+
+.battle-arena__effect-ripple--air {
+  box-shadow: 0 0 20px 5px #b2ebf2;
+  border: 2px solid #b2ebf2;
+}
+
+.battle-arena__effect-ripple--arcane {
+  box-shadow: 0 0 20px 5px #9c27b0;
+  border: 2px solid #9c27b0;
+}
+
+.battle-arena__effect-ripple--nature {
+  box-shadow: 0 0 20px 5px #4caf50;
+  border: 2px solid #4caf50;
+}
+
+.battle-arena__effect-ripple--shadow {
+  box-shadow: 0 0 20px 5px #424242;
+  border: 2px solid #424242;
+}
+
+.battle-arena__effect-ripple--light {
+  box-shadow: 0 0 20px 5px #ffeb3b;
+  border: 2px solid #ffeb3b;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
 }
 
 /* Main Menu styles */
@@ -1258,4 +1306,748 @@ button:disabled {
 .main-menu__save-slot-level::after {
   content: " - ";
   margin-left: 2px;
+}
+
+/* Deck Builder Styles */
+.deck-builder {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--ui-background);
+  z-index: 100;
+  overflow-y: auto;
+  padding: var(--spacing-xl);
+  color: var(--ui-text);
+}
+
+.deck-builder__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 2px solid var(--primary-main);
+  padding-bottom: var(--spacing-md);
+}
+
+.deck-builder__header h2 {
+  font-size: var(--font-size-xl);
+  color: var(--primary-main);
+  margin: 0;
+}
+
+.deck-builder__close {
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.deck-builder__close:hover {
+  background-color: var(--primary-light);
+}
+
+/* Deck Management */
+.deck-builder__deck-management {
+  margin-bottom: var(--spacing-xl);
+  background-color: var(--ui-background-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+.deck-builder__deck-management h3 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  color: var(--secondary-main);
+}
+
+.deck-builder__decks-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.deck-builder__deck-item {
+  background-color: var(--ui-card);
+  border: 2px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deck-builder__deck-item:hover {
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.deck-builder__deck-item--selected {
+  border-color: var(--primary-main);
+  background-color: rgba(106, 61, 232, 0.1);
+}
+
+.deck-builder__deck-item--active {
+  border-left: 5px solid var(--secondary-main);
+}
+
+.deck-builder__deck-name {
+  font-weight: bold;
+  font-size: var(--font-size-md);
+  margin-bottom: var(--spacing-xs);
+}
+
+.deck-builder__active-badge {
+  background-color: var(--secondary-main);
+  color: var(--secondary-contrast);
+  font-size: var(--font-size-xs);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  margin-left: var(--spacing-xs);
+}
+
+.deck-builder__deck-info {
+  font-size: var(--font-size-sm);
+  color: var(--ui-text-secondary);
+}
+
+.deck-builder__deck-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.deck-builder__deck-action {
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  flex: 1;
+  min-width: 150px;
+}
+
+.deck-builder__deck-action:hover:not(:disabled) {
+  background-color: var(--primary-light);
+}
+
+.deck-builder__deck-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deck-builder__deck-action--danger {
+  background-color: #f44336;
+}
+
+.deck-builder__deck-action--danger:hover:not(:disabled) {
+  background-color: #ff5252;
+}
+
+.deck-builder__create-deck {
+  margin-top: var(--spacing-md);
+  background-color: var(--ui-card);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+.deck-builder__create-deck h4 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  color: var(--primary-light);
+}
+
+.deck-builder__create-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.deck-builder__create-form input {
+  padding: var(--spacing-md);
+  background-color: var(--ui-background);
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  color: var(--ui-text);
+}
+
+.deck-builder__create-actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.deck-builder__create-action {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.deck-builder__create-action:hover {
+  background-color: var(--primary-light);
+}
+
+.deck-builder__create-action--cancel {
+  background-color: transparent;
+  border: 1px solid var(--ui-text-secondary);
+  color: var(--ui-text);
+}
+
+.deck-builder__create-action--cancel:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Current Deck Editing */
+.deck-builder__current-deck {
+  margin-bottom: var(--spacing-lg);
+  background-color: var(--ui-background-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+.deck-builder__current-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.deck-builder__current-header h3 {
+  margin: 0;
+  color: var(--secondary-main);
+}
+
+.deck-builder__save-button {
+  background-color: var(--secondary-main);
+  color: var(--secondary-contrast);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.deck-builder__save-button:hover {
+  background-color: var(--secondary-light);
+}
+
+.deck-builder__deck-slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.deck-builder__deck-slot {
+  width: 200px;
+  height: 300px;
+  background-color: var(--ui-card);
+  border: 2px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.deck-builder__deck-slot--empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 2px dashed var(--ui-card-border);
+}
+
+.deck-builder__empty-slot {
+  text-align: center;
+  color: var(--ui-text-secondary);
+}
+
+.deck-builder__empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--ui-background-light);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-md);
+  color: var(--ui-text-secondary);
+  font-style: italic;
+}
+
+/* Collection and filters */
+.deck-builder__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background-color: var(--ui-background-light);
+  border-radius: var(--radius-md);
+}
+
+.deck-builder__search {
+  flex: 1;
+  min-width: 250px;
+}
+
+.deck-builder__search input {
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--ui-card);
+  border: 1px solid var(--ui-card-border);
+  color: var(--ui-text);
+  border-radius: var(--radius-md);
+}
+
+.deck-builder__filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+
+.deck-builder__filter-group label {
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--ui-text-secondary);
+}
+
+.deck-builder__filter-group select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--ui-card);
+  border: 1px solid var(--ui-card-border);
+  color: var(--ui-text);
+  border-radius: var(--radius-md);
+}
+
+.deck-builder__collection h3 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-md);
+  color: var(--secondary-main);
+}
+
+.deck-builder__spells-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.deck-builder__spell {
+  transition: transform 0.2s;
+}
+
+.deck-builder__spell:hover {
+  transform: translateY(-5px);
+}
+
+.deck-builder__spell--in-deck {
+  opacity: 0.7;
+}
+
+.deck-builder__no-spells {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--ui-text-secondary);
+}
+
+/* Spell Card Styles */
+.spell-card {
+  width: 100%;
+  height: 100%;
+  background-color: var(--ui-card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.spell-card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.spell-card__slot-number {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  background-color: var(--secondary-main);
+  color: var(--secondary-contrast);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  border-bottom-left-radius: var(--radius-md);
+  z-index: 2;
+}
+
+.spell-card__header {
+  background-color: var(--primary-dark);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.spell-card__name {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: bold;
+  color: var(--primary-contrast);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spell-card__tier {
+  font-size: var(--font-size-xs);
+  color: var(--primary-contrast);
+  opacity: 0.8;
+}
+
+.spell-card__image-container {
+  position: relative;
+  height: 100px;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spell-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.spell-card:hover .spell-card__image {
+  transform: scale(1.05);
+}
+
+.spell-card__element-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: rgba(0, 0, 0, 0.6);
+  font-size: var(--font-size-xs);
+}
+
+.spell-card__element,
+.spell-card__type {
+  text-transform: capitalize;
+  color: var(--ui-text);
+}
+
+.spell-card__info {
+  flex: 1;
+  padding: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+}
+
+.spell-card__mana-cost {
+  display: flex;
+  align-items: center;
+  color: #3b7aff;
+  font-weight: bold;
+}
+
+.spell-card__mana-icon {
+  margin-right: var(--spacing-xs);
+}
+
+.spell-card__description {
+  font-size: var(--font-size-xs);
+  color: var(--ui-text-secondary);
+  margin-bottom: var(--spacing-xs);
+  flex: 1;
+  overflow-y: auto;
+  max-height: 60px;
+}
+
+.spell-card__effects {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spell-card__effect {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  line-height: 1.2;
+}
+
+.spell-card__effect-type {
+  width: 16px;
+  text-align: center;
+}
+
+.spell-card__effect-value {
+  font-weight: bold;
+  color: var(--ui-text);
+}
+
+.spell-card__effect-duration {
+  color: var(--ui-text-secondary);
+  font-size: calc(var(--font-size-xs) * 0.8);
+}
+
+.spell-card__effect-target {
+  margin-left: auto;
+  color: var(--ui-text-secondary);
+  font-size: calc(var(--font-size-xs) * 0.8);
+}
+
+.spell-card__equipped-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  text-align: center;
+  padding: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  font-weight: bold;
+}
+
+/* Element-specific styles */
+.spell-card--fire {
+  border-left: 3px solid #ff3b3b;
+}
+
+.spell-card--water {
+  border-left: 3px solid #3b7aff;
+}
+
+.spell-card--earth {
+  border-left: 3px solid #a97142;
+}
+
+.spell-card--air {
+  border-left: 3px solid #a0a0ff;
+}
+
+.spell-card--arcane {
+  border-left: 3px solid #d252ff;
+}
+
+.spell-card--nature {
+  border-left: 3px solid #7aff3b;
+}
+
+.spell-card--shadow {
+  border-left: 3px solid #6a3de8;
+}
+
+.spell-card--light {
+  border-left: 3px solid #ffeb3b;
+}
+
+/* Spell type styles */
+.spell-card--damage .spell-card__header {
+  background-color: #8b3030;
+}
+
+.spell-card--healing .spell-card__header {
+  background-color: #2d8b30;
+}
+
+.spell-card--buff .spell-card__header {
+  background-color: #30678b;
+}
+
+.spell-card--debuff .spell-card__header {
+  background-color: #8b6830;
+}
+
+.spell-card--dot .spell-card__header {
+  background-color: #8b308b;
+}
+
+.spell-card--reaction .spell-card__header {
+  background-color: #308b8b;
+}
+
+.deck-builder__help {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #7c4dff;
+}
+
+.deck-builder__help-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.deck-builder__help-header h3 {
+  margin: 0;
+  color: #c0a0ff;
+  font-size: 1.2rem;
+}
+
+.deck-builder__help-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+}
+
+.deck-builder__help-toggle.expanded {
+  transform: rotate(180deg);
+}
+
+.deck-builder__help-content {
+  margin-top: 1rem;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.deck-builder__help-content p {
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.deck-builder__help-content ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.deck-builder__help-content li {
+  margin-bottom: 0.25rem;
+}
+
+.deck-builder__warning {
+  color: #ff9800;
+  font-size: 0.85rem;
+  margin-left: 0.5rem;
+}
+
+.deck-builder__min-size-warning {
+  background-color: rgba(255, 152, 0, 0.2);
+  border: 1px dashed #ff9800;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+  text-align: center;
+  color: #ff9800;
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+/* Responsive styles for deck builder */
+@media (max-width: 768px) {
+  .deck-builder {
+    padding: 1rem;
+    max-width: 100%;
+    height: 100%;
+    overflow-y: auto;
+  }
+  
+  .deck-builder__deck-slots,
+  .deck-builder__spells-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.5rem;
+  }
+  
+  .deck-builder__filters {
+    flex-direction: column;
+  }
+  
+  .deck-builder__search,
+  .deck-builder__filter-group {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .deck-builder__deck-actions {
+    flex-direction: column;
+  }
+  
+  .deck-builder__deck-action {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .deck-builder__create-actions {
+    flex-direction: column;
+  }
+  
+  .deck-builder__create-action {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .spell-card {
+    max-width: 100%;
+  }
+}
+
+/* Additional responsive adjustments for very small screens */
+@media (max-width: 480px) {
+  .deck-builder__header,
+  .deck-builder__current-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .deck-builder__close,
+  .deck-builder__save-button {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+  
+  .deck-builder__deck-slots,
+  .deck-builder__spells-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .deck-builder__help {
+    padding: 0.75rem;
+  }
 }

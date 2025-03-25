@@ -3,9 +3,24 @@
 
 import EnhancedSpellSystem from './EnhancedSpellSystem.js';
 
+/**
+ * Manages player progression, spell unlocking, and difficulty scaling
+ */
 export class ProgressionSystem {
+    /**
+     * Initialize the progression system with default values
+     */
     constructor() {
+        /**
+         * The spell system instance
+         * @type {EnhancedSpellSystem}
+         */
         this.spellSystem = null;
+
+        /**
+         * The progression tiers
+         * @type {Array<{name: string, requiredWins: number, maxDifficulty: string}>}
+         */
         this.progressionTiers = [
             { name: 'Novice', requiredWins: 0, maxDifficulty: 'easy' },
             { name: 'Apprentice', requiredWins: 3, maxDifficulty: 'normal' },
@@ -14,6 +29,11 @@ export class ProgressionSystem {
             { name: 'Master', requiredWins: 18, maxDifficulty: 'hard' },
             { name: 'Archmage', requiredWins: 25, maxDifficulty: 'hard' }
         ];
+
+        /**
+         * The achievements
+         * @type {Array<{id: string, name: string, description: string, unlocked: boolean}>}
+         */
         this.achievements = [
             { id: 'first_win', name: 'First Victory', description: 'Win your first duel', unlocked: false },
             { id: 'fire_master', name: 'Fire Master', description: 'Unlock all fire spells', unlocked: false },
@@ -25,72 +45,110 @@ export class ProgressionSystem {
             { id: 'winning_streak', name: 'Winning Streak', description: 'Win 5 duels in a row', unlocked: false },
             { id: 'elemental_balance', name: 'Elemental Balance', description: 'Use spells from all 5 elements in a single duel', unlocked: false }
         ];
+
+        /**
+         * The current win streak
+         * @type {number}
+         */
         this.currentWinStreak = 0;
+
+        /**
+         * The used elements in the current duel
+         * @type {Set<string>}
+         */
         this.usedElementsInCurrentDuel = new Set();
     }
-    
+
+    /**
+     * Initialize the progression system with the spell system
+     * @param {EnhancedSpellSystem} spellSystem
+     * @returns {ProgressionSystem}
+     */
     init(spellSystem) {
         this.spellSystem = spellSystem;
-        
+
         // Load achievements from local storage
         this.loadAchievements();
-        
+
         return this;
     }
-    
+
+    /**
+     * Get the current tier
+     * @returns {{name: string, requiredWins: number, maxDifficulty: string}}
+     */
     getCurrentTier() {
         const wins = this.getPlayerProgress().stats?.wins || 0;
-        
+
         // Find the highest tier the player qualifies for
         for (let i = this.progressionTiers.length - 1; i >= 0; i--) {
             if (wins >= this.progressionTiers[i].requiredWins) {
                 return this.progressionTiers[i];
             }
         }
-        
+
         // Default to first tier
         return this.progressionTiers[0];
     }
-    
+
+    /**
+     * Get the next tier
+     * @returns {{name: string, requiredWins: number, maxDifficulty: string}|null}
+     */
     getNextTier() {
         const currentTier = this.getCurrentTier();
         const currentTierIndex = this.progressionTiers.findIndex(tier => tier.name === currentTier.name);
-        
+
         // If player is at max tier, return null
         if (currentTierIndex === this.progressionTiers.length - 1) {
             return null;
         }
-        
+
         return this.progressionTiers[currentTierIndex + 1];
     }
-    
+
+    /**
+     * Get the wins until the next tier
+     * @returns {number}
+     */
     getWinsUntilNextTier() {
         const nextTier = this.getNextTier();
         if (!nextTier) {
             return 0; // Already at max tier
         }
-        
+
         const wins = this.getPlayerProgress().stats?.wins || 0;
         return nextTier.requiredWins - wins;
     }
-    
+
+    /**
+     * Get the recommended difficulty
+     * @returns {string}
+     */
     getRecommendedDifficulty() {
         const currentTier = this.getCurrentTier();
         return currentTier.maxDifficulty;
     }
-    
+
+    /**
+     * Process the battle result
+     * @param {boolean} won
+     * @param {string} difficulty
+     * @param {Array<{element: string}>} usedSpells
+     * @returns {{won: boolean, newSpell: any, currentTier: {name: string, requiredWins: number, maxDifficulty: string}, nextTier: {name: string, requiredWins: number, maxDifficulty: string}|null, winsUntilNextTier: number, unlockedAchievements: Array<{id: string, name: string, description: string, unlocked: boolean}>}}
+     */
     processBattleResult(won, difficulty, usedSpells) {
         // Record battle result in spell system
         this.spellSystem.recordBattleResult(won, difficulty);
-        
+
         // Update win streak
         if (won) {
             this.currentWinStreak++;
-            
+
             // Calculate experience gain based on difficulty
             const playerLevel = this.spellSystem.getPlayerProgress().level || 1;
             let experienceGained = 0;
-            
+
             switch (difficulty) {
                 case 'easy':
                     experienceGained = 10 * playerLevel;
@@ -104,9 +162,9 @@ export class ProgressionSystem {
                 default:
                     experienceGained = 25 * playerLevel; // Default to normal
             }
-            
+
             console.log(`Player earned ${experienceGained} experience points from ${difficulty} difficulty battle`);
-            
+
             // Add experience to player
             const leveledUp = this.spellSystem.addExperience(experienceGained);
             if (leveledUp) {
@@ -115,23 +173,23 @@ export class ProgressionSystem {
         } else {
             this.currentWinStreak = 0;
         }
-        
+
         // Track used elements in current duel
         if (usedSpells && usedSpells.length > 0) {
             usedSpells.forEach(spell => {
                 this.usedElementsInCurrentDuel.add(spell.element);
             });
         }
-        
+
         // Check for achievements
         this.checkAchievements(won);
-        
+
         // If player won, attempt to unlock a new spell
         let newSpell = null;
         if (won) {
             newSpell = this.spellSystem.unlockNewSpell(difficulty);
         }
-        
+
         // Return battle results with progression info
         return {
             won,
@@ -142,38 +200,45 @@ export class ProgressionSystem {
             unlockedAchievements: this.getNewlyUnlockedAchievements()
         };
     }
-    
+
+    /**
+     * Start a new duel
+     */
     startNewDuel() {
         // Reset tracking for new duel
         this.usedElementsInCurrentDuel.clear();
         this.newlyUnlockedAchievements = [];
     }
-    
+
+    /**
+     * Check for achievements
+     * @param {boolean} won
+     */
     checkAchievements(won) {
         this.newlyUnlockedAchievements = [];
         const progress = this.getPlayerProgress();
         const unlockedSpells = this.spellSystem.getUnlockedSpells();
-        
+
         // Check first win achievement
         if (won && progress.stats?.wins === 1) {
             this.unlockAchievement('first_win');
         }
-        
+
         // Check winning streak achievement
         if (this.currentWinStreak >= 5) {
             this.unlockAchievement('winning_streak');
         }
-        
+
         // Check spell collector achievement
         if (unlockedSpells.length >= 10) {
             this.unlockAchievement('spell_collector');
         }
-        
+
         // Check elemental balance achievement
         if (this.usedElementsInCurrentDuel.size >= 5) {
             this.unlockAchievement('elemental_balance');
         }
-        
+
         // Check element master achievements
         const elementCounts = {
             fire: 0,
@@ -182,41 +247,45 @@ export class ProgressionSystem {
             air: 0,
             arcane: 0
         };
-        
+
         unlockedSpells.forEach(spell => {
             if (elementCounts[spell.element] !== undefined) {
                 elementCounts[spell.element]++;
             }
         });
-        
+
         // Check if all spells of each element are unlocked
         if (elementCounts.fire >= 3) {
             this.unlockAchievement('fire_master');
         }
-        
+
         if (elementCounts.water >= 3) {
             this.unlockAchievement('water_master');
         }
-        
+
         if (elementCounts.earth >= 3) {
             this.unlockAchievement('earth_master');
         }
-        
+
         if (elementCounts.air >= 3) {
             this.unlockAchievement('air_master');
         }
-        
+
         if (elementCounts.arcane >= 3) {
             this.unlockAchievement('arcane_master');
         }
-        
+
         // Save achievements
         this.saveAchievements();
     }
-    
+
+    /**
+     * Unlock an achievement
+     * @param {string} achievementId
+     */
     unlockAchievement(achievementId) {
         const achievement = this.achievements.find(a => a.id === achievementId);
-        
+
         if (achievement && !achievement.unlocked) {
             achievement.unlocked = true;
             achievement.unlockDate = new Date().toISOString();
@@ -224,23 +293,42 @@ export class ProgressionSystem {
             console.log(`Achievement unlocked: ${achievement.name}`);
         }
     }
-    
+
+    /**
+     * Get the newly unlocked achievements
+     * @returns {Array<{id: string, name: string, description: string, unlocked: boolean}>}
+     */
     getNewlyUnlockedAchievements() {
         return this.newlyUnlockedAchievements || [];
     }
-    
+
+    /**
+     * Get all achievements
+     * @returns {Array<{id: string, name: string, description: string, unlocked: boolean}>}
+     */
     getAllAchievements() {
         return [...this.achievements];
     }
-    
+
+    /**
+     * Get unlocked achievements
+     * @returns {Array<{id: string, name: string, description: string, unlocked: boolean}>}
+     */
     getUnlockedAchievements() {
         return this.achievements.filter(a => a.unlocked);
     }
-    
+
+    /**
+     * Get locked achievements
+     * @returns {Array<{id: string, name: string, description: string, unlocked: boolean}>}
+     */
     getLockedAchievements() {
         return this.achievements.filter(a => !a.unlocked);
     }
-    
+
+    /**
+     * Save achievements
+     */
     saveAchievements() {
         try {
             localStorage.setItem('wizardsChoice_achievements', JSON.stringify(this.achievements));
@@ -249,16 +337,19 @@ export class ProgressionSystem {
             console.error('Error saving achievements:', error);
         }
     }
-    
+
+    /**
+     * Load achievements
+     */
     loadAchievements() {
         try {
             const savedAchievements = localStorage.getItem('wizardsChoice_achievements');
             const savedWinStreak = localStorage.getItem('wizardsChoice_winStreak');
-            
+
             if (savedAchievements) {
                 this.achievements = JSON.parse(savedAchievements);
             }
-            
+
             if (savedWinStreak) {
                 this.currentWinStreak = parseInt(savedWinStreak, 10);
             }
@@ -266,34 +357,41 @@ export class ProgressionSystem {
             console.error('Error loading achievements:', error);
         }
     }
-    
+
+    /**
+     * Reset progress
+     */
     resetProgress() {
         // Reset achievements
         this.achievements.forEach(achievement => {
             achievement.unlocked = false;
             delete achievement.unlockDate;
         });
-        
+
         // Reset win streak
         this.currentWinStreak = 0;
-        
+
         // Save reset state
         this.saveAchievements();
     }
-    
+
+    /**
+     * Get the progress summary
+     * @returns {{tier: string, wins: number, losses: number, winRate: number, spellsUnlocked: number, totalSpells: number, achievementsUnlocked: number, totalAchievements: number, nextTier: string, winsUntilNextTier: number, currentWinStreak: number}}
+     */
     getProgressSummary() {
         const progress = this.getPlayerProgress();
         const currentTier = this.getCurrentTier();
         const nextTier = this.getNextTier();
         const unlockedSpells = this.spellSystem.getUnlockedSpells();
         const unlockedAchievements = this.getUnlockedAchievements();
-        
+
         return {
             tier: currentTier.name,
             wins: progress.stats?.wins || 0,
             losses: progress.stats?.losses || 0,
-            winRate: (progress.stats?.wins || 0) + (progress.stats?.losses || 0) > 0 
-                ? Math.round(((progress.stats?.wins || 0) / ((progress.stats?.wins || 0) + (progress.stats?.losses || 0))) * 100) 
+            winRate: (progress.stats?.wins || 0) + (progress.stats?.losses || 0) > 0
+                ? Math.round(((progress.stats?.wins || 0) / ((progress.stats?.wins || 0) + (progress.stats?.losses || 0))) * 100)
                 : 0,
             spellsUnlocked: unlockedSpells.length,
             totalSpells: Object.keys(this.spellSystem.spells).length,
@@ -304,8 +402,11 @@ export class ProgressionSystem {
             currentWinStreak: this.currentWinStreak
         };
     }
-    
-    // Get the player progress data from the spell system
+
+    /**
+     * Get the player progress
+     * @returns {{stats: {wins: number, losses: number}, level: number}}
+     */
     getPlayerProgress() {
         return this.spellSystem.getPlayerProgress();
     }

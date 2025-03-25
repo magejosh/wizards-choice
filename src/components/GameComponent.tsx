@@ -59,6 +59,128 @@ export default function GameComponent() {
         // Initialize game state manager with all dependencies
         await gameStateManager.init(uiManager, sceneManager, spellSystem, progressionSystem, battleSceneContainer)
         
+        // Function to create floating text effects
+        const createFloatingText = (text, type, targetElement) => {
+          // Create element
+          const floatingText = document.createElement('div');
+          floatingText.className = `floating-text ${type}`;
+          floatingText.textContent = text;
+          
+          // Position element - get target position
+          const targetBounds = targetElement.getBoundingClientRect();
+          
+          // Position floating text
+          floatingText.style.top = `${targetBounds.top + targetBounds.height/2}px`;
+          floatingText.style.left = `${targetBounds.left + targetBounds.width/2}px`;
+          
+          // Add to document
+          document.body.appendChild(floatingText);
+          
+          // Remove after animation completes
+          setTimeout(() => {
+            if (document.body.contains(floatingText)) {
+              document.body.removeChild(floatingText);
+            }
+          }, 2000);
+        };
+        
+        // Function to show spell cast information
+        const showSpellCast = (caster, spellName) => {
+          // Check if there's an existing spell cast text
+          const existingText = document.querySelector('.spell-cast-text');
+          if (existingText && document.body.contains(existingText)) {
+            document.body.removeChild(existingText);
+          }
+          
+          // Create element
+          const spellText = document.createElement('div');
+          spellText.className = 'spell-cast-text';
+          spellText.textContent = `${caster} casts ${spellName}!`;
+          
+          // Add to document
+          document.body.appendChild(spellText);
+          
+          // Remove after a delay
+          setTimeout(() => {
+            if (document.body.contains(spellText)) {
+              document.body.removeChild(spellText);
+            }
+          }, 3000);
+        };
+        
+        // Hook into spell cast events
+        const originalPlayerCastSpell = gameStateManager.playerCastSpell;
+        gameStateManager.playerCastSpell = function(spellId) {
+          const spellData = spellSystem.getSpellById(spellId);
+          if (spellData) {
+            const playerElement = document.querySelector('#player-stats-overlay');
+            if (playerElement) {
+              // Show spell cast text
+              showSpellCast('Player', spellData.name);
+              
+              // Show mana cost
+              if (spellData.manaCost > 0) {
+                createFloatingText(`-${spellData.manaCost} Mana`, 'mana-text', playerElement);
+              }
+            }
+          }
+          
+          // Call original method
+          return originalPlayerCastSpell.call(gameStateManager, spellId);
+        };
+        
+        // Hook into enemy spell cast events
+        const originalEnemyCastSpell = gameStateManager.enemyCastSpell;
+        gameStateManager.enemyCastSpell = function(spellId) {
+          const spellData = spellSystem.getSpellById(spellId);
+          if (spellData) {
+            const enemyElement = document.querySelector('#enemy-stats-overlay');
+            if (enemyElement) {
+              // Show spell cast text
+              showSpellCast('Enemy', spellData.name);
+              
+              // Show mana cost
+              if (spellData.manaCost > 0) {
+                createFloatingText(`-${spellData.manaCost} Mana`, 'mana-text', enemyElement);
+              }
+            }
+          }
+          
+          // Call original method
+          return originalEnemyCastSpell.call(gameStateManager, spellId);
+        };
+        
+        // Hook into damage/healing events
+        gameStateManager.onDamageDealt = function(target, amount) {
+          const targetElement = target === 'player' ? 
+            document.querySelector('#player-stats-overlay') : 
+            document.querySelector('#enemy-stats-overlay');
+          
+          if (targetElement && amount > 0) {
+            createFloatingText(`-${amount} HP`, 'damage-text', targetElement);
+          }
+        };
+        
+        gameStateManager.onHealingReceived = function(target, amount) {
+          const targetElement = target === 'player' ? 
+            document.querySelector('#player-stats-overlay') : 
+            document.querySelector('#enemy-stats-overlay');
+          
+          if (targetElement && amount > 0) {
+            createFloatingText(`+${amount} HP`, 'heal-text', targetElement);
+          }
+        };
+        
+        gameStateManager.onManaRestored = function(target, amount) {
+          const targetElement = target === 'player' ? 
+            document.querySelector('#player-stats-overlay') : 
+            document.querySelector('#enemy-stats-overlay');
+          
+          if (targetElement && amount > 0) {
+            createFloatingText(`+${amount} Mana`, 'mana-text', targetElement);
+          }
+        };
+        
         // Set up state change handler
         gameStateManager.onStateChange = (newState: string) => {
           console.log(`Game state changed to: ${newState}`)
@@ -137,6 +259,136 @@ export default function GameComponent() {
           setGameState(prevState => ({ ...prevState, showMenu: !prevState.showMenu }));
         });
       }
+
+      // Set up sync between hidden elements and visible overlay elements
+      const setupUISync = () => {
+        // Function to sync player health
+        const syncPlayerHealth = () => {
+          const playerHealthFill = document.querySelector('#player-health .health-fill') as HTMLElement;
+          const playerHealthText = document.querySelector('#player-health .health-text') as HTMLElement;
+          const overlayHealthFill = document.querySelector('#player-stats-overlay .overlay-health-fill') as HTMLElement;
+          const overlayHealthText = document.querySelector('#player-stats-overlay .overlay-stat-label span:nth-child(2)') as HTMLElement;
+          
+          if (playerHealthFill && overlayHealthFill) {
+            const width = playerHealthFill.style.width;
+            if (width) {
+              overlayHealthFill.style.width = width;
+            }
+          }
+          
+          if (playerHealthText && overlayHealthText) {
+            overlayHealthText.textContent = playerHealthText.textContent;
+          }
+        };
+        
+        // Function to sync player mana
+        const syncPlayerMana = () => {
+          const playerManaFill = document.querySelector('#player-mana .mana-fill') as HTMLElement;
+          const playerManaText = document.querySelector('#player-mana .mana-text') as HTMLElement;
+          const overlayManaFill = document.querySelector('#player-stats-overlay .overlay-mana-fill') as HTMLElement;
+          const overlayManaText = document.querySelector('#player-stats-overlay .overlay-stat:nth-child(3) .overlay-stat-label span:nth-child(2)') as HTMLElement;
+          
+          if (playerManaFill && overlayManaFill) {
+            const width = playerManaFill.style.width;
+            if (width) {
+              overlayManaFill.style.width = width;
+            }
+          }
+          
+          if (playerManaText && overlayManaText) {
+            overlayManaText.textContent = playerManaText.textContent;
+          }
+        };
+        
+        // Function to sync enemy health and mana
+        const syncEnemyStats = () => {
+          const enemyHealthFill = document.querySelector('#opponent-health .health-fill') as HTMLElement;
+          const enemyHealthText = document.querySelector('#opponent-health .health-text') as HTMLElement;
+          const overlayHealthFill = document.querySelector('#enemy-stats-overlay .overlay-health-fill') as HTMLElement;
+          const overlayHealthText = document.querySelector('#enemy-stats-overlay .overlay-stat:nth-child(2) .overlay-stat-label span:nth-child(2)') as HTMLElement;
+          
+          if (enemyHealthFill && overlayHealthFill) {
+            const width = enemyHealthFill.style.width;
+            if (width) {
+              overlayHealthFill.style.width = width;
+            }
+          }
+          
+          if (enemyHealthText && overlayHealthText) {
+            overlayHealthText.textContent = enemyHealthText.textContent;
+          }
+          
+          const enemyManaFill = document.querySelector('#opponent-mana .mana-fill') as HTMLElement;
+          const enemyManaText = document.querySelector('#opponent-mana .mana-text') as HTMLElement;
+          const overlayManaFill = document.querySelector('#enemy-stats-overlay .overlay-mana-fill') as HTMLElement;
+          const overlayManaText = document.querySelector('#enemy-stats-overlay .overlay-stat:nth-child(3) .overlay-stat-label span:nth-child(2)') as HTMLElement;
+          
+          if (enemyManaFill && overlayManaFill) {
+            const width = enemyManaFill.style.width;
+            if (width) {
+              overlayManaFill.style.width = width;
+            }
+          }
+          
+          if (enemyManaText && overlayManaText) {
+            overlayManaText.textContent = enemyManaText.textContent;
+          }
+        };
+        
+        // Set up MutationObserver to watch for changes to the hidden elements
+        const setupObserver = () => {
+          // Create MutationObserver instance
+          const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              const target = mutation.target as HTMLElement;
+              
+              // Check which element changed and sync accordingly
+              if (target.closest('#player-health')) {
+                syncPlayerHealth();
+              } else if (target.closest('#player-mana')) {
+                syncPlayerMana();
+              } else if (target.closest('#opponent-health') || target.closest('#opponent-mana')) {
+                syncEnemyStats();
+              }
+            });
+          });
+          
+          // Configure and start the observer
+          const config = { attributes: true, childList: true, characterData: true, subtree: true };
+          
+          // Observe player health and mana
+          const playerHealth = document.getElementById('player-health');
+          const playerMana = document.getElementById('player-mana');
+          const opponentHealth = document.getElementById('opponent-health');
+          const opponentMana = document.getElementById('opponent-mana');
+          
+          if (playerHealth) observer.observe(playerHealth, config);
+          if (playerMana) observer.observe(playerMana, config);
+          if (opponentHealth) observer.observe(opponentHealth, config);
+          if (opponentMana) observer.observe(opponentMana, config);
+        };
+        
+        // Initial sync
+        syncPlayerHealth();
+        syncPlayerMana();
+        syncEnemyStats();
+        
+        // Set up observer
+        setupObserver();
+        
+        // Periodic sync (as a fallback)
+        const syncInterval = setInterval(() => {
+          syncPlayerHealth();
+          syncPlayerMana();
+          syncEnemyStats();
+        }, 500);
+        
+        return () => clearInterval(syncInterval);
+      };
+      
+      // Run the setup after a short delay to ensure DOM is ready
+      const syncSetupTimeout = setTimeout(setupUISync, 1000);
+      return () => clearTimeout(syncSetupTimeout);
     }
   }, [])
 
@@ -325,124 +577,143 @@ export default function GameComponent() {
       </div>
       
       {/* Game UI */}
-      <div id="game-ui" className="game-screen">
-        <div className="game-content">
-          {/* Player Info */}
-          <div id="player-info" className="player-info">
-            <div className="player-stats">
-              <div className="player-name">Your Wizard</div>
-              <div id="player-health" className="health-bar">
-                <div className="bar-header">
-                  <span className="bar-label">Health</span>
-                  <span className="bar-value">100/100</span>
-                </div>
-                <div className="health-bar-container">
-                  <div className="health-fill"></div>
-                  <div className="health-text">100/100</div>
-                </div>
+      <div id="game-ui" className="game-screen scene-integrated">
+        <div id="battle-container">
+          {/* Battle Scene Canvas Container */}
+          <div id="battle-scene"></div>
+          
+          {/* Stat Overlays */}
+          <div id="player-stats-overlay" className="stats-overlay">
+            <div className="overlay-name">Your Wizard</div>
+            <div className="overlay-stat">
+              <div className="overlay-stat-label">
+                <span>Health</span>
+                <span>100/100</span>
               </div>
-              <div id="player-mana" className="mana-bar">
-                <div className="bar-header">
-                  <span className="bar-label">Mana</span>
-                  <span className="bar-value">100/100</span>
-                </div>
-                <div className="mana-bar-container">
-                  <div className="mana-fill"></div>
-                  <div className="mana-text">100/100</div>
-                </div>
+              <div className="overlay-bar">
+                <div className="overlay-bar-fill overlay-health-fill" style={{width: '100%'}}></div>
+              </div>
+            </div>
+            <div className="overlay-stat">
+              <div className="overlay-stat-label">
+                <span>Mana</span>
+                <span>100/100</span>
+              </div>
+              <div className="overlay-bar">
+                <div className="overlay-bar-fill overlay-mana-fill" style={{width: '100%'}}></div>
               </div>
             </div>
           </div>
           
-          {/* Battle Scene */}
-          <div id="battle-scene" className="battle-scene"></div>
-          
-          {/* Opponent Info */}
-          <div id="opponent-info" className="opponent-info">
-            <div className="opponent-stats">
-              <div className="opponent-name">Enemy Wizard</div>
-              <div id="opponent-health" className="health-bar">
-                <div className="bar-header">
-                  <span className="bar-label">Health</span>
-                  <span className="bar-value">100/100</span>
-                </div>
-                <div className="health-bar-container">
-                  <div className="health-fill"></div>
-                  <div className="health-text">100/100</div>
-                </div>
+          <div id="enemy-stats-overlay" className="stats-overlay">
+            <div className="overlay-name">Enemy Wizard</div>
+            <div className="overlay-stat">
+              <div className="overlay-stat-label">
+                <span>Health</span>
+                <span>100/100</span>
               </div>
-              <div id="opponent-mana" className="mana-bar">
-                <div className="bar-header">
-                  <span className="bar-label">Mana</span>
-                  <span className="bar-value">100/100</span>
-                </div>
-                <div className="mana-bar-container">
-                  <div className="mana-fill"></div>
-                  <div className="mana-text">100/100</div>
-                </div>
+              <div className="overlay-bar">
+                <div className="overlay-bar-fill overlay-health-fill" style={{width: '100%'}}></div>
               </div>
-              <div className="opponent-difficulty">
-                <span className="difficulty-label">Difficulty:</span>
-                <span id="opponent-difficulty" className="difficulty-value">Normal</span>
+            </div>
+            <div className="overlay-stat">
+              <div className="overlay-stat-label">
+                <span>Mana</span>
+                <span>100/100</span>
+              </div>
+              <div className="overlay-bar">
+                <div className="overlay-bar-fill overlay-mana-fill" style={{width: '100%'}}></div>
               </div>
             </div>
           </div>
           
-          {/* Battle Stats */}
-          <div id="battle-stats" className="battle-stats">
-            <div className="stats-header">Battle Info</div>
-            <div className="battle-stats-content">
-              <div className="stats-column">
-                <div className="stat-row">
-                  <span className="stat-label">Turn:</span>
-                  <span id="turn-counter" className="stat-value">1</span>
-                </div>
-                <div className="stat-row">
-                  <span className="stat-label">Spells Cast:</span>
-                  <span id="spells-cast" className="stat-value">0</span>
-                </div>
-                <div className="stat-row">
-                  <span className="stat-label">Last Action:</span>
-                  <span id="last-action" className="stat-value">Battle started</span>
-                </div>
-              </div>
-              <div id="battle-log" className="battle-log">
-                <div className="log-entry">Battle begins! Choose your spell...</div>
-              </div>
-            </div>
+          <div id="battle-info-overlay" className="stats-overlay">
+            <div>Turn: <span id="overlay-turn-counter">1</span></div>
+            <div>Last Action: <span id="overlay-last-action">Battle started</span></div>
           </div>
           
-          {/* Spell Choices */}
-          <div id="spell-choices" className="spell-choices">
-            <div className="spells-header">
-              <span>Your Spells: <span className="spells-known-count"><span id="player-spells-count">{gameState.playerSpells.length}</span> Known</span></span>
-            </div>
-            <div className="spells-list">
-              {gameState.playerSpells.map((spell, index) => (
-                <div 
-                  key={spell.instanceId || `${spell.id}_${index}`} 
-                  className="spell-button" 
-                  data-spell-id={spell.id}
-                  style={{ borderColor: getElementColor(spell.element) }}
-                >
-                  <div className="spell-header">
-                    <span className="spell-element">{getElementIcon(spell.element)}</span>
-                    <span className="spell-name">{spell.name}</span>
-                    <span className="spell-cost">{spell.manaCost} MP</span>
+          {/* Hidden elements for compatibility - do not display */}
+          <div id="player-health" className="hidden-ui-element">
+            <div className="health-fill"></div>
+            <div className="health-text">100/100</div>
+          </div>
+          <div id="player-mana" className="hidden-ui-element">
+            <div className="mana-fill"></div>
+            <div className="mana-text">100/100</div>
+          </div>
+          <div id="opponent-health" className="hidden-ui-element">
+            <div className="health-fill"></div>
+            <div className="health-text">100/100</div>
+          </div>
+          <div id="opponent-mana" className="hidden-ui-element">
+            <div className="mana-fill"></div>
+            <div className="mana-text">100/100</div>
+          </div>
+          
+          {/* Spell Container - overlay on the battle scene */}
+          <div id="spell-container">
+            <div id="spell-choices" className="spell-choices">
+              <div className="spells-header">
+                <span>Your Spells: <span className="spells-known-count"><span id="player-spells-count">{gameState.playerSpells.length}</span> Known</span></span>
+              </div>
+              <div className="spells-list">
+                {gameState.playerSpells.map((spell, index) => (
+                  <div 
+                    key={spell.instanceId || `${spell.id}_${index}`} 
+                    className="spell-button" 
+                    data-spell-id={spell.id}
+                    onClick={(e) => {
+                      console.log(`Spell clicked: ${spell.name}`);
+                      // Any additional click handling here
+                    }}
+                    style={{ 
+                      backgroundColor: `rgba(20, 20, 50, 0.9)`,
+                      borderColor: getElementColor(spell.element)
+                    }}
+                  >
+                    <div className="spell-header" style={{
+                      backgroundColor: `${getElementColor(spell.element)}30`,
+                      borderBottom: `1px solid ${getElementColor(spell.element)}60`
+                    }}>
+                      <span className="spell-element">{getElementIcon(spell.element)}</span>
+                      <span className="spell-name">{spell.name}</span>
+                      <span className="spell-cost">{spell.manaCost} MP</span>
+                    </div>
+                    <div className="spell-image-container">
+                      <div 
+                        className="spell-element-placeholder"
+                        style={{
+                          backgroundColor: `${getElementColor(spell.element)}40`,
+                          width: '100%',
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '36px'
+                        }}
+                      >
+                        {getElementIcon(spell.element)}
+                        <span className="spell-element-text">{spell.element}</span>
+                      </div>
+                    </div>
+                    <div className="spell-description">
+                      {spell.description}
+                    </div>
+                    <div className="spell-stats" style={{
+                      backgroundColor: `${getElementColor(spell.element)}20`
+                    }}>
+                      {spell.damage > 0 && <span className="spell-damage">Damage: {spell.damage}</span>}
+                      {spell.healing > 0 && <span className="spell-healing">Healing: {spell.healing}</span>}
+                      {spell.manaRestore > 0 && <span className="spell-mana">Mana: +{spell.manaRestore}</span>}
+                    </div>
                   </div>
-                  <div className="spell-description">{spell.description}</div>
-                  <div className="spell-stats">
-                    {spell.damage > 0 && <span className="spell-damage">Damage: {spell.damage}</span>}
-                    {spell.healing > 0 && <span className="spell-healing">Healing: {spell.healing}</span>}
-                    {spell.manaRestore > 0 && <span className="spell-mana">Mana: +{spell.manaRestore}</span>}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
         
-        {/* Menu Button (bottom right corner) - smaller icon only version */}
+        {/* Menu Button (bottom right corner) */}
         <div className="corner-button menu-button-container">
           <button id="menu-btn" className="icon-button" onClick={() => setGameState(prevState => ({ ...prevState, showMenu: !prevState.showMenu }))}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">

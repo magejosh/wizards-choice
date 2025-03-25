@@ -1,6 +1,13 @@
 // SpellProgressionTracker.js - Manages player progression and spell unlocking
 
+/**
+ * Manages player progression, experience, unlocked spells, and level advancement
+ */
 class SpellProgressionTracker {
+    /**
+     * Create a SpellProgressionTracker instance
+     * @param {Object} spellDefinitions - The spell definitions object
+     */
     constructor(spellDefinitions) {
         this.spellDefinitions = spellDefinitions;
         this.playerUnlockedSpells = [];
@@ -11,6 +18,10 @@ class SpellProgressionTracker {
         };
     }
 
+    /**
+     * Initialize player progression tracking
+     * @returns {Object} The player's progress
+     */
     init() {
         console.log('Initializing SpellProgressionTracker...');
         
@@ -21,7 +32,10 @@ class SpellProgressionTracker {
         return this.playerProgress;
     }
 
-    // Initialize player progress - sets up default progress for a new game
+    /**
+     * Initialize player progress - sets up default progress for a new game
+     * @returns {Object} The player's progress
+     */
     initPlayerProgress() {
         console.log('Initializing player progress...');
         
@@ -41,7 +55,10 @@ class SpellProgressionTracker {
         return this.playerProgress;
     }
 
-    // Reset player progress to default values
+    /**
+     * Reset player progress to default values
+     * @returns {Object} The player's progress
+     */
     resetPlayerProgress() {
         console.log('Resetting player progress...');
         
@@ -49,7 +66,10 @@ class SpellProgressionTracker {
         return this.initPlayerProgress();
     }
 
-    // Save player progress to localStorage
+    /**
+     * Save player progress to localStorage
+     * @returns {boolean} Whether saving was successful
+     */
     saveProgress() {
         try {
             // Update the unlockedSpells in the progress object
@@ -65,7 +85,10 @@ class SpellProgressionTracker {
         }
     }
 
-    // Load player progress from localStorage
+    /**
+     * Load player progress from localStorage
+     * @returns {Object} The player's progress
+     */
     loadProgress() {
         try {
             const savedProgress = localStorage.getItem('playerProgress');
@@ -94,22 +117,35 @@ class SpellProgressionTracker {
         }
     }
 
-    // Get player unlocked spells
+    /**
+     * Get player unlocked spells
+     * @returns {Array<string>} The player's unlocked spells
+     */
     getPlayerUnlockedSpells() {
         return this.playerUnlockedSpells;
     }
 
-    // Alias for getPlayerUnlockedSpells to maintain compatibility
+    /**
+     * Alias for getPlayerUnlockedSpells to maintain compatibility
+     * @returns {Array<string>} The player's unlocked spells
+     */
     getUnlockedSpells() {
         return this.getPlayerUnlockedSpells();
     }
 
-    // Get player progress
+    /**
+     * Get player progress
+     * @returns {Object} The player's progress
+     */
     getPlayerProgress() {
         return this.playerProgress;
     }
 
-    // Add experience to the player
+    /**
+     * Add experience to the player
+     * @param {number} amount - The amount of experience to add
+     * @returns {boolean} Whether the player leveled up
+     */
     addExperience(amount) {
         // Define max level
         const MAX_LEVEL = 10;
@@ -159,12 +195,20 @@ class SpellProgressionTracker {
         return false;
     }
 
-    // Get spells that unlock at a specific level
+    /**
+     * Get spells that unlock at a specific level
+     * @param {number} level - The level to check
+     * @returns {Array<Object>} The spells that unlock at the given level
+     */
     getSpellsByUnlockLevel(level) {
         return Object.values(this.spellDefinitions.spells).filter(spell => spell.unlockLevel === level);
     }
 
-    // Get available spells for unlock based on player level
+    /**
+     * Get available spells for unlock based on player level
+     * @param {number} playerLevel - The player's level
+     * @returns {Array<Object>} The available spells for unlock
+     */
     getAvailableSpellsForUnlock(playerLevel) {
         // Get all spells that are unlockable at the player's level or below
         const availableSpells = Object.values(this.spellDefinitions.spells).filter(spell => 
@@ -174,7 +218,11 @@ class SpellProgressionTracker {
         return availableSpells;
     }
 
-    // Unlock a spell for the player
+    /**
+     * Unlock a spell for the player
+     * @param {string} spellId - The ID of the spell to unlock
+     * @returns {Object|null} The unlocked spell, or null if the spell is already unlocked
+     */
     unlockSpell(spellId) {
         console.log(`Attempting to unlock spell: ${spellId}`);
         
@@ -196,7 +244,11 @@ class SpellProgressionTracker {
         return null;
     }
 
-    // Get spell options for level-up (1 from defeated enemy, 2 random)
+    /**
+     * Get spell options for level-up (1 from defeated enemy, 2 random)
+     * @param {Array<string>} defeatedEnemySpells - The spells of the defeated enemy
+     * @returns {Array<Object>} The spell options for level-up
+     */
     getSpellOptionsForLevelUp(defeatedEnemySpells) {
         console.log('Getting spell options for level-up');
         
@@ -257,7 +309,11 @@ class SpellProgressionTracker {
         return spellOptions;
     }
 
-    // Unlock a new spell based on difficulty
+    /**
+     * Unlock a new spell based on difficulty
+     * @param {string} difficulty - The difficulty level
+     * @returns {Object|null} The unlocked spell, or null if no spell was unlocked
+     */
     unlockNewSpell(difficulty) {
         console.log(`Attempting to unlock new spell based on ${difficulty} difficulty`);
         
@@ -304,7 +360,12 @@ class SpellProgressionTracker {
         return spellToUnlock;
     }
 
-    // Record battle results and update player progress
+    /**
+     * Record battle results and update player progress
+     * @param {boolean} won - Whether the player won the battle
+     * @param {string} difficulty - The difficulty level
+     * @returns {Object} The player's updated stats
+     */
     recordBattleResult(won, difficulty) {
         console.log(`Recording battle result: ${won ? 'Victory' : 'Defeat'} on ${difficulty} difficulty`);
         
@@ -347,7 +408,11 @@ class SpellProgressionTracker {
         return this.playerProgress.stats;
     }
 
-    // Improve an existing spell
+    /**
+     * Improve an existing spell
+     * @param {string} spellId - The ID of the spell to improve
+     * @returns {Object|null} The improved spell, or null if the spell was not found
+     */
     improveSpell(spellId) {
         console.log(`Improving existing spell: ${spellId}`);
         

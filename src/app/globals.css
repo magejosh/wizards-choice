@@ -127,12 +127,18 @@ body {
   height: 100%;
   background: linear-gradient(90deg, #f56565 0%, #e53e3e 100%);
   transition: width 0.3s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .mana-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, #4299e1 0%, #3182ce 100%);
   transition: width 0.3s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .bar-text {
@@ -147,6 +153,7 @@ body {
   color: white;
   font-weight: bold;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }
 
 /* Spell effects */

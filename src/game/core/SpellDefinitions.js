@@ -1,10 +1,20 @@
 // SpellDefinitions.js - Contains spell catalog and attributes
 
+/**
+ * Defines and stores all spell data used in the game
+ */
 class SpellDefinitions {
+    /**
+     * Initialize spell definitions container
+     */
     constructor() {
         this.spells = {};
     }
 
+    /**
+     * Initialize spell definitions
+     * @returns {Object} The spells catalog
+     */
     init() {
         console.log('Initializing Spell Definitions...');
         
@@ -15,6 +25,9 @@ class SpellDefinitions {
         return this.spells;
     }
 
+    /**
+     * Define all spells in the game
+     */
     defineSpells() {
         // Fire spells
         this.addSpell({
@@ -214,10 +227,19 @@ class SpellDefinitions {
         });
     }
 
+    /**
+     * Add a spell to the spell catalog
+     * @param {Object} spellData - The spell data to add
+     */
     addSpell(spellData) {
         this.spells[spellData.id] = spellData;
     }
 
+    /**
+     * Get a spell by its ID
+     * @param {string} spellId - The ID of the spell to retrieve
+     * @returns {Object|null} The spell data, or null if not found
+     */
     getSpellById(spellId) {
         if (this.spells[spellId]) {
             return {
@@ -235,14 +257,29 @@ class SpellDefinitions {
         return null;
     }
 
+    /**
+     * Get all spells of a specific element
+     * @param {string} element - The element to filter by
+     * @returns {Object[]} An array of spell data
+     */
     getSpellsByElement(element) {
         return Object.values(this.spells).filter(spell => spell.element === element);
     }
 
+    /**
+     * Get all spells that unlock at a specific level
+     * @param {number} level - The level to filter by
+     * @returns {Object[]} An array of spell data
+     */
     getSpellsByUnlockLevel(level) {
         return Object.values(this.spells).filter(spell => spell.unlockLevel === level);
     }
 
+    /**
+     * Get all spells for display, sorted by element and mana cost
+     * @param {string[]} unlockedSpells - An array of unlocked spell IDs
+     * @returns {Object[]} An array of spell data
+     */
     getSpellsForDisplay(unlockedSpells) {
         return unlockedSpells.map(spellId => {
             const spell = this.spells[spellId];

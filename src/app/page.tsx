@@ -7,6 +7,7 @@ import Link from 'next/link'
 // Import CSS
 import '../styles/style.css'
 import '../styles/enhanced-style.css'
+import '../styles/scene-overlay.css'
 
 // Create a dynamic import for the Game component to avoid SSR issues with ThreeJS
 const GameComponent = dynamic(

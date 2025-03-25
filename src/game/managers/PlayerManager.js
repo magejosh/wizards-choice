@@ -1,11 +1,21 @@
 // PlayerManager.js - Handles player state and actions
 
+/**
+ * Manages player state and actions
+ */
 export class PlayerManager {
+    /**
+     * Create a PlayerManager instance
+     * @param {Object} gameStateManager - The game state manager instance
+     */
     constructor(gameStateManager) {
         this.gameStateManager = gameStateManager;
     }
 
-    // Handle player casting a spell
+    /**
+     * Handle player casting a spell
+     * @param {string} spellId - ID of the spell to cast
+     */
     playerCastSpell(spellId) {
         console.log(`Player attempting to cast spell: ${spellId}`);
         const gameState = this.gameStateManager.getGameState();
@@ -60,7 +70,7 @@ export class PlayerManager {
             // Update battle log
             gameState.battleLog.push(`You cast ${spell.name}`);
             
-            // Update UI to show changes immediately
+            // Update the entire battle UI, including player and opponent stats
             this.gameStateManager.updateBattleUI();
             
             // Check if battle has ended after player's spell
@@ -74,6 +84,9 @@ export class PlayerManager {
             console.log('Scheduling opponent turn');
             setTimeout(() => {
                 this.gameStateManager.battleManager.processOpponentTurn();
+                
+                // Update the battle UI again after opponent's turn
+                this.gameStateManager.updateBattleUI();
             }, 1000);
             
         } catch (error) {
@@ -84,7 +97,9 @@ export class PlayerManager {
         }
     }
     
-    // Show spell selection screen before battle
+    /**
+     * Show spell selection screen before battle
+     */
     showSpellSelectionScreen() {
         console.log('Showing spell selection screen');
         
@@ -310,56 +325,169 @@ export class PlayerManager {
         }
     }
     
-    // Update UI to display player progression information
+    /**
+     * Update player progress display, including experience bar
+     */
     updatePlayerProgressDisplay() {
-        // Check if progression system is initialized
-        if (!this.gameStateManager.progressionSystem) {
-            console.warn('Cannot update player progress display: progression system not initialized');
+        console.log('Updating player progress display');
+        
+        const player = this.gameStateManager.getGameState().player;
+        if (!player) {
+            console.error('No player data found');
             return;
         }
         
-        // Get player progress
-        const playerProgress = this.gameStateManager.progressionSystem.getPlayerProgress();
-        
-        // Update player level display
-        const playerLevelElement = document.getElementById('player-level-value');
-        if (playerLevelElement) {
-            playerLevelElement.textContent = playerProgress.level;
+        // Update overlay stats through UI manager if available
+        if (this.gameStateManager.uiManager && typeof this.gameStateManager.uiManager.updatePlayerOverlay === 'function') {
+            this.gameStateManager.uiManager.updatePlayerOverlay(player);
+            return;
         }
         
-        // Update player name to include level
-        const playerNameElement = document.querySelector('.player-name');
-        if (playerNameElement) {
-            playerNameElement.textContent = `Your Wizard - Level ${playerProgress.level}`;
+        // If no UI manager, update elements directly
+        
+        // Update health bar
+        const healthBarElement = document.querySelector('#player-health .health-bar .health-bar-fill');
+        const healthTextElement = document.querySelector('#player-health .health-bar .bar-text');
+        
+        if (healthBarElement && healthTextElement) {
+            const healthPercentage = Math.max(0, Math.min(100, (player.health / player.maxHealth) * 100));
+            
+            healthBarElement.style.width = `${healthPercentage}%`;
+            healthTextElement.textContent = `${Math.round(player.health)}/${player.maxHealth}`;
+            
+            console.log(`Health: ${player.health}/${player.maxHealth} (${healthPercentage}%)`);
+        } else {
+            console.warn('Health bar elements not found');
         }
         
-        // Update spells known display
-        const playerSpellsCountElement = document.getElementById('player-spells-known-value');
-        if (playerSpellsCountElement) {
-            const unlockedSpells = this.gameStateManager.spellSystem.getPlayerUnlockedSpells();
-            playerSpellsCountElement.textContent = unlockedSpells.length;
+        // Update mana bar
+        const manaBarElement = document.querySelector('#player-mana .mana-bar .mana-bar-fill');
+        const manaTextElement = document.querySelector('#player-mana .mana-bar .bar-text');
+        
+        if (manaBarElement && manaTextElement) {
+            const manaPercentage = Math.max(0, Math.min(100, (player.mana / player.maxMana) * 100));
+            
+            manaBarElement.style.width = `${manaPercentage}%`;
+            manaTextElement.textContent = `${Math.round(player.mana)}/${player.maxMana}`;
+            
+            console.log(`Mana: ${player.mana}/${player.maxMana} (${manaPercentage}%)`);
+        } else {
+            console.warn('Mana bar elements not found');
         }
         
-        // Update experience bar
-        const expBarFill = document.getElementById('exp-bar-fill');
+        // Update experience bar (using the new overlay elements)
+        const expFill = document.getElementById('player-exp-fill');
         const expCurrentElement = document.getElementById('exp-current-value');
         const expNextElement = document.getElementById('exp-next-value');
+        const playerLevelElement = document.getElementById('player-level');
         
-        if (expBarFill && expCurrentElement && expNextElement) {
-            const currentExp = playerProgress.experience;
-            const expForCurrentLevel = this.gameStateManager.progressionSystem.getExpForLevel(playerProgress.level);
-            const expForNextLevel = this.gameStateManager.progressionSystem.getExpForLevel(playerProgress.level + 1);
-            const expNeeded = expForNextLevel - expForCurrentLevel;
-            const currentLevelExp = currentExp - expForCurrentLevel;
-            const percentage = (currentLevelExp / expNeeded) * 100;
-            
-            // Update the fill width
-            expBarFill.style.width = `${percentage}%`;
-            
-            // Update the text values
-            expCurrentElement.textContent = currentLevelExp;
-            expNextElement.textContent = expNeeded;
+        if (expFill && expCurrentElement && expNextElement) {
+            try {
+                const currentLevel = player.level || 1;
+                const expNeeded = this.calculateExpToNextLevel(currentLevel);
+                const currentExp = player.experience || 0;
+                
+                // Calculate experience for current level
+                let expForPreviousLevels = 0;
+                for (let i = 1; i < currentLevel; i++) {
+                    expForPreviousLevels += this.calculateExpToNextLevel(i);
+                }
+                
+                const currentLevelExp = currentExp - expForPreviousLevels;
+                const percentage = Math.max(0, Math.min(100, (currentLevelExp / expNeeded) * 100));
+                
+                // Update UI elements
+                expFill.style.width = `${percentage}%`;
+                expCurrentElement.textContent = Math.floor(currentLevelExp);
+                expNextElement.textContent = expNeeded;
+                
+                // Update player level if element exists
+                if (playerLevelElement) {
+                    playerLevelElement.textContent = currentLevel;
+                }
+                
+                console.log(`Experience: ${currentLevelExp}/${expNeeded} (${percentage}%)`);
+            } catch (error) {
+                console.error('Error updating experience bar:', error);
+            }
+        } else {
+            console.warn('Experience bar elements not found');
         }
+    }
+    
+    /**
+     * Create missing experience bar elements if they don't exist
+     */
+    createMissingExperienceBarElements() {
+        console.log('Creating missing experience bar elements for player stats overlay');
+        
+        // Check if the player stats overlay exists
+        let playerStatsOverlay = document.getElementById('player-stats-overlay');
+        if (!playerStatsOverlay) {
+            console.warn('Player stats overlay not found, creating it');
+            playerStatsOverlay = document.createElement('div');
+            playerStatsOverlay.id = 'player-stats-overlay';
+            playerStatsOverlay.className = 'stats-overlay';
+            
+            // Try to find the battle container
+            const battleContainer = document.getElementById('battle-container');
+            if (battleContainer) {
+                battleContainer.appendChild(playerStatsOverlay);
+            } else {
+                document.body.appendChild(playerStatsOverlay);
+            }
+        }
+        
+        // Check if the XP stat section exists
+        let expStatSection = playerStatsOverlay.querySelector('.overlay-stat:last-child');
+        if (!expStatSection || !expStatSection.querySelector('.overlay-stat-label span:first-child')?.textContent.includes('XP')) {
+            console.log('Creating XP stat section');
+            
+            // Create new XP stat section
+            expStatSection = document.createElement('div');
+            expStatSection.className = 'overlay-stat';
+            expStatSection.innerHTML = `
+                <div class="overlay-stat-label">
+                    <span>XP</span>
+                    <span id="player-exp-text"><span id="exp-current-value">0</span>/<span id="exp-next-value">100</span></span>
+                </div>
+                <div class="overlay-bar">
+                    <div id="player-exp-fill" class="overlay-bar-fill overlay-exp-fill" style="width: 0%;"></div>
+                </div>
+            `;
+            
+            playerStatsOverlay.appendChild(expStatSection);
+        }
+        
+        // Check if player level is shown in the overlay name
+        const overlayName = playerStatsOverlay.querySelector('.overlay-name');
+        if (!overlayName) {
+            console.log('Creating player name and level display');
+            
+            const nameElement = document.createElement('div');
+            nameElement.className = 'overlay-name';
+            nameElement.innerHTML = 'Your Wizard - Level <span id="player-level">1</span>';
+            
+            playerStatsOverlay.insertBefore(nameElement, playerStatsOverlay.firstChild);
+        } else if (!overlayName.querySelector('#player-level')) {
+            console.log('Adding level display to player name');
+            overlayName.innerHTML = 'Your Wizard - Level <span id="player-level">1</span>';
+        }
+        
+        console.log('Experience bar elements created successfully');
+        
+        // Update display immediately
+        setTimeout(() => this.updatePlayerProgressDisplay(), 100);
+    }
+    
+    /**
+     * Calculate experience required for the next level
+     * @param {number} currentLevel - Current player level
+     * @returns {number} Experience points needed for next level
+     */
+    calculateExpToNextLevel(currentLevel) {
+        // Simple exponential experience curve
+        return Math.floor(100 * Math.pow(1.5, currentLevel - 1));
     }
 }
 

@@ -130,7 +130,8 @@ button:hover {
 }
 
 /* Health and Mana Bars */
-.health-bar, .mana-bar {
+/* These styles are now superseded by enhanced-style.css */
+/* .health-bar, .mana-bar {
     height: 20px;
     margin: 5px 0;
     border-radius: 10px;
@@ -148,7 +149,7 @@ button:hover {
     height: 100%;
     background-color: #5050ff;
     transition: width 0.5s ease;
-}
+} */
 
 /* Spell Choice Buttons */
 .spell-button {

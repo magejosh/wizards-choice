@@ -217,6 +217,34 @@ flowchart TD
     style S fill:#fbf,stroke:#333,stroke-width:2px
 ```
 
+## UI Element Updates Process
+
+```mermaid
+flowchart TD
+    A[Game Initialization] --> B[UIFixer.fixUI]
+    B --> C[Apply Base Styling]
+    C --> D[Apply Initial Layout]
+    D --> E[Set Event Listeners]
+    
+    F[Game State Changes] --> G[PlayerManager.updatePlayerProgressDisplay]
+    G --> H[Update health/mana bar width]
+    H --> I[Update health/mana text values]
+    
+    J[Battle State Changes] --> K[BattleManager.updateHealthAndManaDisplay]
+    K --> L[Update health/mana bar width]
+    L --> M[Update health/mana text values]
+    
+    C -.-> H
+    C -.-> L
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#bbf,stroke:#333,stroke-width:2px
+    style F fill:#bfb,stroke:#333,stroke-width:2px
+    style J fill:#bfb,stroke:#333,stroke-width:2px
+```
+
+This diagram illustrates the separation of concerns between initial UI styling (handled by UIFixer) and runtime updates to health/mana displays (handled by PlayerManager and BattleManager). The UIFixer applies all necessary CSS styles to ensure the bars are properly displayed, while the manager classes only update the width values and text content during gameplay.
+
 ## Progression System Process
 
 ```mermaid

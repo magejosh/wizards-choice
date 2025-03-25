@@ -14,6 +14,17 @@ module.exports = {
     static: './dist',
     hot: true,
   },
+  cache: {
+    type: 'filesystem',
+    cacheDirectory: path.resolve(__dirname, 'node_modules/.cache/webpack'),
+    maxMemoryGenerations: 1,
+    maxAge: 3600000,
+  },
+  performance: {
+    hints: false,
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000
+  },
   module: {
     rules: [
       {
@@ -47,4 +58,17 @@ module.exports = {
       template: './src/index.html',
     }),
   ],
+  optimization: {
+    moduleIds: 'deterministic',
+    runtimeChunk: 'single',
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
+        },
+      },
+    },
+  },
 };

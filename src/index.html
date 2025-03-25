@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
     <title>Wizard's Choice</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/enhanced-style.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/enhanced-style.css">
+    <link rel="stylesheet" href="styles/scene-overlay.css">
 </head>
 <body>
     <div id="game-container">
@@ -19,39 +20,146 @@
             <button id="start-game">Start New Duel</button>
             <button id="options">Options</button>
         </div>
-        <div id="game-ui" class="hidden">
-            <div id="player-info">
-                <div id="player-health"></div>
-                <div id="player-mana"></div>
+        <div id="game-ui" class="hidden scene-integrated">
+            <!-- Battle container (top 2/3) -->
+            <div id="battle-container">
+                <!-- 3D battle scene -->
+                <div id="battle-scene"></div>
+                
+                <!-- Player stats overlay -->
+                <div id="player-stats-overlay" class="stats-overlay">
+                    <div class="overlay-name">Your Wizard - Level <span id="player-level">1</span></div>
+                    <div class="overlay-stat">
+                        <div class="overlay-stat-label">
+                            <span>HP</span>
+                            <span id="player-health-text">100/100</span>
+                        </div>
+                        <div class="overlay-bar">
+                            <div id="player-health-fill" class="overlay-bar-fill overlay-health-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <div class="overlay-stat">
+                        <div class="overlay-stat-label">
+                            <span>MP</span>
+                            <span id="player-mana-text">100/100</span>
+                        </div>
+                        <div class="overlay-bar">
+                            <div id="player-mana-fill" class="overlay-bar-fill overlay-mana-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <div class="overlay-stat">
+                        <div class="overlay-stat-label">
+                            <span>XP</span>
+                            <span id="player-exp-text"><span id="exp-current-value">0</span>/<span id="exp-next-value">100</span></span>
+                        </div>
+                        <div class="overlay-bar">
+                            <div id="player-exp-fill" class="overlay-bar-fill overlay-exp-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enemy stats overlay -->
+                <div id="enemy-stats-overlay" class="stats-overlay">
+                    <div class="overlay-name">Enemy Wizard</div>
+                    <div class="overlay-stat">
+                        <div class="overlay-stat-label">
+                            <span>HP</span>
+                            <span id="enemy-health-text">100/100</span>
+                        </div>
+                        <div class="overlay-bar">
+                            <div id="enemy-health-fill" class="overlay-bar-fill overlay-health-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <div class="overlay-stat">
+                        <div class="overlay-stat-label">
+                            <span>MP</span>
+                            <span id="enemy-mana-text">100/100</span>
+                        </div>
+                        <div class="overlay-bar">
+                            <div id="enemy-mana-fill" class="overlay-bar-fill overlay-mana-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <div class="overlay-stat">
+                        <div class="overlay-stat-label">
+                            <span>Difficulty</span>
+                            <span id="enemy-difficulty">Normal</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Battle info overlay -->
+                <div id="battle-info-overlay" class="stats-overlay">
+                    <div class="overlay-name">Battle Info</div>
+                    <div class="overlay-stat">
+                        <div class="overlay-stat-label">
+                            <span>Turn</span>
+                            <span id="turn-counter">1</span>
+                        </div>
+                    </div>
+                    <div class="overlay-stat">
+                        <div class="overlay-stat-label">
+                            <span>Spells Cast</span>
+                            <span id="spells-cast">0</span>
+                        </div>
+                    </div>
+                    <div id="battle-log">
+                        <div class="log-entry">Battle started against Enemy Wizard</div>
+                    </div>
+                </div>
             </div>
-            <div id="opponent-info">
-                <div id="opponent-health"></div>
-                <div id="opponent-mana"></div>
+            
+            <!-- Spell container (bottom 1/3) -->
+            <div id="spell-container">
+                <div id="spell-choices"></div>
             </div>
-            <div id="battle-scene"></div>
-            <div id="battle-info" class="battle-info">
+            
+            <!-- Traditional UI elements (hidden by CSS but kept for backward compatibility) -->
+            <div id="player-info" style="display: none;">
+                <div id="player-health" class="player-stat">
+                    <div class="stat-label">HP</div>
+                    <div class="health-bar">
+                        <div class="health-bar-fill"></div>
+                        <div class="bar-text">100/100</div>
+                    </div>
+                </div>
+                <div id="player-mana" class="player-stat">
+                    <div class="stat-label">MP</div>
+                    <div class="mana-bar">
+                        <div class="mana-bar-fill"></div>
+                        <div class="bar-text">100/100</div>
+                    </div>
+                </div>
+            </div>
+            <div id="opponent-info" style="display: none;">
+                <div id="opponent-health" class="opponent-stat">
+                    <div class="stat-label">HP</div>
+                    <div class="health-bar">
+                        <div class="health-bar-fill"></div>
+                        <div class="bar-text">100/100</div>
+                    </div>
+                </div>
+                <div id="opponent-mana" class="opponent-stat">
+                    <div class="stat-label">MP</div>
+                    <div class="mana-bar">
+                        <div class="mana-bar-fill"></div>
+                        <div class="bar-text">100/100</div>
+                    </div>
+                </div>
+            </div>
+            <div id="battle-info" class="battle-info" style="display: none;">
                 <h3>Battle Info</h3>
                 <div class="info-row">
                     <span class="info-label">Turn:</span>
-                    <span class="info-value" id="turn-counter">1</span>
+                    <span class="info-value" id="turn-counter-old">1</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Spells Cast:</span>
-                    <span class="info-value" id="spells-cast">0</span>
+                    <span class="info-value" id="spells-cast-old">0</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Last Action:</span>
                     <span class="info-value" id="last-action">Battle started</span>
                 </div>
-            </div>
-            <div id="spell-choices"></div>
-            <div id="battle-log"></div>
-            <div id="menu-button-container">
-                <button id="menu-button" class="menu-button" aria-label="Menu">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
-                    </svg>
-                </button>
             </div>
         </div>
         <div id="game-over" class="hidden">

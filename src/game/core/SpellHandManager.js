@@ -1,6 +1,13 @@
 // SpellHandManager.js - Manages the player's spell hand during battles
 
+/**
+ * Manages the player's spell hand, deck, and discard pile during battles
+ */
 class SpellHandManager {
+    /**
+     * Create a SpellHandManager instance
+     * @param {Object} spellDefinitions - The spell definitions object
+     */
     constructor(spellDefinitions) {
         this.spellDefinitions = spellDefinitions;
         this.playerSpellHand = [];
@@ -9,7 +16,10 @@ class SpellHandManager {
         this.usedSpellsTracking = [];
     }
 
-    // Initialize the player's spell hand for battle
+    /**
+     * Initialize the player's spell hand for battle
+     * @param {Array<string>} unlockedSpells - Array of unlocked spell IDs
+     */
     initializeSpellHand(unlockedSpells) {
         console.log('Initializing player spell hand for battle');
         
@@ -36,7 +46,9 @@ class SpellHandManager {
         return this.playerSpellHand;
     }
     
-    // Refill the player's spell hand up to the maximum hand size
+    /**
+     * Refill the player's spell hand up to the maximum hand size
+     */
     refillSpellHand() {
         console.log('Refilling player spell hand');
         console.log(`Current hand has ${this.playerSpellHand.length} spells out of ${this.maxHandSize}`);
@@ -47,6 +59,9 @@ class SpellHandManager {
             return null;
         }
         
+        // Validate deck state before drawing
+        this.validateDeckState();
+        
         // Draw cards until we have maxHandSize cards or the deck is empty
         let lastDrawnCard = null;
         while (this.playerSpellHand.length < this.maxHandSize) {
@@ -55,31 +70,127 @@ class SpellHandManager {
                 lastDrawnCard = drawnSpell;
             } else {
                 console.log('Failed to draw a spell - deck might be empty');
-                // If we can't draw a card and can't reshuffle, break out
+                
+                // Try one emergency reshuffle if we couldn't draw and hand is still not full
+                if (this.playerSpellHand.length < this.maxHandSize) {
+                    const selectedSpellIds = this.getSelectedSpellIds();
+                    console.log('Emergency reshuffling with selected spells:', selectedSpellIds);
+                    this.reshuffleDiscardPile(selectedSpellIds);
+                    
+                    // Try one more draw after emergency reshuffle
+                    const emergencyDrawn = this.drawSpellFromDeck();
+                    if (emergencyDrawn) {
+                        lastDrawnCard = emergencyDrawn;
+                        continue;
+                    }
+                }
+                
+                // If we still can't draw a card and can't reshuffle, break out
                 break;
             }
         }
         
         console.log('Hand after refill:', this.playerSpellHand.map(spell => spell.name).join(', '));
+        
+        // Ensure we always have at least one spell in hand
+        if (this.playerSpellHand.length === 0) {
+            console.error('Critical error: Hand is empty after refill attempt');
+            
+            // Last resort: Create a basic spell to ensure player can always do something
+            const basicSpell = this.spellDefinitions.getSpellById('fireball');
+            if (basicSpell) {
+                console.log('Adding emergency basic spell to hand:', basicSpell.name);
+                this.playerSpellHand.push(basicSpell);
+                lastDrawnCard = basicSpell;
+            }
+        }
+        
         return lastDrawnCard; // Return the last card drawn for UI feedback
     }
     
-    // Draw a random spell from the deck and add it to the player's hand
+    /**
+     * Validates the current deck and hand state, ensuring neither is empty
+     * @returns {boolean} True if state is valid, false otherwise
+     */
+    validateDeckState() {
+        console.log('Validating deck state');
+        
+        // Check hand state
+        if (!this.playerSpellHand || this.playerSpellHand.length === 0) {
+            console.warn('Player hand is empty - this should not happen during battle');
+            return false;
+        }
+        
+        // Check if deck is nearly depleted (less than spells needed to fill hand)
+        const spellsNeeded = this.maxHandSize - this.playerSpellHand.length;
+        const lowDeckWarningThreshold = Math.max(1, spellsNeeded);
+        
+        if (this.availableSpellsForBattle.length <= lowDeckWarningThreshold) {
+            console.log(`Deck is running low (${this.availableSpellsForBattle.length} cards left)`);
+            
+            // Get IDs of selected spells from the player's hand to prepare for possible reshuffle
+            const selectedSpellIds = this.getSelectedSpellIds();
+            
+            if (selectedSpellIds.length > 0) {
+                console.log('Proactive reshuffling with player selected spells:', selectedSpellIds);
+                this.reshuffleDiscardPile(selectedSpellIds);
+                return this.availableSpellsForBattle.length > 0;
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Gets the IDs of spells currently selected for this battle
+     * @returns {Array<string>} Array of spell IDs
+     */
+    getSelectedSpellIds() {
+        // Get spells from player's hand
+        const handSpellIds = this.playerSpellHand.map(spell => {
+            // Make sure we extract the ID properly from various possible formats
+            if (typeof spell === 'string') return spell;
+            if (typeof spell === 'object' && spell !== null) {
+                // If it's an object, extract the id property
+                return spell.id;
+            }
+            console.warn('Invalid spell in player hand:', spell);
+            return null;
+        }).filter(id => id !== null); // Remove any nulls
+        
+        // If we have tracking data, use that as well
+        if (this.usedSpellsTracking && this.usedSpellsTracking.length > 0) {
+            // Filter out any non-string tracking IDs first
+            const validTrackingIds = this.usedSpellsTracking.filter(id => typeof id === 'string');
+            const allBattleSpells = [...handSpellIds, ...validTrackingIds];
+            // Return unique spell IDs
+            return [...new Set(allBattleSpells)];
+        }
+        
+        return handSpellIds;
+    }
+    
+    /**
+     * Draw a random spell from the deck and add it to the player's hand
+     */
     drawSpellFromDeck() {
         console.log('Attempting to draw a spell from deck');
         
         // Initialize the deck if it doesn't exist
         if (!this.availableSpellsForBattle || this.availableSpellsForBattle.length === 0) {
-            console.log('Deck not initialized, creating it now');
-            return null;
-        }
-        
-        // Check if deck is empty
-        if (this.availableSpellsForBattle.length === 0) {
-            console.log('Deck is empty - need to reshuffle discard pile');
-            // In a real card game, we would reshuffle the discard pile here
-            // For our game, we'll get all spells that aren't currently in hand
-            this.reshuffleDiscardPile();
+            console.log('Deck not initialized or empty, attempting reshuffle');
+            
+            // Get IDs of selected spells from the player's hand
+            const selectedSpellIds = this.getSelectedSpellIds();
+            
+            // Call reshuffleDiscardPile with the selected spell IDs
+            if (selectedSpellIds.length > 0) {
+                console.log('Reshuffling with player selected spells:', selectedSpellIds);
+                this.reshuffleDiscardPile(selectedSpellIds);
+            } else {
+                console.error('No selected spell IDs available for reshuffle');
+                return null;
+            }
             
             // If still no cards after reshuffling, we can't draw
             if (this.availableSpellsForBattle.length === 0) {
@@ -89,9 +200,11 @@ class SpellHandManager {
         }
         
         // Get IDs of spells currently in hand for duplicate checking
-        const spellsInHandIds = this.playerSpellHand.map(spell => 
-            typeof spell === 'object' ? spell.id : spell
-        );
+        const spellsInHandIds = this.playerSpellHand.map(spell => {
+            if (typeof spell === 'string') return spell;
+            if (typeof spell === 'object' && spell !== null) return spell.id;
+            return null;
+        }).filter(id => id !== null);
         
         // Try to draw a non-duplicate spell first
         let attempts = 0;
@@ -101,6 +214,13 @@ class SpellHandManager {
         while (attempts < maxAttempts) {
             // Get the next potential spell
             const potentialSpellId = this.availableSpellsForBattle[0];
+            
+            // Check if this spell is actually valid
+            if (!potentialSpellId || typeof potentialSpellId !== 'string') {
+                console.error('Invalid spell ID in deck:', potentialSpellId);
+                this.availableSpellsForBattle.shift(); // Remove the invalid spell
+                continue;
+            }
             
             // Check if this spell is already in hand
             if (!spellsInHandIds.includes(potentialSpellId)) {
@@ -121,12 +241,35 @@ class SpellHandManager {
             drawnSpellId = this.availableSpellsForBattle.shift();
         }
         
+        // Check if we actually got a spell ID
+        if (!drawnSpellId) {
+            console.error('Failed to draw a spell ID from the deck');
+            return null;
+        }
+        
+        // Ensure drawnSpellId is a string
+        if (typeof drawnSpellId !== 'string') {
+            if (typeof drawnSpellId === 'object' && drawnSpellId !== null && drawnSpellId.id) {
+                console.warn('Converting object to string ID:', drawnSpellId);
+                drawnSpellId = drawnSpellId.id;
+            } else {
+                console.error('Invalid spell ID format:', drawnSpellId);
+                return null;
+            }
+        }
+        
         // Get the spell object from the ID
         const drawnSpell = this.spellDefinitions.getSpellById(drawnSpellId);
         
         if (drawnSpell) {
             console.log(`Drew spell from deck: ${drawnSpell.name}`);
             this.playerSpellHand.push(drawnSpell);
+            
+            // Track this spell for reshuffling purposes
+            if (!this.usedSpellsTracking.includes(drawnSpellId)) {
+                this.usedSpellsTracking.push(drawnSpellId);
+            }
+            
             return drawnSpell;
         } else {
             console.error(`Failed to get spell with ID: ${drawnSpellId}`);
@@ -134,7 +277,9 @@ class SpellHandManager {
         }
     }
     
-    // Shuffle the spell deck (the available spells for battle)
+    /**
+     * Shuffle the spell deck (the available spells for battle)
+     */
     shuffleSpellDeck() {
         // Fisher-Yates shuffle algorithm
         for (let i = this.availableSpellsForBattle.length - 1; i > 0; i--) {
@@ -145,14 +290,51 @@ class SpellHandManager {
         console.log('Spell deck shuffled');
     }
     
-    // Reshuffle the "discard pile" back into the deck
+    /**
+     * Reshuffle the "discard pile" back into the deck
+     * @param {Array<string>} unlockedSpells - Array of unlocked spell IDs
+     */
     reshuffleDiscardPile(unlockedSpells) {
         console.log('Reshuffling discard pile into deck');
         
+        // Check if unlockedSpells parameter is provided and valid
+        if (!unlockedSpells || !Array.isArray(unlockedSpells) || unlockedSpells.length === 0) {
+            console.error('Invalid or missing unlockedSpells parameter in reshuffleDiscardPile');
+            console.log('Current player spell hand:', this.playerSpellHand.map(spell => 
+                typeof spell === 'object' ? spell.name : spell
+            ));
+            
+            // Fallback to the player's selected spells if we have them
+            if (this.playerSpellHand && this.playerSpellHand.length > 0) {
+                console.log('Using player spell hand for reshuffle fallback');
+                const spellIds = this.playerSpellHand.map(spell => {
+                    if (typeof spell === 'string') return spell;
+                    if (typeof spell === 'object' && spell !== null) return spell.id;
+                    return null;
+                }).filter(id => id !== null);
+                
+                unlockedSpells = [...new Set(spellIds)];
+                console.log('Fallback spells for reshuffle:', unlockedSpells);
+            } else {
+                console.error('No valid unlockedSpells and no playerSpellHand available');
+                return;
+            }
+        }
+        
+        // Filter out any non-string IDs to ensure we only have valid string IDs
+        unlockedSpells = unlockedSpells.filter(id => typeof id === 'string');
+        
+        if (unlockedSpells.length === 0) {
+            console.error('No valid string IDs in unlockedSpells after filtering');
+            return;
+        }
+        
         // Get IDs of spells currently in hand 
-        const spellsInHandIds = this.playerSpellHand.map(spell => 
-            typeof spell === 'object' ? spell.id : spell
-        );
+        const spellsInHandIds = this.playerSpellHand.map(spell => {
+            if (typeof spell === 'string') return spell;
+            if (typeof spell === 'object' && spell !== null) return spell.id;
+            return null;
+        }).filter(id => id !== null);
         
         // Reshuffle all spells not currently in hand back into the deck
         this.availableSpellsForBattle = unlockedSpells.filter(spellId => 
@@ -165,7 +347,10 @@ class SpellHandManager {
         console.log(`Deck reshuffled with ${this.availableSpellsForBattle.length} spells`);
     }
     
-    // Remove a spell from the player's hand after casting it
+    /**
+     * Remove a spell from the player's hand after casting it
+     * @param {string} spellId - ID of the spell to remove
+     */
     removeSpellFromHand(spellId) {
         console.log(`Attempting to remove spell ${spellId} from hand`);
         
@@ -199,7 +384,9 @@ class SpellHandManager {
         return false;
     }
     
-    // Get the player's current spell hand
+    /**
+     * Get the player's current spell hand
+     */
     getPlayerSpellHand() {
         // Ensure we have a valid spell hand
         if (!this.playerSpellHand) {
@@ -239,7 +426,10 @@ class SpellHandManager {
         return uniqueSpellHand;
     }
     
-    // Check if a spell is in the player's hand
+    /**
+     * Check if a spell is in the player's hand
+     * @param {string} spellId - ID of the spell to check
+     */
     isSpellInHand(spellId) {
         console.log(`Checking if spell ${spellId} is in player's hand`);
         
@@ -263,6 +453,10 @@ class SpellHandManager {
         return result;
     }
 
+    /**
+     * Set the player's spell hand with selected spells
+     * @param {Array<string|Object>} spells - Array of spell IDs or spell objects
+     */
     setPlayerSpellHand(spells) {
         console.log('Setting player spell hand with selected spells:', spells);
         
@@ -295,13 +489,19 @@ class SpellHandManager {
         return this.playerSpellHand;
     }
 
+    /**
+     * Reset the player's spell hand
+     */
     resetSpellHand() {
         console.log('Resetting player spell hand');
         this.playerSpellHand = [];
         return true;
     }
     
-    // Reset available spells for battle to use only the 3 selected spells
+    /**
+     * Reset available spells for battle to use only the 3 selected spells
+     * @param {Array<string>} unlockedSpells - Array of unlocked spell IDs
+     */
     resetAvailableSpells(unlockedSpells) {
         console.log('Resetting available spells for battle');
         
@@ -337,7 +537,10 @@ class SpellHandManager {
         return this.availableSpellsForBattle;
     }
 
-    // Track spell usage during a battle
+    /**
+     * Track spell usage during a battle
+     * @param {string} spellId - ID of the spell to track
+     */
     trackSpellUsage(spellId) {
         try {
             const spell = this.spellDefinitions.getSpellById(spellId);
@@ -361,7 +564,9 @@ class SpellHandManager {
         }
     }
 
-    // Reset spell tracking for a new battle
+    /**
+     * Reset spell tracking for a new battle
+     */
     resetSpellTracking() {
         try {
             console.log('Resetting spell tracking for new battle');
@@ -373,6 +578,9 @@ class SpellHandManager {
         }
     }
 
+    /**
+     * Get the used spells during a battle
+     */
     getUsedSpells() {
         try {
             return Array.isArray(this.usedSpellsTracking) ? this.usedSpellsTracking : [];

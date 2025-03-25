@@ -3,3 +3,8 @@ node_modules
 
 # windsurf rules
 .windsurfrules
+
+# cursor rules
+.cursorrules
+.cursor
+

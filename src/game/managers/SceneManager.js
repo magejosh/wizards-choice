@@ -21,7 +21,17 @@ export class SceneManager {
         console.log('Initializing Scene Manager...');
         
         // Store the container reference
-        this.container = container;
+        this.container = container || document.getElementById('battle-scene');
+        
+        if (!this.container) {
+            console.warn('No container provided for SceneManager, looking for battle-scene');
+            this.container = document.getElementById('battle-scene');
+            
+            if (!this.container) {
+                console.error('Could not find battle-scene container');
+                return Promise.reject(new Error('No container for SceneManager'));
+            }
+        }
         
         // Create scene
         this.scene = new THREE.Scene();
@@ -30,42 +40,31 @@ export class SceneManager {
         // Create camera
         this.camera = new THREE.PerspectiveCamera(
             75, // Field of view
-            window.innerWidth / window.innerHeight, // Aspect ratio
+            this.container.clientWidth / this.container.clientHeight, // Aspect ratio
             0.1, // Near clipping plane
             1000 // Far clipping plane
         );
         this.camera.position.z = 5;
+        this.camera.position.y = 0.25; // Raise the camera by 5% to shift scene upward
         
         // Create renderer with improved settings
-        this.renderer = new THREE.WebGLRenderer({ 
-            antialias: true, 
-            alpha: true,
-            preserveDrawingBuffer: true
-        });
-        
-        // Get initial container dimensions with fallbacks
-        let containerWidth = container && container.clientWidth ? container.clientWidth : 800;
-        let containerHeight = container && container.clientHeight ? container.clientHeight : 600;
-        
-        // Enforce minimum dimensions
-        containerWidth = Math.max(containerWidth, 300);
-        containerHeight = Math.max(containerHeight, 200);
-        
-        // Set initial size based on container dimensions
-        this.renderer.setSize(containerWidth, containerHeight, true);
-        
-        // Set pixel ratio for high-DPI displays
-        const pixelRatio = window.devicePixelRatio || 1;
-        this.renderer.setPixelRatio(pixelRatio);
-        
-        // Add renderer to container
-        if (container) {
-            container.appendChild(this.renderer.domElement);
-            // Call resize immediately after adding to container
-            setTimeout(() => this.resizeRenderer(), 0);
-        } else {
-            console.error('Container not provided to SceneManager');
+        try {
+            this.renderer = new THREE.WebGLRenderer({ 
+                antialias: true, 
+                alpha: true,
+                preserveDrawingBuffer: true
+            });
+            
+            // Set initial size to container size
+            this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+            this.container.appendChild(this.renderer.domElement);
+        } catch (error) {
+            console.error("Could not create WebGLRenderer:", error);
+            return Promise.reject(error);
         }
+        
+        // Call resize immediately after adding to container
+        setTimeout(() => this.resizeRenderer(), 0);
         
         // Set up animation loop
         this.animate = this.animate.bind(this);
@@ -84,26 +83,12 @@ export class SceneManager {
             }, 100);
         });
         
-        // Add mutation observer to detect DOM changes affecting container size
-        if (container) {
-            // Create ResizeObserver for container size changes
-            if (typeof ResizeObserver !== 'undefined') {
-                this.resizeObserver = new ResizeObserver(() => {
-                    this.resizeRenderer();
-                    console.log('Renderer resized due to container size change');
-                });
-                this.resizeObserver.observe(container);
-            } else {
-                // Fallback for browsers without ResizeObserver
-                this.mutationObserver = new MutationObserver(() => {
-                    this.resizeRenderer();
-                });
-                this.mutationObserver.observe(container, {
-                    attributes: true,
-                    childList: true,
-                    subtree: true
-                });
-            }
+        // Add ResizeObserver for container size changes
+        if (this.container && typeof ResizeObserver !== 'undefined') {
+            this.resizeObserver = new ResizeObserver(() => {
+                this.resizeRenderer();
+            });
+            this.resizeObserver.observe(this.container);
         }
         
         // Add ambient light
@@ -164,17 +149,30 @@ export class SceneManager {
         directionalLight.position.set(0, 1, 1);
         this.scene.add(directionalLight);
         
-        // Create player wizard
-        this.createPlayerWizard();
+        // Get scene dimensions to position wizards optimally
+        let width = this.container ? this.container.clientWidth : window.innerWidth;
+        let height = this.container ? this.container.clientHeight : window.innerHeight * 0.66;
         
-        // Create opponent wizard
+        // Scale positioning based on aspect ratio
+        const aspectRatio = width / height;
+        const wizardSpacing = Math.min(4, Math.max(3, aspectRatio * 2));
+        
+        // Create player wizard with optimal position
+        this.createPlayerWizard();
+        this.playerWizard.position.set(-wizardSpacing/2, -0.25, 0); // Raised Y position by 0.25
+        
+        // Create opponent wizard with optimal position
         this.createOpponentWizard();
+        this.opponentWizard.position.set(wizardSpacing/2, -0.25, 0); // Raised Y position by 0.25
         
         // Add background elements
         this.createBackground();
         
         // Resize renderer to match container
         this.resizeRenderer();
+        
+        // Log scene setup
+        console.log(`Battle scene set up with wizards at spacing: ${wizardSpacing}`);
     }
     
     // Add a method to resize the renderer based on the container
@@ -185,55 +183,36 @@ export class SceneManager {
             return;
         }
         
-        // Get the actual dimensions of the container with fallbacks
-        let containerWidth = 800;
-        let containerHeight = 600;
-        
-        if (this.container) {
-            // Only use clientWidth/Height if they exist and are positive numbers
-            if (this.container.clientWidth && this.container.clientWidth > 0) {
-                containerWidth = this.container.clientWidth;
-            } else {
-                containerWidth = window.innerWidth * 0.6;
-                console.warn('Invalid container width, using fallback: ' + containerWidth);
-            }
-            
-            if (this.container.clientHeight && this.container.clientHeight > 0) {
-                containerHeight = this.container.clientHeight;
-            } else {
-                containerHeight = window.innerHeight * 0.6;
-                console.warn('Invalid container height, using fallback: ' + containerHeight);
-            }
-        } else {
-            // If no container, use default sizes
-            containerWidth = window.innerWidth * 0.6;
-            containerHeight = window.innerHeight * 0.6;
-        }
-        
-        // Enforce minimum dimensions to prevent rendering issues
-        containerWidth = Math.max(containerWidth, 300);
-        containerHeight = Math.max(containerHeight, 200);
-        
-        // Set a fixed size for battle scenes for consistency
-        if (this.container && this.container.id === 'battle-scene') {
-            const aspectRatio = 16 / 9;
-            containerHeight = Math.min(containerHeight, containerWidth / aspectRatio);
-            containerWidth = containerHeight * aspectRatio;
-        }
-        
-        // Debug logging
-        console.log(`Resizing renderer to ${containerWidth}x${containerHeight}`);
+        // Get container dimensions based on actual viewport
+        const containerWidth = window.innerWidth;
+        const containerHeight = window.innerHeight;
         
         // Update camera aspect ratio
         this.camera.aspect = containerWidth / containerHeight;
         this.camera.updateProjectionMatrix();
         
-        // Set renderer size to match container
-        this.renderer.setSize(containerWidth, containerHeight, true);
+        // Update renderer size to fill the viewport - set to match exactly the pixel size
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(containerWidth, containerHeight, false);
         
-        // Ensure the pixel ratio is set correctly for high-DPI displays
-        const pixelRatio = window.devicePixelRatio || 1;
-        this.renderer.setPixelRatio(pixelRatio);
+        // Make sure canvas is positioned correctly
+        if (this.renderer.domElement) {
+            this.renderer.domElement.style.display = 'block';
+            this.renderer.domElement.style.position = 'absolute';
+            this.renderer.domElement.style.top = '0';
+            this.renderer.domElement.style.left = '0';
+            this.renderer.domElement.style.width = '100%';
+            this.renderer.domElement.style.height = '100%';
+            this.renderer.domElement.style.zIndex = '1'; // Lower z-index so overlays appear above
+        }
+        
+        // Reposition wizards based on aspect ratio
+        if (this.playerWizard && this.opponentWizard) {
+            const wizardSpacing = Math.min(4, Math.max(3, this.camera.aspect * 2));
+            this.playerWizard.position.set(-wizardSpacing/2, -0.25, 0); // Raised Y position by 0.25
+            this.opponentWizard.position.set(wizardSpacing/2, -0.25, 0); // Raised Y position by 0.25
+            console.log(`Repositioned wizards with spacing: ${wizardSpacing}`);
+        }
     }
     
     createPlayerWizard() {
@@ -246,7 +225,7 @@ export class SceneManager {
         });
         
         this.playerWizard = new THREE.Mesh(geometry, material);
-        this.playerWizard.position.set(-2, -0.5, 0);
+        this.playerWizard.position.set(-2, -0.25, 0); // Match the Y position from resizeRenderer
         this.scene.add(this.playerWizard);
         
         // Add wizard hat
@@ -286,7 +265,7 @@ export class SceneManager {
         });
         
         this.opponentWizard = new THREE.Mesh(geometry, material);
-        this.opponentWizard.position.set(2, -0.5, 0);
+        this.opponentWizard.position.set(2, -0.25, 0); // Match the Y position from resizeRenderer
         this.scene.add(this.opponentWizard);
         
         // Add wizard hat

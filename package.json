@@ -13,7 +13,9 @@
     "lint": "next lint",
     "build:worker": "opennextjs-cloudflare",
     "preview": "opennextjs-cloudflare && wrangler dev",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts"
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts",
+    "webpack:dev": "webpack serve --open",
+    "webpack:build": "webpack --mode production"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -52,7 +54,7 @@
     "embla-carousel-react": "^8.5.2",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.364.0",
-    "next": "15.1.4",
+    "next": "^15.2.3",
     "next-themes": "^0.4.4",
     "react": "^18.2.0",
     "react-day-picker": "^9.6.3",
@@ -74,12 +76,16 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "css-loader": "^7.1.2",
     "eslint": "^9.23.0",
     "eslint-config-next": "15.1.4",
     "postcss": "^8",
+    "style-loader": "^4.0.0",
     "tailwindcss": "^3.4.1",
     "turbo": "^2.3.3",
     "typescript": "^5",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.0",
     "wrangler": "^3.102.0"
   },
   "packageManager": "pnpm@10.0.0-rc.2+sha512.b6e59b96f90ca92449ac2f6dca9b430880448fc97d21f0fa9200e3d5ddb5289ad535255400554f7f3486e2d60058492161aaa9b58828e81f50c096718be9d156"

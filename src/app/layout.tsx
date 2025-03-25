@@ -1,24 +1,22 @@
-'use client'
+// src/app/layout.tsx
+import '../lib/ui/styles/main.css';
 
-import { ReactNode } from 'react'
-import GameInitializer from '../components/GameInitializer'
+export const metadata = {
+  title: 'Wizard\'s Choice',
+  description: 'A tactical choice-driven strategy game',
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
       <head>
-        <title>Wizard's Choice - A Tactical Wizard Duel Game</title>
-        <meta name="description" content="A quick, choice-driven wizard duel game where strategic spell selection shapes your path to magical supremacy." />
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body>
-        <GameInitializer>
-          {children}
-        </GameInitializer>
-      </body>
+      <body>{children}</body>
     </html>
-  )
+  );
 }

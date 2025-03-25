@@ -1,134 +1,273 @@
-# Deployment Guide for Wizard's Choice Web Application
+# Deployment Guide - Wizard's Choice
 
-This document provides instructions for deploying the Wizard's Choice web application permanently.
+This guide provides detailed instructions for deploying the Wizard's Choice game to various platforms.
 
-## Prerequisites
+## Local Development Deployment
 
-- Node.js and npm installed
-- Cloudflare account for deployment
-- Git for version control
+### Prerequisites
+- Node.js 16.0 or higher
+- npm or pnpm package manager
+- Git
 
-## Local Development
+### Steps
 
-1. Clone the repository:
-```
-git clone https://github.com/yourusername/wizards-choice-web.git
-```
-
-2. Navigate to the project directory:
-```
-cd wizards-choice-web
+1. Clone the repository
+```bash
+git clone https://github.com/magejosh/wizards-choice.git
+cd wizard-choice
 ```
 
-3. Install dependencies:
+2. Install dependencies
+```bash
+npm install
+# or
+pnpm install
 ```
+
+3. Start the development server
+```bash
+npm run dev
+# or
+pnpm dev
+```
+
+4. Access the application at `http://localhost:3000`
+
+## Production Deployment Options
+
+### Netlify Deployment
+
+Netlify offers a straightforward way to deploy Next.js applications with minimal configuration.
+
+#### Prerequisites
+- GitHub, GitLab, or Bitbucket repository with your Wizard's Choice code
+- Netlify account
+
+#### Steps
+
+1. Push your code to a Git repository
+
+2. Log in to Netlify and click "New site from Git"
+
+3. Select your repository and configure the following settings:
+   - Build command: `npm run build`
+   - Publish directory: `.next`
+   - Environment variables (if needed)
+
+4. Click "Deploy site"
+
+5. Once deployment is complete, your site will be available at the provided Netlify URL
+
+#### Custom Domain Setup (Optional)
+
+1. In the Netlify dashboard, go to "Domain settings"
+2. Click "Add custom domain"
+3. Follow the instructions to configure your DNS settings
+
+### Vercel Deployment
+
+Vercel is optimized for Next.js applications and provides the simplest deployment experience.
+
+#### Prerequisites
+- GitHub, GitLab, or Bitbucket repository with your Wizard's Choice code
+- Vercel account
+
+#### Steps
+
+1. Push your code to a Git repository
+
+2. Log in to Vercel and click "New Project"
+
+3. Import your repository
+
+4. Vercel will automatically detect Next.js settings, but verify the following:
+   - Framework preset: Next.js
+   - Build command: `npm run build`
+   - Output directory: `.next`
+   - Environment variables (if needed)
+
+5. Click "Deploy"
+
+6. Once deployment is complete, your site will be available at the provided Vercel URL
+
+#### Custom Domain Setup (Optional)
+
+1. In the Vercel dashboard, go to "Domains"
+2. Click "Add" and enter your domain
+3. Follow the instructions to configure your DNS settings
+
+### Hostinger VPS Deployment
+
+For more control over your deployment, you can use a VPS provider like Hostinger.
+
+#### Prerequisites
+- Hostinger VPS or similar server
+- SSH access to your server
+- Node.js 16.0 or higher installed on the server
+- Nginx installed on the server
+- PM2 or similar process manager
+
+#### Steps
+
+1. SSH into your VPS
+```bash
+ssh username@your-server-ip
+```
+
+2. Install Node.js if not already installed
+```bash
+curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+3. Install PM2 globally
+```bash
+sudo npm install -g pm2
+```
+
+4. Clone the repository
+```bash
+git clone https://github.com/magejosh/wizards-choice.git
+cd wizard-choice
+```
+
+5. Install dependencies
+```bash
 npm install
 ```
 
-4. Start the development server:
-```
-npm run dev
-```
-
-5. Open your browser and navigate to `http://localhost:3000`
-
-## Building for Production
-
-To build the project for production:
-
-```
+6. Build the application
+```bash
 npm run build
 ```
 
-The built files will be in the `.next` directory.
-
-## Deployment Options
-
-### Option 1: Cloudflare Pages (Recommended)
-
-1. Push your code to a GitHub repository
-
-2. Log in to your Cloudflare dashboard
-
-3. Navigate to Pages > Create a project
-
-4. Connect your GitHub repository
-
-5. Configure the build settings:
-   - Build command: `npm run build`
-   - Build output directory: `.next`
-   - Root directory: `/`
-
-6. Deploy the site
-
-7. Your site will be available at `https://wizards-choice.pages.dev` (or your custom domain)
-
-### Option 2: Vercel
-
-1. Install the Vercel CLI:
-```
-npm install -g vercel
+7. Start the application with PM2
+```bash
+pm2 start npm --name "wizard-choice" -- start
 ```
 
-2. Deploy the application:
+8. Configure PM2 to start on boot
+```bash
+pm2 startup
+pm2 save
 ```
-vercel
+
+9. Configure Nginx as a reverse proxy
+
+Create a new Nginx configuration file:
+```bash
+sudo nano /etc/nginx/sites-available/wizard-choice
 ```
 
-3. Follow the prompts to complete the deployment
+Add the following configuration:
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
 
-### Option 3: Netlify
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
 
-1. Push your code to a GitHub repository
+10. Enable the site and restart Nginx
+```bash
+sudo ln -s /etc/nginx/sites-available/wizard-choice /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
 
-2. Log in to your Netlify dashboard
+11. Set up SSL with Let's Encrypt (recommended)
+```bash
+sudo apt-get install certbot python3-certbot-nginx
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+```
 
-3. Click "New site from Git"
+12. Your site should now be accessible at your domain with HTTPS
 
-4. Connect your GitHub repository
+## Updating Your Deployment
 
-5. Configure the build settings:
-   - Build command: `npm run build`
-   - Publish directory: `.next`
+### Netlify/Vercel
 
-6. Deploy the site
+Both Netlify and Vercel support automatic deployments when you push changes to your repository. Simply push your changes, and the platforms will automatically rebuild and deploy your application.
 
-## Custom Domain Setup
+### VPS
 
-To use a custom domain with your deployment:
+To update your application on a VPS:
 
-1. Purchase a domain from a domain registrar
+1. SSH into your server
+```bash
+ssh username@your-server-ip
+```
 
-2. Add the domain in your deployment platform (Cloudflare Pages, Vercel, or Netlify)
+2. Navigate to your application directory
+```bash
+cd wizard-choice
+```
 
-3. Configure DNS settings as instructed by the platform
+3. Pull the latest changes
+```bash
+git pull
+```
 
-4. Wait for DNS propagation (can take up to 48 hours)
+4. Install any new dependencies
+```bash
+npm install
+```
 
-## Maintenance and Updates
+5. Rebuild the application
+```bash
+npm run build
+```
 
-To update the deployed application:
-
-1. Make changes to your local repository
-
-2. Test changes locally
-
-3. Commit and push changes to GitHub
-
-4. The deployment platform will automatically rebuild and deploy the updated site
+6. Restart the application with PM2
+```bash
+pm2 restart wizard-choice
+```
 
 ## Troubleshooting
 
-If you encounter issues with the deployment:
+### Common Issues
 
-1. Check the build logs in your deployment platform
+#### Build Failures
+- Check your Node.js version is compatible (16.0 or higher)
+- Verify all dependencies are installed correctly
+- Check for TypeScript errors in your code
 
-2. Ensure all dependencies are correctly installed
+#### Runtime Errors
+- Check the server logs for error messages
+- Verify environment variables are set correctly
+- Ensure the server has sufficient resources (memory, CPU)
 
-3. Verify that the build command and output directory are correctly configured
+#### Deployment Timeouts
+- Large applications may exceed default build timeouts
+- Increase the build timeout in your deployment platform settings
 
-4. Check for any environment variables that need to be set
+### Getting Help
 
-## Support
+If you encounter issues not covered in this guide:
+- Check the Next.js documentation: https://nextjs.org/docs
+- Visit the deployment platform's support resources
+- Consult the project's GitHub issues for similar problems
 
-For additional support, please contact the development team or refer to the documentation of your chosen deployment platform.
+## Security Considerations
+
+- Always use HTTPS in production
+- Keep your Node.js and npm packages updated
+- Implement proper authentication and authorization
+- Set up proper CORS policies
+- Consider implementing rate limiting for API endpoints
+
+## Performance Optimization
+
+- Enable caching for static assets
+- Implement CDN for global distribution
+- Optimize images and other media
+- Consider server-side rendering for critical pages
+- Implement code splitting to reduce initial load time

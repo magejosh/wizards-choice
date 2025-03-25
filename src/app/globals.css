@@ -1,199 +1,37 @@
+// src/app/globals.css
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 0, 0, 0;
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-/* Game-specific styles */
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.game-button {
-  background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: bold;
-  transition: all 0.3s ease;
-  border: 2px solid #4b6cb7;
-  text-align: center;
-}
-
-.game-button:hover {
-  background: linear-gradient(135deg, #5d7ec9 0%, #243b6b 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.game-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Notification styles */
-.notification {
+.demo-controls {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 15px 20px;
-  border-radius: 8px;
-  background-color: #2d3748;
-  color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  max-width: 300px;
-  animation: slideIn 0.3s ease-out forwards;
-}
-
-.notification.info {
-  border-left: 4px solid #4299e1;
-}
-
-.notification.success {
-  border-left: 4px solid #48bb78;
-}
-
-.notification.warning {
-  border-left: 4px solid #ed8936;
-}
-
-.notification.error {
-  border-left: 4px solid #f56565;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideOut {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-}
-
-.notification.hide {
-  animation: slideOut 0.3s ease-in forwards;
-}
-
-/* Health and mana bars */
-.health-bar, .mana-bar {
-  height: 20px;
-  border-radius: 10px;
-  overflow: hidden;
-  background-color: #2d3748;
-  margin-bottom: 10px;
-  position: relative;
-}
-
-.health-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #f56565 0%, #e53e3e 100%);
-  transition: width 0.3s ease;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.mana-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #4299e1 0%, #3182ce 100%);
-  transition: width 0.3s ease;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.bar-text {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 10px;
+  background-color: rgba(26, 26, 46, 0.8);
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 1000;
+}
+
+.demo-controls button {
+  background-color: var(--primary-main, #6a3de8);
   color: white;
-  font-weight: bold;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  z-index: 1;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Raleway', sans-serif;
 }
 
-/* Spell effects */
-.spell-effect {
-  position: absolute;
-  pointer-events: none;
-  z-index: 10;
+.demo-controls button:hover {
+  background-color: var(--primary-light, #8c65f7);
 }
 
-.spell-effect.fire {
-  filter: drop-shadow(0 0 10px #f56565);
-}
-
-.spell-effect.water {
-  filter: drop-shadow(0 0 10px #4299e1);
-}
-
-.spell-effect.earth {
-  filter: drop-shadow(0 0 10px #48bb78);
-}
-
-.spell-effect.air {
-  filter: drop-shadow(0 0 10px #a0aec0);
-}
-
-.spell-effect.arcane {
-  filter: drop-shadow(0 0 10px #9f7aea);
-}
-
-/* Mobile optimizations */
-@media (max-width: 640px) {
-  .game-container {
-    height: 500px;
-  }
-  
-  .game-button {
-    padding: 0.5rem 1rem;
-  }
-  
-  .health-bar, .mana-bar {
-    height: 15px;
-  }
+.app-container {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }

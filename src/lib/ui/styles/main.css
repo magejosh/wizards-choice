@@ -1,0 +1,965 @@
+// src/lib/ui/styles/main.css
+/* Main CSS file for Wizard's Choice */
+
+:root {
+  /* Import theme variables */
+  --primary-main: #6a3de8;
+  --primary-light: #8c65f7;
+  --primary-dark: #4a2ba6;
+  --primary-contrast: #ffffff;
+  
+  --secondary-main: #ff9d00;
+  --secondary-light: #ffb84d;
+  --secondary-dark: #cc7e00;
+  --secondary-contrast: #000000;
+  
+  --ui-background: #1a1a2e;
+  --ui-background-light: #2d2d42;
+  --ui-card: #272640;
+  --ui-card-border: #4a4a82;
+  --ui-text: #ffffff;
+  --ui-text-secondary: #b3b3cc;
+  
+  /* Status bar colors */
+  --health-bg: #3d0000;
+  --health-fill: #ff3b3b;
+  --mana-bg: #001a33;
+  --mana-fill: #3b7aff;
+  --experience-bg: #1a3300;
+  --experience-fill: #7aff3b;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  
+  /* Font sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-size-3xl: 2.5rem;
+}
+
+/* Global styles */
+body {
+  font-family: 'Raleway', sans-serif;
+  background-color: var(--ui-background);
+  color: var(--ui-text);
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cinzel', serif;
+  margin-top: 0;
+}
+
+button {
+  cursor: pointer;
+  font-family: 'Raleway', sans-serif;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+}
+
+/* Status bar component */
+.status-bar {
+  margin-bottom: var(--spacing-sm);
+}
+
+.status-bar__label {
+  font-weight: bold;
+  margin-bottom: var(--spacing-xs);
+  display: block;
+}
+
+.status-bar__container {
+  height: 1rem;
+  width: 100%;
+  background-color: var(--health-bg);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.status-bar--health .status-bar__container {
+  background-color: var(--health-bg);
+}
+
+.status-bar--mana .status-bar__container {
+  background-color: var(--mana-bg);
+}
+
+.status-bar--experience .status-bar__container {
+  background-color: var(--experience-bg);
+}
+
+.status-bar__fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.status-bar--health .status-bar__fill {
+  background-color: var(--health-fill);
+}
+
+.status-bar--mana .status-bar__fill {
+  background-color: var(--mana-fill);
+}
+
+.status-bar--experience .status-bar__fill {
+  background-color: var(--experience-fill);
+}
+
+.status-bar__values {
+  font-size: var(--font-size-sm);
+  text-align: right;
+  margin-top: var(--spacing-xs);
+}
+
+/* Spell card component */
+.spell-card {
+  width: 200px;
+  height: 300px;
+  background-color: var(--ui-card);
+  border: 2px solid var(--ui-card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.spell-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.spell-card--selected {
+  border-color: var(--primary-main);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.spell-card--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spell-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.spell-card__name {
+  font-size: var(--font-size-md);
+  margin: 0;
+  font-weight: bold;
+}
+
+.spell-card__type-badge {
+  font-size: var(--font-size-xs);
+  background-color: var(--primary-dark);
+  color: var(--primary-contrast);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: capitalize;
+}
+
+.spell-card__image-container {
+  position: relative;
+  height: 100px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.spell-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spell-card__element-badge {
+  position: absolute;
+  bottom: var(--spacing-xs);
+  right: var(--spacing-xs);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: var(--ui-text);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  text-transform: capitalize;
+}
+
+.spell-card__content {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: var(--spacing-sm);
+}
+
+.spell-card__description {
+  font-size: var(--font-size-xs);
+  margin-top: 0;
+  margin-bottom: var(--spacing-sm);
+}
+
+.spell-card__effects {
+  font-size: var(--font-size-xs);
+}
+
+.spell-card__effect {
+  margin-bottom: var(--spacing-xs);
+}
+
+.spell-card__effect-type {
+  font-weight: bold;
+  margin-right: var(--spacing-xs);
+}
+
+.spell-card__effect-value {
+  color: var(--primary-light);
+}
+
+.spell-card__effect-duration {
+  font-style: italic;
+  margin-left: var(--spacing-xs);
+}
+
+.spell-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--ui-card-border);
+  padding-top: var(--spacing-xs);
+}
+
+.spell-card__mana-cost {
+  display: flex;
+  align-items: center;
+}
+
+.spell-card__mana-icon {
+  color: var(--mana-fill);
+  margin-right: 4px;
+}
+
+.spell-card__tier {
+  font-size: var(--font-size-xs);
+  color: var(--ui-text-secondary);
+}
+
+/* Battle arena component */
+.battle-arena {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.battle-arena__canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.battle-arena__ui {
+  position: relative;
+  z-index: 10;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: var(--spacing-md);
+}
+
+.battle-arena__top-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(26, 26, 46, 0.8);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.battle-arena__turn-info {
+  margin-right: var(--spacing-md);
+}
+
+.battle-arena__turn-number {
+  color: var(--primary-main);
+  font-weight: bold;
+}
+
+.battle-arena__action-text {
+  color: var(--primary-light);
+  font-style: italic;
+}
+
+.battle-arena__player-stats,
+.battle-arena__enemy-stats {
+  background-color: rgba(26, 26, 46, 0.8);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  width: 250px;
+  pointer-events: auto;
+}
+
+.battle-arena__player-stats {
+  position: absolute;
+  top: 80px;
+  left: var(--spacing-md);
+}
+
+.battle-arena__enemy-stats {
+  position: absolute;
+  top: 80px;
+  right: var(--spacing-md);
+}
+
+.battle-arena__player-name,
+.battle-arena__enemy-name {
+  margin-top: 0;
+  margin-bottom: var(--spacing-sm);
+  color: var(--primary-light);
+}
+
+.battle-arena__enemy-name {
+  color: var(--secondary-main);
+}
+
+.battle-arena__spell-selection {
+  position: absolute;
+  bottom: var(--spacing-md);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(26, 26, 46, 0.8);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  width: 80%;
+  max-width: 800px;
+  pointer-events: auto;
+}
+
+.battle-arena__spells-header {
+  margin-bottom: var(--spacing-sm);
+}
+
+.battle-arena__spells-container {
+  display: flex;
+  gap: var(--spacing-md);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-sm);
+}
+
+.battle-arena__mystic-punch,
+.battle-arena__skip-turn {
+  min-width: 150px;
+  height: 200px;
+  background-color: var(--ui-card);
+  border: 2px solid var(--ui-card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.battle-arena__mystic-punch:hover,
+.battle-arena__skip-turn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.battle-arena__mystic-punch {
+  background-color: rgba(255, 61, 61, 0.2);
+}
+
+.battle-arena__skip-turn {
+  background-color: rgba(59, 122, 255, 0.2);
+}
+
+.battle-arena__battle-result {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(26, 26, 46, 0.9);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+  pointer-events: auto;
+}
+
+.battle-arena__battle-result--playerWon h2 {
+  color: var(--primary-main);
+}
+
+.battle-arena__battle-result--enemyWon h2 {
+  color: var(--secondary-main);
+}
+
+.battle-arena__continue-button {
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-lg);
+  margin-top: var(--spacing-md);
+}
+
+.battle-arena__continue-button:hover {
+  background-color: var(--primary-light);
+}
+
+/* Main menu component */
+.main-menu {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.main-menu__background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--ui-background);
+  z-index: -1;
+}
+
+.main-menu__magical-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(106, 61, 232, 0.2) 0%, rgba(26, 26, 46, 0) 70%);
+}
+
+.main-menu__content {
+  background-color: rgba(26, 26, 46, 0.8);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+}
+
+.main-menu__title {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--spacing-xs);
+  color: var(--primary-main);
+  text-shadow: 0 0 10px rgba(106, 61, 232, 0.5);
+}
+
+.main-menu__subtitle {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-xl);
+  color: var(--ui-text-secondary);
+}
+
+.main-menu__buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.main-menu__button {
+  padding: var(--spacing-md);
+  font-size: var(--font-size-lg);
+  border-radius: var(--radius-md);
+}
+
+.main-menu__button--primary {
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+}
+
+.main-menu__button--primary:hover {
+  background-color: var(--primary-light);
+}
+
+.main-menu__button--secondary {
+  background-color: transparent;
+  border: 2px solid var(--primary-main);
+  color: var(--primary-main);
+}
+
+.main-menu__button--secondary:hover {
+  background-color: rgba(106, 61, 232, 0.1);
+}
+
+.main-menu__save-slots {
+  margin: var(--spacing-md) 0;
+}
+
+.main-menu__save-slots-title {
+  margin-bottom: var(--spacing-sm);
+  color: var(--ui-text-secondary);
+}
+
+.main-menu__save-slot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--ui-card);
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  width: 100%;
+  text-align: left;
+}
+
+.main-menu__save-slot:hover {
+  background-color: var(--ui-background-light);
+}
+
+.main-menu__save-slot-name {
+  font-weight: bold;
+}
+
+.main-menu__save-slot-details {
+  font-size: var(--font-size-sm);
+  color: var(--ui-text-secondary);
+}
+
+.main-menu__save-slot-level {
+  margin-right: var(--spacing-sm);
+}
+
+.main-menu__footer {
+  position: absolute;
+  bottom: var(--spacing-md);
+  color: var(--ui-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Wizard's Study component */
+.wizard-study {
+  width: 100%;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+}
+
+.wizard-study__header {
+  background-color: var(--ui-background-light);
+  padding: var(--spacing-md) var(--spacing-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--primary-dark);
+}
+
+.wizard-study__title {
+  margin: 0;
+  color: var(--primary-main);
+}
+
+.wizard-study__player-info {
+  text-align: right;
+}
+
+.wizard-study__player-name {
+  margin: 0;
+  color: var(--ui-text);
+}
+
+.wizard-study__player-level {
+  color: var(--primary-light);
+}
+
+.wizard-study__content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  height: 100%;
+}
+
+.wizard-study__main-area {
+  position: relative;
+  overflow: hidden;
+}
+
+.wizard-study__study-scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.wizard-study__study-background {
+  width: 100%;
+  height: 100%;
+  background-color: var(--ui-background);
+  background-image: radial-gradient(circle at center, rgba(106, 61, 232, 0.2) 0%, rgba(26, 26, 46, 0) 70%);
+}
+
+.wizard-study__actions {
+  position: absolute;
+  bottom: var(--spacing-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 80%;
+  max-width: 500px;
+}
+
+.wizard-study__action {
+  padding: var(--spacing-md);
+  font-size: var(--font-size-lg);
+  border-radius: var(--radius-md);
+  background-color: var(--ui-card);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-card-border);
+}
+
+.wizard-study__action:hover {
+  background-color: var(--ui-background-light);
+}
+
+.wizard-study__action--primary {
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  border: none;
+}
+
+.wizard-study__action--primary:hover {
+  background-color: var(--primary-light);
+}
+
+.wizard-study__action--secondary {
+  background-color: transparent;
+  border: 2px solid var(--primary-main);
+  color: var(--primary-main);
+}
+
+.wizard-study__action--secondary:hover {
+  background-color: rgba(106, 61, 232, 0.1);
+}
+
+.wizard-study__action-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.wizard-study__sidebar {
+  background-color: var(--ui-background-light);
+  border-left: 2px solid var(--primary-dark);
+  padding: var(--spacing-md);
+  overflow-y: auto;
+}
+
+.wizard-study__stats,
+.wizard-study__equipped,
+.wizard-study__spells {
+  margin-bottom: var(--spacing-xl);
+}
+
+.wizard-study__stats-title,
+.wizard-study__equipped-title,
+.wizard-study__spells-title {
+  color: var(--primary-main);
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--ui-card-border);
+  padding-bottom: var(--spacing-xs);
+}
+
+.wizard-study__stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+}
+
+.wizard-study__stat-label {
+  font-weight: bold;
+}
+
+.wizard-study__stat-value {
+  color: var(--primary-light);
+}
+
+.wizard-study__equipment-slots {
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.wizard-study__equipment-item {
+  background-color: var(--ui-card);
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+}
+
+.wizard-study__equipment-name {
+  font-weight: bold;
+}
+
+.wizard-study__equipment-slot {
+  font-size: var(--font-size-sm);
+  color: var(--ui-text-secondary);
+  text-transform: capitalize;
+}
+
+.wizard-study__spell-list {
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.wizard-study__spell-item {
+  background-color: var(--ui-card);
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+}
+
+.wizard-study__spell-name {
+  font-weight: bold;
+}
+
+.wizard-study__spell-type {
+  font-size: var(--font-size-sm);
+  color: var(--ui-text-secondary);
+  text-transform: capitalize;
+}
+
+/* How to Play component */
+.how-to-play {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.how-to-play__content {
+  background-color: var(--ui-background);
+  border: 2px solid var(--primary-main);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  max-width: 800px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.how-to-play__title {
+  color: var(--primary-main);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.how-to-play__section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.how-to-play__section-title {
+  color: var(--primary-light);
+  border-bottom: 1px solid var(--ui-card-border);
+  padding-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.how-to-play__list {
+  padding-left: var(--spacing-lg);
+}
+
+.how-to-play__list li {
+  margin-bottom: var(--spacing-xs);
+}
+
+.how-to-play__close-button {
+  display: block;
+  margin: var(--spacing-lg) auto 0;
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-md);
+  border-radius: var(--radius-md);
+}
+
+.how-to-play__close-button:hover {
+  background-color: var(--primary-light);
+}
+
+/* Settings component */
+.settings {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.settings__content {
+  background-color: var(--ui-background);
+  border: 2px solid var(--primary-main);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.settings__title {
+  color: var(--primary-main);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.settings__section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.settings__section-title {
+  color: var(--primary-light);
+  border-bottom: 1px solid var(--ui-card-border);
+  padding-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+.settings__option {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.settings__label {
+  flex: 1;
+  font-weight: bold;
+}
+
+.settings__difficulty-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.settings__difficulty-button {
+  background-color: var(--ui-card);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-card-border);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+
+.settings__difficulty-button--active {
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  border-color: var(--primary-main);
+}
+
+.settings__toggle {
+  display: flex;
+  align-items: center;
+}
+
+.settings__checkbox {
+  margin-right: var(--spacing-xs);
+}
+
+.settings__toggle-label {
+  min-width: 30px;
+}
+
+.settings__slider {
+  flex: 1;
+  margin: 0 var(--spacing-sm);
+}
+
+.settings__value {
+  min-width: 50px;
+  text-align: right;
+}
+
+.settings__select {
+  background-color: var(--ui-card);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-card-border);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+
+.settings__close-button {
+  display: block;
+  margin: var(--spacing-lg) auto 0;
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-md);
+  border-radius: var(--radius-md);
+}
+
+.settings__close-button:hover {
+  background-color: var(--primary-light);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .battle-arena__player-stats,
+  .battle-arena__enemy-stats {
+    width: 200px;
+  }
+  
+  .battle-arena__spell-selection {
+    width: 95%;
+  }
+  
+  .wizard-study__content {
+    grid-template-columns: 1fr;
+  }
+  
+  .wizard-study__sidebar {
+    display: none;
+  }
+  
+  .wizard-study__action-group {
+    grid-template-columns: 1fr;
+  }
+}

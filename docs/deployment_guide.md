@@ -8,6 +8,12 @@ This guide provides detailed instructions for deploying the Wizard's Choice game
 - Node.js 16.0 or higher
 - npm or pnpm package manager
 - Git
+- IndexedDB-compatible browser for local testing (Chrome, Firefox, Safari 14+, Edge)
+
+### Dependencies
+- `bcryptjs` - For secure password hashing 
+- `idb` - For IndexedDB storage
+- React/Next.js core libraries
 
 ### Steps
 

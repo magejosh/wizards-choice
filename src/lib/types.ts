@@ -1,6 +1,14 @@
 // src/lib/types.ts
 // Core type definitions for Wizard's Choice game
 
+// User Authentication
+export interface User {
+  id: string;
+  username: string;
+  isAdmin: boolean;
+  email: string;
+}
+
 // Spell Types
 export type SpellType = 'damage' | 'dot' | 'healing' | 'debuff' | 'buff' | 'reaction';
 export type ElementType = 'fire' | 'water' | 'earth' | 'air' | 'arcane' | 'nature' | 'shadow' | 'light';

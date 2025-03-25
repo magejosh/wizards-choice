@@ -1,4 +1,3 @@
-// src/lib/ui/styles/main.css
 /* Main CSS file for Wizard's Choice */
 
 :root {
@@ -73,6 +72,130 @@ button {
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   transition: all 0.3s ease;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Loading Screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--ui-background);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid var(--ui-background-light);
+  border-top: 5px solid var(--primary-main);
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
+  margin-bottom: var(--spacing-lg);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-screen p {
+  font-size: var(--font-size-lg);
+  color: var(--primary-light);
+  font-family: 'Cinzel', serif;
+}
+
+/* Name Input Modal */
+.name-input-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.name-input-content {
+  background-color: var(--ui-background);
+  border: 2px solid var(--primary-main);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.name-input-content h2 {
+  color: var(--primary-main);
+  margin-bottom: var(--spacing-lg);
+}
+
+.name-input-field {
+  margin-bottom: var(--spacing-lg);
+  text-align: left;
+}
+
+.name-input-field label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: bold;
+}
+
+.name-input-field input {
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--ui-card);
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  color: var(--ui-text);
+  font-size: var(--font-size-lg);
+  box-sizing: border-box;
+}
+
+.name-input-field input:focus {
+  border-color: var(--primary-main);
+  outline: none;
+}
+
+.name-input-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.name-input-cancel {
+  background-color: transparent;
+  border: 1px solid var(--ui-text-secondary);
+  color: var(--ui-text);
+  padding: var(--spacing-sm) var(--spacing-lg);
+}
+
+.name-input-cancel:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.name-input-submit {
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-weight: bold;
+}
+
+.name-input-submit:hover {
+  background-color: var(--primary-light);
 }
 
 /* Status bar component */
@@ -435,15 +558,17 @@ button {
   background-color: var(--primary-light);
 }
 
-/* Main menu component */
+/* Main Menu styles */
 .main-menu {
+  position: relative;
   width: 100%;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  position: relative;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  box-sizing: border-box;
   overflow: hidden;
 }
 
@@ -453,32 +578,22 @@ button {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--ui-background);
-  z-index: -1;
-}
-
-.main-menu__magical-particles {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at center, rgba(106, 61, 232, 0.2) 0%, rgba(26, 26, 46, 0) 70%);
+  background: linear-gradient(135deg, var(--ui-background), var(--primary-dark));
+  z-index: 1;
 }
 
 .main-menu__content {
-  background-color: rgba(26, 26, 46, 0.8);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  position: relative;
+  z-index: 10;
   text-align: center;
-  max-width: 500px;
-  width: 90%;
+  max-width: 600px;
+  width: 100%;
 }
 
 .main-menu__title {
   font-size: var(--font-size-3xl);
-  margin-bottom: var(--spacing-xs);
-  color: var(--primary-main);
+  margin-bottom: var(--spacing-sm);
+  color: var(--primary-light);
   text-shadow: 0 0 10px rgba(106, 61, 232, 0.5);
 }
 
@@ -492,12 +607,16 @@ button {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+  width: 100%;
+  margin: 0 auto;
 }
 
 .main-menu__button {
-  padding: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
   font-size: var(--font-size-lg);
   border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+  width: 100%;
 }
 
 .main-menu__button--primary {
@@ -511,58 +630,24 @@ button {
 
 .main-menu__button--secondary {
   background-color: transparent;
-  border: 2px solid var(--primary-main);
-  color: var(--primary-main);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-text-secondary);
 }
 
 .main-menu__button--secondary:hover {
-  background-color: rgba(106, 61, 232, 0.1);
-}
-
-.main-menu__save-slots {
-  margin: var(--spacing-md) 0;
-}
-
-.main-menu__save-slots-title {
-  margin-bottom: var(--spacing-sm);
-  color: var(--ui-text-secondary);
-}
-
-.main-menu__save-slot {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: var(--ui-card);
-  border: 1px solid var(--ui-card-border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-sm) var(--spacing-md);
-  margin-bottom: var(--spacing-sm);
-  width: 100%;
-  text-align: left;
-}
-
-.main-menu__save-slot:hover {
-  background-color: var(--ui-background-light);
-}
-
-.main-menu__save-slot-name {
-  font-weight: bold;
-}
-
-.main-menu__save-slot-details {
-  font-size: var(--font-size-sm);
-  color: var(--ui-text-secondary);
-}
-
-.main-menu__save-slot-level {
-  margin-right: var(--spacing-sm);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .main-menu__footer {
-  position: absolute;
-  bottom: var(--spacing-md);
-  color: var(--ui-text-secondary);
+  position: fixed;
+  bottom: 1rem;
+  left: 0;
+  width: 100%;
+  text-align: center;
   font-size: var(--font-size-sm);
+  color: var(--ui-text-secondary);
+  z-index: 10;
+  padding-bottom: 10px;
 }
 
 /* Wizard's Study component */
@@ -962,4 +1047,215 @@ button {
   .wizard-study__action-group {
     grid-template-columns: 1fr;
   }
+}
+
+/* Login Component Styles */
+.login {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.login__background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--ui-background), var(--primary-dark));
+  z-index: 1;
+}
+
+.login__content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.login__title {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--spacing-sm);
+  color: var(--primary-light);
+  text-shadow: 0 0 10px rgba(106, 61, 232, 0.5);
+}
+
+.login__subtitle {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-xl);
+  color: var(--ui-text-secondary);
+}
+
+.login__form-container {
+  background-color: var(--ui-background-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.login__form-title {
+  margin-top: 0;
+  margin-bottom: var(--spacing-lg);
+  color: var(--primary-main);
+}
+
+.login__error {
+  background-color: rgba(255, 0, 0, 0.2);
+  color: #ff6b6b;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.login__form-group {
+  margin-bottom: var(--spacing-md);
+  text-align: left;
+}
+
+.login__form-group label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: bold;
+}
+
+.login__form-group input {
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--ui-card);
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  color: var(--ui-text);
+  font-size: var(--font-size-md);
+  box-sizing: border-box;
+}
+
+.login__form-group input:focus {
+  border-color: var(--primary-main);
+  outline: none;
+}
+
+.login__form-actions {
+  margin-top: var(--spacing-lg);
+}
+
+.login__button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-md);
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.login__button--primary {
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+}
+
+.login__button--primary:hover {
+  background-color: var(--primary-light);
+}
+
+.login__toggle {
+  margin-top: var(--spacing-lg);
+  border-top: 1px solid var(--ui-card-border);
+  padding-top: var(--spacing-md);
+}
+
+.login__toggle-button {
+  background: none;
+  border: none;
+  color: var(--primary-light);
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  text-decoration: underline;
+}
+
+.login__toggle-button:hover {
+  color: var(--primary-main);
+}
+
+.login__demo-accounts {
+  margin-top: var(--spacing-lg);
+  border-top: 1px solid var(--ui-card-border);
+  padding-top: var(--spacing-md);
+  text-align: left;
+  font-size: var(--font-size-sm);
+  color: var(--ui-text-secondary);
+}
+
+.login__demo-accounts h4 {
+  margin-top: 0;
+  color: var(--primary-light);
+}
+
+.login__footer {
+  position: fixed;
+  bottom: 1rem;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--ui-text-secondary);
+  z-index: 10;
+  padding-bottom: 10px;
+}
+
+/* Fix for save slot display */
+.main-menu__save-slots {
+  margin: var(--spacing-md) 0;
+}
+
+.main-menu__save-slots-title {
+  margin-bottom: var(--spacing-sm);
+  color: var(--ui-text-secondary);
+}
+
+.main-menu__save-slot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--ui-card);
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  width: 100%;
+  text-align: left;
+}
+
+.main-menu__save-slot:hover {
+  background-color: var(--ui-background-light);
+}
+
+.main-menu__save-slot-name {
+  font-weight: bold;
+}
+
+.main-menu__save-slot-details {
+  font-size: var(--font-size-sm);
+  color: var(--ui-text-secondary);
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.main-menu__save-slot-level {
+  white-space: nowrap;
+}
+
+.main-menu__save-slot-date {
+  white-space: nowrap;
+}
+
+.main-menu__save-slot-level::after {
+  content: " - ";
+  margin-left: 2px;
 }

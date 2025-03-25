@@ -53,7 +53,7 @@ wizard-choice/
 
 ## Authentication System
 
-The authentication system provides user management with login, registration, and admin capabilities. For local development, it uses an in-memory store with demo accounts.
+The authentication system provides user management with login, registration, and admin capabilities. For development, it uses IndexedDB for persistent storage with demo accounts.
 
 ### Demo Accounts
 - Admin: username: `admin`, password: `admin123`
@@ -61,15 +61,17 @@ The authentication system provides user management with login, registration, and
 - Player 2: username: `player2`, password: `player123`
 
 ### Key Features
-- User registration and login
-- Game state persistence tied to user accounts
+- User registration and login with secure password hashing (bcryptjs)
+- Persistent game state storage in IndexedDB tied to user accounts
 - Admin functionality for user management
-- Secure password handling (simulated in demo)
+- Client-side compatibility with Next.js server-side rendering
+- Proper loading states and error handling
 
 ### Best Practices
-- **AXIOM 1**: Never store passwords in plain text in production. Use proper hashing algorithms.
+- **AXIOM 1**: All passwords are properly hashed using bcryptjs with a salt factor of 10.
 - **AXIOM 2**: Separate authentication logic from game logic for better security boundaries.
 - **AXIOM 3**: Always validate user input on both client and server sides.
+- **AXIOM 4**: Check for browser API availability with `typeof window !== 'undefined'` for Next.js compatibility.
 
 ## Game State Management
 
@@ -81,9 +83,9 @@ Game state is managed through a centralized store using Zustand, which provides:
 4. Clean separation between UI and game logic
 
 ### Best Practices
-- **AXIOM 4**: Game state should be immutable; create new state objects rather than mutating existing ones.
-- **AXIOM 5**: Separate UI state from game logic state for cleaner architecture.
-- **AXIOM 6**: Implement auto-save functionality at natural break points in gameplay.
+- **AXIOM 5**: Game state should be immutable; create new state objects rather than mutating existing ones.
+- **AXIOM 6**: Separate UI state from game logic state for cleaner architecture.
+- **AXIOM 7**: Implement auto-save functionality at natural break points in gameplay.
 
 ## Spell System
 
@@ -96,9 +98,9 @@ The spell system is designed to be extensible and balanced, with 10 tiers of spe
 - Spell synergies for strategic depth
 
 ### Best Practices
-- **AXIOM 7**: Balance spell power through a combination of mana cost, damage, and effects.
-- **AXIOM 8**: Design spells in sets with complementary effects to encourage strategic combinations.
-- **AXIOM 9**: Maintain clear documentation of spell effects and interactions for future expansion.
+- **AXIOM 8**: Balance spell power through a combination of mana cost, damage, and effects.
+- **AXIOM 9**: Design spells in sets with complementary effects to encourage strategic combinations.
+- **AXIOM 10**: Maintain clear documentation of spell effects and interactions for future expansion.
 
 ## Combat Engine
 
@@ -111,9 +113,9 @@ The combat engine handles turn-based duels between wizards with:
 5. Combat resolution
 
 ### Best Practices
-- **AXIOM 10**: Separate combat logic from visual effects for cleaner code and easier testing.
-- **AXIOM 11**: Implement AI difficulty levels through strategy patterns rather than hardcoded behaviors.
-- **AXIOM 12**: Use event-based systems for combat effects to allow for extensibility.
+- **AXIOM 11**: Separate combat logic from visual effects for cleaner code and easier testing.
+- **AXIOM 12**: Implement AI difficulty levels through strategy patterns rather than hardcoded behaviors.
+- **AXIOM 13**: Use event-based systems for combat effects to allow for extensibility.
 
 ## Equipment System
 
@@ -125,9 +127,9 @@ The equipment system allows players to customize their wizard with:
 4. Rings (offering passive bonuses)
 
 ### Best Practices
-- **AXIOM 13**: Design equipment bonuses to complement different play styles rather than having clear "best" items.
-- **AXIOM 14**: Implement equipment as composable modifiers to wizard stats for flexibility.
-- **AXIOM 15**: Balance equipment bonuses against progression to maintain game challenge.
+- **AXIOM 14**: Design equipment bonuses to complement different play styles rather than having clear "best" items.
+- **AXIOM 15**: Implement equipment as composable modifiers to wizard stats for flexibility.
+- **AXIOM 16**: Balance equipment bonuses against progression to maintain game challenge.
 
 ## UI Components
 
@@ -142,28 +144,28 @@ UI components are built with React and styled for a responsive, engaging experie
 - Settings Panel
 
 ### Best Practices
-- **AXIOM 16**: Use the 'use client' directive for all components that use client-side hooks or interactivity.
-- **AXIOM 17**: Break down complex components into smaller, focused components for better maintainability.
-- **AXIOM 18**: Implement responsive design principles for all UI components.
-- **AXIOM 19**: Separate styling concerns from component logic using CSS modules or styled components.
+- **AXIOM 17**: Use the 'use client' directive for all components that use client-side hooks or interactivity.
+- **AXIOM 18**: Break down complex components into smaller, focused components for better maintainability.
+- **AXIOM 19**: Implement responsive design principles for all UI components.
+- **AXIOM 20**: Separate styling concerns from component logic using CSS modules or styled components.
 
 ## Best Practices
 
 ### Code Organization
-- **AXIOM 20**: Keep files focused on a single responsibility; break out functions when they grow beyond 50-100 lines.
-- **AXIOM 21**: Use TypeScript interfaces to define clear contracts between components.
-- **AXIOM 22**: Implement proper error handling throughout the application.
-- **AXIOM 23**: Write unit tests for core game logic to ensure stability during development.
+- **AXIOM 21**: Keep files focused on a single responsibility; break out functions when they grow beyond 50-100 lines.
+- **AXIOM 22**: Use TypeScript interfaces to define clear contracts between components.
+- **AXIOM 23**: Implement proper error handling throughout the application.
+- **AXIOM 24**: Write unit tests for core game logic to ensure stability during development.
 
 ### Performance
-- **AXIOM 24**: Optimize 3D rendering by using proper LOD (Level of Detail) techniques.
-- **AXIOM 25**: Implement memoization for expensive calculations in the game logic.
-- **AXIOM 26**: Use React's useMemo and useCallback hooks appropriately to prevent unnecessary re-renders.
+- **AXIOM 25**: Optimize 3D rendering by using proper LOD (Level of Detail) techniques.
+- **AXIOM 26**: Implement memoization for expensive calculations in the game logic.
+- **AXIOM 27**: Use React's useMemo and useCallback hooks appropriately to prevent unnecessary re-renders.
 
 ### Accessibility
-- **AXIOM 27**: Ensure proper color contrast for text and UI elements.
-- **AXIOM 28**: Implement keyboard navigation for all interactive elements.
-- **AXIOM 29**: Provide alternative text for images and visual elements.
+- **AXIOM 28**: Ensure proper color contrast for text and UI elements.
+- **AXIOM 29**: Implement keyboard navigation for all interactive elements.
+- **AXIOM 30**: Provide alternative text for images and visual elements.
 
 ## Deployment Guide
 

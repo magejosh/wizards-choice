@@ -1,13 +1,15 @@
 // src/lib/auth/authService.ts
 import { User, GameState } from '../types';
 import { useGameStateStore } from '../game-state/gameStateStore';
+import bcryptjs from 'bcryptjs';
+import dbService from '../storage/dbService';
 
-// Simulated user database for local development and testing
+// Demo user data for initial setup
 const DEMO_USERS = [
   {
     id: 'admin',
     username: 'admin',
-    password: 'admin123', // In a real app, this would be hashed
+    password: 'admin123', // Will be hashed during initialization
     isAdmin: true,
     email: 'admin@wizardschoice.com'
   },
@@ -27,14 +29,33 @@ const DEMO_USERS = [
   }
 ];
 
-// In-memory storage for user sessions
+// In-memory cache for current user
 let currentUser: User | null = null;
-let userGameStates: Record<string, GameState[]> = {};
 
-// Initialize with some demo data
-DEMO_USERS.forEach(user => {
-  userGameStates[user.id] = [];
-});
+// Initialize the database with demo users
+const initializeDemoUsers = async () => {
+  const users = await dbService.getAllUsers();
+  
+  // If no users exist, add the demo users
+  if (users.length === 0) {
+    for (const user of DEMO_USERS) {
+      // Hash the password
+      const hashedPassword = await bcryptjs.hash(user.password, 10);
+      
+      // Save user with hashed password
+      await dbService.saveUser({
+        ...user,
+        password: hashedPassword
+      });
+    }
+  }
+};
+
+// Only run initialization on the client side
+if (typeof window !== 'undefined') {
+  // Run initialization
+  initializeDemoUsers().catch(console.error);
+}
 
 export const authService = {
   /**
@@ -43,22 +64,31 @@ export const authService = {
    * @param password User's password
    * @returns User object if login successful, null otherwise
    */
-  login: (username: string, password: string): User | null => {
-    const user = DEMO_USERS.find(
-      u => u.username === username && u.password === password
-    );
+  login: async (username: string, password: string): Promise<User | null> => {
+    // Find user by username
+    const user = await dbService.getUserByUsername(username);
     
-    if (user) {
+    // Check if user exists and password matches
+    if (user && await bcryptjs.compare(password, user.password)) {
       // Create a copy without the password for security
       const { password, ...userWithoutPassword } = user;
-      currentUser = userWithoutPassword as User;
+      currentUser = userWithoutPassword;
       
-      // Load user's game states
-      const gameStates = userGameStates[user.id] || [];
-      useGameStateStore.getState().loadSaveSlots(gameStates);
+      // Reset the game state store
+      const gameStore = useGameStateStore.getState();
+      gameStore.resetState();
+      
+      // Load user's game state if it exists
+      const savedGameState = await dbService.loadGameState(user.id);
+      if (savedGameState) {
+        // Set the loaded game state in the store
+        useGameStateStore.setState({ gameState: savedGameState });
+      }
       
       // Store in localStorage for persistence across page refreshes
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      }
       
       return currentUser;
     }
@@ -73,43 +103,50 @@ export const authService = {
    * @param email User's email
    * @returns User object if registration successful, null otherwise
    */
-  register: (username: string, password: string, email: string): User | null => {
+  register: async (username: string, password: string, email: string): Promise<User | null> => {
     // Check if username already exists
-    if (DEMO_USERS.some(u => u.username === username)) {
+    const existingUser = await dbService.getUserByUsername(username);
+    if (existingUser) {
       return null;
     }
+    
+    // Hash the password
+    const hashedPassword = await bcryptjs.hash(password, 10);
     
     // Create new user
     const newUser = {
       id: `user_${Date.now()}`,
       username,
-      password,
+      password: hashedPassword,
       isAdmin: false,
       email
     };
     
-    // Add to demo users
-    DEMO_USERS.push(newUser);
+    // Save the new user
+    await dbService.saveUser(newUser);
     
-    // Initialize game states
-    userGameStates[newUser.id] = [];
-    
-    // Login the new user
+    // Login the new user (this will also initialize their game state)
     return authService.login(username, password);
   },
   
   /**
    * Logout the current user
    */
-  logout: (): void => {
+  logout: async (): Promise<void> => {
     // Save current game state before logout
     if (currentUser) {
-      const gameStates = useGameStateStore.getState().saveSlots;
-      userGameStates[currentUser.id] = gameStates;
+      const gameState = useGameStateStore.getState().gameState;
+      if (gameState) {
+        await dbService.saveGameState(currentUser.id, gameState);
+      }
     }
     
     currentUser = null;
-    localStorage.removeItem('currentUser');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('currentUser');
+    }
+    
+    // Reset game state to initial values
     useGameStateStore.getState().resetState();
   },
   
@@ -119,10 +156,14 @@ export const authService = {
    */
   getCurrentUser: (): User | null => {
     // Check localStorage first
-    if (!currentUser) {
+    if (!currentUser && typeof window !== 'undefined') {
       const storedUser = localStorage.getItem('currentUser');
       if (storedUser) {
-        currentUser = JSON.parse(storedUser);
+        try {
+          currentUser = JSON.parse(storedUser);
+        } catch (e) {
+          console.error('Error parsing stored user:', e);
+        }
       }
     }
     return currentUser;
@@ -147,40 +188,45 @@ export const authService = {
   
   /**
    * Save game state for current user
-   * @param gameState Game state to save
-   * @param slotIndex Save slot index
    */
-  saveGameState: (gameState: GameState, slotIndex: number): void => {
-    if (!currentUser) return;
+  saveGameState: async (): Promise<void> => {
+    const user = authService.getCurrentUser();
+    if (!user) return;
     
-    const gameStates = [...(userGameStates[currentUser.id] || [])];
-    gameStates[slotIndex] = gameState;
-    userGameStates[currentUser.id] = gameStates;
+    const gameState = useGameStateStore.getState().gameState;
+    await dbService.saveGameState(user.id, gameState);
     
-    // Also update the store
-    useGameStateStore.getState().saveGame(gameState, slotIndex);
+    // Also use the store's save function
+    useGameStateStore.getState().saveGame();
   },
   
   /**
    * Load game state for current user
-   * @param slotIndex Save slot index to load
    * @returns Game state if found, null otherwise
    */
-  loadGameState: (slotIndex: number): GameState | null => {
-    if (!currentUser) return null;
+  loadGameState: async (): Promise<GameState | null> => {
+    const user = authService.getCurrentUser();
+    if (!user) return null;
     
-    const gameStates = userGameStates[currentUser.id] || [];
-    return gameStates[slotIndex] || null;
+    const gameState = await dbService.loadGameState(user.id);
+    
+    if (gameState) {
+      // Update the store with the loaded game state
+      useGameStateStore.setState({ gameState });
+    }
+    
+    return gameState;
   },
   
   /**
    * Get all users (admin only)
    * @returns Array of users without passwords if current user is admin, empty array otherwise
    */
-  getAllUsers: (): Partial<User>[] => {
+  getAllUsers: async (): Promise<Partial<User>[]> => {
     if (!authService.isAdmin()) return [];
     
-    return DEMO_USERS.map(({ password, ...user }) => user);
+    const users = await dbService.getAllUsers();
+    return users.map(({ password, ...user }) => user);
   },
   
   /**
@@ -189,13 +235,21 @@ export const authService = {
    * @param newPassword New password
    * @returns true if successful, false otherwise
    */
-  resetUserPassword: (userId: string, newPassword: string): boolean => {
+  resetUserPassword: async (userId: string, newPassword: string): Promise<boolean> => {
     if (!authService.isAdmin()) return false;
     
-    const userIndex = DEMO_USERS.findIndex(u => u.id === userId);
-    if (userIndex === -1) return false;
+    const user = await dbService.getUser(userId);
+    if (!user) return false;
     
-    DEMO_USERS[userIndex].password = newPassword;
+    // Hash the new password
+    const hashedPassword = await bcryptjs.hash(newPassword, 10);
+    
+    // Update the user's password
+    await dbService.saveUser({
+      ...user,
+      password: hashedPassword
+    });
+    
     return true;
   }
 };

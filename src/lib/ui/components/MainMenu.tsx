@@ -9,20 +9,27 @@ interface MainMenuProps {
   onContinueGame: (saveSlotId: number) => void;
   onOpenSettings: () => void;
   onOpenHowToPlay: () => void;
+  onLogout: () => void;
 }
 
 const MainMenu: React.FC<MainMenuProps> = ({
   onStartNewGame,
   onContinueGame,
   onOpenSettings,
-  onOpenHowToPlay
+  onOpenHowToPlay,
+  onLogout
 }) => {
   const { gameState } = useGameStateStore();
   const { saveSlots } = gameState;
   
   return (
     <div className="main-menu">
-      <div className="main-menu__content">
+      <div className="main-menu__background">
+        {/* This would be a ThreeJS background scene in the full implementation */}
+        <div className="main-menu__magical-particles"></div>
+      </div>
+      
+      <div className="main-menu__content" style={{ position: 'relative', zIndex: 10 }}>
         <h1 className="main-menu__title">Wizard's Choice</h1>
         <h2 className="main-menu__subtitle">A Tactical Spell-Casting Adventure</h2>
         
@@ -70,15 +77,17 @@ const MainMenu: React.FC<MainMenuProps> = ({
           >
             How to Play
           </button>
+          
+          <button
+            className="main-menu__button main-menu__button--secondary"
+            onClick={onLogout}
+          >
+            Logout
+          </button>
         </div>
       </div>
       
-      <div className="main-menu__background">
-        {/* This would be a ThreeJS background scene in the full implementation */}
-        <div className="main-menu__magical-particles"></div>
-      </div>
-      
-      <footer className="main-menu__footer">
+      <footer className="main-menu__footer" style={{ position: 'relative', zIndex: 10 }}>
         <p>© 2025 Wizard's Choice</p>
       </footer>
     </div>

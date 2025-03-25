@@ -5,6 +5,34 @@ import { GameState, Wizard, Spell, Equipment, GameSettings } from '../types';
 import { generateDefaultWizard } from '../wizard/wizardUtils';
 import { getDefaultSpells } from '../spells/spellData';
 
+// Default initial game state
+const initialGameState: GameState = {
+  player: generateDefaultWizard(''),
+  gameProgress: {
+    defeatedEnemies: [],
+    unlockedSpells: [],
+    currentLocation: 'wizardStudy',
+    questProgress: {},
+  },
+  settings: {
+    difficulty: 'normal',
+    soundEnabled: true,
+    musicVolume: 0.7,
+    sfxVolume: 0.8,
+    colorblindMode: false,
+    uiScale: 1,
+    theme: 'default',
+  },
+  saveSlots: Array(3).fill(null).map((_, i) => ({
+    id: i,
+    playerName: '',
+    level: 0,
+    lastSaved: '',
+    isEmpty: true,
+  })),
+  currentSaveSlot: 0,
+};
+
 interface GameStateStore {
   gameState: GameState;
   initializeNewGame: (playerName: string, saveSlotId: number) => void;
@@ -20,38 +48,14 @@ interface GameStateStore {
   addExperience: (amount: number) => void;
   spendLevelUpPoints: (stat: 'health' | 'mana' | 'manaRegen', amount: number) => boolean;
   setCurrentLocation: (location: 'wizardStudy' | 'duel' | 'levelUp') => void;
+  resetState: () => void;
 }
 
 // Create the game state store with persistence
 export const useGameStateStore = create<GameStateStore>()(
   persist(
     (set, get) => ({
-      gameState: {
-        player: generateDefaultWizard(''),
-        gameProgress: {
-          defeatedEnemies: [],
-          unlockedSpells: [],
-          currentLocation: 'wizardStudy',
-          questProgress: {},
-        },
-        settings: {
-          difficulty: 'normal',
-          soundEnabled: true,
-          musicVolume: 0.7,
-          sfxVolume: 0.8,
-          colorblindMode: false,
-          uiScale: 1,
-          theme: 'default',
-        },
-        saveSlots: Array(3).fill(null).map((_, i) => ({
-          id: i,
-          playerName: '',
-          level: 0,
-          lastSaved: '',
-          isEmpty: true,
-        })),
-        currentSaveSlot: 0,
-      },
+      gameState: initialGameState,
 
       initializeNewGame: (playerName: string, saveSlotId: number) => {
         const defaultWizard = generateDefaultWizard(playerName);
@@ -337,6 +341,11 @@ export const useGameStateStore = create<GameStateStore>()(
         if (location === 'wizardStudy') {
           get().saveGame();
         }
+      },
+
+      resetState: () => {
+        // Reset to initial state
+        set({ gameState: initialGameState });
       },
     }),
     {

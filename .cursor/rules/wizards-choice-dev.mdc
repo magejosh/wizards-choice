@@ -7,7 +7,7 @@ alwaysApply: true
 This document defines the core guidelines and best practices for making changes to the Wizard's Choice codebase. It consolidates information from the Deployment Guide, Game Design Document, UI Components, User Guide, and Code Documentation. **Any new or additional documentation files must also reside in the `/docs` directory.**
 
 1. **Authoritative Context:**  
-    Always consult the documentation in `/docs` (including the Deployment Guide, Game Design Document, UI Components, User Guide, and Code Documentation) as the single source of truth. Do not implement changes outside the context provided by these files. If uncertain, review the relevant document before proceeding.
+    Always consult the documentation in `/docs` (including the Deployment Guide, Game Design Document, UI Components, User Guide, Technical Documentation, and/or Code Documentation) as the single source of truth. Do not implement changes outside the context provided by these files. If uncertain, review the relevant document before proceeding.
     
 2. **Verification:**  
     Confirm every detail with the existing documentation. Avoid assumptions or speculation—every decision must be evidence-based.

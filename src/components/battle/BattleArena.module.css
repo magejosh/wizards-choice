@@ -1,0 +1,458 @@
+.battleArena {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #0f0f1a;
+  color: #ffffff;
+}
+
+.battleCanvas {
+  position: relative;
+  width: 100%;
+  height: 50vh;
+  min-height: 400px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  margin-bottom: 1rem;
+}
+
+.battleUI {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  flex: 1;
+}
+
+/* Top bar */
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}
+
+.turnInfo {
+  display: flex;
+  gap: 1rem;
+  font-family: 'Cinzel', serif;
+}
+
+.roundNumber, .turnNumber {
+  color: #6a3de8;
+  font-weight: bold;
+}
+
+.turnIndicator {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  color: #e83d8c;
+  font-weight: bold;
+}
+
+/* Main battle area */
+.mainArea {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  gap: 1rem;
+}
+
+/* Wizard info panels */
+.wizardInfo {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.wizardName {
+  font-family: 'Cinzel', serif;
+  color: #ffffff;
+  margin: 0;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 0.5rem;
+}
+
+/* Stats bars */
+.statsBar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.statGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: #b3b3cc;
+}
+
+.statBarContainer {
+  position: relative;
+  height: 1rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.statBarFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.statValue {
+  font-size: 0.875rem;
+  text-align: center;
+  color: #ffffff;
+}
+
+/* Effects section */
+.effectsSection {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  padding: 0.75rem;
+}
+
+.effectsTitle {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: #b3b3cc;
+}
+
+.effectsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.effectItem {
+  display: flex;
+  justify-content: space-between;
+  background-color: rgba(106, 61, 232, 0.2);
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.effectName {
+  font-weight: bold;
+}
+
+.effectDuration {
+  color: #e83d8c;
+}
+
+.noEffects {
+  color: #b3b3cc;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Deck info */
+.deckInfo {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.deckCounter {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.deckCounter span {
+  color: #6a3de8;
+  font-weight: bold;
+}
+
+.enemyHand {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.enemyHandTitle {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #b3b3cc;
+}
+
+.enemyHandTitle span {
+  color: #e83d8c;
+  font-weight: bold;
+}
+
+/* Battle log */
+.battleLog {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.battleLogTitle {
+  font-family: 'Cinzel', serif;
+  color: #ffffff;
+  margin: 0 0 0.75rem 0;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 0.5rem;
+}
+
+.battleLogEntries {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.battleLogEntry {
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+/* Player action area */
+.actionArea {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.actionTitle {
+  font-family: 'Cinzel', serif;
+  color: #ffffff;
+  margin: 0 0 1rem 0;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 0.5rem;
+}
+
+.noSpells {
+  text-align: center;
+  color: #b3b3cc;
+  font-style: italic;
+  padding: 1rem;
+}
+
+.spellsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.spellCard {
+  background-color: #272640;
+  border: 2px solid #4a4a82;
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.spellCard:hover {
+  border-color: #6a3de8;
+  transform: translateY(-5px);
+}
+
+.spellCardDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spellCardDisabled:hover {
+  border-color: #4a4a82;
+  transform: none;
+}
+
+.spellCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.spellName {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.spellMana {
+  background-color: #4a4a82;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.spellCardBody {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #b3b3cc;
+}
+
+.spellElement {
+  text-transform: capitalize;
+}
+
+.spellType {
+  text-transform: capitalize;
+}
+
+.spellCardDescription {
+  font-size: 0.875rem;
+  flex: 1;
+  line-height: 1.4;
+}
+
+.spellCardFooter {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 0.75rem;
+  color: #e83d8c;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.mysticPunchButton, .skipTurnButton {
+  background-color: #6a3de8;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.mysticPunchButton:hover {
+  background-color: #8c65f7;
+}
+
+.skipTurnButton {
+  background-color: #4a4a82;
+}
+
+.skipTurnButton:hover {
+  background-color: #6a6ab2;
+}
+
+.mysticPunchButton:disabled, .skipTurnButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Game over screen */
+.gameOverContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  animation: fadeIn 0.5s ease;
+}
+
+.gameOverMessage {
+  background-color: #1a1a2e;
+  border: 2px solid #6a3de8;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  max-width: 500px;
+}
+
+.gameOverTitle {
+  font-family: 'Cinzel', serif;
+  color: #ffffff;
+  margin: 0 0 1rem 0;
+  font-size: 2rem;
+}
+
+.continueButton {
+  background-color: #6a3de8;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1.5rem;
+}
+
+.continueButton:hover {
+  background-color: #8c65f7;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .mainArea {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .battleLog {
+    grid-column: span 2;
+    order: 3;
+  }
+}
+
+@media (max-width: 768px) {
+  .mainArea {
+    grid-template-columns: 1fr;
+  }
+  
+  .battleLog {
+    grid-column: span 1;
+  }
+  
+  .spellsContainer {
+    grid-template-columns: 1fr;
+  }
+  
+  .actionButtons {
+    flex-direction: column;
+  }
+} 

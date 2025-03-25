@@ -2,6 +2,14 @@
 import { CombatState, CombatWizard, Wizard, Spell, SpellEffect, ActiveEffect, CombatLogEntry } from '../types';
 import { calculateWizardStats } from '../wizard/wizardUtils';
 import { getAISpellSelection } from './aiEngine';
+import { getRandomInt } from '../utils/randomUtils';
+import { calculateDamage, calculateHealing } from '../utils/combatUtils';
+
+// Number of cards to draw initially
+const INITIAL_HAND_SIZE = 3;
+
+// Number of cards to draw at the start of each round
+const CARDS_PER_DRAW = 1;
 
 /**
  * Initialize a new combat state
@@ -19,13 +27,17 @@ export function initializeCombat(
   const calculatedPlayerWizard = calculateWizardStats(playerWizard);
   const calculatedEnemyWizard = calculateWizardStats(enemyWizard);
   
-  return {
+  // Create initial combat state
+  const initialState: CombatState = {
     playerWizard: {
       wizard: calculatedPlayerWizard,
       currentHealth: calculatedPlayerWizard.maxHealth,
       currentMana: calculatedPlayerWizard.maxMana,
       activeEffects: [],
       selectedSpell: null,
+      hand: [],          // Current hand of spells
+      drawPile: [],      // Spells that can be drawn
+      discardPile: [],   // Spells that have been cast/discarded
     },
     enemyWizard: {
       wizard: calculatedEnemyWizard,
@@ -33,6 +45,9 @@ export function initializeCombat(
       currentMana: calculatedEnemyWizard.maxMana,
       activeEffects: [],
       selectedSpell: null,
+      hand: [],          // Current hand of spells
+      drawPile: [],      // Spells that can be drawn
+      discardPile: [],   // Spells that have been cast/discarded
     },
     turn: 1,
     round: 1,
@@ -41,6 +56,193 @@ export function initializeCombat(
     status: 'active',
     difficulty,
   };
+  
+  // Initialize the player's deck
+  const playerDeck = getPlayerDeck(calculatedPlayerWizard);
+  initialState.playerWizard.drawPile = shuffleArray([...playerDeck]);
+  
+  // Initialize the enemy's deck
+  const enemyDeck = getEnemyDeck(calculatedEnemyWizard);
+  initialState.enemyWizard.drawPile = shuffleArray([...enemyDeck]);
+  
+  // Draw initial hands
+  const stateWithPlayerHand = drawCards(initialState, true, INITIAL_HAND_SIZE);
+  const stateWithBothHands = drawCards(stateWithPlayerHand, false, INITIAL_HAND_SIZE);
+  
+  // Add initial log entry
+  stateWithBothHands.log.push({
+    turn: 1,
+    round: 1,
+    actor: 'player',
+    action: 'combat_start',
+    details: 'The duel has begun! May the best wizard win.',
+  });
+  
+  return stateWithBothHands;
+}
+
+/**
+ * Get the player's deck based on their active deck
+ * @param wizard The player's wizard
+ * @returns Array of spells for the deck
+ */
+function getPlayerDeck(wizard: Wizard): Spell[] {
+  // Get the active deck if it exists
+  if (wizard.activeDeckId && wizard.decks.length > 0) {
+    const activeDeck = wizard.decks.find(deck => deck.id === wizard.activeDeckId);
+    if (activeDeck && activeDeck.spells.length > 0) {
+      return activeDeck.spells;
+    }
+  }
+  
+  // Fallback to equipped spells if no active deck or empty deck
+  return wizard.equippedSpells.length > 0 
+    ? wizard.equippedSpells 
+    : wizard.spells.slice(0, 5); // Take first 5 spells as default
+}
+
+/**
+ * Get the enemy deck based on their equipped spells
+ * @param wizard The enemy wizard
+ * @returns Array of spells for the deck
+ */
+function getEnemyDeck(wizard: Wizard): Spell[] {
+  return wizard.equippedSpells.length > 0 
+    ? wizard.equippedSpells 
+    : wizard.spells.slice(0, 5); // Take first 5 spells as default
+}
+
+/**
+ * Shuffle an array using Fisher-Yates algorithm
+ * @param array The array to shuffle
+ * @returns A new shuffled array
+ */
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+/**
+ * Draw cards from the draw pile into the hand
+ * @param state The current combat state
+ * @param isPlayer Whether the player is drawing cards
+ * @param count The number of cards to draw
+ * @returns Updated combat state
+ */
+function drawCards(
+  state: CombatState,
+  isPlayer: boolean,
+  count: number
+): CombatState {
+  const newState = { ...state };
+  const wizard = isPlayer ? 'playerWizard' : 'enemyWizard';
+  const wizardName = isPlayer ? 'You' : 'Enemy';
+  
+  // Get current piles
+  let hand = [...newState[wizard].hand];
+  let drawPile = [...newState[wizard].drawPile];
+  let discardPile = [...newState[wizard].discardPile];
+  
+  // Calculate actual cards to draw based on extraCardDraw equipment bonus
+  let actualCount = count;
+  if (newState[wizard].wizard.combatStats?.extraCardDraw) {
+    actualCount += newState[wizard].wizard.combatStats.extraCardDraw;
+  }
+  
+  // Draw cards
+  for (let i = 0; i < actualCount; i++) {
+    // If draw pile is empty, shuffle discard pile into draw pile
+    if (drawPile.length === 0 && discardPile.length > 0) {
+      drawPile = shuffleArray(discardPile);
+      discardPile = [];
+      
+      // Add to combat log
+      newState.log.push({
+        turn: newState.turn,
+        round: newState.round,
+        actor: isPlayer ? 'player' : 'enemy',
+        action: 'shuffle_discard',
+        details: `${wizardName} shuffled the discard pile back into the draw pile.`,
+      });
+    }
+    
+    // Draw a card if possible
+    if (drawPile.length > 0) {
+      const card = drawPile.pop()!;
+      hand.push(card);
+    }
+  }
+  
+  // Update the state
+  newState[wizard] = {
+    ...newState[wizard],
+    hand,
+    drawPile,
+    discardPile,
+  };
+  
+  // Add to combat log if any cards were drawn
+  if (count > 0) {
+    newState.log.push({
+      turn: newState.turn,
+      round: newState.round,
+      actor: isPlayer ? 'player' : 'enemy',
+      action: 'draw_cards',
+      details: `${wizardName} drew ${actualCount} card${actualCount !== 1 ? 's' : ''}.`,
+    });
+  }
+  
+  return newState;
+}
+
+/**
+ * Discard a spell from hand to the discard pile
+ * @param state The current combat state
+ * @param spellId The ID of the spell to discard
+ * @param isPlayer Whether the player is discarding
+ * @returns Updated combat state
+ */
+function discardSpell(
+  state: CombatState,
+  spellId: string,
+  isPlayer: boolean
+): CombatState {
+  const newState = { ...state };
+  const wizard = isPlayer ? 'playerWizard' : 'enemyWizard';
+  
+  // Get current piles
+  const hand = [...newState[wizard].hand];
+  const discardPile = [...newState[wizard].discardPile];
+  
+  // Find the spell in hand
+  const spellIndex = hand.findIndex(spell => spell.id === spellId);
+  if (spellIndex === -1) return newState; // Spell not found
+  
+  // Move the spell to discard pile
+  const [spell] = hand.splice(spellIndex, 1);
+  discardPile.push(spell);
+  
+  // Update the state
+  newState[wizard] = {
+    ...newState[wizard],
+    hand,
+    discardPile,
+  };
+  
+  // Add to combat log
+  newState.log.push({
+    turn: newState.turn,
+    round: newState.round,
+    actor: isPlayer ? 'player' : 'enemy',
+    action: 'discard_spell',
+    details: `${isPlayer ? 'You' : 'Enemy'} discarded ${spell.name}.`,
+  });
+  
+  return newState;
 }
 
 /**
@@ -96,6 +298,13 @@ export function executeMysticPunch(
     damageModifier = isPlayer ? 5 : 10;
   } else {
     damageModifier = isPlayer ? 2 : 15;
+  }
+  
+  // Apply mystic punch power from equipment
+  if (isPlayer && state.playerWizard.wizard.combatStats?.mysticPunchPower) {
+    damageModifier += state.playerWizard.wizard.combatStats.mysticPunchPower;
+  } else if (!isPlayer && state.enemyWizard.wizard.combatStats?.mysticPunchPower) {
+    damageModifier += state.enemyWizard.wizard.combatStats.mysticPunchPower;
   }
   
   const damage = spellTier + damageModifier;
@@ -206,6 +415,12 @@ export function executeSpellCast(
     });
   }
   
+  // Move the spell from hand to discard pile
+  const spellInHand = newState[caster].hand.find(s => s.id === spell.id);
+  if (spellInHand) {
+    newState = discardSpell(newState, spell.id, isPlayer);
+  }
+  
   return advanceTurn(newState);
 }
 
@@ -285,11 +500,32 @@ function applySpellEffect(
       
     case 'statModifier':
     case 'statusEffect':
-      // Add effect to active effects if it has a duration
-      if (effect.duration && effect.duration > 0) {
+      // Handle special status effect for extra turn (Time Warp spell)
+      if (effect.type === 'statusEffect' && effect.value === 1 && effect.duration === 1) {
+        // This is the Time Warp extra turn effect
+        const actorName = isPlayerCaster ? 'player' : 'enemy';
+        
+        // Add to combat log
+        newState.log.push({
+          turn: newState.turn,
+          round: newState.round,
+          actor: actorName,
+          action: 'effect_applied',
+          details: `Time warped! ${actorName === 'player' ? 'You' : 'Enemy'} will get an extra turn!`,
+        });
+        
+        // Set a flag to grant an extra turn in the advanceTurn function
+        newState.extraTurn = {
+          for: actorName
+        };
+      } 
+      // Handle regular status/stat effects with duration
+      else if (effect.duration && effect.duration > 0) {
+        const effectName = getEffectName(effect);
+        
         const activeEffect: ActiveEffect = {
           id: `effect_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          name: effect.type === 'statModifier' ? 'Stat Modifier' : 'Status Effect',
+          name: effectName,
           effect: { ...effect },
           remainingDuration: effect.duration,
           source: isPlayerCaster ? 'player' : 'enemy',
@@ -313,6 +549,34 @@ function applySpellEffect(
   }
   
   return newState;
+}
+
+/**
+ * Get a descriptive name for an effect
+ * @param effect The effect to name
+ * @returns A descriptive name for the effect
+ */
+function getEffectName(effect: SpellEffect): string {
+  switch (effect.type) {
+    case 'statModifier':
+      if (effect.value < 0) {
+        return 'Damage Reduction';
+      } else {
+        return 'Power Boost';
+      }
+    case 'statusEffect':
+      if (effect.target === 'self' && effect.value > 0) {
+        return 'Healing Over Time';
+      } else if (effect.target === 'enemy' && effect.value > 0) {
+        return 'Damage Over Time';
+      } else if (effect.value === 1) {
+        return 'Time Warp';
+      } else {
+        return 'Status Effect';
+      }
+    default:
+      return effect.type;
+  }
 }
 
 /**
@@ -460,35 +724,65 @@ function regenerateMana(
 }
 
 /**
- * Advance the turn in combat
+ * Advance to the next turn
  * @param state The current combat state
  * @returns Updated combat state
  */
 function advanceTurn(state: CombatState): CombatState {
+  // Don't advance turn if combat has ended
+  if (state.status !== 'active') {
+    return state;
+  }
+  
   let newState = { ...state };
   
-  // If combat has ended, don't advance turn
-  if (newState.status !== 'active') {
+  // Handle extra turn from Time Warp spell
+  if (newState.extraTurn) {
+    // If there's an extra turn queued up, use it instead of advancing normally
+    const extraTurnFor = newState.extraTurn.for;
+    
+    // Clear the extra turn flag
+    newState.extraTurn = undefined;
+    
+    // Add to combat log
+    newState.log.push({
+      turn: newState.turn,
+      round: newState.round,
+      actor: extraTurnFor,
+      action: 'extra_turn',
+      details: `${extraTurnFor === 'player' ? 'You' : 'Enemy'} takes an extra turn through time magic!`,
+    });
+    
+    // Set the turn to the player who cast Time Warp
+    newState.isPlayerTurn = extraTurnFor === 'player';
+    
     return newState;
   }
   
-  // Toggle player turn
-  newState.isPlayerTurn = !newState.isPlayerTurn;
-  
-  // If it's the start of a new round (after enemy's turn)
-  if (!newState.isPlayerTurn) {
-    newState.turn++;
+  // Normal turn advancement
+  if (newState.isPlayerTurn) {
+    // If it was the player's turn, now it's the enemy's turn
+    newState.isPlayerTurn = false;
   } else {
-    newState.round++;
+    // If it was the enemy's turn, advance to the next round and player's turn
+    newState.isPlayerTurn = true;
+    newState.round += 1;
     
-    // Process active effects at the start of a new round
+    // Process status effects at the start of a new round
     newState = processActiveEffects(newState, true); // Player effects
     newState = processActiveEffects(newState, false); // Enemy effects
     
     // Regenerate mana at the start of a new round
     newState = regenerateMana(newState, true); // Player mana
     newState = regenerateMana(newState, false); // Enemy mana
+    
+    // Draw cards for the new round
+    newState = drawCards(newState, true, CARDS_PER_DRAW);
+    newState = drawCards(newState, false, CARDS_PER_DRAW);
   }
+  
+  // Increase turn counter
+  newState.turn += 1;
   
   return newState;
 }

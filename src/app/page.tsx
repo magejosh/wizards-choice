@@ -8,6 +8,7 @@ import HowToPlay from '../lib/ui/components/HowToPlay';
 import WizardStudy from '../lib/ui/components/WizardStudy';
 import Login from '../lib/ui/components/Login';
 import DeckBuilder from '../lib/ui/components/DeckBuilder';
+import EquipmentScreen from '../lib/ui/components/EquipmentScreen';
 import { useGameStateStore } from '../lib/game-state/gameStateStore';
 import authService from '../lib/auth/authService';
 import '../lib/ui/styles/main.css';
@@ -17,6 +18,7 @@ export default function Home() {
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showNameInput, setShowNameInput] = useState(false);
   const [showDeckBuilder, setShowDeckBuilder] = useState(false);
+  const [showEquipment, setShowEquipment] = useState(false);
   const [playerName, setPlayerName] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -163,7 +165,21 @@ export default function Home() {
   
   const handleOpenEquipment = () => {
     console.log('Opening equipment');
-    alert('Equipment screen would open here');
+    setShowEquipment(true);
+  };
+  
+  const handleCloseEquipment = async () => {
+    // Save the game state when closing the equipment screen
+    // to persist any changes to equipped items
+    setIsLoading(true);
+    try {
+      await authService.saveGameState();
+      setShowEquipment(false);
+    } catch (error) {
+      console.error('Error saving equipment changes:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const handleOpenSpellbook = () => {
@@ -265,6 +281,7 @@ export default function Home() {
           
           {/* Overlay components that can appear in game */}
           {showDeckBuilder && <DeckBuilder onClose={handleCloseDeckBuilder} />}
+          {showEquipment && <EquipmentScreen onClose={handleCloseEquipment} />}
         </>
       )}
     </div>

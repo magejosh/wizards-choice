@@ -27,10 +27,24 @@ The main menu provides these options:
 Battles in Wizard's Choice are turn-based duels between two wizards in a magical arena.
 
 #### Battle Interface
-- Your wizard appears on the left, enemy on the right
-- Health and Mana bars display at the top of the screen
-- Your available spells appear as cards at the bottom
-- Battle log shows recent actions
+- 3D battle arena with interactive elements:
+  - Your wizard appears on the left, enemy on the right
+  - Wizards are animated with special effects for active turns
+  - Spell casting produces visual effects based on spell element and type
+  - Damage and healing numbers float up from affected wizards
+  - Dynamic health bars show remaining health percentage
+- Comprehensive battle UI:
+  - Health and Mana bars display wizard stats
+  - Your available spell cards appear at the bottom
+  - Battle log shows recent actions with color-coded entries
+  - Turn indicator shows which wizard is active
+  - Round counter tracks battle progress
+  - Deck information shows draw and discard pile status
+  - Active effects panel displays status effects on both wizards
+- Action buttons:
+  - Cast spell (select from your hand)
+  - Mystic Punch (discard a spell for direct damage)
+  - Skip Turn (gain extra mana regeneration)
 
 #### Turn Structure
 1. Select one spell to cast (or choose to skip your turn)
@@ -65,6 +79,29 @@ Battles in Wizard's Choice are turn-based duels between two wizards in a magical
 - **Mystic Punch**: Discard a spell card to deal damage (spell tier + difficulty modifier)
 - **Skip Turn**: Regenerate additional mana if you have 2 or fewer cards
 
+### Spell Scrolls
+
+Spell scrolls provide an opportunity to learn new spells or use powerful spells without consuming mana.
+
+#### Finding Scrolls
+- **Loot Drops**: Defeat enemies to occasionally receive spell scrolls
+- **Market Purchases**: Visit markets specializing in scrolls to buy them
+- **Rarity Levels**: Scrolls come in common, uncommon, rare, epic, and legendary varieties
+
+#### Using Scrolls
+- **In Wizard's Study**: Use scrolls to permanently learn new spells for your collection
+  - You cannot learn spells you already know
+  - Once used, the scroll is consumed
+- **In Battle**: Use scrolls to cast a spell one time without spending mana
+  - Access your scroll inventory with the "Use Scroll" button
+  - Scroll is consumed after use
+  - Does not count as your equipped deck spells
+
+#### Scroll Strategy
+- Save rare scrolls for powerful spells you want to add to your collection
+- Use scrolls in battle to cast spells that would normally cost too much mana
+- Consider buying scrolls from markets when you need specific spell types
+
 ### Progression System
 
 #### Experience and Leveling
@@ -79,6 +116,7 @@ Battles in Wizard's Choice are turn-based duels between two wizards in a magical
 - **Max Health**: 1 point per +1 Health
 - **Max Mana**: 1 point per +1 Mana
 - **Mana Regen**: 10 points per +1 Mana Regen per round
+- **New Spell**: 1 point per tier of spell. 
 
 ### The Wizard's Study
 
@@ -107,6 +145,57 @@ You can equip one item in each category:
 #### Rings (up to two)
 - Offer various passive bonuses
 - Example: Mana Ring (+15 Maximum Mana)
+
+### Markets & Trading
+
+The world of Wizard's Choice features an extensive marketplace system where you can buy and sell items.
+
+#### Market Locations
+- Markets unlock as you level up your wizard
+- Each market specializes in particular goods:
+  - Ingredients markets (herbs, crystals, etc.)
+  - Equipment markets (wands, robes, etc.)
+  - Potion markets (healing, mana, etc.)
+  - Scroll markets (spell scrolls)
+
+#### High-Level Markets
+As you progress in levels, you'll unlock increasingly prestigious markets:
+- **Novice Bazaar** (Level 1) - Basic starter market
+- **Herbalist's Haven** (Level 5) - Basic ingredients
+- **Arcane Emporium** (Level 10) - Basic equipment
+- **Alchemist's Square** (Level 15) - Basic potions
+- **Spellcaster's Exchange** (Level 20) - Basic scrolls
+- **Ethereal Bazaar** (Level 25) - Advanced ingredients
+- **Enchanter's Workshop** (Level 50) - Advanced equipment
+- **Celestial Apothecary** (Level 75) - Advanced potions
+- **Archmage's Repository** (Level 100) - Advanced scrolls
+- **Elemental Nexus** (Level 150) - Rare ingredients
+- **Temporal Auction House** (Level 250) - Rare equipment
+- **Philosopher's Emporium** (Level 500) - Rare potions
+- **Cosmic Library** (Level 1000) - Rare scrolls
+
+Higher-level markets stock rarer and more powerful items, but at premium prices.
+
+#### Market Mechanics
+- **Buying**: Purchase items by selecting them and choosing a quantity
+- **Selling**: Sell unwanted items from your inventory
+- **Prices**: Fluctuate based on supply, demand, and your reputation
+- **Reputation**: Improves as you make transactions at a market, resulting in better prices
+- **Inventory Refresh**: Each market refreshes its inventory periodically
+
+#### Market Attacks
+Beware when leaving markets! There's a chance you'll be ambushed by thieves and rogues:
+
+- Higher-level markets have a greater chance of ambushes
+- When ambushed, you can choose to fight or attempt to flee
+- **Fighting**: Engage in a duel with the market attacker
+  - Victory rewards you with rare ingredients
+  - Defeat results in lost gold
+- **Fleeing**: 50% chance to escape safely
+  - Successful escape: Return to your wizard's study unharmed
+  - Failed escape: Lose a portion of your gold
+
+These ambushes add risk to market visits but provide opportunities for valuable rewards!
 
 ## Advanced Strategies
 

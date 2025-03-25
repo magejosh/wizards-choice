@@ -7,14 +7,18 @@
 4. [Authentication System](#authentication-system)
 5. [Game State Management](#game-state-management)
 6. [Spell System](#spell-system)
-7. [Combat Engine](#combat-engine)
-8. [3D Battle System](#3d-battle-system)
-9. [Equipment System](#equipment-system)
-10. [UI Components](#ui-components)
-11. [Best Practices](#best-practices)
-12. [Deployment Guide](#deployment-guide)
-13. [Admin Guide](#admin-guide)
-14. [Future Development](#future-development)
+7. [Spell Scroll System](#spell-scroll-system)
+8. [Combat Engine](#combat-engine)
+9. [Combat Utilities](#combat-utilities)
+10. [3D Battle System](#3d-battle-system)
+11. [Equipment System](#equipment-system)
+12. [UI Components](#ui-components)
+13. [Best Practices](#best-practices)
+14. [Deployment Guide](#deployment-guide)
+15. [Admin Guide](#admin-guide)
+16. [Future Development](#future-development)
+17. [Market System](#market-system)
+18. [Market Attack System](#market-attack-system)
 
 ## Introduction
 
@@ -103,15 +107,95 @@ The spell system is designed to be extensible and balanced, with 10 tiers of spe
 - **AXIOM 9**: Design spells in sets with complementary effects to encourage strategic combinations.
 - **AXIOM 10**: Maintain clear documentation of spell effects and interactions for future expansion.
 
+## Spell Scroll System
+
+The spell scroll system provides an alternative method for players to acquire and use spells beyond the standard deck-building mechanics.
+
+### Key Features
+- Spell scrolls can be found as loot from defeated enemies or purchased in markets
+- Scrolls contain a single spell of varying rarity
+- Players can use scrolls in two ways:
+  - In the Wizard's Study to permanently learn the spell
+  - In battle for a one-time casting without mana cost
+- Different scroll rarities based on the enclosed spell's tier
+
+### Implementation Details
+- Scrolls are generated procedurally based on player level
+- Market scroll availability depends on market specialization and level
+- Scrolls for rare or powerful spells have correspondingly lower drop rates
+- The system integrates with both the loot system and market system
+- UI interfaces for both study and battle scroll usage
+
+### Best Practices
+- **AXIOM 35**: Ensure scroll rarity aligns with the enclosed spell's power level.
+- **AXIOM 36**: Provide clear feedback when using scrolls in different contexts.
+- **AXIOM 37**: Balance scroll acquisition rates to maintain game progression curve.
+- **AXIOM 38**: Store scrolls in the player's inventory using a type-safe approach.
+
 ## Combat Engine
 
-The combat engine handles turn-based duels between wizards with:
+The combat engine handles turn-based duels between wizards with card-based gameplay mechanics for a strategic experience. The system is designed to be extensible and support complex interactions between spells, effects, and abilities.
 
-1. Turn management
-2. Spell casting and effects
-3. Health and mana tracking
-4. AI opponent decision making
-5. Combat resolution
+### Key Features
+
+1. **Deck-Based Combat System**
+   - Players and enemies use decks of spells for combat
+   - Draw pile, hand, and discard pile mechanics similar to deck-building games
+   - Initial hand of 3 cards drawn at the start of combat
+   - Hand refilled to 3 cards at the start of each round
+   - Empty draw piles automatically reshuffle the discard pile
+
+2. **Turn Management**
+   - Clear separation between player and enemy turns
+   - Round-based structure with incrementing counter
+   - Turn actions: cast spell, use mystic punch, skip turn, use scroll
+   - Animations and visual cues to indicate current turn state
+
+3. **Spell Casting and Effects**
+   - Mana cost verification before spell casting
+   - Automatic spell discard after casting
+   - Support for various spell types (attack, healing, buff, debuff)
+   - Elemental damage calculation with resistances and weaknesses
+
+4. **Active Effects System**
+   - Implementation of status effects that persist across turns
+   - Effect types: damage over time, healing over time, mana drain, mana regen
+   - Duration tracking with automatic decrement at end of rounds
+   - Removal of expired effects
+
+5. **Mana Management**
+   - Mana cost for spell casting
+   - Mana regeneration at the end of each round
+   - Maximum mana cap based on wizard stats and equipment
+
+6. **Health Tracking**
+   - Damage application with elemental modifiers
+   - Healing effects with wizard stat bonuses
+   - Victory/defeat detection based on health values
+
+7. **Battle Log**
+   - Comprehensive logging of all combat actions
+   - Clear text descriptions of spell effects, damage, healing
+   - Visual highlighting of important battle events
+
+8. **Mystic Punch Mechanic**
+   - Basic attack option that requires no mana
+   - Consistent damage output as a fallback option
+   - Strategic alternative when spell options are limited
+
+### Core Combat Engine Functions
+
+1. **`initializeCombat`**: Sets up the initial combat state with player and enemy wizards
+2. **`drawSpells`**: Draws a specified number of spells from the draw pile to hand
+3. **`discardSpell`**: Moves a spell from hand to discard pile
+4. **`executeSpell`**: Processes spell casting including mana cost and effects
+5. **`executeMysticPunch`**: Handles the basic attack option
+6. **`addActiveEffect`**: Applies status effects to a target
+7. **`applyActiveEffects`**: Processes active effects at the start of a turn
+8. **`decrementActiveEffects`**: Reduces the duration of active effects
+9. **`checkActiveEffects`**: Removes expired effects
+10. **`regenerateMana`**: Handles mana regeneration between rounds
+11. **`checkBattleEnd`**: Determines if victory or defeat conditions are met
 
 ### AI System
 
@@ -121,21 +205,114 @@ Enemy wizards utilize a sophisticated AI system with three distinct strategies:
 2. **Aggressive Strategy**: Focuses on high-damage spells and debuffs, with minimal health management.
 3. **Balanced Strategy**: Adaptively chooses spells based on the combat situation, with a mix of all spell types.
 
-The AI system implements the Strategy pattern, allowing for easy expansion with new strategies.
+The AI decision-making process implemented in `getAISpellSelection` evaluates the current combat state to choose the most appropriate spell based on:
+- Available mana
+- Current health percentage
+- Available spell types
+- Elemental advantages against the player
+
+### Battle State Management
+
+The combat engine maintains a comprehensive `CombatState` object that tracks:
+- Player and enemy wizard stats, hands, and decks
+- Active effects on both combatants
+- Current turn and round information
+- Battle status (active, playerWon, enemyWon)
+
+This state is passed between components and updated immutably to ensure consistent game state.
 
 ### Best Practices
 - **AXIOM 11**: Separate combat logic from visual effects for cleaner code and easier testing.
 - **AXIOM 12**: Implement AI difficulty levels through strategy patterns rather than hardcoded behaviors.
 - **AXIOM 13**: Use event-based systems for combat effects to allow for extensibility.
+- **AXIOM 47**: Always create new state objects rather than mutating existing state to maintain immutability.
+- **AXIOM 48**: Implement clear type definitions for all combat-related structures and functions.
+- **AXIOM 49**: Balance deck mechanics to ensure players always have meaningful choices.
+- **AXIOM 50**: Use pure functions for combat calculations to facilitate testing and debugging.
+
+## Combat Utilities
+
+The combat utility system provides reusable functions for damage and healing calculations, ensuring consistent and balanced combat mechanics. These utilities are isolated from the main combat engine to promote maintainability and testability.
+
+### Key Utilities
+
+1. **Damage Calculation**
+   - `calculateDamage`: Computes final damage based on spell power, caster stats, and target defenses
+   - Includes random variance (±20%) for unpredictability
+   - Applies elemental strengths and weaknesses (50% bonus damage / 33% reduction)
+   - Factors in equipment damage bonuses
+   - Applies defensive stat reductions
+
+2. **Healing Calculation**
+   - `calculateHealing`: Determines healing amount based on spell power and caster stats
+   - Includes slight random variance (±10%)
+   - Applies healing bonuses from equipment or effects
+
+3. **Critical Hit System**
+   - `calculateCritical`: Determines if an attack is a critical hit
+   - Uses wizard's critical chance stat (default 10%)
+   - Doubles damage on successful critical hits
+
+4. **Spell Validation**
+   - `canCastSpell`: Checks if a spell can be cast based on mana requirements
+   - Validates other potential casting restrictions
+
+5. **Random Utilities**
+   - `getRandomInt`: Generates random integers within a range
+   - `getRandomFloat`: Generates random floating-point numbers
+   - `getRandomItem`: Selects a random item from an array
+   - `shuffleArray`: Randomizes array elements using Fisher-Yates algorithm
+   - `randomChance`: Provides true/false based on probability
+
+### Implementation
+
+The combat utilities are implemented as pure functions in dedicated utility files:
+- `combatUtils.ts`: Contains damage, healing, and validation functions
+- `randomUtils.ts`: Provides randomization functions for combat variance
+
+### Best Practices
+- **AXIOM 51**: Use deterministic calculation formulas for predictable balance testing.
+- **AXIOM 52**: Maintain separate utility functions for each combat calculation type.
+- **AXIOM 53**: Implement bounds checking to prevent negative or invalid values.
+- **AXIOM 54**: Document calculation formulas clearly to aid future balance adjustments.
+- **AXIOM 55**: Use TypeScript for strong typing of all parameters and return values.
 
 ## 3D Battle System
 
 The battle system provides an immersive 3D experience using Three.js via React Three Fiber.
 
 ### Components
-1. **BattleScene**: Manages the overall 3D scene, including lighting, environment, and camera.
-2. **WizardModel**: Renders 3D wizard models with health bars and animations.
-3. **SpellEffect3D**: Creates dynamic spell effects based on spell type and element.
+1. **BattleArena**: The main container component that combines the 3D battle canvas with UI elements.
+   - Manages player and enemy information displays
+   - Renders the spell hand interface for player choices
+   - Displays the battle log with action history
+   - Provides action buttons (Mystic Punch, Skip Turn)
+   - Handles victory/defeat conditions with appropriate UI
+   - Manages animations and state transitions
+
+2. **BattleScene**: Manages the overall 3D scene, including lighting, environment, and camera.
+   - Handles the arrangement of wizards in 3D space
+   - Coordinates visual effects based on combat log entries
+   - Renders floating damage/healing numbers
+   - Displays turn indicators and status information
+   - Integrates environment elements (battle platform, stars, lighting)
+
+3. **WizardModel**: Renders 3D wizard models with health bars and animations.
+   - Creates stylized 3D wizard models with robes, hats, and staffs
+   - Implements hover animations for active wizards
+   - Renders dynamic health bars with color-coded health percentages
+   - Provides visual feedback for wizard state (active, damaged, etc.)
+   - Orients wizards to face each other in the battle arena
+
+4. **SpellEffect3D**: Creates dynamic spell effects based on spell type and element.
+   - Renders unique 3D effects for different spell types:
+     - Attack spells: Projectiles with particle trails
+     - Defense spells: Shield-like barriers
+     - Healing spells: Glowing restorative effects
+     - Utility spells: Specialized visual indicators
+   - Adapts colors and particles based on spell element
+   - Handles effect lifetime and animation
+   - Creates particle systems for magical effects
 
 ### Key Features
 - **Real-time Animations**: Wizards and spells animate based on battle state and actions.
@@ -143,6 +320,9 @@ The battle system provides an immersive 3D experience using Three.js via React T
 - **Visual Feedback**: Damage and healing numbers appear and float upward for clear feedback.
 - **Health Visualization**: Health bars dynamically update with color coding for remaining health.
 - **Turn Indicators**: Visual cues show which wizard is actively taking their turn.
+- **Responsive Integration**: Seamless integration between 3D visuals and 2D UI elements.
+- **Battle Log**: Detailed action history with formatting based on action types.
+- **Spell Card Interface**: Interactive spell cards for player selection.
 
 ### Technical Implementation
 - Three.js is used for 3D rendering through React Three Fiber
@@ -150,12 +330,26 @@ The battle system provides an immersive 3D experience using Three.js via React T
 - Component-based architecture for reusable 3D elements
 - GPU-accelerated particle effects for spell casting
 - Dynamic lighting and environment settings
+- React state management for synchronizing UI with 3D elements
+- CSS modules for styling UI components
+- Canvas integration for rendering the 3D scene within the UI layout
+
+### Design Patterns
+- **Component Composition**: Building complex visuals from simpler components
+- **Props-based Configuration**: Configuring visual appearance through props
+- **React Hooks for Animation**: Using useFrame and useRef for managing animations
+- **Event-based Effects**: Triggering visual effects in response to combat events
+- **Responsive Layout**: Adapting to different screen sizes while maintaining visual quality
 
 ### Best Practices
 - **AXIOM 31**: Batch 3D model updates to minimize render calls and optimize performance.
 - **AXIOM 32**: Use instanced meshes for particle effects to improve rendering efficiency.
 - **AXIOM 33**: Implement proper cleanup for 3D effects to prevent memory leaks.
 - **AXIOM 34**: Scale visual complexity based on device performance capabilities.
+- **AXIOM 43**: Maintain clear separation between combat logic and visual effects.
+- **AXIOM 44**: Implement graceful fallbacks for older devices that may struggle with 3D rendering.
+- **AXIOM 45**: Use consistent color themes and visual language across all spell effects.
+- **AXIOM 46**: Design visual effects to communicate gameplay information (damage type, effect strength).
 
 ## Equipment System
 
@@ -296,3 +490,58 @@ The codebase is designed to be extensible for future features:
 - Implement server-side rendering for improved performance
 - Add comprehensive test coverage
 - Integrate with a proper database for production use
+
+## Market System
+
+The market system provides an economic component to the game where players can trade resources and acquire new items.
+
+### Key Features
+- Multiple market locations with progressive level unlocks (1-1000)
+- Market specializations (ingredients, potions, equipment, scrolls)
+- Dynamic supply and demand affecting prices
+- Reputation system influencing player-specific pricing
+- Inventory refresh cycles varying by market tier
+- Buy and sell interface for all item types
+
+### Market Locations
+The game features 13 unique market locations, each with specific unlock requirements:
+1. **Novice Bazaar** (Level 1) - General market with basic supplies
+2. **Herbalist's Haven** (Level 5) - Specializes in ingredients
+3. **Arcane Emporium** (Level 10) - Specializes in equipment
+4. **Alchemist's Square** (Level 15) - Specializes in potions
+5. **Spellcaster's Exchange** (Level 20) - Specializes in scrolls
+6. **Ethereal Bazaar** (Level 25) - Advanced ingredients market
+7. **Enchanter's Workshop** (Level 50) - Advanced equipment market
+8. **Celestial Apothecary** (Level 75) - Advanced potions market
+9. **Archmage's Repository** (Level 100) - Advanced scrolls market
+10. **Elemental Nexus** (Level 150) - Rare ingredients market
+11. **Temporal Auction House** (Level 250) - Rare equipment market
+12. **Philosopher's Emporium** (Level 500) - Rare potions market
+13. **Cosmic Library** (Level 1000) - Rare scrolls market
+
+Higher-level markets have higher price multipliers but offer rarer items and better quality.
+
+## Market Attack System
+
+The market attack system adds risk and reward to market visits, creating encounters when players leave markets.
+
+### Key Features
+- Random chance of market attacks based on market level and game difficulty
+- Specialized bandit/thief enemies tailored to player level
+- Attack chance scaled by market level (higher level markets are more dangerous)
+- Player option to fight or attempt to flee
+- Gold loss when defeated or failing to flee
+- Rare ingredient rewards for defeating market attackers
+
+### Implementation Details
+- Attack chance calculation: Base chance + (Market Level × Scaling Factor)
+- Difficulty modifiers: Easy (50% less chance), Hard (50% more chance)
+- Flee mechanic: 50% success rate
+- Gold loss: 10-20% of current gold when defeated
+- Rewards: 2-5 ingredients with rarity based on attacker level
+
+### Best Practices
+- **AXIOM 39**: Balance attack frequency to add tension without excessive frustration
+- **AXIOM 40**: Scale rewards appropriately with risk (higher level market attackers provide better rewards)
+- **AXIOM 41**: Ensure UI clearly communicates the risk/reward decision to players
+- **AXIOM 42**: Implement proper state transitions between market, battle, and wizard study

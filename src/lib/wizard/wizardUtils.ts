@@ -1,5 +1,5 @@
 // src/lib/wizard/wizardUtils.ts
-import { Wizard } from '../types';
+import { Wizard, Equipment } from '../types';
 
 /**
  * Generates a default wizard with starting stats
@@ -21,6 +21,11 @@ export function generateDefaultWizard(name: string): Wizard {
     spells: [], // Will be populated with default spells
     equippedSpells: [], // Will be populated with 3 selected spells
     equipment: {}, // No equipment at start
+    inventory: [], // No items in inventory at start
+    potions: [], // No potions at start
+    equippedPotions: [], // No equipped potions at start
+    ingredients: [], // No ingredients at start
+    discoveredRecipes: [], // No discovered recipes at start
     levelUpPoints: 0,
     decks: [], // Will be populated with default deck
     activeDeckId: null, // Will be set to default deck ID
@@ -39,30 +44,82 @@ export function calculateWizardStats(wizard: Wizard): Wizard {
   let totalMaxHealth = wizard.maxHealth;
   let totalMaxMana = wizard.maxMana;
   let totalManaRegen = wizard.level; // Base mana regen equals player level
+  let totalMysticPunchPower = 5; // Base mystic punch power
+  let totalBleedEffect = 0; // Base bleed effect
+  let totalExtraCardDraw = 0; // Base extra card draw
+  let canDiscardAndDraw = false; // Whether the wizard can discard and draw a card
+  let totalPotionSlots = 0; // Total potion slots from belt
+  
+  // Process equipped items by slot
+  const equipment = wizard.equipment;
+  
+  // Array of all equipped items
+  const equippedItems = [
+    equipment.head,
+    equipment.hand, 
+    equipment.body,
+    equipment.neck,
+    equipment.finger1,
+    equipment.finger2,
+    equipment.belt
+  ].filter(Boolean) as Equipment[];
   
   // Add equipment bonuses
-  Object.values(wizard.equipment).forEach(item => {
-    if (!item) return;
+  equippedItems.forEach(item => {
+    // Add maxHealth bonus
+    if (item.bonuses.maxHealth) {
+      totalMaxHealth += item.bonuses.maxHealth;
+    }
     
-    item.bonuses.forEach(bonus => {
-      switch (bonus.type) {
-        case 'health':
-          totalMaxHealth += bonus.value;
-          break;
-        case 'manaBoost':
-          totalMaxMana += bonus.value;
-          break;
-        case 'manaRegen':
-          totalManaRegen += bonus.value;
-          break;
-      }
-    });
+    // Add maxMana bonus
+    if (item.bonuses.maxMana) {
+      totalMaxMana += item.bonuses.maxMana;
+    }
+    
+    // Add manaRegen bonus
+    if (item.bonuses.manaRegen) {
+      totalManaRegen += item.bonuses.manaRegen;
+    }
+    
+    // Add mystic punch power
+    if (item.bonuses.mysticPunchPower) {
+      totalMysticPunchPower += item.bonuses.mysticPunchPower;
+    }
+    
+    // Add bleed effect
+    if (item.bonuses.bleedEffect) {
+      totalBleedEffect += item.bonuses.bleedEffect;
+    }
+    
+    // Add extra card draw
+    if (item.bonuses.extraCardDraw) {
+      totalExtraCardDraw += item.bonuses.extraCardDraw;
+    }
+    
+    // Check for discard and draw ability
+    if (item.bonuses.discardAndDraw) {
+      canDiscardAndDraw = true;
+    }
+    
+    // Check for potion slots on belt
+    if (item.slot === 'belt' && item.bonuses.potionSlots) {
+      totalPotionSlots = item.bonuses.potionSlots;
+    }
   });
   
   // Update the wizard with calculated stats
   calculatedWizard.maxHealth = totalMaxHealth;
   calculatedWizard.maxMana = totalMaxMana;
   calculatedWizard.manaRegen = totalManaRegen;
+  
+  // Store combat-specific stats in a separate property to avoid polluting the core wizard object
+  calculatedWizard.combatStats = {
+    mysticPunchPower: totalMysticPunchPower,
+    bleedEffect: totalBleedEffect,
+    extraCardDraw: totalExtraCardDraw,
+    canDiscardAndDraw: canDiscardAndDraw,
+    potionSlots: totalPotionSlots
+  };
   
   return calculatedWizard;
 }

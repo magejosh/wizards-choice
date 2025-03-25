@@ -1,7 +1,10 @@
 // src/lib/features/loot/lootSystem.ts
-import { Wizard, Spell, Equipment } from '../../types';
+import { Wizard, Spell, Equipment, Ingredient, SpellScroll } from '../../types';
 import { getAllSpells, getSpellsByTier } from '../../spells/spellData';
 import { getRandomEquipment } from '../../equipment/equipmentData';
+import { generateProceduralEquipment, generateLootEquipment } from '../procedural/equipmentGenerator';
+import { generateRandomIngredient } from '../procedural/ingredientGenerator';
+import { generateRandomSpellScroll } from '../scrolls/scrollSystem';
 
 /**
  * Represents a loot drop from defeating an enemy
@@ -9,38 +12,83 @@ import { getRandomEquipment } from '../../equipment/equipmentData';
 export interface LootDrop {
   spells: Spell[];
   equipment: Equipment[];
+  ingredients: Ingredient[];
+  scrolls: SpellScroll[];
   experience: number;
 }
 
 /**
- * Generates loot after defeating an enemy
+ * Generate loot after defeating an enemy
  * @param playerWizard The player's wizard
  * @param enemyWizard The defeated enemy wizard
  * @param isWizardEnemy Whether the enemy was a wizard (true) or a magical creature (false)
  * @param difficulty The game difficulty
- * @returns The generated loot
+ * @returns Loot drop containing spells, equipment, ingredients, and experience
  */
 export function generateLoot(
   playerWizard: Wizard,
   enemyWizard: Wizard,
-  isWizardEnemy: boolean,
-  difficulty: 'easy' | 'normal' | 'hard'
+  isWizardEnemy: boolean = true,
+  difficulty: 'easy' | 'normal' | 'hard' = 'normal'
 ): LootDrop {
-  // Calculate experience based on enemy level and difficulty
-  const experienceMultiplier = difficulty === 'easy' ? 10 : difficulty === 'normal' ? 1 : 0.1;
-  const experience = Math.floor(enemyWizard.level * 10 * experienceMultiplier);
-  
   // Generate spell loot
   const spells = generateSpellLoot(playerWizard, enemyWizard, isWizardEnemy, difficulty);
   
   // Generate equipment loot
   const equipment = generateEquipmentLoot(playerWizard, enemyWizard, isWizardEnemy, difficulty);
   
+  // Generate ingredient loot
+  const ingredients = generateIngredientLoot(playerWizard, enemyWizard, isWizardEnemy, difficulty);
+  
+  // Generate spell scroll loot
+  const scrolls = generateScrollLoot(playerWizard, enemyWizard, isWizardEnemy, difficulty);
+  
+  // Calculate experience reward
+  const experience = calculateExperienceReward(enemyWizard.level, isWizardEnemy, difficulty);
+  
   return {
     spells,
     equipment,
+    ingredients,
+    scrolls,
     experience
   };
+}
+
+/**
+ * Calculate experience reward for defeating an enemy
+ * @param enemyLevel The level of the defeated enemy
+ * @param isWizardEnemy Whether the enemy was a wizard (true) or a magical creature (false)
+ * @param difficulty The game difficulty
+ * @returns Experience points rewarded
+ */
+function calculateExperienceReward(
+  enemyLevel: number,
+  isWizardEnemy: boolean,
+  difficulty: 'easy' | 'normal' | 'hard'
+): number {
+  // Base experience is enemy level * 10
+  let baseExperience = enemyLevel * 10;
+  
+  // Wizards give more experience than magical creatures
+  if (isWizardEnemy) {
+    baseExperience *= 1.5;
+  }
+  
+  // Apply difficulty modifier
+  switch (difficulty) {
+    case 'easy':
+      baseExperience *= 0.8; // 80% of base
+      break;
+    case 'normal':
+      // No modification for normal
+      break;
+    case 'hard':
+      baseExperience *= 1.3; // 130% of base
+      break;
+  }
+  
+  return Math.floor(baseExperience);
 }
 
 /**
@@ -193,8 +241,24 @@ function generateEquipmentLoot(
         lootEquipment.push(randomEnemyEquipment as Equipment);
       }
     } else {
-      // Generate random equipment based on enemy level
-      lootEquipment.push(getRandomEquipment(enemyWizard.level));
+      // Generate procedural equipment based on enemy level
+      // Determine rarity chances based on enemy level and game difficulty
+      let minRarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | undefined = undefined;
+      
+      // Higher level enemies have a chance to drop better equipment
+      if (enemyWizard.level >= 20 && Math.random() < 0.1) {
+        minRarity = 'legendary';
+      } else if (enemyWizard.level >= 15 && Math.random() < 0.2) {
+        minRarity = 'epic';
+      } else if (enemyWizard.level >= 10 && Math.random() < 0.3) {
+        minRarity = 'rare';
+      } else if (enemyWizard.level >= 5 && Math.random() < 0.4) {
+        minRarity = 'uncommon';
+      }
+      
+      // Generate 1-2 equipment pieces for magical creatures
+      const equipmentCount = Math.random() < 0.3 ? 2 : 1;
+      lootEquipment.push(...generateLootEquipment(enemyWizard.level, equipmentCount, minRarity));
     }
   }
   
@@ -202,39 +266,172 @@ function generateEquipmentLoot(
 }
 
 /**
- * Applies loot to the player's wizard
+ * Generates ingredient loot after defeating an enemy
  * @param playerWizard The player's wizard
- * @param loot The loot to apply
- * @returns Updated player wizard
+ * @param enemyWizard The defeated enemy wizard
+ * @param isWizardEnemy Whether the enemy was a wizard (true) or a magical creature (false)
+ * @param difficulty The game difficulty
+ * @returns Array of ingredient loot
  */
-export function applyLoot(playerWizard: Wizard, loot: LootDrop): Wizard {
-  const updatedWizard = { ...playerWizard };
+function generateIngredientLoot(
+  playerWizard: Wizard,
+  enemyWizard: Wizard,
+  isWizardEnemy: boolean,
+  difficulty: 'easy' | 'normal' | 'hard'
+): Ingredient[] {
+  const lootIngredients: Ingredient[] = [];
   
-  // Add experience
-  updatedWizard.experience += loot.experience;
+  // Determine number of ingredients to drop
+  let ingredientDropCount = 0;
+  let ingredientDropChance = 0;
   
-  // Check for level up
-  while (updatedWizard.experience >= updatedWizard.experienceToNextLevel) {
-    updatedWizard.experience -= updatedWizard.experienceToNextLevel;
-    updatedWizard.level += 1;
-    
-    // Calculate new experience required for next level
-    updatedWizard.experienceToNextLevel = updatedWizard.level * 100;
-    
-    // Award level up points based on difficulty
-    // This would normally come from game settings, using normal as default
-    updatedWizard.levelUpPoints += 2;
+  if (isWizardEnemy) {
+    // Wizards have higher chance to drop ingredients
+    switch (difficulty) {
+      case 'easy':
+        ingredientDropChance = 0.9; // 90% chance
+        ingredientDropCount = Math.floor(Math.random() * 3) + 2; // 2-4 ingredients
+        break;
+      case 'normal':
+        ingredientDropChance = 0.7; // 70% chance
+        ingredientDropCount = Math.floor(Math.random() * 2) + 1; // 1-2 ingredients
+        break;
+      case 'hard':
+        ingredientDropChance = 0.5; // 50% chance
+        ingredientDropCount = Math.floor(Math.random() * 2) + 1; // 1-2 ingredients
+        break;
+    }
+  } else {
+    // Magical creatures have higher chance for ingredients
+    switch (difficulty) {
+      case 'easy':
+        ingredientDropChance = 1.0; // 100% chance
+        ingredientDropCount = Math.floor(Math.random() * 4) + 3; // 3-6 ingredients
+        break;
+      case 'normal':
+        ingredientDropChance = 0.9; // 90% chance
+        ingredientDropCount = Math.floor(Math.random() * 3) + 2; // 2-4 ingredients
+        break;
+      case 'hard':
+        ingredientDropChance = 0.8; // 80% chance
+        ingredientDropCount = Math.floor(Math.random() * 2) + 1; // 1-2 ingredients
+        break;
+    }
   }
   
-  // Add spells
-  loot.spells.forEach(spell => {
-    if (!updatedWizard.spells.some(s => s.id === spell.id)) {
-      updatedWizard.spells.push(spell);
+  // Roll for ingredient drops
+  if (Math.random() < ingredientDropChance) {
+    // Generate random ingredients
+    for (let i = 0; i < ingredientDropCount; i++) {
+      lootIngredients.push(generateRandomIngredient(enemyWizard.level));
     }
-  });
+  }
   
-  // Add equipment to inventory (in a real implementation, we would have an inventory system)
-  // For now, we'll just log that the equipment was obtained
+  return lootIngredients;
+}
+
+/**
+ * Generates spell scroll loot after defeating an enemy
+ * @param playerWizard The player's wizard
+ * @param enemyWizard The defeated enemy wizard
+ * @param isWizardEnemy Whether the enemy was a wizard (true) or a magical creature (false)
+ * @param difficulty The game difficulty
+ * @returns Array of spell scroll loot
+ */
+function generateScrollLoot(
+  playerWizard: Wizard,
+  enemyWizard: Wizard,
+  isWizardEnemy: boolean,
+  difficulty: 'easy' | 'normal' | 'hard'
+): SpellScroll[] {
+  const scrolls: SpellScroll[] = [];
   
-  return updatedWizard;
+  // Determine chance to drop scrolls
+  let scrollDropChance = 0;
+  
+  if (isWizardEnemy) {
+    // Wizards have higher chance to drop scrolls
+    switch (difficulty) {
+      case 'easy':
+        scrollDropChance = 0.4; // 40% chance
+        break;
+      case 'normal':
+        scrollDropChance = 0.25; // 25% chance
+        break;
+      case 'hard':
+        scrollDropChance = 0.15; // 15% chance
+        break;
+    }
+  } else {
+    // Magical creatures have lower chance to drop scrolls
+    switch (difficulty) {
+      case 'easy':
+        scrollDropChance = 0.2; // 20% chance
+        break;
+      case 'normal':
+        scrollDropChance = 0.1; // 10% chance
+        break;
+      case 'hard':
+        scrollDropChance = 0.05; // 5% chance
+        break;
+    }
+  }
+  
+  // Check if we should drop a scroll
+  if (Math.random() < scrollDropChance) {
+    // Generate a scroll appropriate for the player's level
+    scrolls.push(generateRandomSpellScroll(playerWizard.level));
+    
+    // Higher level enemies have a small chance to drop an additional scroll
+    if (enemyWizard.level >= 10 && Math.random() < 0.2) {
+      scrolls.push(generateRandomSpellScroll(playerWizard.level));
+    }
+  }
+  
+  return scrolls;
+}
+
+/**
+ * Apply loot to the player's wizard
+ * @param playerWizard The player's wizard
+ * @param loot The loot to apply
+ * @returns Updated wizard with loot applied
+ */
+export function applyLoot(playerWizard: Wizard, loot: LootDrop): Wizard {
+  // Add spells to wizard's collection
+  const updatedSpells = [...playerWizard.spells];
+  for (const spell of loot.spells) {
+    if (!updatedSpells.some(s => s.id === spell.id)) {
+      updatedSpells.push(spell);
+    }
+  }
+  
+  // Add equipment to wizard's inventory
+  const updatedInventory = playerWizard.inventory ? [...playerWizard.inventory] : [];
+  updatedInventory.push(...loot.equipment);
+  
+  // Add ingredients to wizard's collection
+  const updatedIngredients = playerWizard.ingredients ? [...playerWizard.ingredients] : [];
+  for (const ingredient of loot.ingredients) {
+    const existingIndex = updatedIngredients.findIndex(i => i.id === ingredient.id);
+    if (existingIndex >= 0) {
+      // Update the existing ingredient (would need a quantity field for this)
+      // For now, we'll just add it as a duplicate
+      updatedIngredients.push(ingredient);
+    } else {
+      updatedIngredients.push(ingredient);
+    }
+  }
+  
+  // Add spell scrolls to wizard's inventory
+  updatedInventory.push(...loot.scrolls as any); // Cast to any since inventory is Equipment[]
+  
+  // Return updated wizard
+  return {
+    ...playerWizard,
+    spells: updatedSpells,
+    inventory: updatedInventory,
+    ingredients: updatedIngredients,
+    experience: playerWizard.experience + loot.experience
+  };
 }

@@ -1,5 +1,8 @@
 /* Main CSS file for Wizard's Choice */
 
+/* Import other stylesheets */
+@import 'equipment.css';
+
 :root {
   /* Import theme variables */
   --primary-main: #6a3de8;
@@ -442,7 +445,8 @@ button:disabled {
   color: #ffffff;
 }
 
-.battle-arena__turn-number {
+.battle-arena__turn-number,
+.battle-arena__round-number {
   font-weight: bold;
   color: #6a3de8;
 }
@@ -462,6 +466,102 @@ button:disabled {
   font-family: 'Cinzel', serif;
   color: #ffffff;
   margin-bottom: 0.5rem;
+}
+
+/* Deck information */
+.battle-arena__deck-info {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.battle-arena__deck-counter {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 0.875rem;
+}
+
+.battle-arena__deck-label {
+  color: #b3b3cc;
+}
+
+.battle-arena__deck-count {
+  font-weight: bold;
+  color: #6a3de8;
+}
+
+/* Active effects display */
+.battle-arena__active-effects {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.battle-arena__active-effects h3 {
+  font-family: 'Cinzel', serif;
+  color: #ffffff;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.battle-arena__effects-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.battle-arena__effect-item {
+  background-color: rgba(106, 61, 232, 0.3);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #ffffff;
+}
+
+.battle-arena__effect-name {
+  font-weight: bold;
+  margin-right: 0.25rem;
+}
+
+.battle-arena__effect-duration {
+  color: #b3b3cc;
+}
+
+/* Battle log */
+.battle-arena__log {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.battle-arena__log h3 {
+  font-family: 'Cinzel', serif;
+  color: #ffffff;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.battle-arena__log-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.battle-arena__log-entry {
+  color: #b3b3cc;
+  font-size: 0.875rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.battle-arena__log-entry:last-child {
+  border-bottom: none;
 }
 
 .battle-arena__spell-selection {
@@ -489,6 +589,7 @@ button:disabled {
   padding: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  pointer-events: auto;
 }
 
 .battle-arena__mystic-punch:hover,
@@ -515,6 +616,7 @@ button:disabled {
   text-align: center;
   padding: 2rem;
   animation: fadeIn 0.5s ease-in;
+  pointer-events: auto;
 }
 
 .battle-arena__battle-result--playerWon {
@@ -539,6 +641,25 @@ button:disabled {
 
 .battle-arena__continue-button:hover {
   background-color: #8c65f7;
+}
+
+/* Add pointer-events: auto to all interactive elements */
+.battle-arena__spells-container .spell-card,
+.battle-arena__mystic-punch,
+.battle-arena__skip-turn,
+.battle-arena__continue-button {
+  pointer-events: auto;
+}
+
+/* Disabled spell card */
+.spell-card--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spell-card--disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes fadeIn {
@@ -811,6 +932,12 @@ button:disabled {
   gap: var(--spacing-sm);
 }
 
+.wizard-study__secondary-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+
 .wizard-study__sidebar {
   background-color: var(--ui-background-light);
   border-left: 2px solid var(--primary-dark);
@@ -820,13 +947,15 @@ button:disabled {
 
 .wizard-study__stats,
 .wizard-study__equipped,
-.wizard-study__spells {
+.wizard-study__spells,
+.wizard-study__ingredients {
   margin-bottom: var(--spacing-xl);
 }
 
 .wizard-study__stats-title,
 .wizard-study__equipped-title,
-.wizard-study__spells-title {
+.wizard-study__spells-title,
+.wizard-study__ingredients-title {
   color: var(--primary-main);
   margin-top: 0;
   margin-bottom: var(--spacing-md);
@@ -890,6 +1019,16 @@ button:disabled {
   font-size: var(--font-size-sm);
   color: var(--ui-text-secondary);
   text-transform: capitalize;
+}
+
+.wizard-study__ingredients-count {
+  font-size: var(--font-size-md);
+  color: var(--ui-text);
+  padding: var(--spacing-sm);
+  background-color: var(--ui-card);
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  text-align: center;
 }
 
 /* How to Play component */
@@ -2050,4 +2189,266 @@ button:disabled {
   .deck-builder__help {
     padding: 0.75rem;
   }
+}
+
+/* Potion Crafting component */
+.potion-crafting {
+  width: 100%;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  overflow: hidden;
+  background-color: var(--ui-background);
+}
+
+.potion-crafting__header {
+  background-color: var(--ui-background-light);
+  padding: var(--spacing-md) var(--spacing-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--primary-dark);
+}
+
+.potion-crafting__title {
+  margin: 0;
+  color: var(--primary-main);
+}
+
+.potion-crafting__close-button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--ui-card);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.potion-crafting__close-button:hover {
+  background-color: var(--ui-background-light);
+}
+
+.potion-crafting__tabs {
+  display: flex;
+  background-color: var(--ui-background-light);
+  border-bottom: 1px solid var(--ui-card-border);
+}
+
+.potion-crafting__tab {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--ui-text-secondary);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+
+.potion-crafting__tab:hover {
+  color: var(--ui-text);
+}
+
+.potion-crafting__tab--active {
+  color: var(--primary-main);
+  border-bottom-color: var(--primary-main);
+}
+
+.potion-crafting__content {
+  padding: var(--spacing-md);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.potion-crafting__brew-mode,
+.potion-crafting__experiment-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  height: 100%;
+}
+
+.potion-crafting__section-title {
+  color: var(--primary-main);
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--ui-card-border);
+  padding-bottom: var(--spacing-xs);
+}
+
+.potion-crafting__recipes,
+.potion-crafting__ingredients {
+  background-color: var(--ui-card);
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  overflow-y: auto;
+}
+
+.potion-crafting__brewing-area,
+.potion-crafting__experimentation-area {
+  background-color: var(--ui-card);
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.potion-crafting__recipes-list,
+.potion-crafting__ingredients-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.potion-crafting__recipe,
+.potion-crafting__ingredient {
+  background-color: var(--ui-background);
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.potion-crafting__recipe:hover,
+.potion-crafting__ingredient:hover {
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.potion-crafting__recipe--selected,
+.potion-crafting__ingredient--selected {
+  border-color: var(--primary-main);
+  background-color: rgba(106, 61, 232, 0.1);
+}
+
+.potion-crafting__recipe-header,
+.potion-crafting__ingredient-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+}
+
+.potion-crafting__recipe-name,
+.potion-crafting__ingredient-name {
+  font-weight: bold;
+}
+
+.potion-crafting__recipe-tier,
+.potion-crafting__ingredient-category {
+  font-size: var(--font-size-sm);
+  color: var(--ui-text-secondary);
+}
+
+.potion-crafting__recipe-ingredients {
+  margin: var(--spacing-sm) 0;
+  font-size: var(--font-size-sm);
+}
+
+.potion-crafting__recipe-ingredients ul,
+.potion-crafting__selected-ingredients ul {
+  margin-top: var(--spacing-xs);
+  padding-left: var(--spacing-lg);
+}
+
+.potion-crafting__recipe-description,
+.potion-crafting__ingredient-description {
+  font-size: var(--font-size-sm);
+  color: var(--ui-text-secondary);
+  margin-top: var(--spacing-sm);
+}
+
+.potion-crafting__ingredient-properties {
+  font-size: var(--font-size-sm);
+  margin: var(--spacing-xs) 0;
+}
+
+.potion-crafting__selected-recipe {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--ui-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--primary-light);
+}
+
+.potion-crafting__recipe-title {
+  color: var(--primary-main);
+  margin-top: 0;
+}
+
+.potion-crafting__recipe-details {
+  margin: var(--spacing-md) 0;
+}
+
+.potion-crafting__craft-button,
+.potion-crafting__experiment-button {
+  margin-top: auto;
+  padding: var(--spacing-md);
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.potion-crafting__craft-button:hover,
+.potion-crafting__experiment-button:hover {
+  background-color: var(--primary-light);
+}
+
+.potion-crafting__craft-button:disabled,
+.potion-crafting__experiment-button:disabled {
+  background-color: var(--ui-text-secondary);
+  cursor: not-allowed;
+}
+
+.potion-crafting__selected-ingredients {
+  margin: var(--spacing-md) 0;
+  flex-grow: 1;
+}
+
+.potion-crafting__warning {
+  margin-top: var(--spacing-md);
+  color: #f44336;
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.potion-crafting__no-selection {
+  margin-top: var(--spacing-md);
+  text-align: center;
+  color: var(--ui-text-secondary);
+}
+
+.potion-crafting__empty-message {
+  margin-top: var(--spacing-md);
+  text-align: center;
+  color: var(--ui-text-secondary);
+  font-style: italic;
+}
+
+.potion-crafting__result {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.potion-crafting__result--success {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  border: 1px solid #4caf50;
+}
+
+.potion-crafting__result--failure {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+  border: 1px solid #f44336;
 }

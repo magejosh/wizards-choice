@@ -9,19 +9,28 @@ export interface SpellCardProps {
   onClick?: () => void;
   isEquipped?: boolean;
   slotNumber?: number;
+  disabled?: boolean;
 }
 
 const SpellCard: React.FC<SpellCardProps> = ({ 
   spell, 
   onClick, 
   isEquipped = false,
-  slotNumber
+  slotNumber,
+  disabled = false
 }) => {
   // Map element to a CSS class for styling
   const elementClass = `spell-card--${spell.element}`;
   
   // Map type to a CSS class for styling
   const typeClass = `spell-card--${spell.type}`;
+  
+  // Handle click with disabled state
+  const handleClick = () => {
+    if (!disabled && onClick) {
+      onClick();
+    }
+  };
   
   // Get proper image path, with fallbacks
   const getImagePath = () => {
@@ -39,8 +48,8 @@ const SpellCard: React.FC<SpellCardProps> = ({
   
   return (
     <div 
-      className={`spell-card ${elementClass} ${typeClass} ${isEquipped ? 'spell-card--equipped' : ''}`}
-      onClick={onClick}
+      className={`spell-card ${elementClass} ${typeClass} ${isEquipped ? 'spell-card--equipped' : ''} ${disabled ? 'spell-card--disabled' : ''}`}
+      onClick={handleClick}
     >
       {slotNumber !== undefined && (
         <div className="spell-card__slot-number">{slotNumber}</div>

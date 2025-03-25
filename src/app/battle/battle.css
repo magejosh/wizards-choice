@@ -1,0 +1,178 @@
+.battle-page {
+  min-height: 100vh;
+  background-color: #0f0f1a;
+  padding: 1rem;
+  position: relative;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #ffffff;
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+}
+
+/* Mystic Punch Modal */
+.mystic-punch-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.mystic-punch-modal__content {
+  background-color: #1a1a2e;
+  border: 2px solid #6a3de8;
+  border-radius: 8px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.mystic-punch-modal__content h2 {
+  font-family: 'Cinzel', serif;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.mystic-punch-modal__spells {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mystic-punch-modal__spell {
+  background-color: #272640;
+  border: 2px solid #4a4a82;
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mystic-punch-modal__spell:hover {
+  border-color: #6a3de8;
+  transform: translateY(-5px);
+}
+
+.mystic-punch-modal__spell p {
+  font-family: 'Raleway', sans-serif;
+  color: #ffffff;
+  margin: 0;
+}
+
+.mystic-punch-modal__damage {
+  color: #ff4444 !important;
+  margin-top: 0.5rem !important;
+  font-size: 0.875rem;
+}
+
+.mystic-punch-modal__cancel {
+  background-color: #6a3de8;
+  color: #ffffff;
+  font-family: 'Raleway', sans-serif;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  margin: 0 auto;
+  display: block;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.mystic-punch-modal__cancel:hover {
+  background-color: #8c65f7;
+}
+
+/* Battle End Modal */
+.battle-end-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.battle-end-modal__content {
+  background-color: #1a1a2e;
+  border: 2px solid #6a3de8;
+  border-radius: 8px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.battle-end-modal__content h2 {
+  font-family: 'Cinzel', serif;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+
+.battle-end-modal__rewards {
+  margin-bottom: 1.5rem;
+}
+
+.battle-end-modal__rewards p {
+  font-family: 'Raleway', sans-serif;
+  color: #ffffff;
+  margin: 0.5rem 0;
+}
+
+.battle-end-modal__continue {
+  background-color: #6a3de8;
+  color: #ffffff;
+  font-family: 'Cinzel', serif;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.battle-end-modal__continue:hover {
+  background-color: #8c65f7;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .mystic-punch-modal__spells {
+    grid-template-columns: 1fr;
+  }
+  
+  .battle-end-modal__content h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mystic-punch-modal__content,
+  .battle-end-modal__content {
+    padding: 1rem;
+  }
+} 

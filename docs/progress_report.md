@@ -15,16 +15,34 @@ I'm developing a browser-based game called "Wizard's Choice" based on your speci
   - Experience and leveling system
   - Wizard stats and progression system
   - Equipment system with wands, robes, amulets, and rings
+  - Market system with 13 locations unlocked by player level
+  - Market attack system with combat and risk/reward elements
+  - Spell scroll system for learning and casting spells
+- ✅ Implementing robust battle system:
+  - Deck-based combat with draw/discard mechanics
+  - Turn-based structure with player and enemy phases
+  - Active effects system for status effects during combat
+  - Mana regeneration and round progression
+  - Battle log for tracking combat actions
+  - AI decision-making for enemy spell selection
+  - Combat utilities for damage, healing, and critical hit calculations
+- ✅ Developing UI and visuals:
+  - Created placeholder images for spell cards
+  - Designed main menu interface
+  - Implemented 3D battle arena with ThreeJS
+  - Implemented dynamic spell effects with element-based particles
+  - Added animated wizard models with health bars and state visualizations
+  - Integrated UI overlays for health, mana, battle log, and spell selection
+  - Added deck information display with draw and discard pile counters
+  - Implemented visual indicators for active effects
 
 ### In Progress
-- 🔄 Developing UI and visuals:
-  - Creating placeholder images for spell cards
-  - Designing main menu interface
-  - Building 3D battle arena with ThreeJS
-  - Implementing UI overlays for health, mana, etc.
+- 🔄 Creating spell progression tech tree system
 
 ### Next Steps
-- Implement remaining game features
+- Add more enemy types with unique abilities
+- Design comprehensive stats tracking system
+- Implement mobile responsiveness improvements
 - Test and debug the game
 - Create comprehensive documentation
 - Package and deliver the final game
@@ -33,6 +51,14 @@ I'm developing a browser-based game called "Wizard's Choice" based on your speci
 - Using Next.js as the application framework
 - ThreeJS for 3D visualization
 - Zustand for state management
-- Placeholder images for spell cards (will be replaced with your custom artwork)
+- TypeScript for type safety and developer experience
+- Immutable state updates for predictable game state
+- Procedural generation for enemies, equipment, and ingredients
+- Dynamic market system with price fluctuations
+- Risk-based encounter system when leaving markets
+- Interactive 3D battle system with visual effects and animations
+- Card-based combat system with strategic deck management
+- Turn-based combat flow with active effects
+- Extensive utility functions for combat calculations
 
-I'll continue working on the UI components and will update you as I make progress.
+I'll continue working on the spell progression tech tree and will update you as I make progress.

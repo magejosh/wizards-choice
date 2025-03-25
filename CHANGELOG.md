@@ -286,3 +286,56 @@
   - Created project structure
   - Implemented basic UI framework
   - Added initial spell system 
+
+## 2025-03-25
+- Done: Added more enemy types
+  - Created specialized AI strategies for each enemy type
+  - Added visual representations for new enemy types
+  - Implemented enemy-specific loot tables and drop rates
+  - Balanced difficulty scaling for new enemy encounters
+
+- Done: Designed 5 new enemy wizard archetypes with unique abilities
+  - Created Necromancer, Time Weaver, Battle Mage, Illusionist, and Alchemist archetypes
+  - Implemented specialized AI strategies for each archetype
+  - Added unique spells and abilities for each archetype
+  - Balanced stats and mechanics for each archetype
+
+- Done: Designed 5 new enemy magical creature types with unique abilities
+  - Created Ancient Dragon, Eldritch Horror, Nature Guardian, Storm Elemental, and Abyssal Leviathan with unique abilities and stats
+  - Implemented specialized AI strategies for each creature type
+  - Added visual representations and loot tables for each creature
+  - Balanced difficulty scaling for creature encounters
+
+- Done: Created spell progression tech tree system
+  - Design PoE-style spell tree with wizard at center
+  - Create data structure for spell nodes and connections
+  - Implement level-up point system for purchasing connected spells
+  - Design visual tech tree UI with connection paths and node states
+  - Add navigation and interaction for the spell tech tree
+  - Implement spell unlocking logic based on prerequisites
+  - Balance progression curve and spell distribution on tree
+  - Add tooltips and preview for locked/available spells
+
+- Done: Implemented spell scroll system
+  - Created spell scroll item type data structure
+  - Added spell scrolls to loot tables and market inventory
+  - Implemented spell scroll consumption to learn spells permanently if used in wizards study
+  - Added battle mechanic for single-use free casting from scrolls and consumes the scroll
+  - Designed UI for spell scroll inventory and usage, so they show up to the side of the characters spell cards in hand 
+
+## 2025-03-26
+- Done: Improved Wizard's Study UI Layout and Structure
+  - Increased button container width to 90% with max-width of 800px for better space utilization
+  - Implemented responsive grid layout for main buttons using CSS Grid with auto-fit
+  - Added placeholder for future background customization feature with hover effects
+  - Fixed vertical overflow issues with proper positioning and z-indexing
+  - Enhanced mobile responsiveness with media queries
+  - Added smooth transitions and hover effects for better interactivity
+  - Improved typography and spacing for better visual hierarchy 
+
+## 2025-03-25
+- Done: Reorganized inventory system and fixed TypeScript configuration
+  - Created unified inventory system with equipment slots, items, spell scrolls, ingredients, and potions
+  - Fixed TypeScript path aliases for proper module resolution
+  - Implemented responsive grid layouts for all inventory sections
+  - Added consistent styling and empty state handling 

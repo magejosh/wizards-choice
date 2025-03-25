@@ -1,0 +1,88 @@
+'use client';
+
+import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card } from '@/components/ui/card';
+import { Equipment, Ingredient, Potion, SpellScroll } from '@/lib/types';
+import { EquipmentSlots } from './EquipmentSlots';
+import { ItemGrid } from './ItemGrid';
+import { SpellScrolls } from './SpellScrolls';
+import { Ingredients } from './Ingredients';
+import { Potions } from './Potions';
+import styles from './Inventory.module.css';
+
+interface InventoryProps {
+  equipment: Record<string, Equipment | undefined>;
+  inventory: Equipment[];
+  spellScrolls: SpellScroll[];
+  ingredients: Ingredient[];
+  potions: Potion[];
+  onEquipItem: (item: Equipment) => void;
+  onUnequipItem: (slot: string) => void;
+  onUseSpellScroll: (scroll: SpellScroll) => void;
+  onUsePotion: (potion: Potion) => void;
+  onUseIngredient: (ingredient: Ingredient) => void;
+}
+
+export function Inventory({
+  equipment,
+  inventory,
+  spellScrolls,
+  ingredients,
+  potions,
+  onEquipItem,
+  onUnequipItem,
+  onUseSpellScroll,
+  onUsePotion,
+  onUseIngredient,
+}: InventoryProps) {
+  return (
+    <Card className={styles.inventoryContainer}>
+      <Tabs defaultValue="equipment" className={styles.tabs}>
+        <TabsList className={styles.tabsList}>
+          <TabsTrigger value="equipment">Equipment</TabsTrigger>
+          <TabsTrigger value="items">Items</TabsTrigger>
+          <TabsTrigger value="scrolls">Spell Scrolls</TabsTrigger>
+          <TabsTrigger value="ingredients">Ingredients</TabsTrigger>
+          <TabsTrigger value="potions">Potions</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="equipment" className={styles.tabContent}>
+          <EquipmentSlots
+            equipment={equipment}
+            onEquipItem={onEquipItem}
+            onUnequipItem={onUnequipItem}
+          />
+        </TabsContent>
+
+        <TabsContent value="items" className={styles.tabContent}>
+          <ItemGrid
+            items={inventory}
+            onEquipItem={onEquipItem}
+          />
+        </TabsContent>
+
+        <TabsContent value="scrolls" className={styles.tabContent}>
+          <SpellScrolls
+            scrolls={spellScrolls}
+            onUseScroll={onUseSpellScroll}
+          />
+        </TabsContent>
+
+        <TabsContent value="ingredients" className={styles.tabContent}>
+          <Ingredients
+            ingredients={ingredients}
+            onUseIngredient={onUseIngredient}
+          />
+        </TabsContent>
+
+        <TabsContent value="potions" className={styles.tabContent}>
+          <Potions
+            potions={potions}
+            onUsePotion={onUsePotion}
+          />
+        </TabsContent>
+      </Tabs>
+    </Card>
+  );
+} 

@@ -1,5 +1,52 @@
 # Process Maps
 
+## Wizard's Study UI Layout
+
+```mermaid
+flowchart TD
+    WS[Wizard's Study] --> Header[Header Section]
+    WS --> MainArea[Main Content Area]
+    WS --> Sidebar[Sidebar]
+    
+    Header --> Title[Title]
+    Header --> PlayerInfo[Player Info]
+    
+    MainArea --> StudyScene[Study Scene]
+    MainArea --> Actions[Action Buttons]
+    
+    StudyScene --> Background[Background]
+    Background --> CustomizeBtn[Customize Background Button]
+    
+    Actions --> PrimaryActions[Primary Actions]
+    Actions --> ActionGroups[Action Groups]
+    Actions --> SecondaryActions[Secondary Actions]
+    
+    PrimaryActions --> StartDuel[Start Next Duel]
+    
+    ActionGroups --> DeckBuilder[Deck Builder]
+    ActionGroups --> Equipment[Equipment]
+    ActionGroups --> Spellbook[Spellbook]
+    
+    SecondaryActions --> PotionCrafting[Potion Crafting]
+    SecondaryActions --> Marketplace[Marketplace]
+    
+    Sidebar --> Stats[Wizard Stats]
+    Sidebar --> Equipped[Equipped Items]
+    Sidebar --> Spells[Equipped Spells]
+    Sidebar --> Ingredients[Ingredients]
+    
+    Stats --> Health[Health]
+    Stats --> Mana[Mana]
+    Stats --> ManaRegen[Mana Regen]
+    Stats --> Experience[Experience]
+    Stats --> LevelUpPoints[Level-up Points]
+    Stats --> Gold[Gold]
+    
+    Equipped --> EquipmentSlots[Equipment Slots]
+    Spells --> SpellList[Spell List]
+    Ingredients --> IngredientCount[Ingredient Count]
+```
+
 ## Battle System Workflow
 
 ```mermaid
@@ -369,4 +416,99 @@ flowchart TD
     
     SafeExit --> End[End Market Visit]
     ReturnToStudy --> End
+```
+
+## Spell Progression Tech Tree System
+
+```mermaid
+graph TD
+    W[Wizard Center] --> T1[Tier 1 Spells]
+    W --> T2[Tier 2 Spells]
+    W --> T3[Tier 3 Spells]
+    
+    T1 --> T2
+    T2 --> T3
+    
+    subgraph "Node Properties"
+        N[Spell Node]
+        N --> ID[ID]
+        N --> S[Spell Data]
+        N --> P[Position]
+        N --> C[Connections]
+        N --> U[Unlocked State]
+        N --> CO[Cost]
+        N --> PR[Prerequisites]
+    end
+    
+    subgraph "Tree Properties"
+        T[Spell Tree]
+        T --> NODES[Nodes Array]
+        T --> CENTER[Center Node]
+        T --> MAXP[Max Points]
+        T --> ALLOC[Allocated Points]
+    end
+```
+
+The spell progression tech tree system follows a Path of Exile-style design where:
+1. The wizard is positioned at the center of the tree
+2. Spells are organized in tiers radiating outward
+3. Nodes are connected based on proximity and prerequisites
+4. Each node has a cost based on its tier
+5. Nodes can only be unlocked if:
+   - The player has enough points
+   - All prerequisites are met
+   - The node is not already unlocked
+6. The system includes:
+   - Visual feedback for locked/unlocked states
+   - Tooltips showing prerequisites and costs
+   - Unlocking animations
+   - Save/load functionality
+   - Reset capability
+
+## Inventory System Workflow
+
+```mermaid
+flowchart TD
+    Inventory[Inventory System] --> Tabs[Tab Navigation]
+    
+    Tabs --> EquipmentTab[Equipment Tab]
+    Tabs --> ItemsTab[Items Tab]
+    Tabs --> ScrollsTab[Spell Scrolls Tab]
+    Tabs --> IngredientsTab[Ingredients Tab]
+    Tabs --> PotionsTab[Potions Tab]
+    
+    EquipmentTab --> EquipmentSlots[Equipment Slots]
+    EquipmentSlots --> EquipItem[Equip Item]
+    EquipmentSlots --> UnequipItem[Unequip Item]
+    
+    ItemsTab --> ItemGrid[Item Grid]
+    ItemGrid --> ViewItem[View Item Details]
+    ItemGrid --> UseItem[Use Item]
+    
+    ScrollsTab --> ScrollGrid[Scroll Grid]
+    ScrollGrid --> ViewScroll[View Scroll Details]
+    ScrollGrid --> UseScroll[Use Scroll]
+    ScrollGrid --> LearnSpell[Learn Spell]
+    
+    IngredientsTab --> IngredientGrid[Ingredient Grid]
+    IngredientGrid --> ViewIngredient[View Ingredient Details]
+    IngredientGrid --> UseIngredient[Use Ingredient]
+    
+    PotionsTab --> PotionGrid[Potion Grid]
+    PotionGrid --> ViewPotion[View Potion Details]
+    PotionGrid --> UsePotion[Use Potion]
+    
+    EquipItem --> UpdateStats[Update Wizard Stats]
+    UnequipItem --> UpdateStats
+    
+    UseItem --> ApplyEffects[Apply Item Effects]
+    UseScroll --> ApplyEffects
+    UseIngredient --> ApplyEffects
+    UsePotion --> ApplyEffects
+    
+    LearnSpell --> UpdateSpellbook[Update Spellbook]
+    
+    ApplyEffects --> UpdateUI[Update UI]
+    UpdateStats --> UpdateUI
+    UpdateSpellbook --> UpdateUI
 ```

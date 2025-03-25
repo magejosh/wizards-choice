@@ -1,0 +1,115 @@
+.container {
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  position: relative;
+  overflow: hidden;
+  background: #1a1a1a;
+  cursor: grab;
+}
+
+.container:active {
+  cursor: grabbing;
+}
+
+.tree {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+  transition: transform 0.1s ease-out;
+}
+
+.connections {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.connection {
+  stroke-width: 2;
+  stroke: #666;
+}
+
+.connection.unlocked {
+  stroke: #4CAF50;
+}
+
+.connection.locked {
+  stroke: #666;
+}
+
+.node {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.node.unlocked {
+  background: #4CAF50;
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+}
+
+.node.locked {
+  background: #666;
+  box-shadow: 0 0 20px rgba(102, 102, 102, 0.3);
+}
+
+.node:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  z-index: 1;
+}
+
+.nodeContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  text-align: center;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.spellName {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.spellTier {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.spellCost {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+@keyframes unlockAnimation {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 20px rgba(102, 102, 102, 0.3);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.8);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+  }
+}
+
+.node.unlocking {
+  animation: unlockAnimation 0.5s ease-out;
+} 

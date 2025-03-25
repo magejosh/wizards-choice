@@ -9,6 +9,7 @@ import WizardStudy from '../lib/ui/components/WizardStudy';
 import Login from '../lib/ui/components/Login';
 import DeckBuilder from '../lib/ui/components/DeckBuilder';
 import EquipmentScreen from '../lib/ui/components/EquipmentScreen';
+import InventoryScreen from '../lib/ui/components/InventoryScreen';
 import { useGameStateStore } from '../lib/game-state/gameStateStore';
 import authService from '../lib/auth/authService';
 import '../lib/ui/styles/main.css';
@@ -19,6 +20,7 @@ export default function Home() {
   const [showNameInput, setShowNameInput] = useState(false);
   const [showDeckBuilder, setShowDeckBuilder] = useState(false);
   const [showEquipment, setShowEquipment] = useState(false);
+  const [showInventory, setShowInventory] = useState(false);
   const [playerName, setPlayerName] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -182,9 +184,22 @@ export default function Home() {
     }
   };
   
-  const handleOpenSpellbook = () => {
-    console.log('Opening spellbook');
-    alert('Spellbook would open here');
+  const handleOpenInventory = () => {
+    console.log('Opening inventory');
+    setShowInventory(true);
+  };
+  
+  const handleCloseInventory = async () => {
+    // Save the game state when closing the inventory screen
+    setIsLoading(true);
+    try {
+      await authService.saveGameState();
+      setShowInventory(false);
+    } catch (error) {
+      console.error('Error saving inventory changes:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const handleReturnToMainMenu = async () => {
@@ -274,7 +289,7 @@ export default function Home() {
               onStartDuel={handleStartDuel}
               onOpenDeckBuilder={handleOpenDeckBuilder}
               onOpenEquipment={handleOpenEquipment}
-              onOpenSpellbook={handleOpenSpellbook}
+              onOpenInventory={handleOpenInventory}
               onReturnToMainMenu={handleReturnToMainMenu}
             />
           )}
@@ -282,6 +297,7 @@ export default function Home() {
           {/* Overlay components that can appear in game */}
           {showDeckBuilder && <DeckBuilder onClose={handleCloseDeckBuilder} />}
           {showEquipment && <EquipmentScreen onClose={handleCloseEquipment} />}
+          {showInventory && <InventoryScreen onClose={handleCloseInventory} />}
         </>
       )}
     </div>

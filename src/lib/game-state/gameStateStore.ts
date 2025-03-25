@@ -231,6 +231,13 @@ export const useGameStateStore = create<GameStateStore>()(
               currentLocation: 'wizardStudy',
               questProgress: {},
             },
+            marketData: {
+              gold: 100, // Starting gold
+              transactions: [],
+              reputationLevels: {},
+              visitedMarkets: [],
+              favoriteMarkets: []
+            }
           },
         });
       },
@@ -823,6 +830,19 @@ export const useGameStateStore = create<GameStateStore>()(
       getMarkets: () => {
         // Check if markets need inventory refresh
         const { gameState } = get();
+        
+        // Ensure markets array exists
+        if (!gameState.markets || !Array.isArray(gameState.markets)) {
+          // Initialize with empty array if markets doesn't exist
+          set({
+            gameState: {
+              ...gameState,
+              markets: []
+            }
+          });
+          return [];
+        }
+        
         const updatedMarkets = gameState.markets.map(market => {
           // Update prices for all markets
           let updatedMarket = updateMarketPrices(market);

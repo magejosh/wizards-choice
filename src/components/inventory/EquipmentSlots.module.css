@@ -1,0 +1,92 @@
+.equipmentSlots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.slotCard {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.slotCard:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.slotHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.slotLabel {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.unequipButton {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.slotContent {
+  min-height: 100px;
+}
+
+.emptySlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  color: var(--muted-foreground);
+  font-style: italic;
+  border: 2px dashed var(--border);
+  border-radius: 0.25rem;
+}
+
+.equippedItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.itemName {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.itemRarity {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  text-transform: capitalize;
+}
+
+.itemBonuses {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.bonus {
+  color: var(--muted-foreground);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .equipmentSlots {
+    grid-template-columns: 1fr;
+    padding: 0.5rem;
+  }
+
+  .slotCard {
+    padding: 0.75rem;
+  }
+} 

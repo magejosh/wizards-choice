@@ -20,10 +20,9 @@ export interface Spell {
   element: ElementType;
   tier: number; // 1-10
   manaCost: number;
-  power: number; // Base power for damage or healing
   description: string;
-  effect?: ActiveEffect; // Effect that can be applied
-  imagePath?: string; // Path to spell image, default is placeholder
+  effects: SpellEffect[];
+  imagePath: string;
 }
 
 export interface ActiveEffect {
@@ -37,7 +36,7 @@ export interface ActiveEffect {
 
 // Equipment Types
 export type EquipmentSlot = 'head' | 'hand' | 'body' | 'neck' | 'finger' | 'belt';
-export type HandEquipment = 'wand' | 'staff' | 'dagger' | 'sword' | 'spellbook';
+export type HandEquipment = 'wand' | 'staff' | 'dagger' | 'sword' | 'spellbook' | 'scroll';
 export type PotionType = 'health' | 'mana' | 'strength' | 'protection' | 'elemental' | 'luck';
 
 /**
@@ -80,6 +79,25 @@ export interface PotionRecipe {
   description: string;
 }
 
+export interface StatBonus {
+  stat: 'health' | 'maxHealth' | 'mana' | 'maxMana' | 'damage' | 'defense' | 'spellPower' | 'manaRegen' | 'manaCostReduction' | 'mysticPunchPower' | 'bleedEffect' | 'extraCardDraw' | 'potionSlots' | 'potionEffectiveness' | 'elementalAffinity';
+  value: number;
+  element?: ElementType; // For elemental affinity bonuses
+}
+
+/**
+ * Represents a spell scroll that can be used to learn a new spell
+ */
+export interface SpellScroll {
+  id: string;
+  name: string;
+  type: 'scroll';
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  spell: Spell;
+  description: string;
+  imagePath?: string;
+}
+
 export interface Equipment {
   id: string;
   name: string;
@@ -89,11 +107,7 @@ export interface Equipment {
   bonuses: StatBonus[];
   description: string;
   imagePath?: string;
-}
-
-export interface StatBonus {
-  stat: 'health' | 'mana' | 'damage' | 'defense';
-  value: number;
+  spell?: Spell; // For spell scrolls
 }
 
 export interface Potion {
@@ -160,6 +174,24 @@ export interface Enemy {
   weakness?: ElementType;
   resistance?: ElementType;
   imagePath?: string;
+  equipment?: Record<string, Equipment | undefined>;
+  archetype?: string;
+}
+
+export interface EnemyArchetype {
+  name: string;
+  description: string;
+  baseStats: {
+    health: number;
+    mana: number;
+    manaRegen: number;
+  };
+  specialSpells: Spell[];
+  thematicSpells: Spell[];
+  specialEquipment: Record<string, Equipment>;
+  weaknesses: ElementType[];
+  resistances: ElementType[];
+  imagePath: string;
 }
 
 // Encounter Types
@@ -177,33 +209,25 @@ export interface Encounter {
 
 // Combat Types
 export interface CombatState {
-  player: CombatWizard;
-  enemy: CombatWizard;
+  playerWizard: CombatWizard;
+  enemyWizard: CombatWizard;
   turn: number;
   round: number;
+  isPlayerTurn: boolean;
+  log: CombatLogEntry[];
   status: 'active' | 'playerWon' | 'enemyWon';
-  battleResult: 'playerWon' | 'enemyWon' | null;
+  difficulty: 'easy' | 'normal' | 'hard';
 }
 
 export interface CombatWizard {
-  name: string;
-  health: number;
-  maxHealth: number;
-  mana: number;
-  maxMana: number;
-  spells: Spell[];
+  wizard: Wizard;
+  currentHealth: number;
+  currentMana: number;
   activeEffects: ActiveEffect[];
-  hand: Spell[];         // Current hand of spells
-  drawPile: Spell[];     // Spells that can be drawn
-  discardPile: Spell[];  // Spells that have been cast/discarded
-  
-  // Combat stats
-  damageBonus?: number;  // Bonus damage from equipment/effects
-  healingBonus?: number; // Bonus healing from equipment/effects
-  defense?: number;      // Damage reduction
-  criticalChance?: number; // Chance for critical hits
-  weakness?: ElementType; // Element this wizard is weak against
-  resistance?: ElementType; // Element this wizard resists
+  selectedSpell: Spell | null;
+  hand: Spell[];
+  drawPile: Spell[];
+  discardPile: Spell[];
 }
 
 // Player State
@@ -327,15 +351,21 @@ export interface MarketTransaction {
   date: string; // ISO date string
 }
 
-/**
- * Placeholder for the spell scroll system that will be implemented later
- */
-export interface SpellScroll {
-  id: string;
-  name: string;
-  spell: Spell;
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  description: string;
-  isConsumable: boolean; // If true, consumed on use; if false, can be kept
-  imagePath?: string;
+export interface SpellEffect {
+  type: 'damage' | 'healing' | 'buff' | 'debuff' | 'control' | 'summon' | 'utility' | 'timeRewind' | 'delay' | 'confusion' | 'damageBonus' | 'defense' | 'spellEcho';
+  value: number;
+  target: 'self' | 'enemy';
+  element: ElementType;
+  duration?: number;
+}
+
+export interface CombatLogEntry {
+  turn: number;
+  round: number;
+  actor: string;
+  action: string;
+  target?: string;
+  value?: number;
+  element?: ElementType;
+  timestamp: number;
 }

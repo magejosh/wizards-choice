@@ -1,4 +1,4 @@
-import { Equipment, EquipmentBonuses, EquipmentSlot, ElementType } from '../../types';
+import { Equipment, EquipmentSlot, ElementType, StatBonus } from '../../types';
 
 /**
  * Equipment prefix/suffix type for naming
@@ -11,7 +11,7 @@ type AffixType = 'prefix' | 'suffix';
 interface EquipmentAffix {
   type: AffixType;
   name: string;
-  bonuses: Partial<EquipmentBonuses>;
+  bonuses: StatBonus[];
   minLevel: number;
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   // Description template with {item} placeholder for the base equipment name
@@ -25,7 +25,7 @@ interface BaseEquipment {
   name: string;
   slot: EquipmentSlot;
   description: string;
-  bonuses: Partial<EquipmentBonuses>;
+  bonuses: StatBonus[];
   minLevel: number;
 }
 
@@ -63,14 +63,14 @@ export function generateProceduralEquipment(
   
   // 6. Generate name, combine bonuses, and create description
   let finalName = baseEquipment.name;
-  let finalBonuses: Partial<EquipmentBonuses> = { ...baseEquipment.bonuses };
+  let finalBonuses: StatBonus[] = [...baseEquipment.bonuses];
   let finalDescription = baseEquipment.description;
   
   // Apply prefixes (prepend to name)
   const prefixes = appliedAffixes.filter(affix => affix.type === 'prefix');
   for (const prefix of prefixes) {
     finalName = `${prefix.name} ${finalName}`;
-    finalBonuses = { ...finalBonuses, ...prefix.bonuses };
+    finalBonuses = [...finalBonuses, ...prefix.bonuses];
     finalDescription = `${finalDescription} ${prefix.descriptionTemplate.replace('{item}', baseEquipment.name)}`;
   }
   
@@ -78,7 +78,7 @@ export function generateProceduralEquipment(
   const suffixes = appliedAffixes.filter(affix => affix.type === 'suffix');
   for (const suffix of suffixes) {
     finalName = `${finalName} of ${suffix.name}`;
-    finalBonuses = { ...finalBonuses, ...suffix.bonuses };
+    finalBonuses = [...finalBonuses, ...suffix.bonuses];
     finalDescription = `${finalDescription} ${suffix.descriptionTemplate.replace('{item}', baseEquipment.name)}`;
   }
   
@@ -288,393 +288,150 @@ function rarityValue(rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendar
 
 // Base equipment data structures
 const BASE_EQUIPMENT: Record<EquipmentSlot, BaseEquipment[]> = {
-  wand: [
-    {
-      name: 'Wand',
-      slot: 'wand',
-      description: 'A standard wooden wand.',
-      bonuses: [
-        { type: 'manaCostReduction', value: 2 },
-      ],
-      minLevel: 1,
-    },
-    {
-      name: 'Staff',
-      slot: 'wand',
-      description: 'A sturdy wooden staff.',
-      bonuses: [
-        { type: 'spellPower', value: 5 },
-      ],
-      minLevel: 5,
-    },
-    {
-      name: 'Rod',
-      slot: 'wand',
-      description: 'A short rod with a focusing crystal.',
-      bonuses: [
-        { type: 'manaRegen', value: 2 },
-      ],
-      minLevel: 3,
-    },
-    {
-      name: 'Scepter',
-      slot: 'wand',
-      description: 'An ornate scepter that channels magical energy efficiently.',
-      bonuses: [
-        { type: 'manaCostReduction', value: 5 },
-        { type: 'spellPower', value: 3 },
-      ],
-      minLevel: 8,
-    },
-    {
-      name: 'Mystic Blade',
-      slot: 'wand',
-      description: 'A blade that channels magical energy into combat.',
-      bonuses: [
-        { type: 'spellPower', value: 8 },
-      ],
-      minLevel: 10,
-    },
-  ],
-  dagger: [
-    {
-      name: 'Dagger',
-      slot: 'dagger',
-      description: 'A sharp magical dagger that enhances close combat abilities.',
-      bonuses: [
-        { type: 'mysticPunchPower', value: 10 },
-        { type: 'bleedEffect', value: 3 },
-      ],
-      minLevel: 1,
-    },
-    {
-      name: 'Ritual Dagger',
-      slot: 'dagger',
-      description: 'A ceremonial dagger that enhances magical strikes and causes bleeding.',
-      bonuses: [
-        { type: 'mysticPunchPower', value: 15 },
-        { type: 'bleedEffect', value: 5 },
-      ],
-      minLevel: 5,
-    },
-    {
-      name: 'Assassin Blade',
-      slot: 'dagger',
-      description: 'A deadly assassin\'s blade that causes deep wounds and enhances magical strikes.',
-      bonuses: [
-        { type: 'mysticPunchPower', value: 20 },
-        { type: 'bleedEffect', value: 8 },
-        { type: 'spellPower', value: 5 },
-      ],
-      minLevel: 10,
-    },
-    {
-      name: 'Shadow Kris',
-      slot: 'dagger',
-      description: 'A wavy-bladed kris that channels shadow magic into devastating bleeding attacks.',
-      bonuses: [
-        { type: 'mysticPunchPower', value: 25 },
-        { type: 'bleedEffect', value: 12 },
-        { type: 'spellPower', value: 8 },
-      ],
-      minLevel: 15,
-    },
-  ],
-  sword: [
-    {
-      name: 'Shortsword',
-      slot: 'sword',
-      description: 'A magical shortsword that enhances combat abilities with magical strikes.',
-      bonuses: [
-        { type: 'mysticPunchPower', value: 15 },
-        { type: 'bleedEffect', value: 5 },
-      ],
-      minLevel: 3,
-    },
-    {
-      name: 'Spellblade',
-      slot: 'sword',
-      description: 'A elegant blade infused with magical runes that enhance magical strikes.',
-      bonuses: [
-        { type: 'mysticPunchPower', value: 20 },
-        { type: 'bleedEffect', value: 8 },
-        { type: 'manaCostReduction', value: 3 },
-      ],
-      minLevel: 8,
-    },
-    {
-      name: 'Runic Sword',
-      slot: 'sword',
-      description: 'A sword covered in arcane runes that channel magic into devastating strikes.',
-      bonuses: [
-        { type: 'mysticPunchPower', value: 30 },
-        { type: 'bleedEffect', value: 10 },
-        { type: 'spellPower', value: 10 },
-      ],
-      minLevel: 12,
-    },
-    {
-      name: 'Arcblade',
-      slot: 'sword',
-      description: 'A legendary sword that arcs magical energy through foes, causing severe wounds.',
-      bonuses: [
-        { type: 'mysticPunchPower', value: 40 },
-        { type: 'bleedEffect', value: 15 },
-        { type: 'spellPower', value: 15 },
-      ],
-      minLevel: 18,
-    },
-  ],
-  spellbook: [
-    {
-      name: 'Spellbook',
-      slot: 'spellbook',
-      description: 'A basic spellbook that allows for improved spell management during duels.',
-      bonuses: [
-        { type: 'extraCardDraw', value: 1 },
-        { type: 'spellPower', value: 5 },
-      ],
-      minLevel: 2,
-    },
-    {
-      name: 'Grimoire',
-      slot: 'spellbook',
-      description: 'An ancient grimoire that enables drawing additional cards in combat.',
-      bonuses: [
-        { type: 'extraCardDraw', value: 1 },
-        { type: 'spellPower', value: 10 },
-        { type: 'manaCostReduction', value: 2 },
-      ],
-      minLevel: 7,
-    },
-    {
-      name: 'Tome',
-      slot: 'spellbook',
-      description: 'A powerful tome allowing for discarding and drawing new cards during battle.',
-      bonuses: [
-        { type: 'extraCardDraw', value: 1 },
-        { type: 'discardAndDraw', value: true },
-        { type: 'spellPower', value: 8 },
-      ],
-      minLevel: 10,
-    },
-    {
-      name: 'Arcanum',
-      slot: 'spellbook',
-      description: 'A legendary arcanum that grants access to expanded spell options in combat.',
-      bonuses: [
-        { type: 'extraCardDraw', value: 2 },
-        { type: 'discardAndDraw', value: true },
-        { type: 'spellPower', value: 12 },
-        { type: 'manaCostReduction', value: 5 },
-      ],
-      minLevel: 15,
-    },
-  ],
-  hat: [
+  head: [
     {
       name: 'Wizard Hat',
-      slot: 'hat',
+      slot: 'head',
       description: 'A classic pointed wizard hat that enhances magical abilities.',
       bonuses: [
-        { type: 'maxMana', value: 15 },
-        { type: 'spellPower', value: 3 },
+        { stat: 'maxMana', value: 15 },
+        { stat: 'spellPower', value: 3 }
       ],
       minLevel: 1,
     },
     {
       name: 'Mage Cap',
-      slot: 'hat',
+      slot: 'head',
       description: 'A comfortable cap that improves mental focus and magical reserves.',
       bonuses: [
-        { type: 'maxMana', value: 25 },
-        { type: 'manaRegen', value: 1 },
+        { stat: 'maxMana', value: 20 },
+        { stat: 'manaRegen', value: 2 }
       ],
       minLevel: 5,
     },
-    {
-      name: 'Circlet',
-      slot: 'hat',
-      description: 'An elegant circlet that enhances magical power and capacity.',
-      bonuses: [
-        { type: 'maxMana', value: 30 },
-        { type: 'maxHealth', value: 20 },
-        { type: 'spellPower', value: 5 },
-      ],
-      minLevel: 10,
-    },
-    {
-      name: 'Crown',
-      slot: 'hat',
-      description: 'A majestic crown that greatly amplifies the wearer\'s magical potential.',
-      bonuses: [
-        { type: 'maxMana', value: 50 },
-        { type: 'maxHealth', value: 30 },
-        { type: 'spellPower', value: 10 },
-        { type: 'manaRegen', value: 2 },
-      ],
-      minLevel: 15,
-    },
   ],
-  robe: [
+  hand: [
     {
-      name: 'Robe',
-      slot: 'robe',
-      description: 'A simple cloth robe.',
+      name: 'Wand',
+      slot: 'hand',
+      description: 'A standard wooden wand.',
       bonuses: [
-        { type: 'damageReduction', value: 2 },
+        { stat: 'manaCostReduction', value: 2 }
       ],
       minLevel: 1,
     },
     {
-      name: 'Cloak',
-      slot: 'robe',
-      description: 'A protective magical cloak.',
+      name: 'Staff',
+      slot: 'hand',
+      description: 'A sturdy wooden staff.',
       bonuses: [
-        { type: 'damageReduction', value: 3 },
-        { type: 'health', value: 5 },
-      ],
-      minLevel: 3,
-    },
-    {
-      name: 'Vestment',
-      slot: 'robe',
-      description: 'Ceremonial vestments imbued with protective magic.',
-      bonuses: [
-        { type: 'damageReduction', value: 5 },
+        { stat: 'spellPower', value: 5 }
       ],
       minLevel: 5,
     },
     {
-      name: 'Mantle',
-      slot: 'robe',
-      description: 'A enchanted mantle that protects the wearer.',
+      name: 'Dagger',
+      slot: 'hand',
+      description: 'A sharp magical dagger that enhances close combat abilities.',
       bonuses: [
-        { type: 'health', value: 15 },
-        { type: 'damageReduction', value: 4 },
+        { stat: 'mysticPunchPower', value: 10 },
+        { stat: 'bleedEffect', value: 3 }
       ],
-      minLevel: 8,
+      minLevel: 1,
     },
     {
-      name: 'Armor',
-      slot: 'robe',
-      description: 'Magical armor that protects without restricting movement.',
+      name: 'Spellbook',
+      slot: 'hand',
+      description: 'A basic spellbook that allows for improved spell management during duels.',
       bonuses: [
-        { type: 'damageReduction', value: 8 },
-        { type: 'health', value: 10 },
+        { stat: 'extraCardDraw', value: 1 },
+        { stat: 'spellPower', value: 5 }
       ],
-      minLevel: 10,
+      minLevel: 2,
     },
   ],
-  amulet: [
+  body: [
     {
-      name: 'Amulet',
-      slot: 'amulet',
-      description: 'A simple magical amulet.',
+      name: 'Apprentice Robe',
+      slot: 'body',
+      description: 'A simple robe that provides basic magical protection.',
       bonuses: [
-        { type: 'manaBoost', value: 10 },
+        { stat: 'maxHealth', value: 10 },
+        { stat: 'maxMana', value: 10 }
       ],
-      minLevel: 3,
+      minLevel: 1,
     },
     {
-      name: 'Pendant',
-      slot: 'amulet',
-      description: 'A pendant that enhances magical abilities.',
+      name: 'Mage Robe',
+      slot: 'body',
+      description: 'A well-crafted robe that enhances magical abilities.',
       bonuses: [
-        { type: 'spellPower', value: 5 },
+        { stat: 'maxHealth', value: 20 },
+        { stat: 'maxMana', value: 20 },
+        { stat: 'spellPower', value: 5 }
       ],
       minLevel: 5,
-    },
-    {
-      name: 'Talisman',
-      slot: 'amulet',
-      description: 'A powerful talisman with protective magic.',
-      bonuses: [
-        { type: 'health', value: 15 },
-        { type: 'manaBoost', value: 5 },
-      ],
-      minLevel: 8,
-    },
-    {
-      name: 'Medallion',
-      slot: 'amulet',
-      description: 'A medallion that resonates with magical energy.',
-      bonuses: [
-        { type: 'manaRegen', value: 3 },
-        { type: 'spellPower', value: 3 },
-      ],
-      minLevel: 10,
     },
   ],
-  ring: [
+  neck: [
     {
-      name: 'Ring',
-      slot: 'ring',
-      description: 'A basic enchanted ring.',
+      name: 'Mana Pendant',
+      slot: 'neck',
+      description: 'A pendant that enhances mana regeneration.',
       bonuses: [
-        { type: 'manaBoost', value: 5 },
+        { stat: 'manaRegen', value: 2 }
+      ],
+      minLevel: 1,
+    },
+    {
+      name: 'Arcane Amulet',
+      slot: 'neck',
+      description: 'An amulet that boosts magical power.',
+      bonuses: [
+        { stat: 'spellPower', value: 8 }
       ],
       minLevel: 5,
     },
+  ],
+  finger: [
     {
-      name: 'Band',
-      slot: 'ring',
-      description: 'A band that enhances magical abilities.',
+      name: 'Ring of Power',
+      slot: 'finger',
+      description: 'A ring that enhances magical abilities.',
       bonuses: [
-        { type: 'spellPower', value: 3 },
+        { stat: 'spellPower', value: 3 }
       ],
-      minLevel: 7,
+      minLevel: 1,
     },
     {
-      name: 'Signet',
-      slot: 'ring',
-      description: 'A signet ring with focused magical properties.',
+      name: 'Ring of Protection',
+      slot: 'finger',
+      description: 'A ring that provides magical protection.',
       bonuses: [
-        { type: 'manaCostReduction', value: 4 },
+        { stat: 'maxHealth', value: 15 }
       ],
-      minLevel: 10,
+      minLevel: 3,
     },
   ],
   belt: [
     {
-      name: 'Simple Belt',
+      name: 'Potion Belt',
       slot: 'belt',
-      description: 'A basic belt with a single potion slot.',
-      bonuses: {
-        potionSlots: 1
-      },
+      description: 'A belt with pouches for carrying potions.',
+      bonuses: [
+        { stat: 'potionSlots', value: 2 }
+      ],
       minLevel: 1,
     },
     {
       name: 'Alchemist Belt',
       slot: 'belt',
-      description: 'A specialized belt with multiple potion loops for quick access.',
-      bonuses: {
-        potionSlots: 2,
-        manaRegen: 1
-      },
+      description: 'A specialized belt for carrying multiple potions.',
+      bonuses: [
+        { stat: 'potionSlots', value: 3 },
+        { stat: 'potionEffectiveness', value: 10 }
+      ],
       minLevel: 5,
-    },
-    {
-      name: 'Master\'s Utility Belt',
-      slot: 'belt',
-      description: 'A well-crafted belt with numerous secure pouches for various potions.',
-      bonuses: {
-        potionSlots: 3,
-        manaRegen: 2
-      },
-      minLevel: 10,
-    },
-    {
-      name: 'Archmage\'s Belt',
-      slot: 'belt',
-      description: 'A legendary belt with enchanted loops that preserve potions indefinitely.',
-      bonuses: {
-        potionSlots: 5,
-        manaRegen: 3,
-        spellPower: 5
-      },
-      minLevel: 15,
     },
   ],
 };
@@ -687,7 +444,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Arcane',
-    bonuses: [{ type: 'spellPower', value: 8 }],
+    bonuses: [{ stat: 'spellPower', value: 8 }],
     minLevel: 1,
     rarity: 'uncommon',
     descriptionTemplate: 'Enhances spell power.',
@@ -695,7 +452,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Enchanted',
-    bonuses: [{ type: 'spellPower', value: 12 }],
+    bonuses: [{ stat: 'spellPower', value: 12 }],
     minLevel: 5,
     rarity: 'rare',
     descriptionTemplate: 'Significantly enhances spell power.',
@@ -703,7 +460,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Sorcerous',
-    bonuses: [{ type: 'spellPower', value: 18 }],
+    bonuses: [{ stat: 'spellPower', value: 18 }],
     minLevel: 10,
     rarity: 'epic',
     descriptionTemplate: 'Greatly enhances spell power.',
@@ -711,7 +468,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Transcendent',
-    bonuses: [{ type: 'spellPower', value: 25 }],
+    bonuses: [{ stat: 'spellPower', value: 25 }],
     minLevel: 15,
     rarity: 'legendary',
     descriptionTemplate: 'Massively enhances spell power.',
@@ -721,7 +478,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Efficient',
-    bonuses: [{ type: 'manaCostReduction', value: 8 }],
+    bonuses: [{ stat: 'manaCostReduction', value: 8 }],
     minLevel: 1,
     rarity: 'uncommon',
     descriptionTemplate: 'Reduces the mana cost of spells.',
@@ -729,7 +486,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Conserving',
-    bonuses: [{ type: 'manaCostReduction', value: 15 }],
+    bonuses: [{ stat: 'manaCostReduction', value: 15 }],
     minLevel: 5,
     rarity: 'rare',
     descriptionTemplate: 'Significantly reduces the mana cost of spells.',
@@ -737,7 +494,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Thrifty',
-    bonuses: [{ type: 'manaCostReduction', value: 25 }],
+    bonuses: [{ stat: 'manaCostReduction', value: 25 }],
     minLevel: 10,
     rarity: 'epic',
     descriptionTemplate: 'Greatly reduces the mana cost of spells.',
@@ -747,11 +504,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Fiery',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 10,
-      element: 'fire'
-    }],
+    bonuses: [{ stat: 'elementalAffinity', value: 10, element: 'fire' }],
     minLevel: 1,
     rarity: 'uncommon',
     descriptionTemplate: 'Enhances fire spells.',
@@ -759,11 +512,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Blazing',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 20,
-      element: 'fire'
-    }],
+    bonuses: [{ stat: 'elementalAffinity', value: 20, element: 'fire' }],
     minLevel: 8,
     rarity: 'rare',
     descriptionTemplate: 'Significantly enhances fire spells.',
@@ -771,11 +520,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Infernal',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 35,
-      element: 'fire'
-    }],
+    bonuses: [{ stat: 'elementalAffinity', value: 35, element: 'fire' }],
     minLevel: 15,
     rarity: 'epic',
     descriptionTemplate: 'Greatly enhances fire spells.',
@@ -785,11 +530,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Icy',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 10,
-      element: 'water'
-    }],
+    bonuses: [{ stat: 'elementalAffinity', value: 10, element: 'water' }],
     minLevel: 1,
     rarity: 'uncommon',
     descriptionTemplate: 'Enhances water spells.',
@@ -797,11 +538,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Frozen',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 20,
-      element: 'water'
-    }],
+    bonuses: [{ stat: 'elementalAffinity', value: 20, element: 'water' }],
     minLevel: 8,
     rarity: 'rare',
     descriptionTemplate: 'Significantly enhances water spells.',
@@ -809,11 +546,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Glacial',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 35,
-      element: 'water'
-    }],
+    bonuses: [{ stat: 'elementalAffinity', value: 35, element: 'water' }],
     minLevel: 15,
     rarity: 'epic',
     descriptionTemplate: 'Greatly enhances water spells.',
@@ -823,11 +556,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Rocky',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 10,
-      element: 'earth'
-    }],
+    bonuses: [{ stat: 'elementalAffinity', value: 10, element: 'earth' }],
     minLevel: 1,
     rarity: 'uncommon',
     descriptionTemplate: 'Enhances earth spells.',
@@ -835,11 +564,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Earthen',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 20,
-      element: 'earth'
-    }],
+    bonuses: [{ stat: 'elementalAffinity', value: 20, element: 'earth' }],
     minLevel: 8,
     rarity: 'rare',
     descriptionTemplate: 'Significantly enhances earth spells.',
@@ -847,11 +572,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Stone',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 35,
-      element: 'earth'
-    }],
+    bonuses: [{ stat: 'elementalAffinity', value: 35, element: 'earth' }],
     minLevel: 15,
     rarity: 'epic',
     descriptionTemplate: 'Greatly enhances earth spells.',
@@ -861,11 +582,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Windy',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 10,
-      element: 'air'
-    }],
+    bonuses: [{ stat: 'elementalAffinity', value: 10, element: 'air' }],
     minLevel: 1,
     rarity: 'uncommon',
     descriptionTemplate: 'Enhances air spells.',
@@ -873,11 +590,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Stormy',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 20,
-      element: 'air'
-    }],
+    bonuses: [{ stat: 'elementalAffinity', value: 20, element: 'air' }],
     minLevel: 8,
     rarity: 'rare',
     descriptionTemplate: 'Significantly enhances air spells.',
@@ -885,52 +598,10 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'prefix',
     name: 'Tempestuous',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 35,
-      element: 'air'
-    }],
+    bonuses: [{ stat: 'elementalAffinity', value: 35, element: 'air' }],
     minLevel: 15,
     rarity: 'epic',
     descriptionTemplate: 'Greatly enhances air spells.',
-  },
-  
-  // Elemental Affinities - Arcane
-  {
-    type: 'prefix',
-    name: 'Mystic',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 10,
-      element: 'arcane'
-    }],
-    minLevel: 1,
-    rarity: 'uncommon',
-    descriptionTemplate: 'Enhances arcane spells.',
-  },
-  {
-    type: 'prefix',
-    name: 'Celestial',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 20,
-      element: 'arcane'
-    }],
-    minLevel: 8,
-    rarity: 'rare',
-    descriptionTemplate: 'Significantly enhances arcane spells.',
-  },
-  {
-    type: 'prefix',
-    name: 'Astral',
-    bonuses: [{ 
-      type: 'elementalAffinity', 
-      value: 35,
-      element: 'arcane'
-    }],
-    minLevel: 15,
-    rarity: 'epic',
-    descriptionTemplate: 'Greatly enhances arcane spells.',
   },
   
   // SUFFIXES - Primarily affect defensive and utility capabilities
@@ -1212,14 +883,13 @@ export function generateStaff(playerLevel: number): Equipment {
   const chosenType = weaponTypes[Math.floor(Math.random() * weaponTypes.length)];
   
   // Add a physical damage bonus
-  const physicalDamageBonus: Partial<EquipmentBonuses> = {
-    type: 'spellPower',
-    value: 10 + Math.floor(playerLevel * 1.5)
-  };
+  const physicalDamageBonus: StatBonus[] = [
+    { stat: 'spellPower', value: 10 + Math.floor(playerLevel * 1.5) }
+  ];
   
   // Update the name and properties
   equipment.name = equipment.name.replace(/Wand|Rod|Scepter/, chosenType);
-  equipment.bonuses = { ...equipment.bonuses, ...physicalDamageBonus };
+  equipment.bonuses = [...equipment.bonuses, ...physicalDamageBonus];
   equipment.description += ' Enhances the mystic punch ability.';
   
   return equipment;

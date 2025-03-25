@@ -1,0 +1,180 @@
+.scrollGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.scrollCard {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.scrollCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.scrollHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.scrollTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.scrollName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.scrollType {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.scrollContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.spellInfo {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 0.75rem;
+  background-color: var(--background-primary);
+  border-radius: 4px;
+}
+
+.spellLevel,
+.spellSchool {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.value {
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.scrollActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.learnButton {
+  padding: 0.5rem 1rem;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.learnButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.emptyScrolls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  padding: 2rem;
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  border: 1px dashed var(--border-color);
+}
+
+.emptyScrollsText {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+/* Rarity styles */
+.rarity {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.common {
+  background-color: var(--rarity-common-bg);
+  color: var(--rarity-common-text);
+}
+
+.uncommon {
+  background-color: var(--rarity-uncommon-bg);
+  color: var(--rarity-uncommon-text);
+}
+
+.rare {
+  background-color: var(--rarity-rare-bg);
+  color: var(--rarity-rare-text);
+}
+
+.epic {
+  background-color: var(--rarity-epic-bg);
+  color: var(--rarity-epic-text);
+}
+
+.legendary {
+  background-color: var(--rarity-legendary-bg);
+  color: var(--rarity-legendary-text);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .scrollGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0.5rem;
+  }
+
+  .scrollCard {
+    padding: 1rem;
+  }
+
+  .scrollName {
+    font-size: 1.125rem;
+  }
+
+  .spellInfo {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+} 

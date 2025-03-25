@@ -12,7 +12,7 @@ interface WizardStudyProps {
   onStartDuel: () => void;
   onOpenDeckBuilder: () => void;
   onOpenEquipment: () => void;
-  onOpenSpellbook: () => void;
+  onOpenInventory: () => void;
   onReturnToMainMenu: () => void;
 }
 
@@ -20,7 +20,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
   onStartDuel,
   onOpenDeckBuilder,
   onOpenEquipment,
-  onOpenSpellbook,
+  onOpenInventory,
   onReturnToMainMenu
 }) => {
   const { gameState, setCurrentLocation, getPlayerScrolls, consumeScrollToLearnSpell, checkIfScrollSpellKnown } = useGameStateStore();
@@ -72,6 +72,17 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
     }, 3000);
   };
   
+  // Get active deck name
+  const getActiveDeckName = (): string => {
+    if (player.activeDeckId && player.decks && player.decks.length > 0) {
+      const activeDeck = player.decks.find(deck => deck.id === player.activeDeckId);
+      if (activeDeck) {
+        return activeDeck.name;
+      }
+    }
+    return "Default Deck";
+  };
+  
   // If potion crafting is open, render the potion crafting screen
   if (isPotionCraftingOpen) {
     return <PotionCraftingScreen onClose={handleClosePotionCrafting} />;
@@ -95,8 +106,17 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
       <div className="wizard-study__content">
         <div className="wizard-study__main-area">
           <div className="wizard-study__study-scene">
-            {/* This would be a ThreeJS scene in the full implementation */}
-            <div className="wizard-study__study-background"></div>
+            <div className="wizard-study__study-background">
+              {/* Background customization placeholder */}
+              <div className="wizard-study__background-customization">
+                <button 
+                  className="wizard-study__action wizard-study__action--secondary"
+                  onClick={() => {/* TODO: Implement background customization */}}
+                >
+                  Customize Background
+                </button>
+              </div>
+            </div>
           </div>
           
           <div className="wizard-study__actions">
@@ -117,16 +137,9 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
               
               <button 
                 className="wizard-study__action"
-                onClick={onOpenEquipment}
+                onClick={onOpenInventory}
               >
-                Equipment
-              </button>
-              
-              <button 
-                className="wizard-study__action"
-                onClick={onOpenSpellbook}
-              >
-                Spellbook
+                Inventory
               </button>
             </div>
             
@@ -145,13 +158,6 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
                 Marketplace
               </button>
             </div>
-            
-            <button 
-              className="wizard-study__action wizard-study__action--secondary"
-              onClick={() => setShowScrolls(true)}
-            >
-              Spell Scrolls
-            </button>
             
             <button 
               className="wizard-study__action wizard-study__action--secondary"
@@ -191,37 +197,9 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
             </div>
           </div>
           
-          <div className="wizard-study__equipped">
-            <h3 className="wizard-study__equipped-title">Equipped Items</h3>
-            <div className="wizard-study__equipment-slots">
-              {Object.entries(player.equipment).map(([slot, item]) => (
-                item && (
-                  <div key={slot} className="wizard-study__equipment-item">
-                    <div className="wizard-study__equipment-name">{item.name}</div>
-                    <div className="wizard-study__equipment-slot">{slot}</div>
-                  </div>
-                )
-              ))}
-            </div>
-          </div>
-          
-          <div className="wizard-study__spells">
-            <h3 className="wizard-study__spells-title">Equipped Spells</h3>
-            <div className="wizard-study__spell-list">
-              {player.equippedSpells.map((spell) => (
-                <div key={spell.id} className="wizard-study__spell-item">
-                  <div className="wizard-study__spell-name">{spell.name}</div>
-                  <div className="wizard-study__spell-type">{spell.type} - {spell.element}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="wizard-study__ingredients">
-            <h3 className="wizard-study__ingredients-title">Ingredients</h3>
-            <div className="wizard-study__ingredients-count">
-              {player.ingredients ? player.ingredients.length : 0} ingredients in inventory
-            </div>
+          <div className="wizard-study__active-deck-sidebar">
+            <h3 className="wizard-study__active-deck-title">Active Deck</h3>
+            <div className="wizard-study__active-deck-value">{getActiveDeckName()}</div>
           </div>
         </div>
       </div>

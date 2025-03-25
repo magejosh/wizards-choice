@@ -1,0 +1,144 @@
+.scrollGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.emptyScrolls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--muted-foreground);
+  font-style: italic;
+  border: 2px dashed var(--border);
+  border-radius: 0.5rem;
+  margin: 1rem;
+}
+
+.scrollCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.scrollCard:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.scrollHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.scrollName {
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.rarity {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  text-transform: capitalize;
+}
+
+.common {
+  background-color: var(--common);
+  color: var(--common-foreground);
+}
+
+.uncommon {
+  background-color: var(--uncommon);
+  color: var(--uncommon-foreground);
+}
+
+.rare {
+  background-color: var(--rare);
+  color: var(--rare-foreground);
+}
+
+.epic {
+  background-color: var(--epic);
+  color: var(--epic-foreground);
+}
+
+.legendary {
+  background-color: var(--legendary);
+  color: var(--legendary-foreground);
+}
+
+.spellInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.spellName {
+  font-weight: 600;
+  color: var(--foreground);
+  font-size: 1rem;
+}
+
+.spellDetails {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.spellType,
+.spellElement,
+.spellTier {
+  padding: 0.25rem 0.5rem;
+  background-color: var(--secondary);
+  border-radius: 0.25rem;
+  text-transform: capitalize;
+}
+
+.spellDescription {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+}
+
+.scrollActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+.useButton {
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .scrollGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding: 0.5rem;
+  }
+
+  .scrollCard {
+    padding: 0.75rem;
+  }
+
+  .scrollName {
+    font-size: 1rem;
+  }
+
+  .spellDetails {
+    flex-wrap: wrap;
+  }
+} 

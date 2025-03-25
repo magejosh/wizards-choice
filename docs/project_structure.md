@@ -31,6 +31,10 @@ wizard-choice/
 │   │       ├── WizardModel.tsx       # 3D wizard character model
 │   │       └── effects/              # Visual effect components
 │   │           └── SpellEffect3D.tsx # 3D spell effects for different elements
+│   │       └── spells/
+│   │           ├── SpellTree.tsx           # Interactive spell progression tree component
+│   │           ├── SpellTree.module.css    # Styles for spell tree component
+│   │           └── SpellDetails.tsx        # Detailed spell information display
 │   └── lib/                 # Core game logic and utilities
 │       ├── auth/            # Authentication services
 │       │   └── authService.ts # User authentication and management
@@ -150,3 +154,38 @@ The project is hosted on GitHub at:
 ```
 https://github.com/magejosh/wizards-choice
 ```
+
+## Spell System
+
+```
+src/
+├── components/
+│   └── spells/
+│       ├── SpellTree.tsx           # Interactive spell progression tree component
+│       ├── SpellTree.module.css    # Styles for spell tree component
+│       └── SpellDetails.tsx        # Detailed spell information display
+├── lib/
+│   └── spells/
+│       ├── spellTree.ts           # Spell tree data structures and logic
+│       ├── spellTreeLayout.ts     # Node positioning and connection logic
+│       └── spells.ts              # Core spell definitions and utilities
+└── app/
+    └── spell-tree/
+        ├── page.tsx               # Spell tree page component
+        └── page.module.css        # Styles for spell tree page
+```
+
+### Spell Tree System
+- **Components**
+  - `SpellTree.tsx`: Main component for rendering the interactive spell progression tree
+  - `SpellDetails.tsx`: Displays detailed information about selected spells
+  - `SpellTree.module.css`: Styles for the spell tree visualization
+
+- **Logic**
+  - `spellTree.ts`: Core data structures and tree management logic
+  - `spellTreeLayout.ts`: Handles node positioning and connection generation
+  - `spells.ts`: Spell definitions and utility functions
+
+- **Pages**
+  - `spell-tree/page.tsx`: Main page component for the spell tree interface
+  - `spell-tree/page.module.css`: Styles for the spell tree page

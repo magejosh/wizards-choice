@@ -1,4 +1,5 @@
 import { CombatState, Spell, SpellType, ElementType, CombatWizard } from '../types';
+import { enemyArchetypes } from '../features/procedural/enemyArchetypes';
 
 // Interface for AI strategies
 interface AIStrategy {
@@ -344,13 +345,243 @@ class ElementalStrategy extends BaseAIStrategy {
 }
 
 /**
+ * Strategy for Necromancer archetype
+ */
+class NecromancerStrategy extends BaseAIStrategy {
+  selectSpell(state: CombatState): Spell | null {
+    const availableSpells = this.getAvailableSpells(state);
+    
+    // If low health, prioritize healing spells
+    if (this.isLowHealth(state.enemyWizard)) {
+      const healingSpells = this.getSpellsByType(availableSpells, 'healing');
+      if (healingSpells.length > 0) {
+        return healingSpells[0];
+      }
+    }
+    
+    // If we have minions, use damage spells
+    const hasMinions = state.enemyWizard.activeEffects.some(effect => effect.type === 'summon');
+    if (hasMinions) {
+      const damageSpells = this.getSpellsByType(availableSpells, 'damage');
+      if (damageSpells.length > 0) {
+        return damageSpells[0];
+      }
+    }
+    
+    // If no minions, try to summon
+    const summonSpells = this.getSpellsByType(availableSpells, 'summon');
+    if (summonSpells.length > 0) {
+      return summonSpells[0];
+    }
+    
+    return null;
+  }
+  
+  getName(): string {
+    return 'Necromancer';
+  }
+}
+
+/**
+ * Strategy for Time Weaver archetype
+ */
+class TimeWeaverStrategy extends BaseAIStrategy {
+  selectSpell(state: CombatState): Spell | null {
+    const availableSpells = this.getAvailableSpells(state);
+    
+    // If player is about to cast a powerful spell, use time stop
+    const playerSpells = state.playerWizard.hand;
+    const hasPowerfulSpell = playerSpells.some(spell => 
+      this.calculateSpellDamage(spell) > state.enemyWizard.currentHealth * 0.3
+    );
+    
+    if (hasPowerfulSpell) {
+      const controlSpells = this.getSpellsByType(availableSpells, 'control');
+      if (controlSpells.length > 0) {
+        return controlSpells[0];
+      }
+    }
+    
+    // If we have time effects, use damage spells
+    const hasTimeEffect = state.enemyWizard.activeEffects.some(effect => 
+      effect.type === 'timeRewind' || effect.type === 'delay'
+    );
+    if (hasTimeEffect) {
+      const damageSpells = this.getSpellsByType(availableSpells, 'damage');
+      if (damageSpells.length > 0) {
+        return damageSpells[0];
+      }
+    }
+    
+    // If low mana, use time rewind
+    if (this.isLowMana(state.enemyWizard)) {
+      const utilitySpells = this.getSpellsByType(availableSpells, 'utility');
+      if (utilitySpells.length > 0) {
+        return utilitySpells[0];
+      }
+    }
+    
+    return null;
+  }
+  
+  getName(): string {
+    return 'Time Weaver';
+  }
+}
+
+/**
+ * Strategy for Battle Mage archetype
+ */
+class BattleMageStrategy extends BaseAIStrategy {
+  selectSpell(state: CombatState): Spell | null {
+    const availableSpells = this.getAvailableSpells(state);
+    
+    // If we have weapon enhancement, use damage spells
+    const hasEnhancement = state.enemyWizard.activeEffects.some(effect => 
+      effect.type === 'damageBonus'
+    );
+    if (hasEnhancement) {
+      const damageSpells = this.getSpellsByType(availableSpells, 'damage');
+      if (damageSpells.length > 0) {
+        return damageSpells[0];
+      }
+    }
+    
+    // If low health, use combat surge
+    if (this.isLowHealth(state.enemyWizard)) {
+      const buffSpells = this.getSpellsByType(availableSpells, 'buff');
+      if (buffSpells.length > 0) {
+        return buffSpells[0];
+      }
+    }
+    
+    // If no enhancement, use weapon enhancement
+    const enhancementSpells = availableSpells.filter(spell => 
+      spell.effects.some(effect => effect.type === 'damageBonus')
+    );
+    if (enhancementSpells.length > 0) {
+      return enhancementSpells[0];
+    }
+    
+    return null;
+  }
+  
+  getName(): string {
+    return 'Battle Mage';
+  }
+}
+
+/**
+ * Strategy for Illusionist archetype
+ */
+class IllusionistStrategy extends BaseAIStrategy {
+  selectSpell(state: CombatState): Spell | null {
+    const availableSpells = this.getAvailableSpells(state);
+    
+    // If player is confused, use damage spells
+    const playerConfused = state.playerWizard.activeEffects.some(effect => 
+      effect.type === 'confusion'
+    );
+    if (playerConfused) {
+      const damageSpells = this.getSpellsByType(availableSpells, 'damage');
+      if (damageSpells.length > 0) {
+        return damageSpells[0];
+      }
+    }
+    
+    // If we have mirror images, use control spells
+    const hasMirrorImages = state.enemyWizard.activeEffects.some(effect => 
+      effect.type === 'summon' && effect.element === 'arcane'
+    );
+    if (hasMirrorImages) {
+      const controlSpells = this.getSpellsByType(availableSpells, 'control');
+      if (controlSpells.length > 0) {
+        return controlSpells[0];
+      }
+    }
+    
+    // If no confusion, try to confuse
+    const confusionSpells = availableSpells.filter(spell => 
+      spell.effects.some(effect => effect.type === 'confusion')
+    );
+    if (confusionSpells.length > 0) {
+      return confusionSpells[0];
+    }
+    
+    return null;
+  }
+  
+  getName(): string {
+    return 'Illusionist';
+  }
+}
+
+/**
+ * Strategy for Alchemist archetype
+ */
+class AlchemistStrategy extends BaseAIStrategy {
+  selectSpell(state: CombatState): Spell | null {
+    const availableSpells = this.getAvailableSpells(state);
+    
+    // If low health, use healing elixir
+    if (this.isLowHealth(state.enemyWizard)) {
+      const healingSpells = this.getSpellsByType(availableSpells, 'healing');
+      if (healingSpells.length > 0) {
+        return healingSpells[0];
+      }
+    }
+    
+    // If player has poison effect, use damage spells
+    const playerPoisoned = state.playerWizard.activeEffects.some(effect => 
+      effect.element === 'poison'
+    );
+    if (playerPoisoned) {
+      const damageSpells = this.getSpellsByType(availableSpells, 'damage');
+      if (damageSpells.length > 0) {
+        return damageSpells[0];
+      }
+    }
+    
+    // If no poison effect, use potion throw
+    const poisonSpells = availableSpells.filter(spell => 
+      spell.effects.some(effect => effect.element === 'poison')
+    );
+    if (poisonSpells.length > 0) {
+      return poisonSpells[0];
+    }
+    
+    return null;
+  }
+  
+  getName(): string {
+    return 'Alchemist';
+  }
+}
+
+/**
  * Factory for creating AI strategies based on difficulty and wizard level
  */
 export class AIStrategyFactory {
   /**
    * Create an appropriate AI strategy based on difficulty and enemy wizard level
    */
-  static createStrategy(difficulty: 'easy' | 'normal' | 'hard', wizardLevel: number): AIStrategy {
+  static createStrategy(difficulty: 'easy' | 'normal' | 'hard', wizardLevel: number, archetype?: string): AIStrategy {
+    // If archetype is specified, use its strategy
+    if (archetype) {
+      switch (archetype) {
+        case 'necromancer':
+          return new NecromancerStrategy();
+        case 'timeWeaver':
+          return new TimeWeaverStrategy();
+        case 'battleMage':
+          return new BattleMageStrategy();
+        case 'illusionist':
+          return new IllusionistStrategy();
+        case 'alchemist':
+          return new AlchemistStrategy();
+      }
+    }
+    
     // For easy difficulty, always use defensive or very basic strategy
     if (difficulty === 'easy') {
       return new DefensiveStrategy();
@@ -403,9 +634,26 @@ export class AIStrategyFactory {
  * The main AI function that selects a spell for the enemy wizard
  */
 export function getAISpellSelection(state: CombatState): Spell | null {
+  // Get the enemy's archetype from their name or theme
+  const enemyTheme = state.enemyWizard.wizard.name.toLowerCase();
+  let archetype: string | undefined;
+  
+  if (enemyTheme.includes('dark') || enemyTheme.includes('death') || enemyTheme.includes('grave')) {
+    archetype = 'necromancer';
+  } else if (enemyTheme.includes('time') || enemyTheme.includes('chronos') || enemyTheme.includes('temporal')) {
+    archetype = 'timeWeaver';
+  } else if (enemyTheme.includes('blade') || enemyTheme.includes('steel') || enemyTheme.includes('war')) {
+    archetype = 'battleMage';
+  } else if (enemyTheme.includes('mirage') || enemyTheme.includes('phantom') || enemyTheme.includes('veil')) {
+    archetype = 'illusionist';
+  } else if (enemyTheme.includes('potion') || enemyTheme.includes('brew') || enemyTheme.includes('vial')) {
+    archetype = 'alchemist';
+  }
+  
   const strategy = AIStrategyFactory.createStrategy(
     state.difficulty,
-    state.enemyWizard.wizard.level
+    state.enemyWizard.wizard.level,
+    archetype
   );
   
   const selectedSpell = strategy.selectSpell(state);

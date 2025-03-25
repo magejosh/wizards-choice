@@ -118,13 +118,76 @@ Spell scrolls provide an opportunity to learn new spells or use powerful spells 
 - **Mana Regen**: 10 points per +1 Mana Regen per round
 - **New Spell**: 1 point per tier of spell. 
 
+### Spell Progression Tech Tree
+
+The spell progression tech tree is a visual representation of your spell collection and progression path. It's designed in a Path of Exile-style layout with your wizard at the center.
+
+#### Tree Layout
+- Your wizard is positioned at the center of the tree
+- Spells are organized in tiers radiating outward
+- Each spell node shows:
+  - Spell name and tier
+  - Cost in points
+  - Connection paths to other spells
+  - Locked/unlocked state
+
+#### Node Connections
+- Nodes are connected based on proximity and prerequisites
+- You can only unlock nodes that are connected to already unlocked nodes
+- Each node has a cost based on its tier
+- Higher tier spells require more points to unlock
+
+#### Unlocking Spells
+To unlock a spell node, you need:
+1. Enough points to cover the node's cost
+2. All prerequisite nodes must be unlocked
+3. The node must not already be unlocked
+
+#### Tree Features
+- **Zoom and Pan**: Navigate the tree by zooming and panning
+- **Tooltips**: Hover over nodes to see detailed information
+- **Visual Feedback**: 
+  - Locked nodes appear grayed out
+  - Unlocked nodes glow with your wizard's color
+  - Available nodes (prerequisites met) are highlighted
+- **Reset Option**: You can reset your tree to reallocate points
+- **Save/Load**: Your tree progress is automatically saved
+
+#### Strategy Tips
+1. Plan your path through the tree before spending points
+2. Consider spell synergies when choosing which nodes to unlock
+3. Balance between unlocking new spells and strengthening existing ones
+4. Use the reset option if you want to try different spell combinations
+5. Check tooltips for prerequisite information before attempting to unlock nodes
+
 ### The Wizard's Study
 
-Between duels, you'll return to your Wizard's Study where you can:
-- Select your next opponent (wizard or magical creature)
-- Manage your spell collection in the Deckbuilder
-- Equip items to enhance your abilities
-- Save your progress
+Between duels, you'll return to your Wizard's Study, your main hub for game management. The study features:
+
+#### Layout and Navigation
+- A clean, responsive grid layout for all action buttons
+- A 90% width container (max-width 800px) for optimal space utilization
+- A background customization placeholder (coming soon)
+- Mobile-responsive design that adapts to your screen size
+- Smooth transitions and hover effects for all interactive elements
+
+#### Main Actions
+- **Start Next Duel**: Begin your next wizard duel
+- **Deck Builder**: Manage your spell collection and create custom decks
+- **Equipment**: Equip and manage your wizard's gear
+- **Spellbook**: View and organize your spell collection
+
+#### Secondary Actions
+- **Potion Crafting**: Create powerful potions from ingredients
+- **Marketplace**: Visit various markets to buy and sell items
+
+#### Sidebar Information
+- **Wizard Stats**: View your health, mana, mana regeneration, experience, and gold
+- **Equipped Items**: See your currently equipped gear
+- **Spells**: View your equipped spells
+- **Ingredients**: Check your ingredient inventory
+
+The study is designed to be intuitive and accessible, with all critical functions easily reachable without scrolling. The layout automatically adjusts for different screen sizes, ensuring a smooth experience on both desktop and mobile devices.
 
 ### Equipment
 

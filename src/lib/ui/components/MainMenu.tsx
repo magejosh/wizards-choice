@@ -3,6 +3,7 @@
 
 import React from 'react';
 import { useGameStateStore } from '../../game-state/gameStateStore';
+import { clearSaveGames } from '../../game-state/clearSaveGames';
 
 interface MainMenuProps {
   onStartNewGame: () => void;
@@ -76,6 +77,13 @@ const MainMenu: React.FC<MainMenuProps> = ({
             onClick={onOpenHowToPlay}
           >
             How to Play
+          </button>
+
+          <button 
+            className="main-menu__button main-menu__button--danger"
+            onClick={clearSaveGames}
+          >
+            Clear Save Games
           </button>
           
           <button

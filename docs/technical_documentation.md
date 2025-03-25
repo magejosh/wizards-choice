@@ -12,13 +12,15 @@
 9. [Combat Utilities](#combat-utilities)
 10. [3D Battle System](#3d-battle-system)
 11. [Equipment System](#equipment-system)
-12. [UI Components](#ui-components)
-13. [Best Practices](#best-practices)
-14. [Deployment Guide](#deployment-guide)
-15. [Admin Guide](#admin-guide)
-16. [Future Development](#future-development)
-17. [Market System](#market-system)
-18. [Market Attack System](#market-attack-system)
+12. [Inventory System](#inventory-system)
+13. [UI Components](#ui-components)
+14. [Best Practices](#best-practices)
+15. [Deployment Guide](#deployment-guide)
+16. [Admin Guide](#admin-guide)
+17. [Future Development](#future-development)
+18. [Market System](#market-system)
+19. [Market Attack System](#market-attack-system)
+20. [Spell Progression Tech Tree System](#spell-progression-tech-tree-system)
 
 ## Introduction
 
@@ -365,6 +367,34 @@ The equipment system allows players to customize their wizard with:
 - **AXIOM 15**: Implement equipment as composable modifiers to wizard stats for flexibility.
 - **AXIOM 16**: Balance equipment bonuses against progression to maintain game challenge.
 
+## Inventory System
+
+The inventory system provides a unified interface for managing all player items, equipment, spell scrolls, ingredients, and potions.
+
+### Key Features
+- Tabbed interface for different inventory sections
+- Equipment slots with visual feedback
+- Grid-based layout for items, scrolls, ingredients, and potions
+- Consistent styling and empty state handling
+- Responsive design for all screen sizes
+
+### Implementation Details
+- Located in `src/components/inventory/`
+- Components:
+  - `Inventory.tsx`: Main container with tab management
+  - `EquipmentSlots.tsx`: Equipment slot display and management
+  - `ItemGrid.tsx`: General item inventory display
+  - `SpellScrolls.tsx`: Spell scroll management
+  - `Ingredients.tsx`: Ingredient storage and usage
+  - `Potions.tsx`: Potion management
+
+### Best Practices
+- **AXIOM 39**: Use consistent styling across all inventory sections for better UX
+- **AXIOM 40**: Implement responsive grid layouts that adapt to screen size
+- **AXIOM 41**: Provide clear visual feedback for item interactions
+- **AXIOM 42**: Handle empty states gracefully with informative messages
+- **AXIOM 43**: Use TypeScript for type-safe inventory management
+
 ## UI Components
 
 UI components are built with React and styled for a responsive, engaging experience.
@@ -377,6 +407,17 @@ UI components are built with React and styled for a responsive, engaging experie
 - Deck Builder
 - Status Bars
 - Settings Panel
+
+### Wizard's Study
+The Wizard's Study serves as the main hub for the game, providing:
+- Responsive grid layout for main action buttons
+- 90% width container with 800px max-width for optimal space utilization
+- Background customization placeholder with hover effects
+- Proper z-indexing and overflow handling
+- Mobile-responsive design with adaptive layout
+- Smooth transitions and hover effects
+- Improved typography and visual hierarchy
+- Organized action groups with clear hierarchy
 
 ### Deck Builder
 The deck builder provides an intuitive interface for managing spells with:
@@ -545,3 +586,126 @@ The market attack system adds risk and reward to market visits, creating encount
 - **AXIOM 40**: Scale rewards appropriately with risk (higher level market attackers provide better rewards)
 - **AXIOM 41**: Ensure UI clearly communicates the risk/reward decision to players
 - **AXIOM 42**: Implement proper state transitions between market, battle, and wizard study
+
+## Spell Progression Tech Tree System
+
+### Components
+
+#### SpellTree Component
+- Location: `src/components/spells/SpellTree.tsx`
+- Purpose: Renders the interactive spell progression tree
+- Features:
+  - Zoom and pan functionality
+  - Node connection visualization
+  - Interactive node unlocking
+  - Tooltip display for locked nodes
+  - Unlocking animations
+  - Responsive layout
+
+#### SpellTreeLayout
+- Location: `src/lib/spells/spellTreeLayout.ts`
+- Purpose: Handles the positioning and connection logic for spell nodes
+- Features:
+  - Radial layout calculation
+  - Connection path generation
+  - Node positioning optimization
+  - Tier-based spacing
+
+#### SpellTree Data Structure
+- Location: `src/lib/spells/spellTree.ts`
+- Purpose: Manages the spell tree state and logic
+- Features:
+  - Node and connection data structures
+  - Unlocking validation
+  - Point system management
+  - State persistence
+
+### Data Structures
+
+```typescript
+interface SpellNode {
+  id: string;
+  spell: Spell;
+  position: { x: number; y: number };
+  connections: string[];
+  unlocked: boolean;
+  cost: number;
+  prerequisites: string[];
+}
+
+interface SpellTree {
+  nodes: SpellNode[];
+  centerNode: SpellNode;
+  maxPoints: number;
+  allocatedPoints: number;
+}
+```
+
+### Key Features
+
+1. **Visual Layout**
+   - Centered wizard node
+   - Tiered spell organization
+   - Dynamic connection paths
+   - Visual state indicators
+
+2. **Interaction**
+   - Click to unlock nodes
+   - Hover for tooltips
+   - Zoom and pan navigation
+   - Reset functionality
+
+3. **State Management**
+   - Local storage persistence
+   - Point tracking
+   - Unlock state validation
+   - Prerequisite checking
+
+4. **Animations**
+   - Unlocking effects
+   - Connection highlighting
+   - State transitions
+
+### Integration Points
+
+1. **Spell System**
+   - Connected to spell data structures
+   - Integrated with spell learning mechanics
+   - Linked to spell scroll system
+
+2. **UI Components**
+   - Integrated with main game interface
+   - Connected to spell details panel
+   - Linked to point system display
+
+3. **State Management**
+   - Connected to game state store
+   - Integrated with save/load system
+   - Linked to progression tracking
+
+## TypeScript Configuration
+
+The project uses TypeScript with Next.js, configured for optimal development experience.
+
+### Key Features
+- Path aliases for cleaner imports (`@/` maps to `src/`)
+- Strict type checking for better code quality
+- Next.js-specific TypeScript configuration
+- Module resolution optimized for React development
+
+### Configuration Details
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
+}
+```
+
+### Best Practices
+- **AXIOM 44**: Use path aliases for consistent import paths
+- **AXIOM 45**: Maintain strict type checking for better code quality
+- **AXIOM 46**: Keep TypeScript configuration in sync with Next.js requirements

@@ -53,6 +53,9 @@ const StreamlinedMarketUI: React.FC<StreamlinedMarketUIProps> = ({ onClose }) =>
   const [gold, setGold] = useState<number>(0);
   const [message, setMessage] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [filteredPlayerInventory, setFilteredPlayerInventory] = useState<any[]>([]);
+  const [transactionStatus, setTransactionStatus] = useState<'success' | 'error' | null>(null);
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
   
   // Market attack state
   const [showAttackModal, setShowAttackModal] = useState(false);
@@ -87,6 +90,9 @@ const StreamlinedMarketUI: React.FC<StreamlinedMarketUIProps> = ({ onClose }) =>
         
         // Update gold
         setGold(getPlayerGold());
+        
+        // Initialize filtered player inventory
+        setFilteredPlayerInventory(getFilteredPlayerInventory());
         
         setLoadingState('complete');
       } catch (err) {
@@ -204,35 +210,40 @@ const StreamlinedMarketUI: React.FC<StreamlinedMarketUIProps> = ({ onClose }) =>
     if (!selectedMarket || !selectedItem) return;
     
     // Convert UI tab names to API parameter names
-    const itemTypeMap = {
+    const itemTypeMap: Record<string, 'ingredient' | 'potion' | 'equipment' | 'scroll'> = {
       'ingredients': 'ingredient',
       'potions': 'potion',
       'equipment': 'equipment',
       'scrolls': 'scroll'
     };
     
-    const itemType = itemTypeMap[selectedTab] as 'ingredient' | 'potion' | 'equipment' | 'scroll';
-    
     const result = buyItem(
-      selectedMarket.id,
-      itemType,
+      selectedMarketId as string,
+      itemTypeMap[selectedTab],
       selectedItem.item.id,
       quantity
     );
     
-    // Show result message
-    setMessage(result.message);
-    
-    // Update gold
-    setGold(getPlayerGold());
-    
-    // Clear selection after successful purchase
+    // Force refresh of UI state
     if (result.success) {
-      setTimeout(() => {
-        setSelectedItem(null);
-        setMessage('');
-      }, 2000);
+      setGold(getPlayerGold());
+      // Force refresh of the market data to reflect updated quantities
+      const updatedMarket = getMarketById(selectedMarketId as string);
+      if (updatedMarket) {
+        // Update the markets array with the new market data
+        setMarkets(prevMarkets => 
+          prevMarkets.map(market => 
+            market.id === updatedMarket.id ? updatedMarket : market
+          )
+        );
+      }
+      // Force reloading of filtered player inventory
+      setFilteredPlayerInventory(getFilteredPlayerInventory());
     }
+
+    setMessage(result.message);
+    setTransactionStatus(result.success ? 'success' : 'error');
+    setShowTransactionModal(true);
   };
   
   // Handle selling items
@@ -240,35 +251,40 @@ const StreamlinedMarketUI: React.FC<StreamlinedMarketUIProps> = ({ onClose }) =>
     if (!selectedMarket || !selectedItem) return;
     
     // Convert UI tab names to API parameter names
-    const itemTypeMap = {
+    const itemTypeMap: Record<string, 'ingredient' | 'potion' | 'equipment' | 'scroll'> = {
       'ingredients': 'ingredient',
       'potions': 'potion',
       'equipment': 'equipment',
       'scrolls': 'scroll'
     };
     
-    const itemType = itemTypeMap[selectedTab] as 'ingredient' | 'potion' | 'equipment' | 'scroll';
-    
     const result = sellItem(
-      selectedMarket.id,
-      itemType,
+      selectedMarketId as string,
+      itemTypeMap[selectedTab],
       selectedItem.id,
       quantity
     );
     
-    // Show result message
-    setMessage(result.message);
-    
-    // Update gold
-    setGold(getPlayerGold());
-    
-    // Clear selection after successful sale
+    // Force refresh of UI state
     if (result.success) {
-      setTimeout(() => {
-        setSelectedItem(null);
-        setMessage('');
-      }, 2000);
+      setGold(getPlayerGold());
+      // Force refresh of the market data to reflect updated quantities
+      const updatedMarket = getMarketById(selectedMarketId as string);
+      if (updatedMarket) {
+        // Update the markets array with the new market data
+        setMarkets(prevMarkets => 
+          prevMarkets.map(market => 
+            market.id === updatedMarket.id ? updatedMarket : market
+          )
+        );
+      }
+      // Force reloading of filtered player inventory
+      setFilteredPlayerInventory(getFilteredPlayerInventory());
     }
+
+    setMessage(result.message);
+    setTransactionStatus(result.success ? 'success' : 'error');
+    setShowTransactionModal(true);
   };
   
   // Handle market close (with possible attack)
@@ -900,6 +916,59 @@ const StreamlinedMarketUI: React.FC<StreamlinedMarketUIProps> = ({ onClose }) =>
           )}
         </div>
       </div>
+      
+      {/* Transaction Modal */}
+      {showTransactionModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 10000
+        }}>
+          <div style={{
+            backgroundColor: '#222',
+            padding: '20px',
+            borderRadius: '8px',
+            maxWidth: '400px',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ 
+              color: transactionStatus === 'success' ? '#22ff22' : '#ff2222',
+              marginBottom: '15px'
+            }}>
+              {transactionStatus === 'success' ? 'Transaction Complete' : 'Transaction Failed'}
+            </h3>
+            <p style={{ color: '#fff', marginBottom: '20px' }}>{message}</p>
+            <button 
+              onClick={() => {
+                setShowTransactionModal(false);
+                if (transactionStatus === 'success') {
+                  setSelectedItem(null);
+                  setQuantity(1);
+                  setMessage('');
+                }
+              }}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#0088ff',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

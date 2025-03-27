@@ -1187,11 +1187,17 @@ export const useGameStateStore = create<GameStateStore>()(
           return { success: false, message: 'Not enough gold.' };
         }
         
-        // Update player's gold
-        const deductionSuccess = get().deductGold(totalCost);
-        if (!deductionSuccess) {
-          return { success: false, message: 'Failed to deduct gold.' };
-        }
+        // Update player's gold - FIXED: Use direct updates instead of helper methods
+        const newGold = gameState.marketData.gold - totalCost;
+        set({
+          gameState: {
+            ...gameState,
+            marketData: {
+              ...gameState.marketData,
+              gold: newGold
+            }
+          }
+        });
         
         // Update market item quantity
         const updatedMarket = { ...market };
@@ -1235,23 +1241,39 @@ export const useGameStateStore = create<GameStateStore>()(
         }
         
         updatedMarket.inventory = updatedInventory;
-        get().updateMarket(marketId, updatedMarket);
+        
+        // Update markets array with the modified market
+        const updatedMarkets = gameState.markets.map(m => 
+          m.id === marketId ? updatedMarket : m
+        );
         
         // Add item to player's inventory
         const item = marketItem.item;
-        for (let i = 0; i < quantity; i++) {
-          switch (itemType) {
-            case 'ingredient':
-              get().addIngredientToInventory(item as unknown as Ingredient);
-              break;
-            case 'potion':
-              get().addPotionToInventory(item as unknown as Potion);
-              break;
-            case 'equipment':
-              get().addItemToInventory(item as unknown as Equipment);
-              break;
-            // case 'scroll' will be implemented later with the spell scroll system
-          }
+        let updatedPlayer = { ...gameState.player };
+        
+        switch (itemType) {
+          case 'ingredient':
+            // Direct update of player ingredients
+            updatedPlayer.ingredients = [
+              ...updatedPlayer.ingredients,
+              ...(Array(quantity).fill(null).map(() => item as unknown as Ingredient))
+            ];
+            break;
+          case 'potion':
+            // Direct update of player potions
+            updatedPlayer.potions = [
+              ...updatedPlayer.potions,
+              ...(Array(quantity).fill(null).map(() => item as unknown as Potion))
+            ];
+            break;
+          case 'equipment':
+            // Direct update of player inventory
+            updatedPlayer.inventory = [
+              ...updatedPlayer.inventory,
+              ...(Array(quantity).fill(null).map(() => item as unknown as Equipment))
+            ];
+            break;
+          // case 'scroll' will be implemented later with the spell scroll system
         }
         
         // Create and record transaction
@@ -1265,14 +1287,15 @@ export const useGameStateStore = create<GameStateStore>()(
           'buy'
         );
         
-        // Update player's transaction history
-        const updatedTransactions = [...gameState.marketData.transactions, transaction];
+        // Update entire state to ensure changes are reflected properly
         set({
           gameState: {
             ...gameState,
+            player: updatedPlayer,
+            markets: updatedMarkets,
             marketData: {
               ...gameState.marketData,
-              transactions: updatedTransactions
+              transactions: [...gameState.marketData.transactions, transaction]
             }
           }
         });
@@ -1295,6 +1318,7 @@ export const useGameStateStore = create<GameStateStore>()(
         let itemName = '';
         let sellPrice = 0;
         let hasItem = false;
+        let updatedPlayer = { ...gameState.player };
         
         switch (itemType) {
           case 'ingredient':
@@ -1318,6 +1342,16 @@ export const useGameStateStore = create<GameStateStore>()(
                 }[ingredient.rarity];
                 sellPrice = Math.round(basePrice * 0.7);
               }
+              
+              // Directly update player ingredients
+              let ingredientsToRemove = quantity;
+              updatedPlayer.ingredients = ingredients.filter(item => {
+                if (item.id === itemId && ingredientsToRemove > 0) {
+                  ingredientsToRemove--;
+                  return false;
+                }
+                return true;
+              });
             }
             break;
           
@@ -1342,6 +1376,16 @@ export const useGameStateStore = create<GameStateStore>()(
                 }[potion.rarity];
                 sellPrice = Math.round(basePrice * 0.6);
               }
+              
+              // Directly update player potions
+              let potionsToRemove = quantity;
+              updatedPlayer.potions = potions.filter(item => {
+                if (item.id === itemId && potionsToRemove > 0) {
+                  potionsToRemove--;
+                  return false;
+                }
+                return true;
+              });
             }
             break;
           
@@ -1367,6 +1411,16 @@ export const useGameStateStore = create<GameStateStore>()(
                 const basePrice = 50 * rarityMultipliers[equip.rarity];
                 sellPrice = Math.round(basePrice * 0.5);
               }
+              
+              // Directly update player equipment
+              let equipmentToRemove = quantity;
+              updatedPlayer.inventory = equipment.filter(item => {
+                if (item.id === itemId && equipmentToRemove > 0) {
+                  equipmentToRemove--;
+                  return false;
+                }
+                return true;
+              });
             }
             break;
           
@@ -1377,25 +1431,9 @@ export const useGameStateStore = create<GameStateStore>()(
           return { success: false, message: 'Item not found in your inventory.' };
         }
         
-        // Remove item from player's inventory
-        for (let i = 0; i < quantity; i++) {
-          switch (itemType) {
-            case 'ingredient':
-              get().removeIngredientFromInventory(itemId);
-              break;
-            case 'potion':
-              get().removePotionFromInventory(itemId);
-              break;
-            case 'equipment':
-              get().removeItemFromInventory(itemId);
-              break;
-            // case 'scroll' will be implemented later
-          }
-        }
-        
-        // Add gold to player
+        // Add gold to player directly
         const totalSalePrice = sellPrice * quantity;
-        get().addGold(totalSalePrice);
+        const newGold = gameState.marketData.gold + totalSalePrice;
         
         // Create and record transaction
         const transaction = createTransaction(
@@ -1408,14 +1446,15 @@ export const useGameStateStore = create<GameStateStore>()(
           'sell'
         );
         
-        // Update player's transaction history
-        const updatedTransactions = [...gameState.marketData.transactions, transaction];
+        // Update entire state to ensure changes are reflected properly
         set({
           gameState: {
             ...gameState,
+            player: updatedPlayer,
             marketData: {
               ...gameState.marketData,
-              transactions: updatedTransactions
+              gold: newGold,
+              transactions: [...gameState.marketData.transactions, transaction]
             }
           }
         });

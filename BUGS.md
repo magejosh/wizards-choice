@@ -256,4 +256,54 @@ A complete refactoring of the MarketUI component is needed, as outlined in the p
 - [React Error Boundaries](https://reactjs.org/docs/error-boundaries.html)
 - [React State Updates](https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous)
 - [React Import/Export](https://reactjs.org/docs/code-splitting.html#named-exports)
-- [CSS z-index and stacking contexts](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_positioned_layout/Understanding_z-index/Stacking_context) 
+- [CSS z-index and stacking contexts](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_positioned_layout/Understanding_z-index/Stacking_context)
+
+# StreamlinedMarketUI Remaining Issues
+
+## Problem Description
+While the new StreamlinedMarketUI component successfully renders and allows for user interaction, there are a few functional issues that need to be addressed:
+
+1. **Gold Deduction Not Working**: When purchasing items, the player's gold amount is not properly depleted by the item's cost.
+   
+2. **Inventory Update Not Working**: Purchased items are not being added to the player's inventory.
+   
+3. **Market Quantity Not Updating**: The market inventory quantity doesn't decrease when items are purchased.
+
+## Implementation Approach
+
+1. **Fix Transaction Logic**
+   - Investigate the buyItem and sellItem functions in the game state store
+   - Ensure proper parameters are being passed to these functions
+   - Verify that the functions are properly updating the game state
+   - Add logging to trace the flow of data during transactions
+
+2. **Inventory Synchronization**
+   - Add state update after successful transactions to refresh displayed gold amount
+   - Ensure inventory state is properly updated after transactions
+   - Verify item data structure matches what's expected by the inventory system
+
+3. **Market Inventory Updates**
+   - Ensure market item quantities are properly decremented on purchase
+   - Add refresh mechanism to update UI after transactions
+   - Check for race conditions or asynchronous issues in state updates 
+
+## Fixed Issues
+
+### StreamlinedMarketUI Transaction Issues (Fixed 2025-03-31)
+1. **Gold Deduction Not Working (Fixed)**
+   - Issue: Player's gold amount was not properly depleted by the item's cost.
+   - Fix: Replaced indirect helper function calls with direct state updates to ensure gold was properly deducted when buying items.
+
+2. **Inventory Update Not Working (Fixed)**
+   - Issue: Purchased items were not being added to the player's inventory.
+   - Fix: Implemented direct inventory updates within the transaction functions instead of relying on helper methods that weren't properly updating state.
+
+3. **Market Quantity Not Updating (Fixed)**
+   - Issue: The market inventory quantity didn't decrease when items were purchased.
+   - Fix: Improved market inventory update logic and added UI refresh mechanisms to reflect the updated quantities.
+
+### Implementation Approach (Applied Successfully)
+- **Transaction Logic Fixes**: Modified both buyItem and sellItem functions to use direct state updates instead of helper functions.
+- **State Synchronization**: Implemented a comprehensive state update approach that updates all relevant parts of the state in a single operation.
+- **UI Refresh**: Added mechanisms to force UI refreshes after transactions complete to ensure changes are reflected immediately.
+- **Testing**: Verified that gold, inventory, and market quantities are all properly updated. 

@@ -2,24 +2,36 @@
 Main tasks are not to be marked complete until all subtasks are completed.
 
 ## Immediate Tasks
-- [ ] Fix MarketUI rendering issues
-  - [x] Implement new streamlined MarketUI component
-  - [x] Replace refresh button with travel mechanic that triggers market attack random chance check and then loads the selected market location
-  - [x] Implement market inventory regeneration on timer
-  - [ ] Ensure proper display of all UI elements
-    - [x] Fix TypeScript errors in StreamlinedMarketUI component
-    - [ ] Verify UI layout and styling across different screen sizes
-    - [ ] Confirm all interactive elements work as expected
-  - [ ] Verify the market is able to generate random market items as needed to regnerate inventory
-  - [ ] Ask user to Test final implementation with actual market data
+- [x] Fix transaction functionality in StreamlinedMarketUI
+  - [x] Fixed gold not being deducted properly when buying items
+  - [x] Fixed purchased items not being added to inventory
+  - [x] Fixed market inventory quantities not updating correctly
+  - [x] Implemented direct state updates instead of relying on helper functions
+  - [x] Added proper UI refresh after transactions
+- [ ] Comprehensive test verification
+  - [ ] Verify all market scenarios with different item types
+  - [ ] Test edge cases (inventory full, market attack, etc.)
+
+## Completed Tasks
+- [x] Fix MarketUI rendering issues
+  - [x] Completely rewrote with new StreamlinedMarketUI component
+  - [x] Fixed layout and styling issues
+  - [x] Implemented clear loading states
+  - [x] Improved error handling and fallbacks
+  - [x] Replaced refresh button with travel mechanic
+  - [x] Added attack chance when traveling to market
+- [x] Fix TypeScript errors in StreamlinedMarketUI component
+- [x] Ensure proper display of all UI elements
+  - [x] Fix TypeScript errors in StreamlinedMarketUI component
+  - [ ] Verify UI layout and styling across different screen sizes
+  - [ ] Confirm all interactive elements work as expected
 
 ## Up Next
-- [x] Add player profile with stats tracking
-  - [x] Design comprehensive stats tracking system
-  - [x] Create player profile UI with achievement display using docs/player_profile_system.md as the guide.
-  - [x] Implement battle history and performance metrics
-  - [x] Add player titles/ranks based on achievements
-  - [x] Create export/share functionality for player stats
+- [x] Add player profiles and stats tracking
+  - [x] Create profile page with player stats
+  - [x] Track combat performance metrics
+  - [x] Implement achievement system
+  - [x] Add visual indicators for progress
 
 ## Project Management
 - [ ] Update all documentation

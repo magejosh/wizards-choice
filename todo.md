@@ -3,12 +3,15 @@ Main tasks are not to be marked complete until all subtasks are completed.
 
 ## Immediate Tasks
 - [ ] Fix MarketUI rendering issues
-  - [ ] Complete MarketUI component refactoring based on BUGS.md plan
-    - [ ] Implement new streamlined MarketUI component
-    - [ ] Replace refresh button with travel mechanic
-    - [ ] Implement market inventory regeneration on timer
-    - [ ] Ensure proper display of all UI elements
-    - [ ] Test final implementation with actual market data
+  - [x] Implement new streamlined MarketUI component
+  - [x] Replace refresh button with travel mechanic that triggers market attack random chance check and then loads the selected market location
+  - [x] Implement market inventory regeneration on timer
+  - [ ] Ensure proper display of all UI elements
+    - [x] Fix TypeScript errors in StreamlinedMarketUI component
+    - [ ] Verify UI layout and styling across different screen sizes
+    - [ ] Confirm all interactive elements work as expected
+  - [ ] Verify the market is able to generate random market items as needed to regnerate inventory
+  - [ ] Ask user to Test final implementation with actual market data
 
 ## Up Next
 - [x] Add player profile with stats tracking

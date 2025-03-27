@@ -66,12 +66,51 @@ After multiple attempts to fix individual issues, we need a complete refactoring
 
 ### Implementation Approach
 
-1. Create a new streamlined MarketUI component with simpler state management
-2. Implement strong error boundaries and visual debugging elements
-3. Ensure proper z-index and display properties to guarantee visibility
-4. Add detailed logging for each step of the market rendering process
-5. Implement the removal of the refresh button and addition of the travel mechanic
-6. Ensure market inventory properly regenerates on a timer (hourly) rather than on demand
+1. **Loading-First Architecture**
+   - Implement a dedicated loading screen that appears immediately when the market UI is opened
+   - Pre-load ALL necessary market data before attempting to render any UI elements
+   - Use explicit loading states with visual feedback (progress indicators, animated elements)
+   - Only transition to the full UI when data readiness is confirmed
+
+2. **Phased Rendering**
+   - Phase 1: Render market selection interface with available markets list only
+   - Phase 2: Only render inventory after market selection and travel completion
+   - Phase 3: Show filtered items only after tab selection and search criteria are applied
+   - Each phase waits for data confirmation before proceeding
+
+3. **Market Selection and Travel Flow**
+   - Allow users to select a market from dropdown without loading that market's inventory
+   - Only load market inventory after the Travel button is clicked and any market attack is resolved
+   - This creates a clear data dependency chain: selection → travel → (possible battle) → inventory loading
+
+4. **Graceful Inventory Regeneration**
+   - Implement market inventory regeneration on a timer (hourly)
+   - Do NOT update inventory while player is viewing the market
+   - Store regeneration events and apply them only when player closes and reopens the market
+   - Add visual indicator if regeneration has occurred since last visit
+
+5. **Atomic State Management**
+   - Use a dedicated reducer for market state to handle complex state transitions as atomic operations
+   - Keep market data in a normalized structure with clear relationships
+   - Implement explicit data synchronization mechanisms instead of relying on React's rendering cycle
+
+6. **Error Prevention and Recovery**
+   - Add comprehensive error boundaries with meaningful fallbacks at multiple levels
+   - Implement data validation checks before any rendering attempt
+   - Include self-healing mechanisms that can recover from incomplete or corrupted state
+   - Provide emergency "reset market data" option for users experiencing persistent issues
+
+7. **Enhanced Debugging**
+   - Add detailed logging for each step of the market rendering process
+   - Include DOM verification to confirm elements are actually being rendered
+   - Track timing of data loading, state updates, and UI rendering phases
+   - Log warnings for unexpected or out-of-sequence operations
+
+8. **Styling and Visibility Guarantees**
+   - Use a combination of CSS modules and critical inline styles for maximum reliability
+   - Implement guaranteed visibility properties for all key UI elements
+   - Set explicit z-index values and positioning to prevent conflicts with other components
+   - Use !important flags sparingly but strategically for critical visibility properties
 
 ## Symptoms
 - Only the background of the MarketUI is visible

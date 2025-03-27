@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2025-03-30
+- Done: Implemented new StreamlinedMarketUI component to resolve rendering issues
+  - Completely rewrote the MarketUI using a phased loading architecture to improve stability
+  - Replaced refresh button with travel mechanic that includes market attack random chance
+  - Implemented proper loading states with visual feedback for each step of the process
+  - Created consistent UI layout with clear sections for market selection, item browsing, and transactions
+  - Added detailed item cards with improved visual design based on rarity
+  - Ensured smooth transition between buy and sell modes with appropriate item filtering
+
 ## 2025-03-29
 - Note: Completed multiple approaches to fix MarketUI rendering issues, but none fully resolved the problem
   - Implemented comprehensive ErrorBoundary around MarketUI component

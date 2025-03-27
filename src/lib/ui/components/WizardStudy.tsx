@@ -5,8 +5,7 @@ import React, { useState, useEffect, ErrorInfo } from 'react';
 import { useGameStateStore } from '../../game-state/gameStateStore';
 import { Wizard, Spell, Equipment, SpellScroll } from '../../types';
 import PotionCraftingScreen from './PotionCraftingScreen';
-import { MarketUI } from './MarketUI';
-import EmergencyMarketUI from './EmergencyMarketUI';
+import StreamlinedMarketUI from './StreamlinedMarketUI';
 import SpellCard from './SpellCard';
 import { PlayerProfileScreen } from './profile/PlayerProfileScreen';
 
@@ -145,91 +144,47 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
   if (isMarketOpen) {
     console.log('WizardStudy: About to render Market UI with error boundary');
     
-    // Use the MarketUI component with proper error handling
-    try {
-      return (
-        <ErrorBoundary
-          fallback={
-            <div style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0,0,0,0.7)',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: '20px',
-              zIndex: 9999999,
-              color: 'white'
-            }}>
-              <h2>Failed to load Market UI</h2>
-              <p>There was an error loading the Market UI. Please try again later.</p>
-              <button 
-                onClick={handleCloseMarket}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: 'white',
-                  color: 'black',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  marginTop: '20px'
-                }}
-              >
-                Return to Study
-              </button>
-            </div>
-          }
-          onError={(error, errorInfo) => {
-            console.error('MarketUI Error:', error);
-            console.error('MarketUI ErrorInfo:', errorInfo);
-          }}
-        >
-          <MarketUI onClose={handleCloseMarket} />
-        </ErrorBoundary>
-      );
-    } catch (err) {
-      console.error('WizardStudy: Error rendering MarketUI component:', err);
-      
-      // Fallback UI if there's an error creating the ErrorBoundary
-      return (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: '#ff6b6b',
-          color: 'white',
-          zIndex: 9999999,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: '20px'
-        }}>
-          <h1>Critical Error</h1>
-          <p>Something went wrong while trying to render the Market UI.</p>
-          <button
-            onClick={handleCloseMarket}
-            style={{
-              padding: '10px 20px',
-              marginTop: '20px',
-              backgroundColor: 'white',
-              color: 'black',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}
-          >
-            Return to Study
-          </button>
-        </div>
-      );
-    }
+    // Use the StreamlinedMarketUI component with proper error handling
+    return (
+      <ErrorBoundary
+        fallback={
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '20px',
+            zIndex: 9999999,
+            color: 'white'
+          }}>
+            <h2>Failed to load Market UI</h2>
+            <p>There was an error loading the Market UI. Please try again later.</p>
+            <button 
+              onClick={handleCloseMarket}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: 'white',
+                color: 'black',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                marginTop: '20px'
+              }}
+            >
+              Return to Study
+            </button>
+          </div>
+        }
+      >
+        <StreamlinedMarketUI onClose={handleCloseMarket} />
+      </ErrorBoundary>
+    );
   }
 
   // If player profile is open, render the profile screen

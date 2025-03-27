@@ -1,5 +1,78 @@
 # CHANGELOG
 
+## 2025-03-29
+- Note: Completed multiple approaches to fix MarketUI rendering issues, but none fully resolved the problem
+  - Implemented comprehensive ErrorBoundary around MarketUI component
+  - Added detailed performance monitoring to identify bottlenecks and race conditions
+  - Resolved CSS module duplication by consolidating MarketUI.module.css files
+  - Removed duplicate CSS file in src/lib/ui/components/styles
+  - Ensured consistent import paths across all components
+  - Tested switching back to CSS modules from inline styles
+  - Created simple version using CSS modules to verify styles apply correctly
+  - Refactored component to use CSS modules instead of inline styles
+  - Tested with mock data to determine if issues were related to data structure or timing
+  - Created mock market data for testing
+  - Implemented fallbacks for empty or malformed data
+  - Fixed linter errors related to the market attack functionality
+  - Resolved import/export mismatch between WizardStudy and MarketUI
+  - Fixed component recursion problem causing infinite rendering loop
+  - Diagnosed MarketUI visibility issues with emergency implementations
+  - Created refactoring plan with detailed component structure in BUGS.md
+  - After multiple unsuccessful approaches, decided to create a complete refactoring plan for the MarketUI
+
+## 2025-03-28
+- Done: Completed MarketUI rendering improvements and refactoring
+  - Fixed import/export mismatch between WizardStudy and MarketUI components
+  - Fully transitioned MarketUI to use CSS modules instead of inline styles
+  - Fixed function calls for market attack functionality to match their signatures
+  - Enhanced error handling with comprehensive fallbacks for empty or malformed data
+  - Added ErrorBoundary component with CSS-styled fallback UI 
+  - Ensured consistent import paths across all components
+  - Resolved CSS module duplication by consolidating styles
+
+## 2025-03-27
+- Done: Improved MarketUI component stability and usability
+  - Implemented comprehensive ErrorBoundary around MarketUI component to catch and log specific React errors
+  - Added detailed performance monitoring utilities to identify bottlenecks and race conditions 
+  - Removed duplicate CSS module files to resolve style conflicts
+  - Created simplified version of MarketUI using CSS modules to verify styling issues
+  - Implemented mock market data for consistent testing and debugging
+  - Enhanced error handling for market data loading and processing
+
+## 2025-03-26
+- Done: Fixed UI integration bugs in player profile and market systems
+  - Updated PlayerProfileScreen to use useGameStateStore instead of useGameState for consistent state management
+  - Fixed market screen navigation issue by changing router handling during market attacks
+  - Improved error handling in component state transitions
+  - Ensured proper integration between the Wizard's Study, Profile, and Market components
+
+## 2025-03-26
+- Done: Moved player profile button to Wizard's Study screen
+  - Relocated profile button from main menu to Wizard's Study for better integration with character management
+  - Added profile button under player name and level in the top right corner
+  - Styled button to match existing UI design language
+  - Designed for future expansion to support multiple character saves (up to 3)
+
+## 2025-03-26
+- Done: Created comprehensive documentation for Player Profile and Stats Tracking System
+  - Designed detailed specifications for player statistics tracking across combat, progression, and collection categories
+  - Defined achievement system with categories, examples, and reward mechanics
+  - Created title/rank system with progression paths and gameplay bonuses
+  - Designed battle history logging system for performance tracking
+  - Implemented export/share functionality specifications
+  - Added process maps for Player Profile System and UI navigation flow
+  - Documented technical considerations for data management and performance optimization
+
+## 2025-03-26
+- Done: Fixed React state management issues in Market system
+  - Fixed React state update error in the MarketUI component by implementing proper state management with useEffect and local component state
+  - Optimized getMarkets function to prevent React rendering errors by deferring state updates with setTimeout
+  - Updated technical documentation with new Market UI state management best practices
+  - Added detailed process map for Market UI Component state flow
+  - Updated UI Components section of technical documentation with MarketUI details
+  - Completed all UI reorganization tasks in Wizard's Study screen
+  - Consolidated navigation by merging inventory-related functionality into a single Inventory button
+
 ## 2025-03-25
 - Done: Added marketplace attacks feature
   - Implemented random attack chances when leaving markets based on market level and difficulty

@@ -1,14 +1,25 @@
 .marketContainer {
-  display: flex;
+  display: flex !important;
   flex-direction: column;
-  width: 100%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
   max-width: 1200px;
+  height: auto;
+  min-height: 300px;
+  max-height: 90vh;
   margin: 0 auto;
   padding: 20px;
   background-color: #f0f0f0;
   border-radius: 8px;
   color: #333;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 9999999;
+  overflow: auto;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .marketHeader {
@@ -24,6 +35,15 @@
   margin: 0;
   color: #4a2c82;
   font-size: 28px;
+  flex: 1;
+}
+
+.marketHeader .marketControls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 0;
 }
 
 .goldAmount {
@@ -105,6 +125,16 @@
 
 .refreshButton:hover {
   background-color: #4a2c82;
+}
+
+.refreshButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.refreshButton:disabled:hover {
+  background-color: #cccccc;
 }
 
 .tabContainer {
@@ -202,19 +232,18 @@
 }
 
 .itemCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .selectedCard {
-  box-shadow: 0 0 0 3px #6d4ca3, 0 5px 15px rgba(0, 0, 0, 0.1);
-  transform: translateY(-5px);
+  border-width: 3px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .itemHeader {
-  background-color: #6d4ca3;
-  color: white;
   padding: 10px;
+  color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -226,11 +255,11 @@
 }
 
 .rarityBadge {
-  background-color: rgba(255, 255, 255, 0.2);
-  padding: 3px 6px;
-  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 2px 6px;
+  border-radius: 3px;
   font-size: 12px;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 
 .itemDetails {
@@ -240,13 +269,15 @@
 .itemDetails p {
   margin: 0 0 10px 0;
   font-size: 14px;
+  color: #666;
 }
 
 .itemProperties {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  font-size: 14px;
+  font-size: 12px;
+  color: #666;
 }
 
 .marketData {
@@ -255,16 +286,7 @@
   border-top: 1px solid #eee;
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  font-size: 14px;
-}
-
-.price {
-  font-weight: bold;
-  color: #d4af37;
-}
-
-.supplyDemand {
+  gap: 5px;
   font-size: 12px;
   color: #666;
 }
@@ -272,32 +294,28 @@
 .transactionPanel {
   flex: 1;
   background-color: white;
-  border-radius: 6px;
   padding: 20px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .transactionPanel h3 {
-  margin: 0;
+  margin: 0 0 10px 0;
   color: #4a2c82;
 }
 
 .transactionPanel h4 {
-  margin: 0;
+  margin: 0 0 20px 0;
   color: #333;
-  font-size: 18px;
 }
 
 .quantitySelector {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  margin-bottom: 20px;
 }
 
 .quantitySelector label {
+  display: block;
+  margin-bottom: 5px;
   font-weight: bold;
 }
 
@@ -308,44 +326,46 @@
 }
 
 .quantityControls button {
-  width: 30px;
-  height: 30px;
-  border: none;
   background-color: #6d4ca3;
   color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
   border-radius: 4px;
-  font-size: 18px;
   cursor: pointer;
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.quantityControls button:hover {
+  background-color: #4a2c82;
+}
+
 .quantityControls span {
-  width: 40px;
+  min-width: 30px;
   text-align: center;
   font-weight: bold;
 }
 
 .priceCalculation {
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   gap: 5px;
-  background-color: #f0f0f0;
-  padding: 10px;
-  border-radius: 4px;
 }
 
 .transactionButton {
+  width: 100%;
+  padding: 12px;
   background-color: #6d4ca3;
   color: white;
   border: none;
-  padding: 10px;
   border-radius: 4px;
-  font-weight: bold;
   cursor: pointer;
+  font-weight: bold;
   transition: background-color 0.3s;
-  margin-top: 10px;
 }
 
 .transactionButton:hover:not(:disabled) {
@@ -358,24 +378,27 @@
 }
 
 .transactionMessage {
-  background-color: #f0f0f0;
+  margin-top: 10px;
   padding: 10px;
   border-radius: 4px;
-  text-align: center;
-  font-weight: bold;
-}
-
-.emptyMessage {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 4px;
+  background-color: #f8f8f8;
   color: #666;
 }
 
-/* Modal overlay for market attacks */
 .modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.attackModal {
   position: fixed;
   top: 0;
   left: 0;
@@ -383,73 +406,361 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
 }
 
-.attackModal {
-  background-color: #f0f0f0;
+.modalContent {
+  background-color: white;
+  padding: 30px;
   border-radius: 8px;
-  padding: 20px;
-  width: 90%;
   max-width: 500px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   text-align: center;
-  border: 3px solid #6d4ca3;
 }
 
 .attackModal h2 {
-  color: #e74c3c;
-  margin-top: 0;
-  font-size: 24px;
+  margin: 0 0 20px 0;
+  color: #4a2c82;
 }
 
 .attackModal p {
-  margin: 10px 0;
-  font-size: 16px;
+  margin: 0 0 20px 0;
+  color: #666;
 }
 
 .attackModalButtons {
   display: flex;
-  justify-content: space-around;
-  margin-top: 20px;
+  gap: 10px;
+  justify-content: center;
+}
+
+.duelButton, .fleeButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
 }
 
 .duelButton {
-  background-color: #e74c3c;
+  background-color: #6d4ca3;
   color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
 }
 
 .duelButton:hover {
-  background-color: #c0392b;
+  background-color: #4a2c82;
 }
 
 .fleeButton {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  background-color: #e8e3f0;
+  color: #4a2c82;
 }
 
 .fleeButton:hover {
-  background-color: #2980b9;
+  background-color: #d5c8f0;
 }
 
 .modalMessage {
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  color: #666;
+}
+
+.loadingMessage, .errorMessage {
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+  color: #666;
+}
+
+.errorMessage {
+  color: #dc3545;
+}
+
+.emptyMessage {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Error Boundary styles */
+.errorContainer {
+  padding: 20px;
+  margin: 20px;
+  background-color: #fff0f0;
+  border: 1px solid #ffcccc;
+  border-radius: 4px;
+  color: #990000;
+}
+
+.errorContainer h2 {
+  color: #990000;
+  margin-top: 0;
+}
+
+.errorCloseButton {
+  padding: 8px 16px;
+  background-color: #6d4ca3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.errorCloseButton:hover {
+  background-color: #4a2c82;
+}
+
+/* New styles for the simplified market approach */
+.refreshInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-end;
+  margin-left: 10px;
+}
+
+.refreshInfo p {
+  margin: 0;
+  font-size: 14px;
+  font-style: italic;
+  color: #666;
+}
+
+.refreshAllButton {
+  background-color: #6d4ca3;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.refreshAllButton:hover {
+  background-color: #4a2c82;
+}
+
+.globalMessage {
+  background-color: #e8f0e3;
+  border: 1px solid #a3c293;
+  color: #2c7a4a;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+/* Add missing class definitions */
+.mainContent {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.itemsListing {
+  flex: 3;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.tabNavigation {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.tab, .activeTab {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.tab {
+  background-color: #e8e3f0;
+  color: #4a2c82;
+}
+
+.tab:hover {
+  background-color: #d5c8f0;
+}
+
+.activeTab {
+  background-color: #6d4ca3;
+  color: white;
+}
+
+.buySellToggle {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+.buySell, .activeBuySell {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  flex: 1;
+  max-width: 100px;
+}
+
+.buySell {
+  background-color: #e8e3f0;
+  color: #4a2c82;
+}
+
+.buySell:hover {
+  background-color: #d5c8f0;
+}
+
+.activeBuySell {
+  background-color: #6d4ca3;
+  color: white;
+}
+
+.noItems {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 30px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  color: #666;
+  font-style: italic;
+}
+
+.selectedItem {
+  flex: 1;
+  min-width: 300px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.buySellButton {
+  padding: 10px 15px;
+  background-color: #6d4ca3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.buySellButton:hover {
+  background-color: #4a2c82;
+}
+
+.disabledButton {
+  padding: 10px 15px;
+  background-color: #cccccc;
+  color: #666666;
+  border: none;
+  border-radius: 4px;
+  cursor: not-allowed;
+  font-weight: bold;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.message {
   margin-top: 15px;
   padding: 10px;
-  background-color: #f8f9fa;
+  background-color: #e8f0e3;
+  color: #2c7a4a;
   border-radius: 4px;
+  text-align: center;
+}
+
+.errorCard {
+  padding: 10px;
+  background-color: #ffcccc;
+  color: #990000;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Missing button group styles */
+.buttonGroup {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.fightButton, .fleeButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
   font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.fightButton {
+  background-color: #6d4ca3;
+  color: white;
+}
+
+.fightButton:hover {
+  background-color: #4a2c82;
+}
+
+.fleeButton {
+  background-color: #e8e3f0;
+  color: #4a2c82;
+}
+
+.fleeButton:hover {
+  background-color: #d5c8f0;
+}
+
+.quantityButton {
+  width: 30px;
+  height: 30px;
+  background-color: #6d4ca3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantityButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.priceDetails {
+  margin: 15px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 } 

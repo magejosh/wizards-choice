@@ -862,6 +862,9 @@ button:disabled {
 
 .wizard-study__player-info {
   text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .wizard-study__player-name {
@@ -873,6 +876,23 @@ button:disabled {
 .wizard-study__player-level {
   color: var(--primary-light);
   font-size: var(--font-size-md);
+  margin-bottom: var(--spacing-xs);
+}
+
+.wizard-study__profile-button {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-md);
+  background-color: transparent;
+  border: 1px solid var(--primary-main);
+  color: var(--primary-main);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wizard-study__profile-button:hover {
+  background-color: rgba(106, 61, 232, 0.1);
+  transform: translateY(-1px);
 }
 
 .wizard-study__content {

@@ -15,7 +15,15 @@ import {
   MarketData,
   MarketTransaction,
   MarketItem,
-  SpellScroll
+  SpellScroll,
+  // Add new profile system types
+  Achievement,
+  PlayerTitle,
+  BattleRecord,
+  PlayerStats,
+  SpellType,
+  ElementType,
+  MarketInventory
 } from '../types';
 import { generateDefaultWizard } from '../wizard/wizardUtils';
 import { getDefaultSpells } from '../spells/spellData';
@@ -26,6 +34,12 @@ import {
   shouldRefreshMarketInventory,
   createTransaction
 } from '../features/market/marketSystem';
+import { 
+  generateRandomIngredient,
+  generateRandomPotion,
+  generateRandomEquipment,
+  generateRandomScroll
+} from '../features/items/itemGenerators';
 import { 
   shouldMarketAttackOccur,
   generateMarketAttacker,
@@ -44,6 +58,64 @@ const initialGameState: GameState = {
     unlockedSpells: [],
     currentLocation: 'wizardStudy',
     questProgress: {},
+    // Initialize player profile data
+    achievements: [],
+    titles: [],
+    battleHistory: [],
+    playerStats: {
+      // Combat Statistics
+      battlesTotal: 0,
+      battlesWon: 0,
+      battlesLost: 0,
+      damageDealt: 0,
+      damageReceived: 0,
+      healingDone: 0,
+      criticalHitsLanded: 0,
+      criticalHitsReceived: 0,
+      spellsCast: {
+        total: 0,
+        byType: {},
+        byElement: {}
+      },
+      mysticPunchesUsed: 0,
+      totalTurns: 0,
+      longestBattle: 0,
+      shortestVictory: 0,
+      flawlessVictories: 0,
+
+      // Progression Statistics
+      totalExperienceGained: 0,
+      goldEarned: 0,
+      goldSpent: 0,
+      levelsGained: 0,
+      skillPointsSpent: 0,
+
+      // Collection Statistics
+      spellsAcquired: 0,
+      equipmentCollected: 0,
+      potionsCrafted: 0,
+      ingredientsGathered: 0,
+      recipesDiscovered: 0,
+      scrollsUsed: 0,
+
+      // Efficiency Metrics
+      damagePerMana: 0,
+      averageTurnsPerVictory: 0,
+      goldPerBattle: 0,
+      experiencePerBattle: 0,
+      
+      // By Element Damage
+      elementalDamage: {
+        fire: 0,
+        water: 0,
+        earth: 0,
+        air: 0,
+        arcane: 0,
+        nature: 0,
+        shadow: 0,
+        light: 0
+      }
+    }
   },
   settings: {
     difficulty: 'normal',
@@ -179,6 +251,55 @@ interface GameStateStore {
   };
   checkIfWizardKnowsSpell: (spellId: string) => boolean;
   checkIfScrollSpellKnown: (scrollId: string) => boolean;
+  
+  // Player Profile System methods
+  
+  // Achievement methods
+  getAchievements: () => Achievement[];
+  getAchievementById: (achievementId: string) => Achievement | undefined;
+  updateAchievementProgress: (achievementId: string, progress: number) => void;
+  checkAchievementCompletion: (achievementId: string) => boolean;
+  unlockAchievement: (achievementId: string) => {
+    success: boolean;
+    achievement?: Achievement;
+    reward?: any;
+  };
+  
+  // Title methods
+  getTitles: () => PlayerTitle[];
+  getTitleById: (titleId: string) => PlayerTitle | undefined;
+  checkTitleUnlockRequirements: (titleId: string) => boolean;
+  unlockTitle: (titleId: string) => {
+    success: boolean;
+    title?: PlayerTitle;
+  };
+  equipTitle: (titleId: string) => void;
+  unequipTitle: (titleId: string) => void;
+  
+  // Battle history methods
+  getBattleHistory: () => BattleRecord[];
+  addBattleRecord: (record: Omit<BattleRecord, 'id' | 'date'>) => void;
+  getBattleRecordById: (recordId: string) => BattleRecord | undefined;
+  clearBattleHistory: () => void;
+  
+  // Player stats methods
+  getPlayerStats: () => PlayerStats;
+  updatePlayerStats: (stats: Partial<PlayerStats>) => void;
+  recordSpellCast: (spell: Spell) => void;
+  recordDamageDealt: (amount: number, element?: ElementType) => void;
+  recordDamageReceived: (amount: number) => void;
+  recordHealingDone: (amount: number) => void;
+  recordCriticalHit: (isPlayer: boolean) => void;
+  recordMysticPunchUsed: () => void;
+  recordBattleResult: (won: boolean, turns: number, flawless: boolean) => void;
+  recordGoldTransaction: (amount: number, isEarned: boolean) => void;
+  recordExperienceGained: (amount: number) => void;
+  recordItemAcquired: (type: 'spell' | 'equipment' | 'potion' | 'ingredient' | 'recipe' | 'scroll') => void;
+  
+  // Export methods
+  exportPlayerProfile: () => string;
+  exportBattleHistory: () => string;
+  exportAchievements: () => string;
 }
 
 // Create the game state store with persistence
@@ -230,6 +351,63 @@ export const useGameStateStore = create<GameStateStore>()(
               unlockedSpells: defaultSpells.map(spell => spell.id),
               currentLocation: 'wizardStudy',
               questProgress: {},
+              achievements: [],
+              titles: [],
+              battleHistory: [],
+              playerStats: {
+                // Combat Statistics
+                battlesTotal: 0,
+                battlesWon: 0,
+                battlesLost: 0,
+                damageDealt: 0,
+                damageReceived: 0,
+                healingDone: 0,
+                criticalHitsLanded: 0,
+                criticalHitsReceived: 0,
+                spellsCast: {
+                  total: 0,
+                  byType: {},
+                  byElement: {}
+                },
+                mysticPunchesUsed: 0,
+                totalTurns: 0,
+                longestBattle: 0,
+                shortestVictory: 0,
+                flawlessVictories: 0,
+
+                // Progression Statistics
+                totalExperienceGained: 0,
+                goldEarned: 0,
+                goldSpent: 0,
+                levelsGained: 0,
+                skillPointsSpent: 0,
+
+                // Collection Statistics
+                spellsAcquired: 0,
+                equipmentCollected: 0,
+                potionsCrafted: 0,
+                ingredientsGathered: 0,
+                recipesDiscovered: 0,
+                scrollsUsed: 0,
+
+                // Efficiency Metrics
+                damagePerMana: 0,
+                averageTurnsPerVictory: 0,
+                goldPerBattle: 0,
+                experiencePerBattle: 0,
+                
+                // By Element Damage
+                elementalDamage: {
+                  fire: 0,
+                  water: 0,
+                  earth: 0,
+                  air: 0,
+                  arcane: 0,
+                  nature: 0,
+                  shadow: 0,
+                  light: 0
+                }
+              }
             },
             marketData: {
               gold: 100, // Starting gold
@@ -828,24 +1006,26 @@ export const useGameStateStore = create<GameStateStore>()(
 
       // Market system functions
       getMarkets: () => {
-        // Check if markets need inventory refresh
         const { gameState } = get();
         
-        // Ensure markets array exists
+        // Ensure markets array exists and is initialized
         if (!gameState.markets || !Array.isArray(gameState.markets)) {
-          // Initialize with empty array if markets doesn't exist
+          const initializedMarkets = initializeMarkets();
           set({
             gameState: {
-              ...gameState,
-              markets: []
+              ...get().gameState,
+              markets: initializedMarkets
             }
           });
-          return [];
+          return initializedMarkets;
         }
         
+        // Update prices and refresh inventory for all markets
         const updatedMarkets = gameState.markets.map(market => {
-          // Update prices for all markets
-          let updatedMarket = updateMarketPrices(market);
+          let updatedMarket = { ...market };
+          
+          // Update prices
+          updatedMarket = updateMarketPrices(updatedMarket);
           
           // Check if inventory needs refreshing
           if (shouldRefreshMarketInventory(updatedMarket)) {
@@ -859,7 +1039,7 @@ export const useGameStateStore = create<GameStateStore>()(
         if (JSON.stringify(updatedMarkets) !== JSON.stringify(gameState.markets)) {
           set({
             gameState: {
-              ...gameState,
+              ...get().gameState,
               markets: updatedMarkets
             }
           });
@@ -1488,17 +1668,816 @@ export const useGameStateStore = create<GameStateStore>()(
         }
         
         return wizardKnowsScrollSpell(gameState.player, scroll);
-      }
+      },
+      
+      // Player Profile System methods
+      
+      // Achievement methods
+      getAchievements: () => {
+        return get().gameState.gameProgress.achievements || [];
+      },
+      
+      getAchievementById: (achievementId: string) => {
+        const achievements = get().gameState.gameProgress.achievements || [];
+        return achievements.find(achievement => achievement.id === achievementId);
+      },
+      
+      updateAchievementProgress: (achievementId: string, progress: number) => {
+        const { gameState } = get();
+        const achievements = [...(gameState.gameProgress.achievements || [])];
+        const achievementIndex = achievements.findIndex(a => a.id === achievementId);
+        
+        if (achievementIndex === -1) return;
+        
+        const achievement = { ...achievements[achievementIndex] };
+        achievement.progress = Math.min(achievement.requiredProgress, achievement.progress + progress);
+        
+        achievements[achievementIndex] = achievement;
+        
+        // Check if the achievement is now completed
+        if (achievement.progress >= achievement.requiredProgress && !achievement.unlocked) {
+          get().unlockAchievement(achievementId);
+        } else {
+          set({
+            gameState: {
+              ...gameState,
+              gameProgress: {
+                ...gameState.gameProgress,
+                achievements
+              }
+            }
+          });
+        }
+      },
+      
+      checkAchievementCompletion: (achievementId: string) => {
+        const achievement = get().getAchievementById(achievementId);
+        if (!achievement) return false;
+        
+        return achievement.progress >= achievement.requiredProgress;
+      },
+      
+      unlockAchievement: (achievementId: string) => {
+        const { gameState } = get();
+        const achievements = [...(gameState.gameProgress.achievements || [])];
+        const achievementIndex = achievements.findIndex(a => a.id === achievementId);
+        
+        if (achievementIndex === -1) {
+          return { success: false };
+        }
+        
+        const achievement = { ...achievements[achievementIndex] };
+        
+        // Already unlocked
+        if (achievement.unlocked) {
+          return { success: false, achievement };
+        }
+        
+        // Update achievement
+        achievement.unlocked = true;
+        achievement.unlockedDate = new Date();
+        achievements[achievementIndex] = achievement;
+        
+        // Apply the reward if there is one
+        let reward;
+        if (achievement.reward) {
+          switch (achievement.reward.type) {
+            case 'stat_bonus':
+              if (achievement.reward.stat && achievement.reward.value) {
+                // Apply stat bonus to player
+                const player = { ...gameState.player };
+                
+                // Handle different stats
+                if (achievement.reward.stat === 'maxHealth') {
+                  player.maxHealth += achievement.reward.value;
+                  player.health = player.maxHealth; // Heal to new max
+                } else if (achievement.reward.stat === 'maxMana') {
+                  player.maxMana += achievement.reward.value;
+                  player.mana = player.maxMana; // Restore to new max
+                } else if (achievement.reward.stat === 'manaRegen') {
+                  player.manaRegen += achievement.reward.value;
+                }
+                
+                reward = { stat: achievement.reward.stat, value: achievement.reward.value };
+                
+                set({
+                  gameState: {
+                    ...gameState,
+                    player,
+                    gameProgress: {
+                      ...gameState.gameProgress,
+                      achievements
+                    }
+                  }
+                });
+              }
+              break;
+              
+            case 'gold':
+              get().addGold(achievement.reward.value);
+              reward = { gold: achievement.reward.value };
+              
+              set({
+                gameState: {
+                  ...gameState,
+                  gameProgress: {
+                    ...gameState.gameProgress,
+                    achievements
+                  }
+                }
+              });
+              break;
+              
+            // Handle other reward types as needed
+            default:
+              set({
+                gameState: {
+                  ...gameState,
+                  gameProgress: {
+                    ...gameState.gameProgress,
+                    achievements
+                  }
+                }
+              });
+          }
+        } else {
+          set({
+            gameState: {
+              ...gameState,
+              gameProgress: {
+                ...gameState.gameProgress,
+                achievements
+              }
+            }
+          });
+        }
+        
+        return { success: true, achievement, reward };
+      },
+      
+      // Title methods
+      getTitles: () => {
+        return get().gameState.gameProgress.titles || [];
+      },
+      
+      getTitleById: (titleId: string) => {
+        const titles = get().gameState.gameProgress.titles || [];
+        return titles.find(title => title.id === titleId);
+      },
+      
+      checkTitleUnlockRequirements: (titleId: string) => {
+        const { gameState } = get();
+        const title = get().getTitleById(titleId);
+        
+        if (!title) return false;
+        
+        // Check player level requirement
+        if (title.requiredLevel && gameState.player.level < title.requiredLevel) {
+          return false;
+        }
+        
+        // Check achievement requirements
+        if (title.requiredAchievements && title.requiredAchievements.length > 0) {
+          const achievements = gameState.gameProgress.achievements || [];
+          const unlockedAchievementIds = achievements
+            .filter(a => a.unlocked)
+            .map(a => a.id);
+            
+          for (const requiredAchievementId of title.requiredAchievements) {
+            if (!unlockedAchievementIds.includes(requiredAchievementId)) {
+              return false;
+            }
+          }
+        }
+        
+        // Check stat requirements
+        if (title.requiredStats && title.requiredStats.length > 0) {
+          const playerStats = gameState.gameProgress.playerStats;
+          if (!playerStats) return false;
+          
+          for (const statReq of title.requiredStats) {
+            // Check against the appropriate player stat
+            const statValue = (playerStats as any)[statReq.stat];
+            if (typeof statValue === 'undefined' || statValue < statReq.value) {
+              return false;
+            }
+          }
+        }
+        
+        return true;
+      },
+      
+      unlockTitle: (titleId: string) => {
+        const { gameState } = get();
+        const titles = [...(gameState.gameProgress.titles || [])];
+        const titleIndex = titles.findIndex(t => t.id === titleId);
+        
+        if (titleIndex === -1) {
+          return { success: false };
+        }
+        
+        const title = { ...titles[titleIndex] };
+        
+        // Already unlocked
+        if (title.unlocked) {
+          return { success: false, title };
+        }
+        
+        // Check requirements
+        if (!get().checkTitleUnlockRequirements(titleId)) {
+          return { success: false };
+        }
+        
+        // Update title
+        title.unlocked = true;
+        title.unlockedDate = new Date();
+        titles[titleIndex] = title;
+        
+        set({
+          gameState: {
+            ...gameState,
+            gameProgress: {
+              ...gameState.gameProgress,
+              titles
+            }
+          }
+        });
+        
+        return { success: true, title };
+      },
+      
+      equipTitle: (titleId: string) => {
+        const { gameState } = get();
+        const titles = [...(gameState.gameProgress.titles || [])];
+        
+        // First unequip any currently equipped title
+        const updatedTitles = titles.map(title => ({
+          ...title,
+          equipped: title.id === titleId && title.unlocked
+        }));
+        
+        set({
+          gameState: {
+            ...gameState,
+            gameProgress: {
+              ...gameState.gameProgress,
+              titles: updatedTitles
+            }
+          }
+        });
+      },
+      
+      unequipTitle: (titleId: string) => {
+        const { gameState } = get();
+        const titles = [...(gameState.gameProgress.titles || [])];
+        const titleIndex = titles.findIndex(t => t.id === titleId);
+        
+        if (titleIndex === -1) return;
+        
+        const title = { ...titles[titleIndex], equipped: false };
+        titles[titleIndex] = title;
+        
+        set({
+          gameState: {
+            ...gameState,
+            gameProgress: {
+              ...gameState.gameProgress,
+              titles
+            }
+          }
+        });
+      },
+      
+      // Battle history methods
+      getBattleHistory: () => {
+        return get().gameState.gameProgress.battleHistory || [];
+      },
+      
+      addBattleRecord: (record) => {
+        const { gameState } = get();
+        const battleHistory = [...(gameState.gameProgress.battleHistory || [])];
+        
+        // Create new record with ID and date
+        const newRecord: BattleRecord = {
+          ...record,
+          id: `battle-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          date: new Date().toISOString()
+        };
+        
+        // Add to the beginning of the array (most recent first)
+        battleHistory.unshift(newRecord);
+        
+        // Limit to 50 battles to prevent excessive storage
+        const limitedHistory = battleHistory.slice(0, 50);
+        
+        set({
+          gameState: {
+            ...gameState,
+            gameProgress: {
+              ...gameState.gameProgress,
+              battleHistory: limitedHistory
+            }
+          }
+        });
+      },
+      
+      getBattleRecordById: (recordId: string) => {
+        const battleHistory = get().gameState.gameProgress.battleHistory || [];
+        return battleHistory.find(record => record.id === recordId);
+      },
+      
+      clearBattleHistory: () => {
+        const { gameState } = get();
+        
+        set({
+          gameState: {
+            ...gameState,
+            gameProgress: {
+              ...gameState.gameProgress,
+              battleHistory: []
+            }
+          }
+        });
+      },
+      
+      // Player stats methods
+      getPlayerStats: () => {
+        return get().gameState.gameProgress.playerStats || initialGameState.gameProgress.playerStats!;
+      },
+      
+      updatePlayerStats: (stats) => {
+        const { gameState } = get();
+        const currentStats = gameState.gameProgress.playerStats || initialGameState.gameProgress.playerStats!;
+        
+        set({
+          gameState: {
+            ...gameState,
+            gameProgress: {
+              ...gameState.gameProgress,
+              playerStats: {
+                ...currentStats,
+                ...stats
+              }
+            }
+          }
+        });
+      },
+      
+      recordSpellCast: (spell) => {
+        const { gameState } = get();
+        const currentStats = gameState.gameProgress.playerStats || initialGameState.gameProgress.playerStats!;
+        
+        // Update total spells cast
+        const spellsCast = { 
+          ...currentStats.spellsCast,
+          total: currentStats.spellsCast.total + 1
+        };
+        
+        // Update by spell type
+        const byType = { ...currentStats.spellsCast.byType };
+        byType[spell.type] = (byType[spell.type] || 0) + 1;
+        spellsCast.byType = byType;
+        
+        // Update by element
+        const byElement = { ...currentStats.spellsCast.byElement };
+        byElement[spell.element] = (byElement[spell.element] || 0) + 1;
+        spellsCast.byElement = byElement;
+        
+        // Update the stats
+        get().updatePlayerStats({ spellsCast });
+      },
+      
+      recordDamageDealt: (amount, element) => {
+        const { gameState } = get();
+        const currentStats = gameState.gameProgress.playerStats || initialGameState.gameProgress.playerStats!;
+        
+        const updates: Partial<PlayerStats> = {
+          damageDealt: currentStats.damageDealt + amount
+        };
+        
+        // If element is provided, update elemental damage
+        if (element) {
+          const elementalDamage = { ...currentStats.elementalDamage };
+          elementalDamage[element] = (elementalDamage[element] || 0) + amount;
+          updates.elementalDamage = elementalDamage;
+        }
+        
+        // Update the stats
+        get().updatePlayerStats(updates);
+      },
+      
+      recordDamageReceived: (amount) => {
+        const { gameState } = get();
+        const currentStats = gameState.gameProgress.playerStats || initialGameState.gameProgress.playerStats!;
+        
+        get().updatePlayerStats({
+          damageReceived: currentStats.damageReceived + amount
+        });
+      },
+      
+      recordHealingDone: (amount) => {
+        const { gameState } = get();
+        const currentStats = gameState.gameProgress.playerStats || initialGameState.gameProgress.playerStats!;
+        
+        get().updatePlayerStats({
+          healingDone: currentStats.healingDone + amount
+        });
+      },
+      
+      recordCriticalHit: (isPlayer) => {
+        const { gameState } = get();
+        const currentStats = gameState.gameProgress.playerStats || initialGameState.gameProgress.playerStats!;
+        
+        if (isPlayer) {
+          get().updatePlayerStats({
+            criticalHitsLanded: currentStats.criticalHitsLanded + 1
+          });
+        } else {
+          get().updatePlayerStats({
+            criticalHitsReceived: currentStats.criticalHitsReceived + 1
+          });
+        }
+      },
+      
+      recordMysticPunchUsed: () => {
+        const { gameState } = get();
+        const currentStats = gameState.gameProgress.playerStats || initialGameState.gameProgress.playerStats!;
+        
+        get().updatePlayerStats({
+          mysticPunchesUsed: currentStats.mysticPunchesUsed + 1
+        });
+      },
+      
+      recordBattleResult: (won, turns, flawless) => {
+        const { gameState } = get();
+        const currentStats = gameState.gameProgress.playerStats || initialGameState.gameProgress.playerStats!;
+        
+        const updates: Partial<PlayerStats> = {
+          battlesTotal: currentStats.battlesTotal + 1,
+          totalTurns: currentStats.totalTurns + turns
+        };
+        
+        if (won) {
+          updates.battlesWon = currentStats.battlesWon + 1;
+          
+          // Update shortest victory if applicable
+          if (currentStats.shortestVictory === 0 || turns < currentStats.shortestVictory) {
+            updates.shortestVictory = turns;
+          }
+          
+          // Update average turns per victory
+          const totalVictories = currentStats.battlesWon + 1; // Include this victory
+          updates.averageTurnsPerVictory = (currentStats.averageTurnsPerVictory * (totalVictories - 1) + turns) / totalVictories;
+          
+          // Track flawless victories
+          if (flawless) {
+            updates.flawlessVictories = currentStats.flawlessVictories + 1;
+          }
+        } else {
+          updates.battlesLost = currentStats.battlesLost + 1;
+        }
+        
+        // Update longest battle if applicable
+        if (turns > currentStats.longestBattle) {
+          updates.longestBattle = turns;
+        }
+        
+        get().updatePlayerStats(updates);
+      },
+      
+      recordGoldTransaction: (amount, isEarned) => {
+        const { gameState } = get();
+        const currentStats = gameState.gameProgress.playerStats || initialGameState.gameProgress.playerStats!;
+        
+        if (isEarned) {
+          get().updatePlayerStats({
+            goldEarned: currentStats.goldEarned + amount
+          });
+        } else {
+          get().updatePlayerStats({
+            goldSpent: currentStats.goldSpent + amount
+          });
+        }
+      },
+      
+      recordExperienceGained: (amount) => {
+        const { gameState } = get();
+        const currentStats = gameState.gameProgress.playerStats || initialGameState.gameProgress.playerStats!;
+        
+        get().updatePlayerStats({
+          totalExperienceGained: currentStats.totalExperienceGained + amount
+        });
+      },
+      
+      recordItemAcquired: (type) => {
+        const { gameState } = get();
+        const currentStats = gameState.gameProgress.playerStats || initialGameState.gameProgress.playerStats!;
+        
+        switch (type) {
+          case 'spell':
+            get().updatePlayerStats({
+              spellsAcquired: currentStats.spellsAcquired + 1
+            });
+            break;
+          case 'equipment':
+            get().updatePlayerStats({
+              equipmentCollected: currentStats.equipmentCollected + 1
+            });
+            break;
+          case 'potion':
+            get().updatePlayerStats({
+              potionsCrafted: currentStats.potionsCrafted + 1
+            });
+            break;
+          case 'ingredient':
+            get().updatePlayerStats({
+              ingredientsGathered: currentStats.ingredientsGathered + 1
+            });
+            break;
+          case 'recipe':
+            get().updatePlayerStats({
+              recipesDiscovered: currentStats.recipesDiscovered + 1
+            });
+            break;
+          case 'scroll':
+            get().updatePlayerStats({
+              scrollsUsed: currentStats.scrollsUsed + 1
+            });
+            break;
+        }
+      },
+      
+      // Export methods
+      exportPlayerProfile: () => {
+        const { gameState } = get();
+        const { player, gameProgress } = gameState;
+        
+        const profileData = {
+          player: {
+            name: player.name,
+            level: player.level,
+            experience: player.experience,
+            experienceToNextLevel: player.experienceToNextLevel,
+            maxHealth: player.maxHealth,
+            maxMana: player.maxMana,
+            manaRegen: player.manaRegen,
+            spellsCount: player.spells.length,
+            equippedSpellsCount: player.equippedSpells.length,
+            gold: gameState.marketData.gold
+          },
+          stats: gameProgress.playerStats,
+          achievements: {
+            total: gameProgress.achievements?.length || 0,
+            unlocked: gameProgress.achievements?.filter(a => a.unlocked).length || 0
+          },
+          titles: {
+            total: gameProgress.titles?.length || 0,
+            unlocked: gameProgress.titles?.filter(t => t.unlocked).length || 0,
+            equipped: gameProgress.titles?.find(t => t.equipped)?.name || 'None'
+          },
+          battles: {
+            total: gameProgress.battleHistory?.length || 0,
+            won: gameProgress.playerStats?.battlesWon || 0,
+            lost: gameProgress.playerStats?.battlesLost || 0
+          }
+        };
+        
+        return JSON.stringify(profileData, null, 2);
+      },
+      
+      exportBattleHistory: () => {
+        const battleHistory = get().getBattleHistory();
+        return JSON.stringify(battleHistory, null, 2);
+      },
+      
+      exportAchievements: () => {
+        const achievements = get().getAchievements();
+        return JSON.stringify(achievements, null, 2);
+      },
+
+      initializeMarkets: () => {
+        const markets: MarketLocation[] = [
+          {
+            id: 'market-1',
+            name: 'Beginner\'s Market',
+            description: 'A small market for novice wizards',
+            unlockLevel: 1,
+            reputationLevel: 0,
+            inventoryRefreshDays: 3,
+            lastRefreshed: new Date().toISOString(),
+            inventory: generateMarketInventory(1),
+            priceMultiplier: 1.0,
+            prices: {}
+          },
+          {
+            id: 'market-2',
+            name: 'Apprentice\'s Market',
+            description: 'A bustling market for growing wizards',
+            unlockLevel: 5,
+            reputationLevel: 0,
+            inventoryRefreshDays: 5,
+            lastRefreshed: new Date().toISOString(),
+            inventory: generateMarketInventory(5),
+            priceMultiplier: 1.2,
+            prices: {}
+          },
+          {
+            id: 'market-3',
+            name: 'Master\'s Market',
+            description: 'An exclusive market for experienced wizards',
+            unlockLevel: 10,
+            reputationLevel: 0,
+            inventoryRefreshDays: 7,
+            lastRefreshed: new Date().toISOString(),
+            inventory: generateMarketInventory(10),
+            priceMultiplier: 1.5,
+            prices: {}
+          }
+        ];
+        
+        // Initialize prices for each market
+        markets.forEach(market => {
+          const inventory = market.inventory;
+          market.prices = {};
+          
+          // Add prices for all items
+          inventory.ingredients.forEach(item => {
+            market.prices[item.item.id] = item.currentPrice;
+          });
+          
+          inventory.potions.forEach(item => {
+            market.prices[item.item.id] = item.currentPrice;
+          });
+          
+          inventory.equipment.forEach(item => {
+            market.prices[item.item.id] = item.currentPrice;
+          });
+          
+          if (inventory.scrolls) {
+            inventory.scrolls.forEach(item => {
+              market.prices[item.item.id] = item.currentPrice;
+            });
+          }
+        });
+        
+        set({
+          gameState: {
+            ...get().gameState,
+            markets
+          }
+        });
+      },
+
+      updateMarketPrices: (market: MarketLocation) => {
+        const updatedMarket = { ...market };
+        const priceMultiplier = 1 + (Math.random() * 0.2 - 0.1); // ±10% price variation
+        
+        updatedMarket.prices = Object.entries(market.prices).reduce((acc: Record<string, number>, [itemId, price]) => {
+          acc[itemId] = Math.round(Number(price) * priceMultiplier);
+          return acc;
+        }, {});
+        
+        return updatedMarket;
+      },
+
+      shouldRefreshMarketInventory: (market: any) => {
+        const lastRefresh = new Date(market.lastRefresh);
+        const now = new Date();
+        const hoursSinceRefresh = (now.getTime() - lastRefresh.getTime()) / (1000 * 60 * 60);
+        return hoursSinceRefresh >= 24; // Refresh every 24 hours
+      },
+
+      refreshMarketInventory: (market: any) => {
+        const updatedMarket = { ...market };
+        updatedMarket.inventory = generateMarketInventory(market.unlockLevel);
+        updatedMarket.lastRefresh = new Date().toISOString();
+        return updatedMarket;
+      },
+
+      generateMarketInventory: (level: number): MarketInventory => {
+        const inventory: MarketInventory = {
+          ingredients: [],
+          potions: [],
+          equipment: [],
+          scrolls: []
+        };
+
+        // Generate ingredients
+        const ingredientCount = Math.min(5 + level, 15);
+        for (let i = 0; i < ingredientCount; i++) {
+          const ingredient = generateRandomIngredient(level);
+          inventory.ingredients.push(generateMarketItem(ingredient, level, 5));
+        }
+
+        // Generate potions
+        const potionCount = Math.min(3 + level, 10);
+        for (let i = 0; i < potionCount; i++) {
+          const potion = generateRandomPotion(level);
+          inventory.potions.push(generateMarketItem(potion, level, 3));
+        }
+
+        // Generate equipment
+        const equipmentCount = Math.min(2 + level, 8);
+        for (let i = 0; i < equipmentCount; i++) {
+          const equipment = generateRandomEquipment(level);
+          inventory.equipment.push(generateMarketItem(equipment, level, 2));
+        }
+
+        // Generate scrolls
+        const scrollCount = Math.min(1 + level, 5);
+        for (let i = 0; i < scrollCount; i++) {
+          const scroll = generateRandomScroll(level);
+          inventory.scrolls.push(generateMarketItem(scroll, level, 2));
+        }
+
+        return inventory;
+      },
+
+      generateMarketPrices: (level: number) => {
+        const prices: Record<string, number> = {};
+        
+        // Generate base prices for all items in the market
+        const inventory = generateMarketInventory(level);
+        
+        // Add ingredient prices
+        inventory.ingredients.forEach(item => {
+          prices[item.item.id] = item.currentPrice;
+        });
+        
+        // Add potion prices
+        inventory.potions.forEach(item => {
+          prices[item.item.id] = item.currentPrice;
+        });
+        
+        // Add equipment prices
+        inventory.equipment.forEach(item => {
+          prices[item.item.id] = item.currentPrice;
+        });
+        
+        // Add scroll prices
+        inventory.scrolls.forEach(item => {
+          prices[item.item.id] = item.currentPrice;
+        });
+        
+        return prices;
+      },
+
+      calculateBasePrice: (item: any, level: number): number => {
+        const rarityMultipliers = {
+          common: 1,
+          uncommon: 2.5,
+          rare: 6,
+          epic: 15,
+          legendary: 40
+        };
+
+        const basePrice = 50 * (rarityMultipliers[item.rarity] || 1);
+        const levelMultiplier = 1 + (level - 1) * 0.2;
+        const variation = 0.9 + Math.random() * 0.2;
+
+        return Math.round(basePrice * levelMultiplier * variation);
+      },
     }),
     {
-      name: 'wizards-choice-state',
-      
-      // Filter out large or sensitive data from persistence
-      partialize: (state) => {
-        // We'll store everything for now, but in a real game you might
-        // want to filter out certain runtime-only state
-        return state;
-      },
+      name: 'wizards-choice-storage', // Name for localStorage key
+      partialize: (state) => ({
+        gameState: state.gameState // Only persist the gameState field
+      }),
     }
   )
 );
+
+const determineSupply = (rarity: string): 'abundant' | 'common' | 'limited' | 'rare' | 'unique' => {
+  switch (rarity) {
+    case 'legendary': return 'unique';
+    case 'epic': return 'rare';
+    case 'rare': return 'limited';
+    case 'uncommon': return 'common';
+    default: return 'abundant';
+  }
+};
+
+const determineDemand = (rarity: string): 'unwanted' | 'low' | 'moderate' | 'high' | 'extreme' => {
+  switch (rarity) {
+    case 'legendary': return 'extreme';
+    case 'epic': return 'high';
+    case 'rare': return 'moderate';
+    case 'uncommon': return 'low';
+    default: return 'unwanted';
+  }
+};
+
+const generateMarketItem = <T extends { rarity: string; id: string }>(
+  item: T,
+  level: number,
+  baseQuantity: number
+): MarketItem<T> => {
+  return {
+    item,
+    quantity: Math.floor(Math.random() * baseQuantity) + 1,
+    currentPrice: calculateBasePrice(item, level),
+    supply: determineSupply(item.rarity),
+    demand: determineDemand(item.rarity),
+    priceHistory: []
+  };
+};

@@ -1,12 +1,41 @@
 // src/lib/ui/components/WizardStudy.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, ErrorInfo } from 'react';
 import { useGameStateStore } from '../../game-state/gameStateStore';
 import { Wizard, Spell, Equipment, SpellScroll } from '../../types';
 import PotionCraftingScreen from './PotionCraftingScreen';
 import { MarketUI } from './MarketUI';
+import EmergencyMarketUI from './EmergencyMarketUI';
 import SpellCard from './SpellCard';
+import { PlayerProfileScreen } from './profile/PlayerProfileScreen';
+
+// Error boundary to catch and display errors
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode, fallback: React.ReactNode }, 
+  { hasError: boolean, error: Error | null, errorInfo: ErrorInfo | null }
+> {
+  constructor(props: { children: React.ReactNode, fallback: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    this.setState({ errorInfo });
+    console.error("Error caught by boundary:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}
 
 interface WizardStudyProps {
   onStartDuel: () => void;
@@ -26,11 +55,23 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
   const { gameState, setCurrentLocation, getPlayerScrolls, consumeScrollToLearnSpell, checkIfScrollSpellKnown } = useGameStateStore();
   const { player } = gameState;
   
+  // Debug flag to check for hydration issues
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    // This will ensure we're fully client-side rendered
+    setMounted(true);
+    console.log('WizardStudy: Component mounted');
+  }, []);
+  
   // State to control the visibility of the potion crafting screen
   const [isPotionCraftingOpen, setIsPotionCraftingOpen] = useState(false);
   
   // State to control the visibility of the market screen
   const [isMarketOpen, setIsMarketOpen] = useState(false);
+  
+  // State to control the visibility of the player profile screen
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   
   // State to control the visibility of the spell scrolls screen
   const [showScrolls, setShowScrolls] = useState(false);
@@ -49,12 +90,24 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
   
   // Handler for opening the market screen
   const handleOpenMarket = () => {
+    console.log('WizardStudy: Opening market');
     setIsMarketOpen(true);
   };
   
   // Handler for closing the market screen
   const handleCloseMarket = () => {
+    console.log('WizardStudy: Closing market');
     setIsMarketOpen(false);
+  };
+  
+  // Handler for opening the player profile screen
+  const handleOpenProfile = () => {
+    setIsProfileOpen(true);
+  };
+  
+  // Handler for closing the player profile screen
+  const handleCloseProfile = () => {
+    setIsProfileOpen(false);
   };
   
   // Get player scrolls
@@ -87,10 +140,101 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
   if (isPotionCraftingOpen) {
     return <PotionCraftingScreen onClose={handleClosePotionCrafting} />;
   }
-  
-  // If market is open, render the market screen
+
+  // If market is open, render the market screen with error boundary
   if (isMarketOpen) {
-    return <MarketUI onClose={handleCloseMarket} />;
+    console.log('WizardStudy: About to render Market UI with error boundary');
+    
+    // Use the MarketUI component with proper error handling
+    try {
+      return (
+        <ErrorBoundary
+          fallback={
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.7)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '20px',
+              zIndex: 9999999,
+              color: 'white'
+            }}>
+              <h2>Failed to load Market UI</h2>
+              <p>There was an error loading the Market UI. Please try again later.</p>
+              <button 
+                onClick={handleCloseMarket}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: 'white',
+                  color: 'black',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  marginTop: '20px'
+                }}
+              >
+                Return to Study
+              </button>
+            </div>
+          }
+          onError={(error, errorInfo) => {
+            console.error('MarketUI Error:', error);
+            console.error('MarketUI ErrorInfo:', errorInfo);
+          }}
+        >
+          <MarketUI onClose={handleCloseMarket} />
+        </ErrorBoundary>
+      );
+    } catch (err) {
+      console.error('WizardStudy: Error rendering MarketUI component:', err);
+      
+      // Fallback UI if there's an error creating the ErrorBoundary
+      return (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#ff6b6b',
+          color: 'white',
+          zIndex: 9999999,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '20px'
+        }}>
+          <h1>Critical Error</h1>
+          <p>Something went wrong while trying to render the Market UI.</p>
+          <button
+            onClick={handleCloseMarket}
+            style={{
+              padding: '10px 20px',
+              marginTop: '20px',
+              backgroundColor: 'white',
+              color: 'black',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Return to Study
+          </button>
+        </div>
+      );
+    }
+  }
+
+  // If player profile is open, render the profile screen
+  if (isProfileOpen) {
+    return <PlayerProfileScreen onClose={handleCloseProfile} />;
   }
   
   return (
@@ -100,6 +244,12 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
         <div className="wizard-study__player-info">
           <h2 className="wizard-study__player-name">{player.name}</h2>
           <div className="wizard-study__player-level">Level {player.level}</div>
+          <button 
+            className="wizard-study__profile-button"
+            onClick={handleOpenProfile}
+          >
+            View Profile
+          </button>
         </div>
       </div>
       

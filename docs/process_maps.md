@@ -11,6 +11,10 @@ flowchart TD
     Header --> Title[Title]
     Header --> PlayerInfo[Player Info]
     
+    PlayerInfo --> PlayerName[Player Name]
+    PlayerInfo --> PlayerLevel[Player Level]
+    PlayerInfo --> ProfileButton[Profile Button]
+    
     MainArea --> StudyScene[Study Scene]
     MainArea --> Actions[Action Buttons]
     
@@ -388,6 +392,89 @@ flowchart TD
     FleeResult --> |No (50%)| GoldLoss[Lose Gold]
 ```
 
+## Market UI Component State Management
+
+```mermaid
+flowchart TD
+    Lifecycle[Component Lifecycle] --> Mount[Component Mount]
+    Lifecycle --> Unmount[Component Unmount]
+    
+    Mount --> InitState[Initialize Local State]
+    InitState --> FetchData[Fetch Market Data]
+    FetchData --> UpdateLocalState[Update Local State]
+    
+    UpdateLocalState --> RenderUI[Render UI]
+    
+    RenderUI --> UserInteraction[User Interaction]
+    UserInteraction --> SelectMarket[Select Market]
+    UserInteraction --> ChangeTab[Change Tab]
+    UserInteraction --> ToggleMode[Toggle Buy/Sell Mode]
+    UserInteraction --> SelectItem[Select Item]
+    UserInteraction --> ChangeQuantity[Change Quantity]
+    UserInteraction --> ExecuteTransaction[Execute Transaction]
+    UserInteraction --> RefreshMarket[Refresh Market]
+    UserInteraction --> CloseMarket[Close Market]
+    
+    SelectMarket --> UpdateSelectedMarket[Update Selected Market State]
+    UpdateSelectedMarket --> CallVisitMarket[Call visitMarket]
+    CallVisitMarket --> RenderUI
+    
+    ChangeTab --> UpdateTabState[Update Tab State]
+    UpdateTabState --> RenderUI
+    
+    ToggleMode --> UpdateModeState[Update Mode State]
+    UpdateModeState --> RenderUI
+    
+    SelectItem --> UpdateSelectedItem[Update Selected Item State]
+    UpdateSelectedItem --> ResetQuantity[Reset Quantity to 1]
+    ResetQuantity --> RenderUI
+    
+    ChangeQuantity --> ValidateQuantity[Validate Quantity]
+    ValidateQuantity --> UpdateQuantityState[Update Quantity State]
+    UpdateQuantityState --> RenderUI
+    
+    ExecuteTransaction --> |Buy| CallBuyItem[Call buyItem]
+    ExecuteTransaction --> |Sell| CallSellItem[Call sellItem]
+    
+    CallBuyItem --> UpdateMessage[Update Message State]
+    CallBuyItem --> UpdateGold[Update Gold State]
+    CallBuyItem --> Success{Transaction Success?}
+    
+    CallSellItem --> UpdateMessage
+    CallSellItem --> UpdateGold
+    CallSellItem --> Success
+    
+    Success --> |Yes| ScheduleReset[Schedule State Reset]
+    Success --> |No| RenderUI
+    
+    ScheduleReset --> ResetSelection[Reset Selected Item]
+    ScheduleReset --> ClearMessage[Clear Message]
+    ScheduleReset --> RefreshData[Refresh Market Data]
+    RefreshData --> UpdateLocalState
+    
+    RefreshMarket --> CallRefreshMarket[Call refreshMarket]
+    CallRefreshMarket --> ScheduleRefreshData[Schedule Data Refresh]
+    ScheduleRefreshData --> RefreshData
+    
+    CloseMarket --> CheckForAttack[Check for Market Attack]
+    CheckForAttack --> AttackFound{Attack Found?}
+    
+    AttackFound --> |Yes| ShowAttackModal[Show Attack Modal]
+    AttackFound --> |No| CallOnClose[Call onClose Prop]
+    
+    ShowAttackModal --> PlayerDecision[Player Decision]
+    PlayerDecision --> |Fight| GoToBattle[Go to Battle]
+    PlayerDecision --> |Flee| AttemptFlee[Attempt to Flee]
+    
+    AttemptFlee --> FleeResult{Flee Success?}
+    FleeResult --> |Yes| EscapeSuccess[Show Success Message]
+    FleeResult --> |No| GoldLoss[Apply Gold Loss]
+    
+    EscapeSuccess --> DelayedClose[Delayed Close]
+    GoldLoss --> DelayedClose
+    DelayedClose --> CallOnClose
+```
+
 ## Market Attack System
 
 ```mermaid
@@ -511,4 +598,127 @@ flowchart TD
     ApplyEffects --> UpdateUI[Update UI]
     UpdateStats --> UpdateUI
     UpdateSpellbook --> UpdateUI
+```
+
+## Player Profile System
+
+```mermaid
+graph TD
+    A[Game Events] --> B[AchievementService]
+    B --> C{Check Achievements}
+    C -->|Unlocked| D[Update GameState]
+    C -->|Not Unlocked| E[Continue]
+    D --> F[Trigger Notification]
+    F --> G[Save Profile Data]
+    
+    H[Battle Completion] --> I[Record Battle]
+    I --> J[Add to Battle History]
+    J --> K[Update Stats]
+    K --> L[Check for Achievements]
+    L --> M[Save Profile Data]
+    
+    N[User Opens Profile] --> O[Load Profile Data]
+    O --> P[Display Profile Screen]
+    P --> Q{Select Tab}
+    Q --> R[Summary Tab]
+    Q --> S[Achievements Tab]
+    Q --> T[Battle History Tab]
+    Q --> U[Titles Tab]
+    
+    V[User Equips Title] --> W[Update GameState]
+    W --> X[Apply Title Bonuses]
+    X --> Y[Save Profile Data]
+    
+    Z[User Exports Data] --> AA[Generate Export File]
+    AA --> AB[Download File]
+```
+
+### Profile System Data Flow
+
+```mermaid
+flowchart LR
+    subgraph GameEvents
+        GE1[Battle] --> GE2[Stat Updates]
+        GE2 --> GE3[Level Up]
+        GE3 --> GE4[Item Collection]
+    end
+    
+    subgraph StateManagement
+        SM1[GameStateContext] --- SM2[GameState]
+        SM2 --- SM3[Game Reducers]
+    end
+    
+    subgraph DataPersistence
+        DP1[LocalStorage] --- DP2[Save File]
+        DP2 --- DP3[Export JSON]
+    end
+    
+    subgraph UIComponents
+        UI1[PlayerProfileScreen] --- UI2[StatsSummary]
+        UI1 --- UI3[AchievementList]
+        UI1 --- UI4[BattleHistoryLog]
+        UI1 --- UI5[TitleRankDisplay]
+    end
+    
+    GameEvents --> StateManagement
+    StateManagement --> UIComponents
+    StateManagement --> DataPersistence
+```
+
+### Achievement Unlock Process
+
+```mermaid
+sequenceDiagram
+    participant GE as Game Event
+    participant AS as AchievementService
+    participant GS as GameState
+    participant NM as NotificationManager
+    participant UI as User Interface
+    
+    GE->>AS: Trigger event (battle win, item collection, etc.)
+    AS->>AS: Check achievement conditions
+    AS->>GS: Unlock achievement if conditions met
+    GS->>GS: Update achievement state
+    GS->>GS: Update player stats
+    GS->>NM: Notify about new achievement
+    NM->>UI: Display achievement notification
+    GS->>GS: Save updated state
+```
+
+## Player Profile UI Navigation
+
+```mermaid
+flowchart TD
+    MainFlow[UI Navigation] --> WizardsStudy[Wizard's Study]
+    WizardsStudy --> ProfileButton[Profile Button]
+    ProfileButton --> Start[Player Profile Screen]
+    
+    Start --> Tabs[Navigation Tabs]
+    Tabs --> SummaryTab[Summary Tab]
+    Tabs --> AchievementsTab[Achievements Tab]
+    Tabs --> BattleHistoryTab[Battle History Tab]
+    Tabs --> TitlesTab[Titles/Ranks Tab]
+    
+    SummaryTab --> PlayerInfo[Player Information]
+    PlayerInfo --> BasicStats[Basic Stats Display]
+    BasicStats --> StatCategories[Combat/Collection/Progress Stats]
+    BasicStats --> ExportStats[Export Stats Button]
+    
+    AchievementsTab --> AchievementsList[Achievements List]
+    AchievementsList --> AchievementFilter[Filter Options]
+    AchievementsList --> AchievementSearch[Search Box]
+    AchievementsList --> AchievementCategories[Categories]
+    AchievementsList --> AchievementExport[Export Achievements]
+    
+    BattleHistoryTab --> BattleLogList[Battle Log Entries]
+    BattleLogList --> BattleDetails[Battle Details]
+    BattleLogList --> BattleStats[Battle Statistics]
+    BattleLogList --> BattleFilters[Filters]
+    BattleLogList --> BattleExport[Export Battle History]
+    
+    TitlesTab --> TitlesList[Available Titles]
+    TitlesList --> TitleDetails[Title Details]
+    TitlesList --> TitleEquip[Equip Title Button]
+    TitleDetails --> TitlePrerequisites[Unlock Requirements]
+    TitleDetails --> TitleBonuses[Title Bonuses]
 ```

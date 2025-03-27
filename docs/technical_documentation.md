@@ -562,6 +562,95 @@ The game features 13 unique market locations, each with specific unlock requirem
 
 Higher-level markets have higher price multipliers but offer rarer items and better quality.
 
+### Market UI Component
+
+The `MarketUI` component (`src/lib/ui/components/MarketUI.tsx`) provides the user interface for interacting with markets, featuring:
+
+- Selection of available markets based on player level
+- Tabbed interface for different item categories (ingredients, potions, equipment)
+- Buy/sell toggle for different transaction modes
+- Item card display with rarity-coded styling
+- Transaction panel for quantity selection and price calculation
+- Dynamic gold and inventory updates
+
+#### State Management
+
+The MarketUI component follows React best practices for state management:
+
+- Uses React `useState` hooks for component-specific state
+- Implements `useEffect` for data fetching and initialization
+- Defers state updates to avoid React rendering errors
+- Maintains separation between store data and component-specific state
+
+Key optimizations:
+- Market data is fetched and stored in component state instead of being accessed directly from the store during render
+- All market operations (buying, selling, refreshing) update local state after completion
+- Quantity selection is properly bounded by available item counts
+- State updates are batched when appropriate
+
+### Game State Store Integration
+
+The market system interacts with the game state store through these key functions:
+
+- `getMarkets`: Retrieves all available markets with proper state initialization
+- `getMarketById`: Finds a specific market by ID
+- `visitMarket`: Records market visits and updates current location
+- `refreshMarket`: Updates market inventory with new items
+- `buyItem`: Handles purchase transactions with proper validation
+- `sellItem`: Handles sale transactions with validation
+- `getPlayerGold`: Retrieves current gold amount
+- `updatePlayerGold`: Updates gold after transactions
+
+#### Optimized State Updates
+
+The `getMarkets` function in `gameStateStore.ts` is optimized to prevent state updates during component rendering:
+
+```typescript
+getMarkets: () => {
+  const { gameState } = get();
+  
+  // Ensure markets array exists
+  if (!gameState.markets || !Array.isArray(gameState.markets)) {
+    // Don't update state during render - schedule it for the next tick
+    setTimeout(() => {
+      set({
+        gameState: {
+          ...get().gameState,
+          markets: []
+        }
+      });
+    }, 0);
+    return [];
+  }
+  
+  // Process market updates as needed
+  const updatedMarkets = /* market processing logic */;
+  
+  // Defer state updates to avoid React render-time state mutations
+  if (marketsNeedUpdate) {
+    setTimeout(() => {
+      set({
+        gameState: {
+          ...get().gameState,
+          markets: updatedMarkets
+        }
+      });
+    }, 0);
+  }
+  
+  return gameState.markets;
+}
+```
+
+### Best Practices
+- **AXIOM 39**: Balance attack frequency to add tension without excessive frustration
+- **AXIOM 40**: Scale rewards appropriately with risk (higher level market attackers provide better rewards)
+- **AXIOM 41**: Ensure UI clearly communicates the risk/reward decision to players
+- **AXIOM 42**: Implement proper state transitions between market, battle, and wizard study
+- **AXIOM 56**: Never update state during component rendering; defer updates using setTimeout or useEffect
+- **AXIOM 57**: Initialize component-specific state from store data rather than accessing store directly in render
+- **AXIOM 58**: Implement proper error boundaries around market components to prevent crashes
+
 ## Market Attack System
 
 The market attack system adds risk and reward to market visits, creating encounters when players leave markets.

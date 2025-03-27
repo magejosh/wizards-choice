@@ -30,7 +30,7 @@ This document defines the core guidelines and best practices for making changes 
         
     - Do not remove or alter code outside the scope of the requested changes.
         
-    - Provide all modifications as a single complete update per file, not multiple partial edits.
+    - Provide all modifications as a single complete update per file, not multiple partial edits. 
         
 7. **No Extraneous Interactions:**
     
@@ -48,6 +48,8 @@ This document defines the core guidelines and best practices for making changes 
     - Adhere to the established coding style found in the project’s documentation (refer to UI Components and Code Documentation for guidelines).
         
     - Replace hard-coded values with named constants to avoid “magic numbers.”
+
+    - Preferred case for code is camelCase class names and for file names the preference is kebab-case.
         
 10. **Performance and Security:**
     

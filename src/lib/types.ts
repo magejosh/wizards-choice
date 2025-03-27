@@ -108,6 +108,22 @@ export interface Equipment {
   description: string;
   imagePath?: string;
   spell?: Spell; // For spell scrolls
+  unlocked: boolean;
+  equipped: boolean;
+  unlockedDate?: Date;
+  requiredLevel?: number;
+  requiredAchievements?: string[];
+  requiredStats?: { stat: string; value: number; }[];
+  bonus?: {
+    health?: number;
+    mana?: number;
+    manaRegen?: number;
+    damage?: number;
+    defense?: number;
+    criticalChance?: number;
+    criticalDamage?: number;
+    potionSlots?: number;
+  };
 }
 
 export interface Potion {
@@ -245,6 +261,134 @@ export interface PlayerState {
   completedEncounters: string[];
 }
 
+// Player Profile System Types
+
+/**
+ * Player stats that track game progress and achievements
+ */
+export interface PlayerStats {
+  // Combat Statistics
+  battlesTotal: number;
+  battlesWon: number;
+  battlesLost: number;
+  damageDealt: number;
+  damageReceived: number;
+  healingDone: number;
+  criticalHitsLanded: number;
+  criticalHitsReceived: number;
+  mysticPunchesUsed: number;
+  totalTurns: number;
+  shortestVictory: number;
+  longestBattle: number;
+  averageTurnsPerVictory: number;
+  flawlessVictories: number;
+
+  // Spell Statistics
+  spellsCast: {
+    total: number;
+    byType: Record<string, number>;
+    byElement: Record<string, number>;
+  };
+  spellsAcquired: number;
+
+  // Collection Statistics
+  equipmentCollected: number;
+  potionsCrafted: number;
+  ingredientsGathered: number;
+  recipesDiscovered: number;
+  scrollsUsed: number;
+
+  // Economic Statistics
+  goldEarned: number;
+  goldSpent: number;
+  totalExperienceGained: number;
+
+  // Elemental Damage Tracking
+  elementalDamage: Record<string, number>;
+
+  // Progression Statistics
+  levelsGained: number;
+  skillPointsSpent: number;
+
+  // Efficiency Metrics
+  damagePerMana: number;
+  goldPerBattle: number;
+  experiencePerBattle: number;
+}
+
+/**
+ * Achievement that can be unlocked by the player
+ */
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  unlocked: boolean;
+  unlockedDate?: Date;
+  currentProgress: number;
+  requiredProgress: number;
+  progress: number;
+  reward?: {
+    type: 'stat_bonus' | 'gold';
+    stat?: string;
+    value?: number;
+  };
+  hidden?: boolean;
+}
+
+/**
+ * Title that can be earned and equipped by the player
+ */
+export interface PlayerTitle {
+  id: string;
+  name: string;
+  description: string;
+  unlocked: boolean;
+  equipped: boolean;
+  requiredLevel?: number;
+  requiredAchievements?: string[];
+  requiredStats?: Array<{
+    stat: string;
+    value: number;
+  }>;
+  bonus?: {
+    type: string;
+    value: number;
+  };
+}
+
+/**
+ * Battle outcome type
+ */
+export type BattleOutcome = 'victory' | 'defeat' | 'retreat';
+
+/**
+ * Spell casting record for battle history
+ */
+export interface SpellCastRecord {
+  total: number;
+  byType: Partial<Record<SpellType, number>>;
+  byElement: Partial<Record<ElementType, number>>;
+}
+
+/**
+ * Record of a battle that occurred
+ */
+export interface BattleRecord {
+  id: string;
+  enemyName: string;
+  chapterName?: string;
+  outcome: BattleOutcome;
+  date: Date | string;
+  duration: number; // in seconds or turns
+  damageDealt: number;
+  damageTaken: number;
+  spellsCast: SpellCastRecord;
+  itemsUsed: number;
+  rewards?: string;
+  notes?: string;
+}
+
 // Game State Types
 export interface GameProgress {
   defeatedEnemies: string[];
@@ -254,6 +398,12 @@ export interface GameProgress {
   craftedRecipes?: string[];
   currentLocation: 'wizardStudy' | 'duel' | 'levelUp' | 'market';
   questProgress: Record<string, any>;
+  
+  // New fields for the player profile system
+  achievements?: Achievement[];
+  titles?: PlayerTitle[];
+  battleHistory?: BattleRecord[];
+  playerStats?: PlayerStats;
 }
 
 export interface GameSettings {
@@ -293,13 +443,14 @@ export interface MarketLocation {
   id: string;
   name: string;
   description: string;
-  unlockLevel: number; // Player level required to unlock this market
-  specialization?: 'ingredients' | 'potions' | 'equipment' | 'scrolls'; // Market specialization affects available inventory
-  reputationLevel: number; // Reputation with this market (0-100)
-  inventoryRefreshDays: number; // Days before inventory refreshes
-  lastRefreshed: string; // ISO date string of last refresh
+  unlockLevel: number;
+  specialization?: 'ingredients' | 'potions' | 'equipment' | 'scrolls';
+  reputationLevel: number;
+  inventoryRefreshDays: number;
+  lastRefreshed: string;
   inventory: MarketInventory;
-  priceMultiplier: number; // Base price modifier for this market (0.8-1.5)
+  priceMultiplier: number;
+  prices: Record<string, number>;
 }
 
 /**
@@ -309,7 +460,7 @@ export interface MarketInventory {
   ingredients: MarketItem<Ingredient>[];
   potions: MarketItem<Potion>[];
   equipment: MarketItem<Equipment>[];
-  scrolls?: MarketItem<SpellScroll>[]; // Added later when spell scroll system is implemented
+  scrolls: MarketItem<SpellScroll>[];
 }
 
 /**
@@ -317,12 +468,11 @@ export interface MarketInventory {
  */
 export interface MarketItem<T> {
   item: T;
-  basePrice: number;
-  currentPrice: number; // Fluctuates based on supply/demand
-  quantity: number; // Available quantity
-  supply: 'abundant' | 'common' | 'limited' | 'rare' | 'unique'; // Affects price and quantity
-  demand: 'unwanted' | 'low' | 'moderate' | 'high' | 'extreme'; // Affects price fluctuation
-  priceHistory: number[]; // Last 5 prices for tracking trends
+  quantity: number;
+  currentPrice: number;
+  supply: 'abundant' | 'common' | 'limited' | 'rare' | 'unique';
+  demand: 'unwanted' | 'low' | 'moderate' | 'high' | 'extreme';
+  priceHistory: number[];
 }
 
 /**

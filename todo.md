@@ -1,30 +1,30 @@
 # Wizard's Choice - Next Steps
+Main tasks are not to be marked complete until all subtasks are completed.
 
-## Immediate
-- [ ] Reorganize UI Components in Wizard's Study screen (main tasks don't complete until all subtasks complete)
-  - [x] Create unified Inventory System
-    - [x] Design inventory UI with equipment slots
-    - [x] Move items, spell scrolls, and ingredients into inventory
-    - [x] Implement equipped items display
-  - [ ] Update Spell System
-    - [ ] Remove side panel spell list
-    - [ ] Add deck name display showing active deck
-    - [ ] Show "Default Deck" if no custom deck equipped 
-  - [ ] Consolidate Navigation
-    - [ ] Merge spell scrolls, equipment, and ingredients into Inventory button in the main menu buttons.
-    - [ ] Reorganize main menu buttons and side panel for better hierarchy ensuring removal of scrolls and equipment buttons on main menu buttons and removal of the equipped spells section of the side panel and the ingredients counts section of the side panel. Ingredients should be in the inventory screen and the potion making screen. Equipped items are unnecessary in the side panel if we can see them in the equipment slots of the inventory screen.
-    - [ ] Ensure all critical buttons remain visible without scrolling
+## Immediate Tasks
+- [ ] Fix MarketUI rendering issues
+  - [ ] Complete MarketUI component refactoring based on BUGS.md plan
+    - [ ] Implement new streamlined MarketUI component
+    - [ ] Replace refresh button with travel mechanic
+    - [ ] Implement market inventory regeneration on timer
+    - [ ] Ensure proper display of all UI elements
+    - [ ] Test final implementation with actual market data
 
 ## Up Next
-- [ ] Add player profile with stats tracking
-  - [ ] Design comprehensive stats tracking system
-  - [ ] Create player profile UI with achievement display
-  - [ ] Implement battle history and performance metrics
-  - [ ] Add player titles/ranks based on achievements
-  - [ ] Create export/share functionality for player stats
+- [x] Add player profile with stats tracking
+  - [x] Design comprehensive stats tracking system
+  - [x] Create player profile UI with achievement display using docs/player_profile_system.md as the guide.
+  - [x] Implement battle history and performance metrics
+  - [x] Add player titles/ranks based on achievements
+  - [x] Create export/share functionality for player stats
 
 ## Project Management
 - [ ] Update all documentation
+  - [ ] Clear all completed tasks from the docs/todo.md and move any remaining tasks to the todo.md in the project root at the bottom of the file. 
+  - [ ] Create a checklist of all files in the project using the docs/todo.md 
+  - [ ] Create a checklist of all docs files in the project using the docs/todo.md 
+  - [ ] Compare the code in each file with each of the docs one at a time, step by step to verify accuracy of the docs to the actual code in the project and correct any errors in the docs without removing any information that might be from intended but unimplemented features. Note these in the docs/todo.md as up to two line comments at the bottom of the file.
+  - [ ] Review and update deployment instructions.
 
 - [ ] Mobile responsiveness improvements
   - [ ] Optimize UI layouts for various screen sizes

@@ -92,7 +92,8 @@
 ### Wizard's Study (Hub)
 - Central hub for selecting next duel (wizard or magical creature)
 - Deckbuilder for tactical spell storage and selection
-- Equipment management: one wand, one robe, one amulet, and two rings
+- Inventory management: spell scrolls, ingredients, potions, and equipment
+  - Equipment management: one wand or weapon (hand slot), one robe or armor (body slot), one amulet (neck slot), one belt (belt slot), and two rings (finger slots)
 
 ### Equipment System
 - Equipment types and example bonuses:
@@ -100,6 +101,16 @@
   - Robes: Health (+20), Damage reduction (5%), Health Regen (+5 per round)
   - Amulets: Elemental Affinity (+10% specific element), Spell reuse (once per 3 rounds), Damage barrier (once per duel)
   - Rings: Critical spellcast (5% double effect), Mana (+15), Spell vampirism (10% health restored from damage)
+  - Belts: Potion slots (1-5 based on rarity)
+
+### Market System
+- Multiple market locations with progressive level unlocks (1-1000)
+  - Buy/Sell Mode
+  - Market specializations (ingredients, potions, equipment, scrolls)
+  - Dynamic supply and demand affecting prices (simulated with randomization generated at market initialization/refresh)
+  - Inventory refresh cycles varying by market tier
+  - Market attacks on travel to new market location with random chance of attack based on distance where distance is relative to market unlock scale
+  
 
 ### Procedural Content & Replayability
 - Enemy wizards and creatures procedurally match player's level and earned points
@@ -150,7 +161,7 @@
 
 ## Testing Requirements
 
-- Thorough testing for errors
+- Thorough testing for errors guidelines written in concise action steps format for the user to perform testing as needed.
 - Balance testing for gameplay mechanics
 - Cross-browser compatibility testing
 - Responsive design testing

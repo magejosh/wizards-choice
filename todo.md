@@ -3,14 +3,16 @@ Main tasks are not to be marked complete until all subtasks are completed.
 
 ## Immediate Tasks
 - [x] Fix transaction functionality in StreamlinedMarketUI
-  - [x] Fixed gold not being deducted properly when buying items
-  - [x] Fixed purchased items not being added to inventory
+  - [ ] Fixed gold not being deducted from player's Current Gold properly when buying items (or something is instantly resetting it to the starting 100 gold)
+  - [ ] Fixed purchased items not being added to player's inventory after purchase
   - [x] Fixed market inventory quantities not updating correctly
+    - [ ] Fixed market inventory quantities not persisting until the hourly market inventory refresh. Currently when the player leaves the market for any reason (via button or page reload) and returns the item quantities reset to what they started as which is undesirable.
   - [x] Implemented direct state updates instead of relying on helper functions
   - [x] Added proper UI refresh after transactions
 - [ ] Comprehensive test verification
   - [ ] Verify all market scenarios with different item types
   - [ ] Test edge cases (inventory full, market attack, etc.)
+  - [ ] Confirm all interactive elements in the market screen work as expected by asking the user to test all features via presenting an itemized list of all features and asking the user to test each one with instructions for how to test each. ```WAIT until.USER.Confirms.THIS.TaskComplete && THEN REFACTOR MarketUI component WITH StreamlinedMarketUI component AS GUIDE.```
 
 ## Completed Tasks
 - [x] Fix MarketUI rendering issues
@@ -23,8 +25,7 @@ Main tasks are not to be marked complete until all subtasks are completed.
 - [x] Fix TypeScript errors in StreamlinedMarketUI component
 - [x] Ensure proper display of all UI elements
   - [x] Fix TypeScript errors in StreamlinedMarketUI component
-  - [ ] Verify UI layout and styling across different screen sizes
-  - [ ] Confirm all interactive elements work as expected
+  - [x] Verify UI layout and styling across different screen sizes
 
 ## Up Next
 - [x] Add player profiles and stats tracking

@@ -1,9 +1,9 @@
 # Wizard's Choice Refactor Proposal
-Implementing robust patterns for card-based mechanics
+Implementing robust patterns for card-based mechanics using Phaser.js
 
 ## Current vs Proposed Structure
 
-### Card Management
+### Card Management & Rendering
 
 ```mermaid
 flowchart TD
@@ -16,16 +16,19 @@ flowchart TD
         CardWidget[Card Widget] --> HandManager[Hand Manager]
         HandManager --> DeckManager[Deck Manager]
         DeckManager --> GameState[Centralized State]
+        GameState --> Renderer[Phaser.js Renderer]
     end
 ```
 
 ## Key Improvements
 
 ### 1. Widget-Based Card System
-A dedicated widget system for spell cards provides better encapsulation and state management:
+A dedicated widget system for spell cards using Phaser.js provides better encapsulation and state management:
 
 ```typescript
 interface SpellCardWidget {
+    sprite: Phaser.GameObjects.Sprite;
+    particles?: Phaser.GameObjects.Particles.ParticleEmitter;
     state: {
         isFlipped: boolean;
         zIndex: number;
@@ -36,6 +39,7 @@ interface SpellCardWidget {
     flip(): void;
     setPosition(pos: Vector2): void;
     updateVisuals(): void;
+    updateParticleEffects(): void;
 }
 ```
 
@@ -155,66 +159,63 @@ flowchart TD
 2. Implement draw/discard mechanics
 3. Add shuffle functionality
 
+## Technical Implementation
+
+### Visual Effects System
+```typescript
+class SpellCardWidget extends BaseWidget {
+    private sprite: Phaser.GameObjects.Sprite;
+    private particles?: Phaser.GameObjects.Particles.ParticleEmitter;
+    
+    render() {
+        this.update2DElements();
+        if (this.hasSpecialEffect) {
+            this.updateParticleEffects();
+        }
+    }
+
+    private updateParticleEffects() {
+        // Dynamic particle effects for spells
+        this.particles.setPosition(this.x, this.y);
+        this.particles.setSpeed(200);
+        this.particles.setBlendMode(Phaser.BlendModes.ADD);
+    }
+}
+```
+
+### Performance Optimizations
+- Utilize Phaser.js's optimized 2D rendering pipeline
+- Implement sprite atlases for efficient texture management
+- Use particle systems for dynamic spell effects
+- Leverage Phaser.js's animation system for smooth transitions
+- Implement device-based quality settings for optimal performance
+
+## Core Systems Integration
+- Card Widget System with Phaser.js sprites
+- Hand Management with optimized 2D positioning
+- Deck Organization maintains current structure
+- Enhanced visual feedback through particle effects
+- Smooth animations for card movements
+
 ## Technical Benefits
 
 1. **Improved Organization**
    - Clear separation of concerns
    - Better state management
    - Modular components
+   - Optimized 2D rendering pipeline
 
 2. **Enhanced Maintainability**
    - Isolated card logic
    - Cleaner combat engine
    - Easier debugging
+   - Consistent rendering approach
 
 3. **Better User Experience**
-   - Smoother animations
+   - Smooth particle-based spell effects
    - Responsive interactions
    - Consistent behavior
-
-## Technical Implementation Addendum
-
-### Rendering Layer Enhancement
-While maintaining our widget-based architecture and game mechanics, we'll enhance the visual implementation:
-
-```mermaid
-flowchart TD
-    subgraph Architecture
-        Widget[Widget System] --> Render[Rendering Layer]
-        Render --> Phaser[Phaser.js]
-        Render --> ThreeJS[Three.js]
-    end
-```
-
-### Hybrid Rendering Approach
-- Maintain Three.js for existing 3D spell effects where beneficial
-- Integrate Phaser.js for optimized 2D card mechanics:
-  ```typescript
-  class SpellCardWidget extends BaseWidget {
-      private phaserSprite?: Phaser.GameObjects.Sprite;
-      private threeJSEffect?: THREE.Object3D;
-      
-      render() {
-          this.update2DElements();
-          if (this.hasSpecialEffect) {
-              this.update3DEffects();
-          }
-      }
-  }
-  ```
-
-### Performance Optimizations
-- Use Phaser.js for card movement and basic interactions
-- Reserve Three.js for premium visual effects
-- Implement smart switching between rendering modes based on device capabilities
-
-### Integration with Existing Systems
-- Card Widget System remains unchanged
-- Hand Management logic preserved
-- Deck Organization maintains current structure
-- Enhanced visual feedback through new rendering capabilities
-
-This addition provides performance improvements while preserving all existing gameplay mechanics and special effects.
+   - Efficient animation system
 
 ## Notes
 - Maintain spell-specific features and effects

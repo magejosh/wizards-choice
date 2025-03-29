@@ -1187,17 +1187,8 @@ export const useGameStateStore = create<GameStateStore>()(
           return { success: false, message: 'Not enough gold.' };
         }
         
-        // Update player's gold - FIXED: Use direct updates instead of helper methods
+        // Update player's gold
         const newGold = gameState.marketData.gold - totalCost;
-        set({
-          gameState: {
-            ...gameState,
-            marketData: {
-              ...gameState.marketData,
-              gold: newGold
-            }
-          }
-        });
         
         // Update market item quantity
         const updatedMarket = { ...market };
@@ -1295,6 +1286,7 @@ export const useGameStateStore = create<GameStateStore>()(
             markets: updatedMarkets,
             marketData: {
               ...gameState.marketData,
+              gold: newGold,
               transactions: [...gameState.marketData.transactions, transaction]
             }
           }

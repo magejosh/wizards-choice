@@ -35,7 +35,7 @@ export function Ingredients({ ingredients, onUseIngredient }: IngredientsProps) 
             </div>
             <p className={styles.description}>{ingredient.description}</p>
             <div className={styles.effects}>
-              {ingredient.effects.map((effect, index) => (
+              {(ingredient.effects || []).map((effect, index) => (
                 <span key={index} className={styles.effect}>
                   {effect}
                 </span>

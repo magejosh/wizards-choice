@@ -13,6 +13,7 @@ import InventoryScreen from '../lib/ui/components/InventoryScreen';
 import { useGameStateStore } from '../lib/game-state/gameStateStore';
 import authService from '../lib/auth/authService';
 import '../lib/ui/styles/main.css';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [showSettings, setShowSettings] = useState(false);
@@ -25,6 +26,7 @@ export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { gameState, initializeNewGame, setCurrentLocation } = useGameStateStore();
+  const router = useRouter();
 
   // Track if we're in the game proper or still in the menu
   const [gameStarted, setGameStarted] = useState(false);
@@ -142,8 +144,12 @@ export default function Home() {
   // Wizard Study handlers
   const handleStartDuel = () => {
     console.log('Starting a duel');
-    // In a full implementation, this would navigate to the battle arena
-    alert('Duel would start here');
+    
+    // Set current location to 'duel'
+    setCurrentLocation('duel');
+    
+    // Navigate to the battle page
+    router.push('/battle');
   };
   
   const handleOpenDeckBuilder = () => {

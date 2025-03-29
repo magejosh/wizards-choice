@@ -6,7 +6,7 @@
 ## Technical Requirements
 
 ### Engine & Framework
-- ThreeJS for 3D visualization and responsive visuals
+- PhaserJS for 2D visualization and responsive visuals
 - Next.js as the application framework (with future multiplayer considerations)
 - Browser-based implementation for cross-platform accessibility
 
@@ -30,7 +30,7 @@
   - Each duel
   - Exiting the Level-Up screen
   - Returning to the Wizard's Study
-- Multiple save slots functionality
+- Multiple save slots functionality, active one selected on start new game or continue game button press from main menu.
 
 ### Game Initialization
 - Players start with 5 initial spells (3 defaults, 2 random Tier 1)
@@ -38,12 +38,12 @@
 - Initial stats: 100 Health, 100 Mana (level 1 baseline)
 
 ### Duel Mechanics
-- 3D visualization of two wizards in a battle arena
+- 2D visualization of two wizards in a battle arena, with space for their card hand, deck, discard pile, summoned creatures, available scrolls, equipped potions.
 - UI overlay showing:
-  - Current/max Health
-  - Current/max Mana
+  - Current/max Health, red fill color on fillbar.
+  - Current/max Mana, blue  fill color on fillbar.
   - Level counter
-  - Experience bar
+  - Experience bar showing current/next level values for experience inside a pretty fillbar. green fill color.
 - Spell cards (2:3 aspect ratio, rounded corners) displaying:
   - Name
   - Type (direct damage, DoT, healing, debuff)
@@ -81,7 +81,8 @@
 - Scaling mana costs and effects:
   - Tier 1: High Mana (25-40), minor effects
   - Tier 3: Moderate Mana (around 15), balanced effects
-- Spell synergy mechanics
+- Spell synergy mechanics similar to MtG. We could use tags on Spells to help integrate this idea as ways to target/trigger synergy mechanics.
+- Spell card types: damage, buff, debuff, healing, summoning, interrupt, hybrid
 
 ### Wizard Stats & Progression
 - Level-up points can enhance:

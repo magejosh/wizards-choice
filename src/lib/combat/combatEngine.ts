@@ -70,13 +70,13 @@ export function initializeCombat(
   const stateWithBothHands = drawCards(stateWithPlayerHand, false, INITIAL_HAND_SIZE);
   
   // Add initial log entry
-  stateWithBothHands.log.push({
+  stateWithBothHands.log.push(createLogEntry({
     turn: 1,
     round: 1,
     actor: 'player',
     action: 'combat_start',
     details: 'The duel has begun! May the best wizard win.',
-  });
+  }));
   
   return stateWithBothHands;
 }
@@ -161,13 +161,13 @@ function drawCards(
       discardPile = [];
       
       // Add to combat log
-      newState.log.push({
+      newState.log.push(createLogEntry({
         turn: newState.turn,
         round: newState.round,
         actor: isPlayer ? 'player' : 'enemy',
         action: 'shuffle_discard',
         details: `${wizardName} shuffled the discard pile back into the draw pile.`,
-      });
+      }));
     }
     
     // Draw a card if possible
@@ -187,13 +187,13 @@ function drawCards(
   
   // Add to combat log if any cards were drawn
   if (count > 0) {
-    newState.log.push({
+    newState.log.push(createLogEntry({
       turn: newState.turn,
       round: newState.round,
       actor: isPlayer ? 'player' : 'enemy',
       action: 'draw_cards',
       details: `${wizardName} drew ${actualCount} card${actualCount !== 1 ? 's' : ''}.`,
-    });
+    }));
   }
   
   return newState;
@@ -234,13 +234,13 @@ function discardSpell(
   };
   
   // Add to combat log
-  newState.log.push({
+  newState.log.push(createLogEntry({
     turn: newState.turn,
     round: newState.round,
     actor: isPlayer ? 'player' : 'enemy',
     action: 'discard_spell',
     details: `${isPlayer ? 'You' : 'Enemy'} discarded ${spell.name}.`,
-  });
+  }));
   
   return newState;
 }
@@ -316,25 +316,25 @@ export function executeMysticPunch(
   };
   
   // Add to combat log
-  newState.log.push({
+  newState.log.push(createLogEntry({
     turn: newState.turn,
     round: newState.round,
     actor,
     action: 'mystic_punch',
     details: `${actor === 'player' ? 'You' : 'Enemy'} used Mystic Punch for ${damage} damage!`,
     damage,
-  });
+  }));
   
   // Check if combat has ended
   if (newState[target].currentHealth <= 0) {
     newState.status = isPlayer ? 'playerWon' : 'enemyWon';
-    newState.log.push({
+    newState.log.push(createLogEntry({
       turn: newState.turn,
       round: newState.round,
       actor,
       action: 'combat_end',
       details: `${actor === 'player' ? 'You' : 'Enemy'} won the duel!`,
-    });
+    }));
   }
   
   return advanceTurn(newState);
@@ -363,13 +363,13 @@ export function executeSpellCast(
   // Check if caster has enough mana
   if (newState[caster].currentMana < spell.manaCost) {
     // Not enough mana, add to log and advance turn
-    newState.log.push({
+    newState.log.push(createLogEntry({
       turn: newState.turn,
       round: newState.round,
       actor: isPlayer ? 'player' : 'enemy',
       action: 'spell_failed',
-      details: `Not enough mana to cast ${spell.name}!`,
-    });
+      details: `Not enough mana to cast ${spell.name}!`
+    }));
     return advanceTurn(newState);
   }
   
@@ -381,13 +381,14 @@ export function executeSpellCast(
   };
   
   // Add to combat log
-  newState.log.push({
+  newState.log.push(createLogEntry({
     turn: newState.turn,
     round: newState.round,
     actor: isPlayer ? 'player' : 'enemy',
     action: 'spell_cast',
     details: `${isPlayer ? 'You' : 'Enemy'} cast ${spell.name}!`,
-  });
+    spellName: spell.name
+  }));
   
   // Apply spell effects
   spell.effects.forEach(effect => {
@@ -397,22 +398,22 @@ export function executeSpellCast(
   // Check if combat has ended
   if (newState.playerWizard.currentHealth <= 0) {
     newState.status = 'enemyWon';
-    newState.log.push({
+    newState.log.push(createLogEntry({
       turn: newState.turn,
       round: newState.round,
       actor: 'enemy',
       action: 'combat_end',
-      details: 'Enemy won the duel!',
-    });
+      details: 'Enemy won the duel!'
+    }));
   } else if (newState.enemyWizard.currentHealth <= 0) {
     newState.status = 'playerWon';
-    newState.log.push({
+    newState.log.push(createLogEntry({
       turn: newState.turn,
       round: newState.round,
       actor: 'player',
       action: 'combat_end',
-      details: 'You won the duel!',
-    });
+      details: 'You won the duel!'
+    }));
   }
   
   // Move the spell from hand to discard pile
@@ -450,14 +451,14 @@ function applySpellEffect(
       };
       
       // Add to combat log
-      newState.log.push({
+      newState.log.push(createLogEntry({
         turn: newState.turn,
         round: newState.round,
         actor: isPlayerCaster ? 'player' : 'enemy',
         action: 'damage',
         details: `${effect.value} ${effect.element || ''} damage to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'}!`,
-        damage: effect.value,
-      });
+        damage: effect.value
+      }));
       break;
       
     case 'healing':
@@ -469,14 +470,14 @@ function applySpellEffect(
       };
       
       // Add to combat log
-      newState.log.push({
+      newState.log.push(createLogEntry({
         turn: newState.turn,
         round: newState.round,
         actor: isPlayerCaster ? 'player' : 'enemy',
         action: 'healing',
         details: `${effect.value} healing to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'}!`,
-        healing: effect.value,
-      });
+        healing: effect.value
+      }));
       break;
       
     case 'manaRestore':
@@ -488,14 +489,14 @@ function applySpellEffect(
       };
       
       // Add to combat log
-      newState.log.push({
+      newState.log.push(createLogEntry({
         turn: newState.turn,
         round: newState.round,
         actor: isPlayerCaster ? 'player' : 'enemy',
         action: 'mana_restore',
         details: `${effect.value} mana restored to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'}!`,
-        mana: effect.value,
-      });
+        mana: effect.value
+      }));
       break;
       
     case 'statModifier':
@@ -506,13 +507,13 @@ function applySpellEffect(
         const actorName = isPlayerCaster ? 'player' : 'enemy';
         
         // Add to combat log
-        newState.log.push({
+        newState.log.push(createLogEntry({
           turn: newState.turn,
           round: newState.round,
           actor: actorName,
           action: 'effect_applied',
-          details: `Time warped! ${actorName === 'player' ? 'You' : 'Enemy'} will get an extra turn!`,
-        });
+          details: `Time warped! ${actorName === 'player' ? 'You' : 'Enemy'} will get an extra turn!`
+        }));
         
         // Set a flag to grant an extra turn in the advanceTurn function
         newState.extraTurn = {
@@ -526,9 +527,12 @@ function applySpellEffect(
         const activeEffect: ActiveEffect = {
           id: `effect_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           name: effectName,
-          effect: { ...effect },
-          remainingDuration: effect.duration,
+          type: effect.type === 'statusEffect' ? 'damage_over_time' : 'stun', // Default based on effect type
+          value: effect.value,
+          duration: effect.duration || 1,
+          remainingDuration: effect.duration || 1,
           source: isPlayerCaster ? 'player' : 'enemy',
+          effect: { ...effect }
         };
         
         newState[effectTarget] = {
@@ -537,13 +541,13 @@ function applySpellEffect(
         };
         
         // Add to combat log
-        newState.log.push({
+        newState.log.push(createLogEntry({
           turn: newState.turn,
           round: newState.round,
           actor: isPlayerCaster ? 'player' : 'enemy',
           action: 'effect_applied',
           details: `Applied ${activeEffect.name} to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'} for ${effect.duration} turns!`,
-        });
+        }));
       }
       break;
   }
@@ -609,14 +613,14 @@ function processActiveEffects(
         };
         
         // Add to combat log
-        newState.log.push({
+        newState.log.push(createLogEntry({
           turn: newState.turn,
           round: newState.round,
           actor: activeEffect.source,
           action: 'damage_over_time',
           details: `${effect.value} ${effect.element || ''} damage to ${isPlayer ? 'you' : 'enemy'} from ${activeEffect.name}!`,
           damage: effect.value,
-        });
+        }));
         break;
         
       case 'healing':
@@ -628,14 +632,14 @@ function processActiveEffects(
         };
         
         // Add to combat log
-        newState.log.push({
+        newState.log.push(createLogEntry({
           turn: newState.turn,
           round: newState.round,
           actor: activeEffect.source,
           action: 'healing_over_time',
           details: `${effect.value} healing to ${isPlayer ? 'you' : 'enemy'} from ${activeEffect.name}!`,
           healing: effect.value,
-        });
+        }));
         break;
         
       case 'manaRestore':
@@ -647,14 +651,14 @@ function processActiveEffects(
         };
         
         // Add to combat log
-        newState.log.push({
+        newState.log.push(createLogEntry({
           turn: newState.turn,
           round: newState.round,
           actor: activeEffect.source,
           action: 'mana_restore_over_time',
           details: `${effect.value} mana restored to ${isPlayer ? 'you' : 'enemy'} from ${activeEffect.name}!`,
           mana: effect.value,
-        });
+        }));
         break;
     }
     
@@ -671,13 +675,13 @@ function processActiveEffects(
   
   // Log expired effects
   expiredEffects.forEach(expiredEffect => {
-    newState.log.push({
+    newState.log.push(createLogEntry({
       turn: newState.turn,
       round: newState.round,
       actor: expiredEffect.source,
       action: 'effect_expired',
       details: `${expiredEffect.name} has expired for ${isPlayer ? 'you' : 'enemy'}!`,
-    });
+    }));
   });
   
   // Update active effects
@@ -711,14 +715,14 @@ function regenerateMana(
   };
   
   // Add to combat log
-  newState.log.push({
+  newState.log.push(createLogEntry({
     turn: newState.turn,
     round: newState.round,
     actor: isPlayer ? 'player' : 'enemy',
     action: 'mana_regen',
     details: `${isPlayer ? 'You' : 'Enemy'} regenerated ${manaRegen} mana!`,
     mana: manaRegen,
-  });
+  }));
   
   return newState;
 }
@@ -745,13 +749,13 @@ function advanceTurn(state: CombatState): CombatState {
     newState.extraTurn = undefined;
     
     // Add to combat log
-    newState.log.push({
+    newState.log.push(createLogEntry({
       turn: newState.turn,
       round: newState.round,
       actor: extraTurnFor,
       action: 'extra_turn',
       details: `${extraTurnFor === 'player' ? 'You' : 'Enemy'} takes an extra turn through time magic!`,
-    });
+    }));
     
     // Set the turn to the player who cast Time Warp
     newState.isPlayerTurn = extraTurnFor === 'player';
@@ -867,4 +871,14 @@ export function calculateExperienceGained(state: CombatState): number {
   }[state.difficulty];
   
   return Math.floor(enemyValue * difficultyMultiplier);
+}
+
+/**
+ * Helper function to create a combat log entry with timestamp
+ */
+function createLogEntry(entry: Omit<CombatLogEntry, 'timestamp'>): CombatLogEntry {
+  return {
+    ...entry,
+    timestamp: Date.now()
+  };
 }

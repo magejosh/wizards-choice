@@ -31,7 +31,9 @@ export interface ActiveEffect {
   type: 'damage_over_time' | 'healing_over_time' | 'mana_drain' | 'mana_regen' | 'stun' | 'silence';
   value: number;
   duration: number; // In turns
+  remainingDuration: number; // Remaining turns for the effect
   source?: 'player' | 'enemy';
+  effect?: SpellEffect; // The original spell effect that created this active effect
 }
 
 // Equipment Types
@@ -60,6 +62,8 @@ export interface Ingredient {
   rarity: IngredientRarity;
   description: string;
   properties: string[];
+  effects: string[];
+  quantity: number;
   imagePath?: string;
 }
 
@@ -233,6 +237,7 @@ export interface CombatState {
   log: CombatLogEntry[];
   status: 'active' | 'playerWon' | 'enemyWon';
   difficulty: 'easy' | 'normal' | 'hard';
+  extraTurn?: { for: 'player' | 'enemy' }; // Add this for Time Warp spell effect
 }
 
 export interface CombatWizard {
@@ -502,7 +507,9 @@ export interface MarketTransaction {
 }
 
 export interface SpellEffect {
-  type: 'damage' | 'healing' | 'buff' | 'debuff' | 'control' | 'summon' | 'utility' | 'timeRewind' | 'delay' | 'confusion' | 'damageBonus' | 'defense' | 'spellEcho';
+  type: 'damage' | 'healing' | 'buff' | 'debuff' | 'control' | 'summon' | 'utility' | 'timeRewind' | 
+        'delay' | 'confusion' | 'damageBonus' | 'defense' | 'spellEcho' | 
+        'manaRestore' | 'statModifier' | 'statusEffect';
   value: number;
   target: 'self' | 'enemy';
   element: ElementType;
@@ -518,4 +525,9 @@ export interface CombatLogEntry {
   value?: number;
   element?: ElementType;
   timestamp: number;
+  details?: string;
+  damage?: number;
+  healing?: number;
+  mana?: number;
+  spellName?: string;
 }

@@ -580,7 +580,10 @@ const _MarketUI: React.FC<MarketUIProps> = ({ onClose, useMockData = false }) =>
       
       // Update UI immediately after transaction
       setMessage(result.message);
-      setGold(getPlayerGold()); // Update gold after purchase
+      
+      // Ensure we get the latest gold value directly from the store
+      const updatedGold = getPlayerGold();
+      setGold(updatedGold);
       
       // Reset selection after successful purchase
       if (result.success) {
@@ -619,7 +622,10 @@ const _MarketUI: React.FC<MarketUIProps> = ({ onClose, useMockData = false }) =>
       
       // Update UI immediately after transaction
       setMessage(result.message);
-      setGold(getPlayerGold()); // Update gold after selling
+      
+      // Ensure we get the latest gold value directly from the store
+      const updatedGold = getPlayerGold();
+      setGold(updatedGold);
       
       // Reset selection after successful sale
       if (result.success) {
@@ -881,6 +887,15 @@ const _MarketUI: React.FC<MarketUIProps> = ({ onClose, useMockData = false }) =>
       setMessage("Error refreshing markets. Please try again.");
     }
   };
+  
+  // Added useEffect to ensure gold is always synced with gameState
+  useEffect(() => {
+    // This will run whenever gameState changes, ensuring gold display is in sync
+    const currentGold = getPlayerGold();
+    if (currentGold !== gold) {
+      setGold(currentGold);
+    }
+  }, [gameState.marketData.gold]); // Only re-run when marketData.gold changes
   
   if (isLoading) {
     return (

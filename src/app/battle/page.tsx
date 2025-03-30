@@ -39,6 +39,9 @@ export default function BattlePage() {
     saveGame
   } = useGameStateStore();
   
+  // Add state for enemy turn indicator
+  const [isEnemyTurnIndicatorVisible, setIsEnemyTurnIndicatorVisible] = useState(false);
+  
   // Initialize combat once
   useEffect(() => {
     if (isInitialized) return;
@@ -99,165 +102,6 @@ export default function BattlePage() {
     setIsInitialized(true);
   }, []);
   
-  // Handle AI turn
-  useEffect(() => {
-    // Ensure we only process AI turns when needed
-    if (!combatState) {
-      console.log("AI turn: No combat state available");
-      return;
-    }
-    
-    if (combatState.isPlayerTurn) {
-      // Player's turn, don't process AI turn
-      return;
-    }
-    
-    if (combatState.status !== 'active') {
-      console.log("AI turn: Combat is not active, status:", combatState.status);
-      return;
-    }
-    
-    // CRITICAL FIX: Force reset animation state if it's been true for more than 5 seconds
-    // This prevents the AI turn from being blocked indefinitely
-    
-    if (isAnimating) {
-      console.log("AI turn: Animation in progress, waiting");
-      
-      // Clear any existing timeout
-      if (animationTimeoutRef.current) {
-        clearTimeout(animationTimeoutRef.current);
-      }
-      
-      // Set a new timeout to force animation to end after 3 seconds
-      animationTimeoutRef.current = setTimeout(() => {
-        console.log("AI turn: Animation timeout reached, forcing animation to end");
-        setIsAnimating(false);
-        isHandlingAITurnRef.current = false;
-      }, 3000);
-      
-      return; // Don't proceed if animations are playing
-    }
-    
-    if (isHandlingAITurnRef.current) {
-      console.log("AI turn: Already handling AI turn");
-      return;
-    }
-    
-    // Clear animation timeout if we're proceeding with AI turn
-    if (animationTimeoutRef.current) {
-      clearTimeout(animationTimeoutRef.current);
-      animationTimeoutRef.current = null;
-    }
-    
-    console.log("AI turn: Starting AI turn logic");
-    
-    // Prevent re-entry
-    isHandlingAITurnRef.current = true;
-    setIsAnimating(true);
-    
-    // Use setTimeout to add a delay before AI acts
-    const aiTimer = setTimeout(() => {
-      if (!combatState) {
-        console.log("AI turn: Combat state no longer available");
-        isHandlingAITurnRef.current = false;
-        setIsAnimating(false);
-        return;
-      }
-      
-      try {
-        // Log available spells for the enemy
-        console.log("AI turn: Enemy wizard", combatState.enemyWizard);
-        console.log("AI turn: Enemy wizard has equipped spells:", combatState.enemyWizard.wizard.equippedSpells);
-        
-        // Get AI spell selection
-        const aiSpell = getAISpellSelection(combatState);
-        console.log("AI turn: Selected spell for AI turn", aiSpell);
-        
-        if (!aiSpell) {
-          console.error("AI turn: No valid spell selected for AI turn");
-          // If no spell available, skip turn
-          const skipTurnLog = {
-            turn: combatState.turn,
-            round: combatState.round,
-            actor: 'enemy',
-            action: 'skip_turn',
-            details: `${combatState.enemyWizard.wizard.name} skipped their turn.`,
-            timestamp: Date.now()
-          };
-          
-          setCombatState({
-            ...combatState,
-            isPlayerTurn: true,
-            turn: combatState.turn + 1,
-            log: [...combatState.log, skipTurnLog]
-          });
-          
-          // Ensure animation flag is reset
-          setTimeout(() => {
-            isHandlingAITurnRef.current = false;
-            setIsAnimating(false);
-          }, 300);
-          return;
-        }
-        
-        // Make sure the spell has required properties
-        const validatedSpell = {
-          ...aiSpell,
-          effects: aiSpell.effects || [],
-          imagePath: aiSpell.imagePath || '/images/spells/default-placeholder.jpg'
-        };
-        
-        console.log("AI turn: Validated spell with required properties", validatedSpell);
-        
-        // Update state with selected spell
-        const updatedState = selectSpell(combatState, validatedSpell, false);
-        console.log("AI turn: After spell selection", updatedState);
-        
-        setCombatState(updatedState);
-        
-        // Execute the spell after a short delay
-        setTimeout(() => {
-          try {
-            if (!updatedState) {
-              console.error("AI turn: Updated state is null after spell selection");
-              isHandlingAITurnRef.current = false;
-              setIsAnimating(false);
-              return;
-            }
-            
-            console.log("AI turn: Executing spell cast");
-            const afterCastState = executeSpellCast(updatedState, false);
-            console.log("AI turn: After spell execution", afterCastState);
-            setCombatState(afterCastState);
-            
-            // Ensure animation flag is reset
-            setTimeout(() => {
-              console.log("AI turn completed, setting isAnimating to false");
-              isHandlingAITurnRef.current = false;
-              setIsAnimating(false);
-            }, 500);
-          } catch (error) {
-            console.error("Error executing AI spell:", error);
-            isHandlingAITurnRef.current = false;
-            setIsAnimating(false);
-          }
-        }, 1000);
-      } catch (error) {
-        console.error("Error in AI turn:", error);
-        isHandlingAITurnRef.current = false;
-        setIsAnimating(false);
-      }
-    }, 800); // Reduced from 1500ms to 800ms for better flow
-    
-    return () => {
-      clearTimeout(aiTimer);
-      if (animationTimeoutRef.current) {
-        clearTimeout(animationTimeoutRef.current);
-      }
-      isHandlingAITurnRef.current = false;
-    };
-  }, [combatState, isAnimating]);
-  
   // Handle game end
   useEffect(() => {
     if (!combatState || 
@@ -309,13 +153,16 @@ export default function BattlePage() {
     }
   };
 
-  // Handle spell selection
+  // Handle player spell selection
   const handleSpellSelect = (spell: Spell) => {
     if (!combatState || !combatState.isPlayerTurn || isAnimating) return;
     
     setIsAnimating(true);
     
     try {
+      // STEP 1: PLAYER TURN
+      console.log("PLAYER TURN: Player casting spell");
+      
       // Make sure the spell has required properties
       const validatedSpell: Spell = {
         ...spell,
@@ -323,36 +170,99 @@ export default function BattlePage() {
         imagePath: spell.imagePath || '/images/spells/default-placeholder.jpg'
       };
       
-      console.log("Casting spell:", validatedSpell);
+      console.log("PLAYER TURN: Casting spell:", validatedSpell);
       
       // Update state with selected spell
-      const updatedState = selectSpell(combatState, validatedSpell, true);
-      setCombatState(updatedState);
+      const playerStateWithSpell = selectSpell(combatState, validatedSpell, true);
       
-      // Execute the spell after a short delay
+      // Execute the spell immediately
+      console.log("PLAYER TURN: Executing spell:", validatedSpell);
+      const playerTurnComplete = executeSpellCast(playerStateWithSpell, true);
+      console.log("PLAYER TURN: Spell executed, new state:", playerTurnComplete);
+      
+      // STEP 2: ENEMY TURN - process it after a delay with visual indicator
       setTimeout(() => {
-        try {
-          console.log("Executing spell:", validatedSpell);
-          
-          const afterCastState = executeSpellCast(updatedState, true);
-          console.log("Spell executed, new state:", afterCastState);
-          
-          setCombatState(afterCastState);
-          
-          // Add a slight delay before setting isAnimating to false
-          // This ensures animations complete before AI turn processing
-          setTimeout(() => {
-            console.log("Player turn animation completed, setting isAnimating to false");
+        // Show enemy turn indicator
+        setIsEnemyTurnIndicatorVisible(true);
+        
+        setTimeout(() => {
+          try {
+            console.log("ENEMY TURN: Starting enemy turn after player");
+            
+            // Get the enemy wizard info
+            const enemyWizard = playerTurnComplete.enemyWizard.wizard;
+            console.log("ENEMY TURN: Enemy wizard data:", enemyWizard);
+            
+            // Find any spell the enemy can cast
+            const availableSpells = enemyWizard.equippedSpells.filter(
+              spell => spell.manaCost <= playerTurnComplete.enemyWizard.currentMana
+            );
+            
+            console.log("ENEMY TURN: Available spells:", availableSpells);
+            
+            // Pick a spell for the enemy
+            let enemySpell: Spell;
+            
+            if (availableSpells.length > 0) {
+              enemySpell = availableSpells[0];
+              console.log("ENEMY TURN: Selected spell:", enemySpell);
+            } else {
+              // Create a basic spell if needed
+              enemySpell = {
+                id: `emergency_spell_${Date.now()}`,
+                name: "Emergency Magic",
+                description: "A basic magical attack",
+                manaCost: 0,
+                tier: 1,
+                type: "attack" as any,
+                element: "arcane" as any,
+                effects: [
+                  {
+                    type: "damage" as any,
+                    value: 5,
+                    target: "enemy",
+                    element: "arcane"
+                  }
+                ],
+                imagePath: '/images/spells/default-placeholder.jpg'
+              };
+              console.log("ENEMY TURN: Created emergency spell:", enemySpell);
+            }
+            
+            // Execute enemy spell
+            const enemyStateWithSpell = selectSpell(playerTurnComplete, enemySpell, false);
+            console.log("ENEMY TURN: Enemy selected spell, state:", enemyStateWithSpell);
+            
+            const enemyTurnComplete = executeSpellCast(enemyStateWithSpell, false);
+            console.log("ENEMY TURN: Enemy spell executed, final state:", enemyTurnComplete);
+            
+            // Wait a moment before hiding the indicator
+            setTimeout(() => {
+              // Hide the enemy turn indicator
+              setIsEnemyTurnIndicatorVisible(false);
+              
+              // Update with the final state after both turns
+              setCombatState(enemyTurnComplete);
+              
+              // Reset animation state
+              setTimeout(() => {
+                setIsAnimating(false);
+                console.log("COMPLETE: Both turns finished, animation reset");
+              }, 500);
+            }, 1000);
+          } catch (error) {
+            console.error("Error in enemy turn:", error);
+            // If enemy turn fails, still update with player's turn
+            setCombatState(playerTurnComplete);
             setIsAnimating(false);
-          }, 300);
-        } catch (error) {
-          console.error("Error executing spell:", error);
-          setIsAnimating(false);
-        }
-      }, 500);
+            setIsEnemyTurnIndicatorVisible(false);
+          }
+        }, 1000); // Wait 1 second after showing indicator before executing enemy turn
+      }, 1000); // Wait 1 second after player's turn before showing enemy turn indicator
     } catch (error) {
-      console.error("Error selecting spell:", error);
+      console.error("Error in player turn:", error);
       setIsAnimating(false);
+      setIsEnemyTurnIndicatorVisible(false);
     }
   };
 
@@ -364,56 +274,130 @@ export default function BattlePage() {
     setShowMysticPunchSelection(true);
   };
 
-  // Execute mystic punch with selected spell
+  // Execute mystic punch with selected spell - also handle enemy turn directly
   const executeMysticPunchWithSpell = (spell: Spell) => {
-    if (!combatState) return;
+    if (!combatState || isAnimating) return;
     
     setIsAnimating(true);
     
     try {
-      // Make sure the spell has required properties
-      const validatedSpell: Spell = {
-        ...spell,
-        effects: spell.effects || [],
-        imagePath: spell.imagePath || '/images/spells/default-placeholder.jpg'
-      };
-      
-      console.log("Using spell for Mystic Punch:", validatedSpell);
+      // STEP 1: PLAYER TURN
+      console.log("PLAYER TURN: Player using Mystic Punch");
       
       // Hide selection modal
       setShowMysticPunchSelection(false);
       
-      // Execute mystic punch with the correct parameters
-      const updatedState = executeMysticPunch(
+      // Execute mystic punch with the spell tier
+      const playerTurnComplete = executeMysticPunch(
         combatState,
-        validatedSpell.tier,
+        spell.tier,
         true // isPlayer = true
       );
       
-      console.log("Mystic Punch executed, new state:", updatedState);
+      console.log("PLAYER TURN: Mystic Punch executed, new state:", playerTurnComplete);
       
-      setCombatState(updatedState);
+      // Check if combat ended with player's turn
+      if (playerTurnComplete.status !== 'active') {
+        setCombatState(playerTurnComplete);
+        setTimeout(() => setIsAnimating(false), 500);
+        return;
+      }
       
-      // Add a slight delay before setting isAnimating to false
-      // This ensures animations complete before AI turn processing
+      // STEP 2: ENEMY TURN - process it after a delay with visual indicator
       setTimeout(() => {
-        console.log("Mystic Punch animation completed, setting isAnimating to false");
-        setIsAnimating(false);
-      }, 500);
+        // Show enemy turn indicator
+        setIsEnemyTurnIndicatorVisible(true);
+        
+        setTimeout(() => {
+          try {
+            console.log("ENEMY TURN: Starting enemy turn after player");
+            
+            // Get the enemy wizard info
+            const enemyWizard = playerTurnComplete.enemyWizard.wizard;
+            console.log("ENEMY TURN: Enemy wizard data:", enemyWizard);
+            
+            // Find any spell the enemy can cast
+            const availableSpells = enemyWizard.equippedSpells.filter(
+              spell => spell.manaCost <= playerTurnComplete.enemyWizard.currentMana
+            );
+            
+            console.log("ENEMY TURN: Available spells:", availableSpells);
+            
+            // Pick a spell for the enemy
+            let enemySpell: Spell;
+            
+            if (availableSpells.length > 0) {
+              enemySpell = availableSpells[0];
+              console.log("ENEMY TURN: Selected spell:", enemySpell);
+            } else {
+              // Create a basic spell if needed
+              enemySpell = {
+                id: `emergency_spell_${Date.now()}`,
+                name: "Emergency Magic",
+                description: "A basic magical attack",
+                manaCost: 0,
+                tier: 1,
+                type: "attack" as any,
+                element: "arcane" as any,
+                effects: [
+                  {
+                    type: "damage" as any,
+                    value: 5,
+                    target: "enemy",
+                    element: "arcane"
+                  }
+                ],
+                imagePath: '/images/spells/default-placeholder.jpg'
+              };
+              console.log("ENEMY TURN: Created emergency spell:", enemySpell);
+            }
+            
+            // Execute enemy spell
+            const enemyStateWithSpell = selectSpell(playerTurnComplete, enemySpell, false);
+            console.log("ENEMY TURN: Enemy selected spell, state:", enemyStateWithSpell);
+            
+            const enemyTurnComplete = executeSpellCast(enemyStateWithSpell, false);
+            console.log("ENEMY TURN: Enemy spell executed, final state:", enemyTurnComplete);
+            
+            // Wait a moment before hiding the indicator
+            setTimeout(() => {
+              // Hide the enemy turn indicator
+              setIsEnemyTurnIndicatorVisible(false);
+              
+              // Update with the final state after both turns
+              setCombatState(enemyTurnComplete);
+              
+              // Reset animation state
+              setTimeout(() => {
+                setIsAnimating(false);
+                console.log("COMPLETE: Both turns finished, animation reset");
+              }, 500);
+            }, 1000);
+          } catch (error) {
+            console.error("Error in enemy turn:", error);
+            // If enemy turn fails, still update with player's turn
+            setCombatState(playerTurnComplete);
+            setIsAnimating(false);
+            setIsEnemyTurnIndicatorVisible(false);
+          }
+        }, 1000); // Wait 1 second after showing indicator before executing enemy turn
+      }, 1000); // Wait 1 second after player's turn before showing enemy turn indicator
     } catch (error) {
       console.error("Error executing mystic punch:", error);
       setIsAnimating(false);
+      setIsEnemyTurnIndicatorVisible(false);
     }
   };
 
-  // Handle skip turn
+  // Handle skip turn - also handle enemy turn directly
   const handleSkipTurn = () => {
     if (!combatState || !combatState.isPlayerTurn || isAnimating) return;
     
     setIsAnimating(true);
     
     try {
-      console.log("Skip turn: Player is skipping their turn");
+      // STEP 1: PLAYER TURN (SKIP)
+      console.log("PLAYER TURN: Player skipping turn");
       
       // Create a log entry for skipping the turn
       const skipTurnLog = {
@@ -422,31 +406,127 @@ export default function BattlePage() {
         actor: 'player',
         action: 'skip_turn',
         details: 'You skipped your turn.',
-        timestamp: Date.now()  // Add the timestamp that's required by the type
+        timestamp: Date.now()
       };
       
-      const newState = {
+      // Create state after player's skip
+      const playerTurnComplete = {
         ...combatState,
         isPlayerTurn: false,
+        turn: combatState.turn + 1,
         log: [...combatState.log, skipTurnLog]
       };
       
-      console.log("Skip turn: Updated state", newState);
-      setCombatState(newState as CombatState);
+      console.log("PLAYER TURN: Skip completed, new state:", playerTurnComplete);
       
+      // STEP 2: ENEMY TURN - process it after a delay with visual indicator
       setTimeout(() => {
-        setIsAnimating(false);
-      }, 300);
+        // Show enemy turn indicator
+        setIsEnemyTurnIndicatorVisible(true);
+        
+        setTimeout(() => {
+          try {
+            console.log("ENEMY TURN: Starting enemy turn after player");
+            
+            // Get the enemy wizard info
+            const enemyWizard = playerTurnComplete.enemyWizard.wizard;
+            console.log("ENEMY TURN: Enemy wizard data:", enemyWizard);
+            
+            // Find any spell the enemy can cast
+            const availableSpells = enemyWizard.equippedSpells.filter(
+              spell => spell.manaCost <= playerTurnComplete.enemyWizard.currentMana
+            );
+            
+            console.log("ENEMY TURN: Available spells:", availableSpells);
+            
+            // Pick a spell for the enemy
+            let enemySpell: Spell;
+            
+            if (availableSpells.length > 0) {
+              enemySpell = availableSpells[0];
+              console.log("ENEMY TURN: Selected spell:", enemySpell);
+            } else {
+              // Create a basic spell if needed
+              enemySpell = {
+                id: `emergency_spell_${Date.now()}`,
+                name: "Emergency Magic",
+                description: "A basic magical attack",
+                manaCost: 0,
+                tier: 1,
+                type: "attack" as any,
+                element: "arcane" as any,
+                effects: [
+                  {
+                    type: "damage" as any,
+                    value: 5,
+                    target: "enemy",
+                    element: "arcane"
+                  }
+                ],
+                imagePath: '/images/spells/default-placeholder.jpg'
+              };
+              console.log("ENEMY TURN: Created emergency spell:", enemySpell);
+            }
+            
+            // Execute enemy spell
+            const enemyStateWithSpell = selectSpell(playerTurnComplete, enemySpell, false);
+            console.log("ENEMY TURN: Enemy selected spell, state:", enemyStateWithSpell);
+            
+            const enemyTurnComplete = executeSpellCast(enemyStateWithSpell, false);
+            console.log("ENEMY TURN: Enemy spell executed, final state:", enemyTurnComplete);
+            
+            // Wait a moment before hiding the indicator
+            setTimeout(() => {
+              // Hide the enemy turn indicator
+              setIsEnemyTurnIndicatorVisible(false);
+              
+              // Update with the final state after both turns
+              setCombatState(enemyTurnComplete);
+              
+              // Reset animation state
+              setTimeout(() => {
+                setIsAnimating(false);
+                console.log("COMPLETE: Both turns finished, animation reset");
+              }, 500);
+            }, 1000);
+          } catch (error) {
+            console.error("Error in enemy turn:", error);
+            // If enemy turn fails, still update with player's turn
+            setCombatState(playerTurnComplete);
+            setIsAnimating(false);
+            setIsEnemyTurnIndicatorVisible(false);
+          }
+        }, 1000); // Wait 1 second after showing indicator before executing enemy turn
+      }, 1000); // Wait 1 second after player's turn before showing enemy turn indicator
     } catch (error) {
       console.error("Error skipping turn:", error);
       setIsAnimating(false);
+      setIsEnemyTurnIndicatorVisible(false);
     }
   };
 
-  // Add useEffect to log animation state changes
+  // Keep our safety timeout but make it longer
   useEffect(() => {
-    console.log(`Animation state changed to: ${isAnimating ? 'animating' : 'not animating'}`);
-  }, [isAnimating]);
+    if (combatState && combatState.status === 'active') {
+      const checkTimeout = setTimeout(() => {
+        if (isAnimating) {
+          console.log("Animation safety timeout: Animation stuck for too long, forcing it to end");
+          setIsAnimating(false);
+          
+          // Also reset the turn if we detected a stuck state
+          if (!combatState.isPlayerTurn) {
+            console.log("Animation safety: Forced turn reset to player");
+            setCombatState({
+              ...combatState,
+              isPlayerTurn: true
+            });
+          }
+        }
+      }, 5000); // 5 seconds
+      
+      return () => clearTimeout(checkTimeout);
+    }
+  }, [combatState, isAnimating]);
 
   if (!combatState) {
     return <div className="loading">Initializing battle...</div>;
@@ -461,6 +541,16 @@ export default function BattlePage() {
         onSkipTurn={handleSkipTurn}
         isAnimating={isAnimating}
       />
+      
+      {/* Enemy turn indicator */}
+      {isEnemyTurnIndicatorVisible && (
+        <div className="enemy-turn-indicator">
+          <div className="enemy-turn-indicator__content">
+            <h3>Enemy's Turn</h3>
+            <p>{combatState.enemyWizard.wizard.name} is casting a spell...</p>
+          </div>
+        </div>
+      )}
       
       {/* Show continue button when battle is over */}
       {combatState.status !== 'active' && (

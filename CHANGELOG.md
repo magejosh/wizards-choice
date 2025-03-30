@@ -1,13 +1,21 @@
 # CHANGELOG
 
-## 2025-03-31
+## 2025-03-30
+- Done: Fixed battle system enemy turn flow and improved visibility
+  - Redesigned the battle flow to embed enemy turns directly into player action handlers
+  - Eliminated race conditions and state management issues with the previous timer-based approach
+  - Added a clear visual "Enemy's Turn" indicator with animated styling to improve user experience
+  - Enhanced safety mechanisms to detect and recover from any stuck animation states
+  - Extended timing between turns to make the enemy's actions more noticeable for players
+
+## 2025-03-28
 - Identified remaining issues in StreamlinedMarketUI after successful rendering implementation
   - Transaction logic not properly updating player gold
   - Inventory not receiving purchased items
   - Market quantities not updating after purchases
   - Created targeted plan to fix transaction-related issues while preserving the successful UI rendering
 
-## 2025-03-30
+## 2025-03-28
 - Done: Successfully resolved MarketUI rendering issues with complete rewrite
   - Completely rewrote the MarketUI using a phased loading architecture to improve stability
   - Used explicit loading states with progress indicators for each step in market data loading
@@ -26,7 +34,7 @@
     - Using inline styles with high z-index values to ensure visibility
     - Ensuring clear separation between API parameter values and UI state
 
-## 2025-03-29
+## 2025-03-28
 - Note: Completed multiple approaches to fix MarketUI rendering issues, but none fully resolved the problem
   - Implemented comprehensive ErrorBoundary around MarketUI component
   - Added detailed performance monitoring to identify bottlenecks and race conditions
@@ -46,7 +54,7 @@
   - Created refactoring plan with detailed component structure in BUGS.md
   - After multiple unsuccessful approaches, decided to create a complete refactoring plan for the MarketUI
 
-## 2025-03-28
+## 2025-03-27
 - Done: Completed MarketUI rendering improvements and refactoring
   - Fixed import/export mismatch between WizardStudy and MarketUI components
   - Fully transitioned MarketUI to use CSS modules instead of inline styles

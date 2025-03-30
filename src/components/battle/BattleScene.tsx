@@ -78,6 +78,7 @@ interface VisualEffect {
   position: [number, number, number];
   target: 'player' | 'enemy';
   lifetime: number;
+  id?: string;
 }
 
 const BattleScene: React.FC<BattleSceneProps> = ({ combatState }) => {
@@ -106,11 +107,11 @@ const BattleScene: React.FC<BattleSceneProps> = ({ combatState }) => {
       
       // Display damage or healing numbers
       if (latestLog.damage && latestLog.damage > 0) {
-        const targetPosition: [number, number, number] = latestLog.actor === 'player' ? [3, 1.5, 0] : [-3, 1.5, 0];
+        const targetPosition: [number, number, number] = latestLog.target === 'enemy' ? [3, 1.5, 0] : [-3, 1.5, 0];
         setDamageNumbers(prev => [...prev, {
           value: latestLog.damage,
           position: targetPosition,
-          lifetime: 60, // frames
+          lifetime: 30, // Reduced from 60 to 30 frames for faster completion
           color: '#ff4444',
           isHealing: false
         }]);
@@ -124,7 +125,8 @@ const BattleScene: React.FC<BattleSceneProps> = ({ combatState }) => {
               element: spell.element,
               position: latestLog.actor === 'player' ? [-3, 1, 0] : [3, 1, 0],
               target: latestLog.actor === 'player' ? 'enemy' : 'player',
-              lifetime: 90 // frames
+              lifetime: 30, // Reduced from 60 to 30 frames for faster completion
+              id: `spell-effect-${Date.now()}-${Math.random()}` // Add unique ID to help with rendering
             }]);
           }
         }
@@ -135,7 +137,7 @@ const BattleScene: React.FC<BattleSceneProps> = ({ combatState }) => {
         setDamageNumbers(prev => [...prev, {
           value: latestLog.healing,
           position: targetPosition,
-          lifetime: 60, // frames
+          lifetime: 30, // Reduced from 60 to 30 frames for faster completion
           color: '#44ff44',
           isHealing: true
         }]);
@@ -149,7 +151,8 @@ const BattleScene: React.FC<BattleSceneProps> = ({ combatState }) => {
               element: spell.element,
               position: targetPosition,
               target: latestLog.target === 'enemy' ? 'enemy' : 'player',
-              lifetime: 90 // frames
+              lifetime: 30, // Reduced from 60 to 30 frames for faster completion
+              id: `heal-effect-${Date.now()}-${Math.random()}` // Add unique ID to help with rendering
             }]);
           }
         }
@@ -159,12 +162,12 @@ const BattleScene: React.FC<BattleSceneProps> = ({ combatState }) => {
     }
   }, [combatState.log, combatState]);
 
-  // Animation frame handler
+  // Animation frame handler - use even higher decay rate to ensure effects don't last too long
   useFrame(() => {
     // Update active effects lifetimes
     setActiveEffects(prev => 
       prev
-        .map(effect => ({ ...effect, lifetime: effect.lifetime - 1 }))
+        .map(effect => ({ ...effect, lifetime: effect.lifetime - 3 })) // Even faster decay (from 2 to 3)
         .filter(effect => effect.lifetime > 0)
     );
     
@@ -173,10 +176,10 @@ const BattleScene: React.FC<BattleSceneProps> = ({ combatState }) => {
       prev
         .map(num => ({ 
           ...num, 
-          lifetime: num.lifetime - 1,
+          lifetime: num.lifetime - 3, // Even faster decay (from 2 to 3)
           position: [
             num.position[0], 
-            num.position[1] + 0.03, 
+            num.position[1] + 0.05, // Move slightly faster upward
             num.position[2]
           ] as [number, number, number]
         }))
@@ -222,7 +225,7 @@ const BattleScene: React.FC<BattleSceneProps> = ({ combatState }) => {
       {/* Render active spell effects */}
       {activeEffects.map((effect, index) => (
         <SpellEffect3D 
-          key={index}
+          key={effect.id || `effect-${index}-${effect.type}-${effect.lifetime}`}
           type={effect.type}
           element={effect.element}
           position={effect.position}

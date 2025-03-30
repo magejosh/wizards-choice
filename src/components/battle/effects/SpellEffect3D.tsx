@@ -51,11 +51,11 @@ const SpellEffect3D: React.FC<SpellEffect3DProps> = ({
   // Update position and scale based on lifetime
   useFrame((_, delta) => {
     if (meshRef.current) {
-      // Move in the direction of the target
-      meshRef.current.position.x += direction.x * delta * 2;
+      // Move in the direction of the target much faster
+      meshRef.current.position.x += direction.x * delta * 10;
       
-      // Scale down as the effect ages
-      const scale = Math.min(1, lifetime / 60);
+      // Scale down as the effect ages even more quickly
+      const scale = Math.min(1, lifetime / 20);
       meshRef.current.scale.set(scale, scale, scale);
     }
   });

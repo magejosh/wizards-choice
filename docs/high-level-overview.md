@@ -18,6 +18,8 @@ Here's a clear breakdown of the Wizard's Choice architecture:
 - `combatEngine.ts`: Core battle mechanics
 - `aiEngine.ts`: Enemy AI decision making
 - Integrates with 3D visualization
+- Embedded enemy turns directly in player action handlers for improved flow
+- Visual "Enemy's Turn" indicator with animated styling
 
 3. **Spell System (`src/lib/spells/`)**
 - Spell definitions and effects
@@ -62,6 +64,15 @@ User Action → UI Component → Game State Store → Combat/Market Engine → S
 - Tracks achievements, titles, battle history
 - Integrates with combat and progression systems
 - Persistent player statistics
+
+### Recent Improvements
+
+- **Battle System Flow (2025-03-30)**: 
+  - Redesigned battle flow with embedded enemy turns in player action handlers
+  - Eliminated race conditions and state management issues with the previous timer-based approach
+  - Added clear visual "Enemy's Turn" indicator with animated styling
+  - Enhanced safety mechanisms to detect and recover from stuck animation states
+  - Extended timing between turns for better player experience
 
 This architecture supports a single-player tactical game with future multiplayer considerations built into the design.
 

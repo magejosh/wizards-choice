@@ -17,7 +17,7 @@ export interface CombatActions {
   getCombatState: () => CombatState | null;
   selectSpell: (spell: Spell, isPlayer: boolean) => void;
   castSpell: (isPlayer: boolean) => void;
-  executeMysticPunch: (isPlayer: boolean) => void;
+  executeMysticPunch: (spell: Spell | null, isPlayer: boolean) => void;
   skipTurn: (isPlayer: boolean) => void;
   addCombatLogEntry: (entry: Omit<CombatLogEntry, 'timestamp'>) => void;
   processTurnEffects: (isPlayer: boolean) => void;
@@ -321,24 +321,63 @@ export const createCombatModule = (set: Function, get: Function): CombatActions 
     });
   },
 
-  executeMysticPunch: (isPlayer) => {
+  executeMysticPunch: (spell, isPlayer) => {
     set((state: any) => {
-      const combatState = { ...state.combatState };
-      if (!combatState) return state;
+      if (!state.combatState) return state;
       
+      const combatState = { ...state.combatState };
+      
+      // Get the attacker and defender
       const attacker = isPlayer ? combatState.playerWizard : combatState.enemyWizard;
       const defender = isPlayer ? combatState.enemyWizard : combatState.playerWizard;
       
-      // Base damage for mystic punch
-      let damage = isPlayer ? 
-        (attacker.wizard.combatStats?.mysticPunchPower || 1) * 5 : 
-        5; // Enemy base punch damage
+      // Safety checks
+      if (!spell || !attacker || !defender) return state;
       
-      // Apply difficulty modifier
-      damage = calculateDamage(damage, isPlayer, combatState.difficulty);
+      // Safe access to wizard data
+      if (!attacker.wizard) {
+        // Clone a minimal wizard object if missing
+        attacker.wizard = {
+          maxHealth: 100,
+          maxMana: 100,
+          manaRegen: 5,
+          combatStats: { mysticPunchPower: 0 }
+        };
+      }
+      
+      // Base damage calculation (with null-safe access)
+      const mysticPunchPower = attacker.wizard.combatStats?.mysticPunchPower || 0;
+      
+      // Calculate damage based on spell tier and difficulty
+      let damageModifier = 0;
+      if (combatState.difficulty === 'easy') {
+        damageModifier = isPlayer ? 20 : 5;
+      } else if (combatState.difficulty === 'normal') {
+        damageModifier = isPlayer ? 5 : 10;
+      } else {
+        damageModifier = isPlayer ? 2 : 15;
+      }
+      
+      // Add mystic punch power bonus
+      damageModifier += mysticPunchPower;
+      
+      const damage = spell.tier + damageModifier;
       
       // Apply damage to defender
       defender.currentHealth = Math.max(0, defender.currentHealth - damage);
+      
+      // Find the spell in hand and move it to discard pile
+      const hand = [...attacker.hand];
+      const discardPile = [...attacker.discardPile];
+      
+      const spellIndex = hand.findIndex(s => s.id === spell.id);
+      if (spellIndex !== -1) {
+        const [discardedSpell] = hand.splice(spellIndex, 1);
+        discardPile.push(discardedSpell);
+        
+        attacker.hand = hand;
+        attacker.discardPile = discardPile;
+      }
       
       // Add log entry
       const logEntry: CombatLogEntry = {
@@ -349,7 +388,8 @@ export const createCombatModule = (set: Function, get: Function): CombatActions 
         target: isPlayer ? 'enemy' : 'player',
         value: damage,
         timestamp: Date.now(),
-        damage
+        damage,
+        details: `${isPlayer ? 'You' : 'Enemy'} used Mystic Punch with ${spell.name} for ${damage} damage!`
       };
       
       combatState.log.push(logEntry);

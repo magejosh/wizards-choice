@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import BattleArena from './BattleArena';
+import BattleEndModal from './BattleEndModal';
 import { Spell, CombatState, CombatLogEntry } from '../../lib/types';
 import { 
   initializeCombat, 
@@ -177,15 +178,13 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       
       // Common logic for both victory and defeat
       
-      // Update location to wizardStudy
-      console.log("COMBAT END: Setting current location to wizardStudy");
-      useGameStateStore.getState().setCurrentLocation('wizardStudy');
-      
-      // Save game state
+      // Save game state but don't change location yet
+      // Location will be changed when user clicks Continue button
       console.log("COMBAT END: Saving game state");
       saveGame();
       
       // Note: We don't navigate here - let the user click the continue button
+      // Location will be set by onReturnToWizardStudy function
     } catch (error) {
       console.error("Error processing battle end:", error);
     }
@@ -327,10 +326,20 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       // Hide selection modal
       setShowMysticPunchSelection(false);
       
+      // Make sure the spell has required properties
+      const validatedSpell: Spell = {
+        ...spell,
+        effects: spell.effects || [],
+        imagePath: spell.imagePath || '/images/spells/default-placeholder.jpg'
+      };
+      
+      // STEP 1: PLAYER TURN - First select the spell
+      const playerStateWithSpell = selectSpell(combatState, validatedSpell, true);
+      
       // Execute mystic punch with the spell tier
       const playerTurnComplete = executeMysticPunch(
-        combatState,
-        spell.tier,
+        playerStateWithSpell,
+        validatedSpell.tier,
         true // isPlayer = true
       );
 
@@ -649,6 +658,12 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
           </div>
         </div>
       )}
+
+      {/* Battle End Modal */}
+      <BattleEndModal 
+        status={combatState.status} 
+        onContinue={onReturnToWizardStudy} 
+      />
     </div>
   );
 };

@@ -286,9 +286,13 @@ export function executeMysticPunch(
   spellTier: number,
   isPlayer: boolean
 ): CombatState {
-  const newState = { ...state };
+  let newState = { ...state };
   const actor = isPlayer ? 'player' : 'enemy';
   const target = isPlayer ? 'enemyWizard' : 'playerWizard';
+  const caster = isPlayer ? 'playerWizard' : 'enemyWizard';
+  
+  // Get the selected spell from the combat state
+  const selectedSpell = newState[caster].selectedSpell;
   
   // Calculate damage based on spell tier and difficulty
   let damageModifier = 0;
@@ -324,6 +328,17 @@ export function executeMysticPunch(
     details: `${actor === 'player' ? 'You' : 'Enemy'} used Mystic Punch for ${damage} damage!`,
     damage,
   }));
+  
+  // Move the spell from hand to discard pile
+  if (selectedSpell) {
+    const spellInHand = newState[caster].hand.find(s => s.id === selectedSpell.id);
+    if (spellInHand) {
+      newState = discardSpell(newState, selectedSpell.id, isPlayer);
+    }
+  }
+  
+  // Clear selected spell
+  newState[caster].selectedSpell = null;
   
   // Check if combat has ended
   if (newState[target].currentHealth <= 0) {

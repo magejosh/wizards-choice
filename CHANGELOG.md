@@ -9,6 +9,7 @@
   - Fixed spell casting functionality and turn transitions
   - Ensured combat log properly displays battle events
   - Enhanced state management to prevent combat flow issues
+  - Fixed mystic punch spell discard functionality to discard the spell after selecting the spell that powers it
 
 ## 2025-03-30
 - Done: Fixed battle arena display and functionality

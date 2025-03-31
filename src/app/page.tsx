@@ -34,6 +34,14 @@ export default function Home() {
   const { navigateToWizardStudy, navigateToBattle, navigateToMainMenu } = useGameNavigation();
   const router = useRouter();
   
+  // Cleanup transition class on mount
+  useEffect(() => {
+    // Remove any page transition classes when mounting
+    if (typeof document !== 'undefined') {
+      document.body.classList.remove('page-transitioning');
+    }
+  }, []);
+  
   // Check for direct battle return via URL (executed once on component mount)
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -88,7 +96,13 @@ export default function Home() {
   // Handle starting a duel
   const handleStartDuel = () => {
     console.log("Starting duel");
+    
+    // First, set location to 'duel' to prevent invalid navigation checks
     navigateToBattle();
+    
+    // IMPORTANT: Show loading screen immediately on button click
+    // This shows immediate feedback to the user
+    document.body.classList.add('page-transitioning');
     
     // Navigate to battle page
     router.push('/battle');

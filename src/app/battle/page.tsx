@@ -16,8 +16,11 @@ export default function BattlePage() {
   const { setCurrentLocation, saveGame } = useGameStateStore();
   const gameState = useGameStateStore(state => state.gameState);
   
-  // Initialize once
+  // Cleanup transition class on mount
   useEffect(() => {
+    // Remove any transition classes from previous navigations
+    document.body.classList.remove('page-transitioning');
+    
     // Check if we're coming from wizard's study (valid entry point)
     // The location should be 'duel' - this is set by the WizardStudy component when starting a duel
     const { currentLocation } = gameState.gameProgress;
@@ -51,7 +54,10 @@ export default function BattlePage() {
     console.log("Navigating to Wizard's Study from battle victory screen");
     
     isNavigatingAwayRef.current = true;
-    setIsLoading(true); // Show loading screen during navigation
+    
+    // IMPORTANT: Instead of showing the loading screen (which creates a flicker),
+    // add a transition class to the body to indicate loading
+    document.body.classList.add('page-transitioning');
     
     try {
       // STEP 1: Update the game state location
@@ -80,7 +86,7 @@ export default function BattlePage() {
     } catch (error) {
       console.error("Error returning to wizard's study:", error);
       isNavigatingAwayRef.current = false;
-      setIsLoading(false);
+      document.body.classList.remove('page-transitioning');
     }
   };
 

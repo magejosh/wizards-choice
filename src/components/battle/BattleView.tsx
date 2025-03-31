@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import BattleArena from './BattleArena';
-import { Spell, CombatState } from '../../lib/types';
+import { Spell, CombatState, CombatLogEntry } from '../../lib/types';
 import { 
   initializeCombat, 
   selectSpell, 
@@ -22,6 +22,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isEnemyTurnIndicatorVisible, setIsEnemyTurnIndicatorVisible] = useState(false);
+  const [battleLog, setBattleLog] = useState<CombatLogEntry[]>([]);
   
   // Use refs to track state that shouldn't trigger re-renders
   const isProcessingEndRef = useRef(false);
@@ -98,7 +99,22 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     
     setCombatState(initialCombatState);
     setIsInitialized(true);
+
+    // Initialize battle log with starting message
+    setBattleLog([{
+      turn: 1,
+      round: 1,
+      actor: 'player',
+      action: 'combat_start',
+      timestamp: Date.now()
+    }]);
   }, []);
+  
+  // Update battle log when combat state changes
+  useEffect(() => {
+    if (!combatState || !combatState.log) return;
+    setBattleLog(combatState.log);
+  }, [combatState]);
   
   // Handle game end
   useEffect(() => {
@@ -139,6 +155,24 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         
         // Award experience to player
         addExperience(experience);
+
+        // Add victory message to battle log
+        setBattleLog(prev => [...prev, {
+          turn: combatState.turn,
+          round: combatState.round,
+          actor: 'player',
+          action: 'victory',
+          timestamp: Date.now()
+        }]);
+      } else if (combatState.status === 'enemyWon') {
+        // Add defeat message to battle log
+        setBattleLog(prev => [...prev, {
+          turn: combatState.turn,
+          round: combatState.round,
+          actor: 'enemy',
+          action: 'victory',
+          timestamp: Date.now()
+        }]);
       }
       
       // Common logic for both victory and defeat
@@ -179,6 +213,16 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       
       // Execute the spell immediately
       const playerTurnComplete = executeSpellCast(playerStateWithSpell, true);
+
+      // Add spell cast to battle log
+      setBattleLog(prev => [...prev, {
+        turn: combatState.turn,
+        round: combatState.round,
+        actor: 'player',
+        action: 'cast_spell',
+        details: spell.name,
+        timestamp: Date.now()
+      }]);
       
       // STEP 2: ENEMY TURN - process it after a delay with visual indicator
       setTimeout(() => {
@@ -225,6 +269,16 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
             // Execute enemy spell
             const enemyStateWithSpell = selectSpell(playerTurnComplete, enemySpell, false);
             const enemyTurnComplete = executeSpellCast(enemyStateWithSpell, false);
+
+            // Add enemy spell cast to battle log
+            setBattleLog(prev => [...prev, {
+              turn: combatState.turn,
+              round: combatState.round,
+              actor: 'enemy',
+              action: 'cast_spell',
+              details: enemySpell.name,
+              timestamp: Date.now()
+            }]);
             
             // Wait a moment before hiding the indicator
             setTimeout(() => {
@@ -279,6 +333,16 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         spell.tier,
         true // isPlayer = true
       );
+
+      // Add mystic punch to battle log
+      setBattleLog(prev => [...prev, {
+        turn: combatState.turn,
+        round: combatState.round,
+        actor: 'player',
+        action: 'use_mystic_punch',
+        details: spell.name,
+        timestamp: Date.now()
+      }]);
       
       // Check if combat ended with player's turn
       if (playerTurnComplete.status !== 'active') {
@@ -332,6 +396,16 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
             // Execute enemy spell
             const enemyStateWithSpell = selectSpell(playerTurnComplete, enemySpell, false);
             const enemyTurnComplete = executeSpellCast(enemyStateWithSpell, false);
+
+            // Add enemy spell cast to battle log
+            setBattleLog(prev => [...prev, {
+              turn: combatState.turn,
+              round: combatState.round,
+              actor: 'enemy',
+              action: 'cast_spell',
+              details: enemySpell.name,
+              timestamp: Date.now()
+            }]);
             
             // Wait a moment before hiding the indicator
             setTimeout(() => {
@@ -370,7 +444,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     
     try {
       // Create a log entry for skipping the turn
-      const skipTurnLog = {
+      const skipTurnLog: CombatLogEntry = {
         turn: combatState.turn,
         round: combatState.round,
         actor: 'player',
@@ -386,6 +460,9 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         turn: combatState.turn + 1,
         log: [...combatState.log, skipTurnLog]
       };
+
+      // Add skip turn to battle log
+      setBattleLog(prev => [...prev, skipTurnLog]);
       
       // STEP 2: ENEMY TURN - process it after a delay with visual indicator
       setTimeout(() => {
@@ -432,6 +509,16 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
             // Execute enemy spell
             const enemyStateWithSpell = selectSpell(playerTurnComplete, enemySpell, false);
             const enemyTurnComplete = executeSpellCast(enemyStateWithSpell, false);
+
+            // Add enemy spell cast to battle log
+            setBattleLog(prev => [...prev, {
+              turn: combatState.turn,
+              round: combatState.round,
+              actor: 'enemy',
+              action: 'cast_spell',
+              details: enemySpell.name,
+              timestamp: Date.now()
+            }]);
             
             // Wait a moment before hiding the indicator
             setTimeout(() => {
@@ -489,15 +576,39 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     return <div className="loading">Initializing battle...</div>;
   }
 
+  // Determine game status for BattleArena
+  let gameStatus: 'active' | 'playerWon' | 'enemyWon' = 'active';
+  if (combatState.status === 'playerWon') {
+    gameStatus = 'playerWon';
+  } else if (combatState.status === 'enemyWon') {
+    gameStatus = 'enemyWon';
+  }
+
   return (
     <div className="battle-page">
       <BattleArena
-        combatState={combatState as any}
-        onSpellSelect={handleSpellSelect}
+        playerHealth={combatState.playerWizard.currentHealth}
+        playerMaxHealth={combatState.playerWizard.wizard.maxHealth}
+        playerMana={combatState.playerWizard.currentMana}
+        playerMaxMana={combatState.playerWizard.wizard.maxMana}
+        playerActiveEffects={combatState.playerWizard.activeEffects}
+        enemyHealth={combatState.enemyWizard.currentHealth}
+        enemyMaxHealth={combatState.enemyWizard.wizard.maxHealth}
+        enemyMana={combatState.enemyWizard.currentMana}
+        enemyMaxMana={combatState.enemyWizard.wizard.maxMana}
+        enemyActiveEffects={combatState.enemyWizard.activeEffects}
+        spells={combatState.playerWizard.hand}
+        battleLog={battleLog}
+        onSpellCast={handleSpellSelect}
         onMysticPunch={handleMysticPunch}
         onSkipTurn={handleSkipTurn}
-        onContinue={onReturnToWizardStudy}
-        isAnimating={isAnimating}
+        onExitBattle={onReturnToWizardStudy}
+        isPlayerTurn={combatState.isPlayerTurn}
+        round={combatState.round}
+        turn={combatState.turn}
+        animating={isAnimating}
+        canCastSpell={(spell) => combatState.isPlayerTurn && combatState.playerWizard.currentMana >= spell.manaCost}
+        canUseMysticPunch={combatState.isPlayerTurn}
       />
       
       {/* Enemy turn indicator */}

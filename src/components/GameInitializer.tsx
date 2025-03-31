@@ -12,6 +12,11 @@ const GameInitializer: React.FC<GameInitializerProps> = ({ onGameStart }) => {
   useEffect(() => {
     console.log("=== GAME INITIALIZER MOUNT ===");
     
+    // Remove transitioning class in case it's still present
+    if (typeof document !== 'undefined') {
+      document.body.classList.remove('page-transitioning');
+    }
+    
     // Check if browser storage is available
     if (typeof window !== 'undefined') {
       // Check URL parameters first (highest priority)

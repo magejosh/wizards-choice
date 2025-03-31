@@ -1,5 +1,47 @@
 # CHANGELOG
 
+## 2025-03-31
+- Done: Fixed battle arena 3D display and combat functionality
+  - Resolved issue with the 3D battle scene not displaying properly
+  - Fixed compatibility issues between BattleView and BattleArena components
+  - Updated BattleScene component to support both direct props and combat state approaches
+  - Implemented proper props passing to restore the original battle arena appearance
+  - Fixed spell casting functionality and turn transitions
+  - Ensured combat log properly displays battle events
+  - Enhanced state management to prevent combat flow issues
+
+## 2025-03-30
+- Done: Fixed battle arena display and functionality
+  - Resolved issue with 3D battle scene not displaying properly
+  - Fixed battle arena component prop mismatch after refactoring
+  - Restored proper spell casting functionality and turn mechanics
+  - Ensured BattleView passes correct props to BattleArena component
+
+## 2025-03-30
+- Done: Fixed market transaction functionality
+  - Implemented missing buyItem and sellItem functions in marketModule.ts
+  - Added checkForMarketAttack and handleMarketAttackResult functions
+  - Ensured proper integration with the getPlayerScrolls function for spell scroll transactions
+  - Fixed "buyItem is not a function" and "checkForMarketAttack is not a function" errors
+
+## 2025-03-30
+- Done: Fixed getPlayerScrolls not a function error
+  - Implemented missing getPlayerScrolls function in wizardModule.ts
+  - Added consumeScrollToLearnSpell and checkIfScrollSpellKnown functions
+  - Ensured proper SpellScroll type imports from spell-types.ts
+  - Fixed battle initialization error when starting new battles
+
+## 2025-03-30
+- Done: Fixed game navigation and transition issues
+  - Fixed navigation from battle victory to wizard's study by implementing a direct URL parameter approach
+  - Solved race conditions in game state updates during navigation between screens
+  - Added immediate visual feedback for button clicks with page transition overlay
+  - Eliminated loading screen flicker when returning from battle to wizard's study
+  - Enhanced state management to prevent game start/continue actions from being overridden
+  - Implemented proper cleanup of transition classes across all components
+  - Made combat initialization more resilient with improved error handling
+  - Added consistent loading indicators with smoother transitions between game views
+
 ## 2025-03-30
 - Done: Fixed battle system enemy turn flow and improved visibility
   - Redesigned the battle flow to embed enemy turns directly into player action handlers
@@ -308,7 +350,7 @@
 - Improved active effect application and processing
 - Fixed deck mechanics to properly handle empty draw piles
 
-## [0.1.0] - 2023-10-15
+## [0.1.0] - 2025-03-25
 
 ### Added
 - Initial project setup with Next.js and TypeScript
@@ -325,14 +367,14 @@
 - Various type issues in core game components
 - Layout issues on smaller screens 
 
-## 2023-11-30
+## 2025-03-25
 - Done: Implemented potion crafting system
   - Created ingredient gathering mechanic through the existing loot system
   - Designed recipe discovery system through experimentation and loot drops
   - Implemented brewing interface accessible from the wizard's study
   - Added comprehensive documentation with mermaid diagram
 
-## 2023-11-15
+## 2025-03-25
 - Done: Fixed TypeScript errors in aiEngine.ts and page.tsx
 - Done: Added comprehensive diagrams to documentation
   - Created Battle System workflow diagram
@@ -340,7 +382,7 @@
   - Created Potion System diagram
   - Updated process_maps.md with all new diagrams
 
-## 2023-11-01
+## 2025-03-25
 - Done: Revised equipment system with logical slot organization
   - Reorganized equipment into six logical slots (head, hand, body, neck, finger, belt)
   - Implemented dual-ring system for finger slot
@@ -349,7 +391,7 @@
   - Implemented potion management UI in equipment screen
   - Enhanced game state store with potion functionality
 
-## 2023-10-15
+## 2025-03-25
 - Done: Expanded equipment options with new gear types
   - Added daggers and swords with enhanced mystic punch and bleed effects
   - Implemented spellbooks with card advantage mechanics
@@ -357,7 +399,7 @@
   - Updated UI to support new equipment slots
   - Enhanced stat calculations for new equipment bonuses
 
-## 2023-10-01
+## 2025-03-25
 - Done: Implemented equipment system with procedural generation
   - Created equipment component UI with slots for wands, staffs, robes, amulets, and rings
   - Implemented equipment data structures with affix-based bonuses
@@ -365,12 +407,12 @@
   - Created procedural equipment generation for loot system
   - Designed and integrated Equipment Screen UI
 
-## 2023-09-15
+## 2025-03-25
 - Done: Expanded spell system
   - Completed all 10 tiers (100 common spells)
   - Added 25 special spells (uncommon, rare, and legendary)
 
-## 2023-09-01
+## 2025-03-25
 - Done: Implemented user persistence features
   - Added unique save game persistence per user
   - Implemented loading states and error handling
@@ -378,7 +420,7 @@
   - Added IndexedDB integration for persistent storage
   - Implemented secure password hashing with bcryptjs
 
-## 2023-08-15
+## 2025-03-25
 - Done: Core game systems implementation
   - Fixed duplicate identifier errors in imports
   - Created deck builder functionality with filtering and sorting
@@ -387,7 +429,7 @@
   - Created interactive battle UI
   - Implemented turn-based combat logic with deck system
 
-## 2023-08-01
+## 2025-03-25
 - Done: Initial project setup
   - Set up GitHub repository
   - Created project structure

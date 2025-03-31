@@ -2,245 +2,177 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import MainMenu from '../lib/ui/components/MainMenu';
+import { useRouter } from 'next/navigation';
+import Login from '../lib/ui/components/Login';
 import Settings from '../lib/ui/components/Settings';
 import HowToPlay from '../lib/ui/components/HowToPlay';
-import WizardStudy from '../lib/ui/components/WizardStudy';
-import Login from '../lib/ui/components/Login';
-import DeckBuilder from '../lib/ui/components/DeckBuilder';
-import EquipmentScreen from '../lib/ui/components/EquipmentScreen';
-import InventoryScreen from '../lib/ui/components/InventoryScreen';
+
+// Import custom hooks
+import { useGameAuth } from '../hooks/useGameAuth';
+import { useGameNavigation } from '../hooks/useGameNavigation';
 import { useGameStateStore } from '../lib/game-state/gameStateStore';
-import authService from '../lib/auth/authService';
+
+// Import refactored components
+import GameInitializer from '../components/GameInitializer';
+import LoadingScreen from '../components/LoadingScreen';
+import MainMenuView from '../components/MainMenuView';
+import GameView from '../components/GameView';
+import CharacterCreation from '../components/CharacterCreation';
+
+// Import styles
 import '../lib/ui/styles/main.css';
-import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  // UI state
   const [showSettings, setShowSettings] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showNameInput, setShowNameInput] = useState(false);
-  const [showDeckBuilder, setShowDeckBuilder] = useState(false);
-  const [showEquipment, setShowEquipment] = useState(false);
-  const [showInventory, setShowInventory] = useState(false);
-  const [playerName, setPlayerName] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const { gameState, initializeNewGame, setCurrentLocation } = useGameStateStore();
-  const router = useRouter();
-
-  // Track if we're in the game proper or still in the menu
   const [gameStarted, setGameStarted] = useState(false);
   
-  // Check if user is already logged in (on page refresh)
-  useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        const isUserLoggedIn = authService.isLoggedIn();
-        setIsAuthenticated(isUserLoggedIn);
-        
-        if (isUserLoggedIn) {
-          // Load the user's game state if they're logged in
-          await authService.loadGameState();
-        }
-      } catch (error) {
-        console.error('Error checking auth status:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    checkAuthStatus();
-  }, []);
-
-  const handleLoginSuccess = () => {
-    setIsAuthenticated(true);
-  };
+  // Custom hooks
+  const { isAuthenticated, isLoading, checkAuthStatus, handleLogout } = useGameAuth();
+  const { navigateToWizardStudy, navigateToBattle, navigateToMainMenu } = useGameNavigation();
+  const router = useRouter();
   
-  const handleLogout = async () => {
-    setIsLoading(true);
-    try {
-      await authService.logout();
-      setIsAuthenticated(false);
-      setGameStarted(false);
-    } catch (error) {
-      console.error('Error during logout:', error);
-    } finally {
-      setIsLoading(false);
+  // Check for direct battle return via URL (executed once on component mount)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const forceBattleReturn = urlParams.get('forceBattleReturn') === 'true';
+      
+      if (forceBattleReturn) {
+        console.log("*** HOME PAGE: Force battle return parameter detected ***");
+        
+        // Clear the URL parameter
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Force the location if needed
+        useGameStateStore.getState().setCurrentLocation('wizardStudy');
+        
+        // Set game started to true to show wizard study
+        console.log("Setting game started to true for battle return");
+        setGameStarted(true);
+      }
     }
-  };
-
+  }, []);
+  
+  // Call checkAuthStatus on component mount
+  useEffect(() => {
+    console.log("Home: Initializing authentication check...");
+    checkAuthStatus();
+  }, [checkAuthStatus]);
+  
+  // Simple handlers
   const handleStartNewGame = () => {
-    console.log('Starting new game setup...');
+    console.log("Starting new game - showing character creation");
     setShowNameInput(true);
   };
-
-  const handleCreateCharacter = async () => {
-    if (!playerName.trim()) {
-      alert('Please enter a name for your wizard');
-      return;
-    }
+  
+  const handleOpenSettings = () => setShowSettings(true);
+  const handleCloseSettings = () => setShowSettings(false);
+  const handleOpenHowToPlay = () => setShowHowToPlay(true);
+  const handleCloseHowToPlay = () => setShowHowToPlay(false);
+  
+  // This handler will be called after character creation is complete
+  const handleCharacterCreationComplete = () => {
+    console.log("Character creation completed - entering game");
+    setShowNameInput(false);
     
-    setIsLoading(true);
-    try {
-      // Initialize a new game in save slot 0
-      initializeNewGame(playerName, 0);
-      
-      // Set the current location to wizard's study
-      setCurrentLocation('wizardStudy');
-      
-      // Save the game state
-      await authService.saveGameState();
-      
-      // Close the dialog and start the game
-      setShowNameInput(false);
-      setGameStarted(true);
-    } catch (error) {
-      console.error('Error creating character:', error);
-      alert('Error creating character. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleContinueGame = async (saveSlotId: number) => {
-    console.log('Continuing game from save slot:', saveSlotId);
+    // First ensure the correct game state
+    navigateToWizardStudy();
     
-    setIsLoading(true);
-    try {
-      // Load the selected game save
-      const loadSuccess = useGameStateStore.getState().loadGame(saveSlotId);
-      
-      if (loadSuccess) {
-        // Save the updated current save slot
-        await authService.saveGameState();
-        setGameStarted(true);
-      } else {
-        alert('Failed to load game save');
-      }
-    } catch (error) {
-      console.error('Error loading game:', error);
-      alert('Error loading game. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleOpenSettings = () => {
-    setShowSettings(true);
-  };
-
-  const handleCloseSettings = () => {
-    setShowSettings(false);
-  };
-
-  const handleOpenHowToPlay = () => {
-    setShowHowToPlay(true);
-  };
-
-  const handleCloseHowToPlay = () => {
-    setShowHowToPlay(false);
+    // Then switch to game view
+    setGameStarted(true);
   };
   
-  // Wizard Study handlers
+  // Handle starting a duel
   const handleStartDuel = () => {
-    console.log('Starting a duel');
+    console.log("Starting duel");
+    navigateToBattle();
     
-    // Set current location to 'duel'
-    setCurrentLocation('duel');
-    
-    // Navigate to the battle page
+    // Navigate to battle page
     router.push('/battle');
   };
   
-  const handleOpenDeckBuilder = () => {
-    console.log('Opening deck builder');
-    setShowDeckBuilder(true);
-  };
-  
-  const handleCloseDeckBuilder = async () => {
-    // Save the game state when closing the deck builder
-    // to persist any changes to equipped spells
-    setIsLoading(true);
-    try {
-      await authService.saveGameState();
-      setShowDeckBuilder(false);
-    } catch (error) {
-      console.error('Error saving deck changes:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const handleOpenEquipment = () => {
-    console.log('Opening equipment');
-    setShowEquipment(true);
-  };
-  
-  const handleCloseEquipment = async () => {
-    // Save the game state when closing the equipment screen
-    // to persist any changes to equipped items
-    setIsLoading(true);
-    try {
-      await authService.saveGameState();
-      setShowEquipment(false);
-    } catch (error) {
-      console.error('Error saving equipment changes:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const handleOpenInventory = () => {
-    console.log('Opening inventory');
-    setShowInventory(true);
-  };
-  
-  const handleCloseInventory = async () => {
-    // Save the game state when closing the inventory screen
-    setIsLoading(true);
-    try {
-      await authService.saveGameState();
-      setShowInventory(false);
-    } catch (error) {
-      console.error('Error saving inventory changes:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
+  // Handle returning to main menu
   const handleReturnToMainMenu = async () => {
-    setIsLoading(true);
-    try {
-      // Save game state before returning to menu
-      await authService.saveGameState();
-      setGameStarted(false);
-    } catch (error) {
-      console.error('Error returning to main menu:', error);
-    } finally {
-      setIsLoading(false);
+    console.log("=== RETURN TO MAIN MENU REQUESTED ===");
+    
+    const result = await navigateToMainMenu();
+    console.log("Navigation result:", result);
+    
+    // Set game started to false to show main menu
+    setGameStarted(false);
+  };
+  
+  // Handle manual navigation to wizard study
+  const handleContinueGame = (saveSlotId: number) => {
+    console.log("=== CONTINUE GAME REQUESTED ===");
+    console.log("Continue game with save slot:", saveSlotId);
+    
+    // First ensure we are in the wizard study location
+    navigateToWizardStudy();
+    
+    // This is the direct, simple fix - immediately set gameStarted to true
+    setGameStarted(true);
+  };
+  
+  // Handler for GameInitializer
+  const handleGameStartChange = (shouldStartGame: boolean) => {
+    console.log("GameInitializer called onGameStart:", shouldStartGame);
+    
+    // Check if any URL parameters are set for battle returns
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const forceBattleReturn = urlParams.get('forceBattleReturn') === 'true';
+      
+      if (forceBattleReturn) {
+        console.log("*** handleGameStartChange: Force battle return parameter detected ***");
+        
+        // Clear the URL parameter
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Force wizard study state and game view
+        useGameStateStore.getState().setCurrentLocation('wizardStudy');
+        setGameStarted(true);
+        return;
+      }
+    }
+    
+    // Only accept positive signals (true) from GameInitializer
+    // This prevents overriding manual game start actions
+    if (shouldStartGame) {
+      console.log("Setting gameStarted to true from GameInitializer");
+      setGameStarted(true);
+    } else {
+      console.log("Ignoring false signal from GameInitializer to preserve manual actions");
     }
   };
 
   // Display loading state
   if (isLoading) {
-    return (
-      <div className="loading-screen">
-        <div className="loading-spinner"></div>
-        <p>Loading Wizard's Choice...</p>
-      </div>
-    );
+    console.log("Home: Showing loading screen: Loading Wizard's Choice...");
+    return <LoadingScreen message="Loading Wizard's Choice..." />;
   }
 
   // If not authenticated, show login screen
   if (!isAuthenticated) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
+    console.log("Home: User not authenticated, showing login screen");
+    return <Login onLoginSuccess={checkAuthStatus} />;
   }
 
+  console.log("Home: User authenticated, rendering game UI, gameStarted =", gameStarted);
+  
+  // Main application container
   return (
     <div className="app-container">
-      {!gameStarted ? (
+      {/* GameInitializer handles battle victory navigation */}
+      <GameInitializer onGameStart={handleGameStartChange} />
+      
+      {/* Main Menu View */}
+      {!gameStarted && (
         <>
-          <MainMenu 
+          <MainMenuView 
             onStartNewGame={handleStartNewGame}
             onContinueGame={handleContinueGame}
             onOpenSettings={handleOpenSettings}
@@ -248,63 +180,26 @@ export default function Home() {
             onLogout={handleLogout}
           />
           
+          {/* Modal overlays */}
           {showSettings && <Settings onClose={handleCloseSettings} />}
           {showHowToPlay && <HowToPlay onClose={handleCloseHowToPlay} />}
           
+          {/* Character creation modal */}
           {showNameInput && (
-            <div className="name-input-modal">
-              <div className="name-input-content">
-                <h2>Create Your Wizard</h2>
-                <div className="name-input-field">
-                  <label htmlFor="player-name">Enter your wizard's name:</label>
-                  <input
-                    id="player-name"
-                    type="text"
-                    value={playerName}
-                    onChange={(e) => setPlayerName(e.target.value)}
-                    placeholder="Wizard name..."
-                    autoFocus
-                    disabled={isLoading}
-                  />
-                </div>
-                <div className="name-input-buttons">
-                  <button 
-                    className="name-input-cancel"
-                    onClick={() => setShowNameInput(false)}
-                    disabled={isLoading}
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    className="name-input-submit"
-                    onClick={handleCreateCharacter}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Creating...' : 'Begin Adventure'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </>
-      ) : (
-        // The game has started, render the appropriate component based on current location
-        <>
-          {gameState.gameProgress.currentLocation === 'wizardStudy' && (
-            <WizardStudy 
-              onStartDuel={handleStartDuel}
-              onOpenDeckBuilder={handleOpenDeckBuilder}
-              onOpenEquipment={handleOpenEquipment}
-              onOpenInventory={handleOpenInventory}
-              onReturnToMainMenu={handleReturnToMainMenu}
+            <CharacterCreation 
+              onComplete={handleCharacterCreationComplete}
+              onCancel={() => setShowNameInput(false)}
             />
           )}
-          
-          {/* Overlay components that can appear in game */}
-          {showDeckBuilder && <DeckBuilder onClose={handleCloseDeckBuilder} />}
-          {showEquipment && <EquipmentScreen onClose={handleCloseEquipment} />}
-          {showInventory && <InventoryScreen onClose={handleCloseInventory} />}
         </>
+      )}
+
+      {/* Game Interface View */}
+      {gameStarted && (
+        <GameView 
+          onStartDuel={handleStartDuel}
+          onReturnToMainMenu={handleReturnToMainMenu}
+        />
       )}
     </div>
   );

@@ -227,7 +227,17 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
           <div className="wizard-study__actions">
             <button 
               className="wizard-study__action wizard-study__action--primary"
-              onClick={onStartDuel}
+              onClick={() => {
+                console.log('Starting duel from WizardStudy component');
+                
+                // Ensure the game state is saved before we navigate
+                try {
+                  // This will be handled by onStartDuel, which updates location and navigates
+                  onStartDuel();
+                } catch (error) {
+                  console.error('Error starting duel:', error);
+                }
+              }}
             >
               Start Next Duel
             </button>
@@ -266,7 +276,11 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
             
             <button 
               className="wizard-study__action wizard-study__action--secondary"
-              onClick={onReturnToMainMenu}
+              onClick={() => {
+                console.log('Return to Main Menu button clicked in WizardStudy');
+                // Just call the parent handler - no need for fallback navigation now
+                onReturnToMainMenu();
+              }}
             >
               Return to Main Menu
             </button>

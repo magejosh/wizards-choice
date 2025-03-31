@@ -240,7 +240,7 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
 const BattleScene: React.FC<BattleSceneProps> = (props) => {
   return (
     <Canvas
-      camera={{ position: [0, 5, 10], fov: 50 }}
+      camera={{ position: [0, 3.5, 6], fov: 45 }}
       style={{ width: '100%', height: '100%' }}
     >
       <BattleSceneContent {...props} />

@@ -9,6 +9,7 @@ import { Spell, ActiveEffect, SpellEffect } from '../../lib/types/spell-types';
 import { CombatState, CombatLogEntry } from '../../lib/types/combat-types';
 import { ElementType } from '../../lib/types/element-types';
 import { Wizard } from '../../lib/types/wizard-types';
+import SpellCard from './SpellCard';
 
 interface BattleArenaProps {
   playerHealth: number;
@@ -145,89 +146,74 @@ const BattleArena: React.FC<BattleArenaProps> = ({
 
   return (
     <div className={styles.battleArena}>
-      <div className={styles.battleCanvas}>
-        <BattleScene
-          combatState={combatState}
-          playerHealth={playerHealth}
-          playerMaxHealth={playerMaxHealth}
-          enemyHealth={enemyHealth}
-          enemyMaxHealth={enemyMaxHealth}
-          animating={animating}
-        />
-        
-        {/* Wizard info panels */}
-        <div className={styles.playerSection}>
-          <WizardStats
-            name="Your Wizard"
-            currentHealth={playerHealth}
-            maxHealth={playerMaxHealth}
-            currentMana={playerMana}
-            maxMana={playerMaxMana}
-            activeEffects={playerActiveEffects || []}
-            isPlayer={true}
-          />
-        </div>
-        
-        <div className={styles.enemySection}>
-          <WizardStats
-            name="Enemy Wizard"
-            currentHealth={enemyHealth}
-            maxHealth={enemyMaxHealth}
-            currentMana={enemyMana}
-            maxMana={enemyMaxMana}
-            activeEffects={enemyActiveEffects || []}
-            isPlayer={false}
-          />
-        </div>
-      </div>
-
-      <div className={styles.battleContent}>
-        {/* Spells section */}
-        <div className={styles.playerSpellSection}>
-          <div className={styles.spellsContainer}>
-            {(spells || []).map((spell, index) => (
-              <div
-                key={index}
-                className={`${styles.spellCard} ${!canCastSpell(spell) ? styles.spellCardDisabled : ''}`}
-                onClick={() => canCastSpell(spell) && onSpellCast(spell)}
-              >
-                <div className={styles.spellCardHeader}>
-                  <span className={styles.spellName}>{spell.name}</span>
-                  <span className={styles.spellMana}>{spell.manaCost}</span>
-                </div>
-                <div className={styles.spellCardBody}>
-                  <span className={styles.spellElement}>{spell.element}</span>
-                  <span className={styles.spellType}>{spell.type}</span>
-                </div>
-                <div className={styles.spellCardDescription}>
-                  {spell.description}
-                </div>
-              </div>
-            ))}
+      <div className={styles.mainContent}>
+        <div className={styles.mainBattleArea}>
+          <div className={styles.wizardInfo}>
+            <WizardStats
+              name="Your Wizard"
+              currentHealth={playerHealth}
+              maxHealth={playerMaxHealth}
+              currentMana={playerMana}
+              maxMana={playerMaxMana}
+              activeEffects={playerActiveEffects || []}
+              isPlayer={true}
+            />
           </div>
           
+          <div className={styles.sceneContainer}>
+            <BattleScene
+              playerHealth={playerHealth}
+              playerMaxHealth={playerMaxHealth}
+              enemyHealth={enemyHealth}
+              enemyMaxHealth={enemyMaxHealth}
+              animating={animating}
+            />
+          </div>
+
+          <div className={styles.wizardInfo}>
+            <WizardStats
+              name="Enemy Wizard"
+              currentHealth={enemyHealth}
+              maxHealth={enemyMaxHealth}
+              currentMana={enemyMana}
+              maxMana={enemyMaxMana}
+              activeEffects={enemyActiveEffects || []}
+              isPlayer={false}
+            />
+          </div>
+        </div>
+
+        <div className={styles.spellsArea}>
+          <div className={styles.spellsContainer}>
+            {spells?.map((spell, index) => (
+              <SpellCard
+                key={index}
+                spell={spell}
+                onClick={() => onSpellCast(spell)}
+                disabled={!canCastSpell(spell)}
+              />
+            ))}
+          </div>
           <div className={styles.actionButtons}>
-            <button 
-              className={styles.actionButton}
+            <button
+              className={styles.mysticPunchButton}
               onClick={onMysticPunch}
-              disabled={!isPlayerTurn || !canUseMysticPunch}
+              disabled={!canUseMysticPunch}
             >
               Mystic Punch
             </button>
             <button
-              className={styles.actionButton}
+              className={styles.skipTurnButton}
               onClick={onSkipTurn}
-              disabled={!isPlayerTurn}
             >
               Skip Turn
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Battle log */}
-        <div className={styles.battleLogSection}>
-          <BattleLog entries={battleLog || []} />
-        </div>
+      <div className={styles.battleLog}>
+        <BattleLog entries={battleLog || []} />
       </div>
     </div>
   );

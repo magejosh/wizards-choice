@@ -1,10 +1,113 @@
 .battleArena {
   display: flex;
+  height: 100vh;
+  width: 100%;
+  padding: 20px;
+  position: relative;
+  gap: 20px;
+}
+
+.mainContent {
+  display: flex;
   flex-direction: column;
+  flex: 1;
+  gap: 20px;
+}
+
+.mainBattleArea {
+  position: relative;
+  height: 45vh;
+}
+
+.sceneContainer {
   width: 100%;
   height: 100%;
-  background-color: #0a0a0f;
-  color: #ffffff;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.wizardInfo {
+  position: absolute;
+  top: 20px;
+  width: 300px;
+  color: white;
+  z-index: 10;
+  padding: 20px;
+}
+
+.wizardInfo:first-child {
+  left: 20px;
+}
+
+.wizardInfo:last-child {
+  right: 20px;
+}
+
+/* Health and mana bars */
+.statBarContainer {
+  height: 24px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  margin: 8px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.healthBar {
+  background: linear-gradient(to right, #2ecc71, #27ae60);
+}
+
+.manaBar {
+  background: linear-gradient(to right, #3498db, #2980b9);
+}
+
+.statBarFill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.statValue {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  line-height: 24px;
+  color: white;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.spellsArea {
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+  padding: 20px;
+  min-height: calc(55vh - 60px);
+  display: flex;
+  flex-direction: column;
+}
+
+.spellsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  flex: 1;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.battleLog {
+  width: 300px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+  padding: 20px;
+  height: calc(100vh - 40px);
+  overflow-y: auto;
 }
 
 .battleHeader {
@@ -204,14 +307,6 @@
 }
 
 /* Battle log */
-.battleLog {
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 1rem;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-}
-
 .battleLogTitle {
   font-family: 'Cinzel', serif;
   color: #ffffff;
@@ -258,13 +353,6 @@
   color: #b3b3cc;
   font-style: italic;
   padding: 1rem;
-}
-
-.spellsContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
 }
 
 .spellCard {
@@ -343,12 +431,6 @@
   justify-content: flex-end;
   font-size: 0.75rem;
   color: #e83d8c;
-}
-
-.actionButtons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
 }
 
 .mysticPunchButton, .skipTurnButton {

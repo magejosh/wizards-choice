@@ -25,35 +25,29 @@ const WizardStats: React.FC<WizardStatsProps> = ({
   isPlayer
 }) => {
   return (
-    <div className={styles.wizardStats}>
-      <h3 className={styles.wizardName}>{name}</h3>
+    <div>
+      <h2>{name}</h2>
       
       <div className={styles.statsBar}>
         <div className={styles.statGroup}>
           <div className={styles.statLabel}>Health</div>
           <div className={styles.statBarContainer}>
             <div 
-              className={styles.healthBar}
-              style={{ 
-                width: `${(currentHealth / maxHealth) * 100}%`,
-                backgroundColor: '#00ff00'  // Bright green health bar
-              }}
+              className={`${styles.statBarFill} ${styles.healthBar}`}
+              style={{ width: `${(currentHealth / maxHealth) * 100}%` }}
             />
             <div className={styles.statValue}>
               {currentHealth}/{maxHealth}
             </div>
           </div>
         </div>
-        
+
         <div className={styles.statGroup}>
           <div className={styles.statLabel}>Mana</div>
           <div className={styles.statBarContainer}>
             <div 
-              className={isPlayer ? styles.manaBar : styles.enemyManaBar}
-              style={{ 
-                width: `${(currentMana / maxMana) * 100}%`,
-                backgroundColor: isPlayer ? '#0088ff' : '#9933ff'  // Blue for player, purple for enemy
-              }}
+              className={`${styles.statBarFill} ${styles.manaBar}`}
+              style={{ width: `${(currentMana / maxMana) * 100}%` }}
             />
             <div className={styles.statValue}>
               {currentMana}/{maxMana}
@@ -61,15 +55,15 @@ const WizardStats: React.FC<WizardStatsProps> = ({
           </div>
         </div>
       </div>
-      
+
       <div className={styles.effectsSection}>
-        <h4 className={styles.effectsTitle}>Active Effects</h4>
+        <h3 className={styles.effectsTitle}>Active Effects</h3>
         {activeEffects.length > 0 ? (
           <div className={styles.effectsList}>
             {activeEffects.map((effect, index) => (
               <div key={index} className={styles.effectItem}>
                 <span className={styles.effectName}>{effect.name}</span>
-                <span className={styles.effectDuration}>{effect.remainingDuration}</span>
+                <span className={styles.effectDuration}>{effect.remainingDuration} turns</span>
               </div>
             ))}
           </div>

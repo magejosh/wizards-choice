@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { useGameStateStore } from '../../game-state/gameStateStore';
+import { useGameStateStore } from '@/lib/game-state/gameStateStore';
 import MainMenu from './MainMenu';
 import Settings from './Settings';
 import HowToPlay from './HowToPlay';
 import BattleArena from './BattleArena';
 import WizardStudy from './WizardStudy';
 import ErrorBoundary from './ErrorBoundary';
-import { CombatState, Spell } from '../../types';
+import { CombatState, Spell } from '@/lib/types';
 
-export const GameInterface: React.FC = () => {
+const GameInterface: React.FC = () => {
   const { gameState, updateGameState } = useGameStateStore();
   const [currentView, setCurrentView] = useState<'menu' | 'battle' | 'study'>('menu');
   const [battleState, setBattleState] = useState<{
@@ -122,4 +122,6 @@ export const GameInterface: React.FC = () => {
       </div>
     </ErrorBoundary>
   );
-}; 
+};
+
+export default GameInterface; 

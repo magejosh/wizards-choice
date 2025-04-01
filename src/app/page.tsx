@@ -3,14 +3,12 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Login from '../lib/ui/components/Login';
 import Settings from '../lib/ui/components/Settings';
 import HowToPlay from '../lib/ui/components/HowToPlay';
 import { NotificationProvider } from '@/lib/ui/components/notifications/NotificationManager';
 import GameInterface from '@/lib/ui/components/GameInterface';
 
 // Import custom hooks
-import { useGameAuth } from '../hooks/useGameAuth';
 import { useGameNavigation } from '../hooks/useGameNavigation';
 import { useGameStateStore } from '../lib/game-state/gameStateStore';
 import { clearSaveGames } from '../lib/game-state/clearSaveGames';
@@ -55,7 +53,6 @@ export default function Home() {
   const [transitionClass, setTransitionClass] = useState('');
   
   // Custom hooks
-  const { isAuthenticated, isLoading, checkAuthStatus, handleLogout } = useGameAuth();
   const { navigateToWizardStudy, navigateToBattle, navigateToMainMenu } = useGameNavigation();
   const router = useRouter();
   const { setCurrentLocation, gameState } = useGameStateStore();
@@ -70,12 +67,6 @@ export default function Home() {
       }
     }
   }, [gameState]);
-  
-  // Call checkAuthStatus on component mount
-  useEffect(() => {
-    console.log("Home: Initializing authentication check...");
-    checkAuthStatus();
-  }, [checkAuthStatus]);
   
   // Simple handlers
   const handleStartNewGame = (saveSlotId: number) => {
@@ -135,19 +126,10 @@ export default function Home() {
     }
   };
 
-  // Display loading state
-  if (isLoading) {
-    console.log("Home: Showing loading screen: Loading Wizard's Choice...");
-    return <LoadingScreen message="Loading Wizard's Choice..." />;
-  }
-
-  // If not authenticated, show login screen
-  if (!isAuthenticated) {
-    console.log("Home: User not authenticated, showing login screen");
-    return <Login onLoginSuccess={checkAuthStatus} />;
-  }
-
-  console.log("Home: User authenticated, rendering game UI, gameStarted =", gameStarted);
+  // Dummy logout handler since we're not using authentication
+  const handleLogout = () => {
+    console.log("Logout clicked - no action needed");
+  };
 
   return (
     <NotificationProvider>

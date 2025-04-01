@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, Stars } from '@react-three/drei';
-import WizardModel from '../lib/ui/components/models/WizardModel';
-import { theme } from '../lib/ui/theme';
+import WizardModel from '../../lib/ui/components/models/WizardModel';
+import { theme } from '../../lib/ui/theme';
 
 export default function DemoPage() {
   const [isClient, setIsClient] = useState(false);

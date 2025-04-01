@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { theme } from '../lib/ui/theme';
-import StatusBar from '../lib/ui/components/StatusBar';
+import { theme } from '../../lib/ui/theme';
+import StatusBar from '../../lib/ui/components/StatusBar';
 
 export default function SimplifiedDemo() {
   const [currentView, setCurrentView] = useState('battle');

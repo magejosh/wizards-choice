@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGameStateStore } from './lib/game-state/gameStateStore';
-import { NotificationProvider } from './lib/ui/components/notifications/NotificationProvider';
+import { NotificationProvider } from './lib/ui/components/notifications/NotificationManager';
 import { GameInterface } from './lib/ui/components/GameInterface';
 
 const App: React.FC = () => {

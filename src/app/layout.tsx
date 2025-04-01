@@ -1,9 +1,10 @@
 // src/app/layout.tsx
-import '../lib/ui/styles/main.css';
+import type { Metadata } from 'next';
+import '@/styles/globals.css';
 
-export const metadata = {
-  title: 'Wizard\'s Choice',
-  description: 'A tactical choice-driven strategy game',
+export const metadata: Metadata = {
+  title: "Wizard's Choice",
+  description: 'A magical card-based RPG game',
 };
 
 export default function RootLayout({

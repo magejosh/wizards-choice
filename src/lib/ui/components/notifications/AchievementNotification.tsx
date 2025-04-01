@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './AchievementNotification.css';
+import styles from './AchievementNotification.module.css';
 
 interface AchievementNotificationProps {
   title: string;
@@ -49,21 +49,21 @@ export const AchievementNotification: React.FC<AchievementNotificationProps> = (
   
   return (
     <div 
-      className={`achievement-notification ${isVisible ? 'visible' : ''} ${isClosing ? 'closing' : ''}`}
+      className={`${styles.achievementNotification} ${isVisible ? styles.visible : ''} ${isClosing ? styles.closing : ''}`}
       onClick={handleClose}
     >
-      <div className="achievement-notification-content">
-        <div className="achievement-notification-icon">
+      <div className={styles.achievementNotificationContent}>
+        <div className={styles.achievementNotificationIcon}>
           <img src={imageUrl} alt="Achievement icon" />
         </div>
-        <div className="achievement-notification-text">
-          <div className="achievement-notification-header">
-            <span className="achievement-label">Achievement Unlocked!</span>
-            <h3 className="achievement-title">{title}</h3>
+        <div className={styles.achievementNotificationText}>
+          <div className={styles.achievementNotificationHeader}>
+            <span className={styles.achievementLabel}>Achievement Unlocked!</span>
+            <h3 className={styles.achievementTitle}>{title}</h3>
           </div>
-          <p className="achievement-description">{description}</p>
+          <p className={styles.achievementDescription}>{description}</p>
           {reward && (
-            <p className="achievement-reward">Reward: {reward}</p>
+            <p className={styles.achievementReward}>Reward: {reward}</p>
           )}
         </div>
       </div>

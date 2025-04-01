@@ -2,30 +2,8 @@ import React, { useState, useEffect, createContext, useContext, ReactNode } from
 import { AchievementNotification } from './AchievementNotification';
 import { useGameStateStore } from '../../../game-state/gameStateStore';
 import { Achievement } from '../../../types';
+import { GameNotification } from '../../../types/game-types';
 import styles from './NotificationManager.module.css';
-
-// Types for notifications
-interface AchievementNotificationData {
-  id: string;
-  type: 'achievement';
-  achievementId: string;
-  title: string;
-  description: string;
-  reward?: string;
-  imageUrl?: string;
-}
-
-interface TitleUnlockNotificationData {
-  id: string;
-  type: 'title';
-  titleId: string;
-  title: string;
-  description: string;
-  bonus?: string;
-  imageUrl?: string;
-}
-
-type NotificationData = AchievementNotificationData | TitleUnlockNotificationData;
 
 // Context for the notification system
 interface NotificationContextData {
@@ -46,12 +24,14 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   children, 
   maxNotifications = 3 
 }) => {
-  const { gameState, setGameState } = useGameStateStore();
-  const { notifications } = gameState;
+  const { gameState, updateGameState } = useGameStateStore();
+  const [activeNotifications, setActiveNotifications] = useState<GameNotification[]>([]);
   
   // Keep track of achievements that changed to unlocked
   useEffect(() => {
-    const unlockedAchievements = notifications.filter(
+    if (!gameState?.notifications) return;
+
+    const unlockedNotifications = gameState.notifications.filter(
       notification => 
         notification.type === 'achievement' &&
         notification.unlocked && 
@@ -60,23 +40,37 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         new Date().getTime() - new Date(notification.unlockedDate).getTime() < 5000
     );
     
-    if (unlockedAchievements.length > 0) {
+    if (unlockedNotifications.length > 0) {
       // Show notifications for newly unlocked achievements
-      unlockedAchievements.forEach(notification => {
-        showAchievementNotification(notification as Achievement);
+      unlockedNotifications.forEach(notification => {
+        if (notification.type === 'achievement') {
+          showAchievementNotification({
+            id: notification.id,
+            name: notification.title,
+            description: notification.description,
+            reward: {
+              type: 'gold',
+              value: notification.reward ? parseInt(notification.reward) : 0
+            },
+            currentProgress: 100,
+            requiredProgress: 100,
+            progress: 100,
+            unlocked: true,
+            unlockedDate: notification.unlockedDate ? new Date(notification.unlockedDate) : new Date()
+          });
+        }
       });
     }
-  }, [notifications]);
+  }, [gameState?.notifications]);
   
   const showAchievementNotification = (achievement: Achievement) => {
     const notificationId = `achievement-${achievement.id}-${Date.now()}`;
-    const newNotification: AchievementNotificationData = {
+    const newNotification: GameNotification = {
       id: notificationId,
       type: 'achievement',
-      achievementId: achievement.id,
       title: achievement.name,
       description: achievement.description,
-      reward: achievement.reward
+      reward: achievement.reward?.value?.toString()
     };
     
     addNotification(newNotification);
@@ -84,35 +78,32 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   
   const showTitleUnlockNotification = (title: { id: string; name: string; description: string; bonus?: string }) => {
     const notificationId = `title-${title.id}-${Date.now()}`;
-    const newNotification: TitleUnlockNotificationData = {
+    const newNotification: GameNotification = {
       id: notificationId,
       type: 'title',
-      titleId: title.id,
       title: `New Title: ${title.name}`,
       description: title.description,
-      bonus: title.bonus
+      reward: title.bonus
     };
     
     addNotification(newNotification);
   };
   
-  const addNotification = (notification: NotificationData) => {
-    setGameState(prev => ({
-      ...prev,
-      notifications: [...prev.notifications, notification]
-    }));
+  const addNotification = (notification: GameNotification) => {
+    setActiveNotifications(prev => {
+      const newNotifications = [...prev, notification];
+      // Keep only the most recent notifications up to maxNotifications
+      return newNotifications.slice(-maxNotifications);
+    });
     
-    // Auto-dismiss after 8 seconds (notification itself auto-closes after 5s)
+    // Auto-dismiss after 8 seconds
     setTimeout(() => {
       dismissNotification(notification.id);
     }, 8000);
   };
   
   const dismissNotification = (id: string) => {
-    setGameState(prev => ({
-      ...prev,
-      notifications: prev.notifications.filter(notification => notification.id !== id)
-    }));
+    setActiveNotifications(prev => prev.filter(notification => notification.id !== id));
   };
   
   return (
@@ -127,10 +118,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       
       {/* Render active notifications */}
       <div className={styles.notificationContainer}>
-        {notifications.map((notification, index) => {
+        {activeNotifications.map((notification, index) => {
           if (notification.type === 'achievement') {
             return (
-              <div key={index} className={styles.notification}>
+              <div key={notification.id} className={styles.notification}>
                 <AchievementNotification
                   title={notification.title}
                   description={notification.description}

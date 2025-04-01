@@ -57,6 +57,20 @@ export interface SaveSlot {
 }
 
 /**
+ * Game notification
+ */
+export interface GameNotification {
+  id: string;
+  type: 'achievement' | 'title';
+  unlocked?: boolean;
+  unlockedDate?: string;
+  title: string;
+  description: string;
+  reward?: string;
+  imageUrl?: string;
+}
+
+/**
  * Complete game state
  */
 export interface GameState {
@@ -67,4 +81,5 @@ export interface GameState {
   currentSaveSlot: number;
   markets: MarketLocation[];
   marketData: MarketData;
+  notifications: GameNotification[];
 } 

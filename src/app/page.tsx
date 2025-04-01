@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Login from '../lib/ui/components/Login';
 import Settings from '../lib/ui/components/Settings';
 import HowToPlay from '../lib/ui/components/HowToPlay';
+import { NotificationProvider } from '@/lib/ui/components/notifications/NotificationManager';
+import GameInterface from '@/lib/ui/components/GameInterface';
 
 // Import custom hooks
 import { useGameAuth } from '../hooks/useGameAuth';
@@ -37,7 +39,7 @@ export default function Home() {
   const { navigateToWizardStudy, navigateToBattle, navigateToMainMenu } = useGameNavigation();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setCurrentLocation } = useGameStateStore();
+  const { setCurrentLocation, gameState } = useGameStateStore();
   
   // Cleanup transition class and check URL parameters on mount
   useEffect(() => {
@@ -55,7 +57,6 @@ export default function Home() {
         }
         
         // Force the location if needed based on state
-        const { gameState } = useGameStateStore.getState();
         if (gameState && gameState.player && gameState.player.name) {
           console.log("Found existing player in state:", gameState.player.name);
         }
@@ -200,43 +201,45 @@ export default function Home() {
   
   // Main application container
   return (
-    <div className={`app-container ${transitionClass}`}>
-      {/* GameInitializer handles battle victory navigation */}
-      <GameInitializer onGameStart={handleGameStartChange} />
-      
-      {/* Main Menu View */}
-      {!gameStarted && (
-        <>
-          <MainMenuView 
-            onStartNewGame={handleStartNewGame}
-            onContinueGame={handleContinueGame}
-            onOpenSettings={handleOpenSettings}
-            onOpenHowToPlay={handleOpenHowToPlay}
-            onLogout={handleLogout}
-          />
-          
-          {/* Modal overlays */}
-          {showSettings && <Settings onClose={handleCloseSettings} />}
-          {showHowToPlay && <HowToPlay onClose={handleCloseHowToPlay} />}
-          
-          {/* Character creation modal */}
-          {showNameInput && (
-            <CharacterCreation 
-              onComplete={handleCharacterCreationComplete}
-              onCancel={() => setShowNameInput(false)}
-              saveSlotId={selectedSaveSlot}
+    <NotificationProvider>
+      <div className={`app-container ${transitionClass}`}>
+        {/* GameInitializer handles battle victory navigation */}
+        <GameInitializer onGameStart={handleGameStartChange} />
+        
+        {/* Main Menu View */}
+        {!gameStarted && (
+          <>
+            <MainMenuView 
+              onStartNewGame={handleStartNewGame}
+              onContinueGame={handleContinueGame}
+              onOpenSettings={handleOpenSettings}
+              onOpenHowToPlay={handleOpenHowToPlay}
+              onLogout={handleLogout}
             />
-          )}
-        </>
-      )}
+            
+            {/* Modal overlays */}
+            {showSettings && <Settings onClose={handleCloseSettings} />}
+            {showHowToPlay && <HowToPlay onClose={handleCloseHowToPlay} />}
+            
+            {/* Character creation modal */}
+            {showNameInput && (
+              <CharacterCreation 
+                onComplete={handleCharacterCreationComplete}
+                onCancel={() => setShowNameInput(false)}
+                saveSlotId={selectedSaveSlot}
+              />
+            )}
+          </>
+        )}
 
-      {/* Game Interface View */}
-      {gameStarted && (
-        <GameView 
-          onStartDuel={handleStartDuel}
-          onReturnToMainMenu={handleReturnToMainMenu}
-        />
-      )}
-    </div>
+        {/* Game Interface View */}
+        {gameStarted && (
+          <GameView 
+            onStartDuel={handleStartDuel}
+            onReturnToMainMenu={handleReturnToMainMenu}
+          />
+        )}
+      </div>
+    </NotificationProvider>
   );
 }

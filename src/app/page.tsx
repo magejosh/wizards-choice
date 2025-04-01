@@ -7,6 +7,7 @@ import Settings from '../lib/ui/components/Settings';
 import HowToPlay from '../lib/ui/components/HowToPlay';
 import { NotificationProvider } from '@/lib/ui/components/notifications/NotificationManager';
 import GameInterface from '@/lib/ui/components/GameInterface';
+import { Analytics } from '@vercel/analytics/react';
 
 // Import custom hooks
 import { useGameNavigation } from '../hooks/useGameNavigation';
@@ -132,25 +133,28 @@ export default function Home() {
   };
 
   return (
-    <NotificationProvider>
-      <Suspense fallback={<LoadingScreen message="Loading..." />}>
-        <URLParamHandler />
-        {gameStarted ? (
-          <GameView
-            onStartDuel={handleStartDuel}
-            onReturnToMainMenu={handleReturnToMainMenu}
-          />
-        ) : (
-          <MainMenuView
-            onStartNewGame={handleStartNewGame}
-            onContinueGame={handleContinueGame}
-            onOpenSettings={handleOpenSettings}
-            onOpenHowToPlay={handleOpenHowToPlay}
-            onLogout={handleLogout}
-          />
-        )}
-        <GameInitializer onGameStart={handleGameStartChange} />
-      </Suspense>
-    </NotificationProvider>
+    <>
+      <NotificationProvider>
+        <Suspense fallback={<LoadingScreen message="Loading..." />}>
+          <URLParamHandler />
+          {gameStarted ? (
+            <GameView
+              onStartDuel={handleStartDuel}
+              onReturnToMainMenu={handleReturnToMainMenu}
+            />
+          ) : (
+            <MainMenuView
+              onStartNewGame={handleStartNewGame}
+              onContinueGame={handleContinueGame}
+              onOpenSettings={handleOpenSettings}
+              onOpenHowToPlay={handleOpenHowToPlay}
+              onLogout={handleLogout}
+            />
+          )}
+          <GameInitializer onGameStart={handleGameStartChange} />
+        </Suspense>
+      </NotificationProvider>
+      <Analytics />
+    </>
   );
 }

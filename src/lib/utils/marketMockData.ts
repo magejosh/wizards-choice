@@ -1,7 +1,8 @@
 /**
  * Mock market data for testing MarketUI component
  */
-import { MarketLocation, MarketItem, Ingredient, Potion, Equipment, IngredientRarity, IngredientCategory, SpellScroll, HandEquipment, PotionType, SpellType, ElementType, Spell, EquipmentSlot } from '../types';
+import { MarketLocation, MarketItem, Ingredient, Potion, Equipment, IngredientRarity, IngredientCategory, SpellScroll, HandEquipment, PotionType, SpellType, Spell, EquipmentSlot } from '../types';
+import { ElementType } from '../types/element-types';
 
 export const mockIngredients: MarketItem<Ingredient>[] = [
   {
@@ -11,7 +12,9 @@ export const mockIngredients: MarketItem<Ingredient>[] = [
       description: 'A shimmering scale from a fire dragon.',
       rarity: 'rare' as IngredientRarity,
       category: 'catalyst' as IngredientCategory,
-      properties: ['fire', 'protection']
+      properties: ['fire', 'protection'],
+      effects: ['fire resistance +20'],
+      quantity: 1
     },
     quantity: 5,
     currentPrice: 150,
@@ -26,7 +29,9 @@ export const mockIngredients: MarketItem<Ingredient>[] = [
       description: 'A rare root that screams when pulled from the ground.',
       rarity: 'uncommon' as IngredientRarity,
       category: 'herb' as IngredientCategory,
-      properties: ['healing', 'transformation']
+      properties: ['healing', 'transformation'],
+      effects: ['healing +15'],
+      quantity: 1
     },
     quantity: 10,
     currentPrice: 95,
@@ -41,7 +46,9 @@ export const mockIngredients: MarketItem<Ingredient>[] = [
       description: 'Thick green blood from a mountain troll.',
       rarity: 'common' as IngredientRarity,
       category: 'essence' as IngredientCategory,
-      properties: ['strength', 'endurance']
+      properties: ['strength', 'endurance'],
+      effects: ['strength +10'],
+      quantity: 1
     },
     quantity: 20,
     currentPrice: 45,
@@ -190,6 +197,7 @@ export const mockMarkets: MarketLocation[] = [
     inventoryRefreshDays: 3,
     lastRefreshed: new Date().toISOString(),
     priceMultiplier: 1.0,
+    sellPriceMultiplier: 0.6,
     prices: {},
     inventory: {
       ingredients: mockIngredients.slice(0, 2),
@@ -207,6 +215,7 @@ export const mockMarkets: MarketLocation[] = [
     inventoryRefreshDays: 3,
     lastRefreshed: new Date().toISOString(),
     priceMultiplier: 1.0,
+    sellPriceMultiplier: 0.6,
     prices: {},
     inventory: {
       ingredients: mockIngredients,
@@ -224,6 +233,7 @@ export const mockMarkets: MarketLocation[] = [
     inventoryRefreshDays: 3,
     lastRefreshed: new Date().toISOString(),
     priceMultiplier: 1.0,
+    sellPriceMultiplier: 0.6,
     prices: {},
     inventory: {
       ingredients: mockIngredients,

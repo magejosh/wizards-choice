@@ -398,7 +398,9 @@ function generateScrollLoot(
  * @returns Updated wizard with loot applied
  */
 export function applyLoot(playerWizard: Wizard, loot: LootDrop): Wizard {
-  // Add spells to wizard's collection
+  console.log("Applying loot to player wizard:", loot);
+
+  // Add spells to wizard's collection (if any)
   const updatedSpells = [...playerWizard.spells];
   for (const spell of loot.spells) {
     if (!updatedSpells.some(s => s.id === spell.id)) {
@@ -406,25 +408,75 @@ export function applyLoot(playerWizard: Wizard, loot: LootDrop): Wizard {
     }
   }
   
-  // Add equipment to wizard's inventory
+  // Initialize inventory if it doesn't exist
   const updatedInventory = playerWizard.inventory ? [...playerWizard.inventory] : [];
-  updatedInventory.push(...loot.equipment);
+  
+  // Add equipment to wizard's inventory
+  if (loot.equipment && loot.equipment.length > 0) {
+    console.log("Adding equipment to inventory:", loot.equipment);
+    
+    // Ensure each equipment item has all required fields
+    const formattedEquipment = loot.equipment.map(equipment => ({
+      ...equipment,
+      unlocked: true,
+      equipped: false,
+      bonuses: equipment.bonuses || []
+    }));
+    
+    updatedInventory.push(...formattedEquipment);
+  }
+  
+  // Add spell scrolls to wizard's inventory as equipment items
+  if (loot.scrolls && loot.scrolls.length > 0) {
+    console.log("Adding scrolls to inventory:", loot.scrolls);
+    
+    // Convert scrolls to equipment format
+    const scrollsAsEquipment = loot.scrolls.map(scroll => ({
+      id: scroll.id,
+      name: scroll.name,
+      slot: 'hand' as const,
+      type: 'scroll' as const,
+      rarity: scroll.rarity,
+      bonuses: [],
+      description: scroll.description,
+      imagePath: scroll.imagePath || '/images/scrolls/default-scroll.jpg',
+      spell: scroll.spell,
+      unlocked: true,
+      equipped: false
+    }));
+    
+    updatedInventory.push(...scrollsAsEquipment);
+  }
   
   // Add ingredients to wizard's collection
   const updatedIngredients = playerWizard.ingredients ? [...playerWizard.ingredients] : [];
-  for (const ingredient of loot.ingredients) {
-    const existingIndex = updatedIngredients.findIndex(i => i.id === ingredient.id);
-    if (existingIndex >= 0) {
-      // Update the existing ingredient (would need a quantity field for this)
-      // For now, we'll just add it as a duplicate
-      updatedIngredients.push(ingredient);
-    } else {
-      updatedIngredients.push(ingredient);
+  if (loot.ingredients && loot.ingredients.length > 0) {
+    console.log("Adding ingredients:", loot.ingredients);
+    
+    for (const ingredient of loot.ingredients) {
+      // Add quantity property if missing
+      const formattedIngredient = {
+        ...ingredient,
+        quantity: ingredient.quantity || 1
+      };
+      
+      const existingIndex = updatedIngredients.findIndex(i => i.id === ingredient.id);
+      if (existingIndex >= 0) {
+        // Update quantity of existing ingredient
+        updatedIngredients[existingIndex].quantity += formattedIngredient.quantity;
+      } else {
+        // Add new ingredient
+        updatedIngredients.push(formattedIngredient);
+      }
     }
   }
   
-  // Add spell scrolls to wizard's inventory
-  updatedInventory.push(...loot.scrolls as any); // Cast to any since inventory is Equipment[]
+  // Calculate total experience from loot
+  const lootExperience = loot.experience || 0;
+  
+  console.log("Updated inventory:", updatedInventory);
+  console.log("Updated ingredients:", updatedIngredients);
+  console.log("Added experience:", lootExperience);
   
   // Return updated wizard
   return {
@@ -432,6 +484,6 @@ export function applyLoot(playerWizard: Wizard, loot: LootDrop): Wizard {
     spells: updatedSpells,
     inventory: updatedInventory,
     ingredients: updatedIngredients,
-    experience: playerWizard.experience + loot.experience
+    experience: playerWizard.experience + lootExperience
   };
 }

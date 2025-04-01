@@ -1,13 +1,32 @@
 // Function to clear save games from local storage
-export function clearSaveGames() {
-  // Clear all game state related items from local storage
-  const keys = Object.keys(localStorage);
-  keys.forEach(key => {
-    if (key.startsWith('wizards-choice-')) {
-      localStorage.removeItem(key);
-    }
-  });
+import { useGameStateStore } from './gameStateStore';
+
+export const clearSaveGames = () => {
+  console.log('Clearing all save games...');
   
-  // Force a page reload to ensure clean state
-  window.location.reload();
-} 
+  try {
+    // Get the resetState function from the store
+    const { resetState } = useGameStateStore.getState();
+    
+    // Clear all localStorage entries first
+    localStorage.removeItem('wizards-choice-game-state');
+    
+    // Clear individual save slots
+    for (let i = 0; i < 3; i++) {
+      localStorage.removeItem(`wizardsChoice_saveSlot_${i}`);
+    }
+    
+    // Clear any other game-related data
+    localStorage.removeItem('wizardsChoice_currentSaveSlot');
+    localStorage.removeItem('wizardsChoice_gameState');
+    
+    // Reset the store state last
+    resetState();
+    
+    console.log('All save data has been cleared');
+    return true;
+  } catch (error) {
+    console.error('Error clearing save games:', error);
+    return false;
+  }
+}; 

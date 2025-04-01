@@ -31,7 +31,7 @@ export interface WizardActions {
   equipPotion: (potion: Potion) => void;
   unequipPotion: (potionId: string) => void;
   getPlayerScrolls: () => SpellScroll[];
-  consumeScrollToLearnSpell: (scrollId: string) => { success: boolean; message: string };
+  consumeScrollToLearnSpell: (scrollId: string) => { success: boolean; message: string; learnedSpell?: Spell };
   checkIfScrollSpellKnown: (scrollId: string) => boolean;
 }
 
@@ -451,7 +451,10 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
   consumeScrollToLearnSpell: (scrollId: string) => {
     const state = get().gameState;
     if (!state.player.inventory) {
-      return { success: false, message: "You have no items in your inventory." };
+      return { 
+        success: false, 
+        message: "You have no items in your inventory." 
+      };
     }
     
     const scrollItem = state.player.inventory.find(
@@ -459,13 +462,19 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
     );
     
     if (!scrollItem || !scrollItem.spell) {
-      return { success: false, message: "Scroll not found in inventory or no spell attached." };
+      return { 
+        success: false, 
+        message: "Scroll not found in inventory or no spell attached." 
+      };
     }
     
     // Check if the spell is already known
     const isAlreadyKnown = state.player.spells.some(spell => spell.id === scrollItem.spell?.id);
     if (isAlreadyKnown) {
-      return { success: false, message: "You already know this spell." };
+      return { 
+        success: false, 
+        message: "You already know this spell."
+      };
     }
     
     // Get the spell from the scroll
@@ -479,7 +488,8 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
     
     return { 
       success: true, 
-      message: `You learned the spell: ${spellToLearn.name}!` 
+      message: `You learned the spell: ${spellToLearn.name}!`,
+      learnedSpell: spellToLearn
     };
   }
 }); 

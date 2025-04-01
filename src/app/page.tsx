@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Login from '../lib/ui/components/Login';
 import Settings from '../lib/ui/components/Settings';
 import HowToPlay from '../lib/ui/components/HowToPlay';
@@ -11,6 +11,7 @@ import HowToPlay from '../lib/ui/components/HowToPlay';
 import { useGameAuth } from '../hooks/useGameAuth';
 import { useGameNavigation } from '../hooks/useGameNavigation';
 import { useGameStateStore } from '../lib/game-state/gameStateStore';
+import { clearSaveGames } from '../lib/game-state/clearSaveGames';
 
 // Import refactored components
 import GameInitializer from '../components/GameInitializer';
@@ -28,17 +29,37 @@ export default function Home() {
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showNameInput, setShowNameInput] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [selectedSaveSlot, setSelectedSaveSlot] = useState(0); // New state for selected save slot
+  const [transitionClass, setTransitionClass] = useState('');
   
   // Custom hooks
   const { isAuthenticated, isLoading, checkAuthStatus, handleLogout } = useGameAuth();
   const { navigateToWizardStudy, navigateToBattle, navigateToMainMenu } = useGameNavigation();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { setCurrentLocation } = useGameStateStore();
   
-  // Cleanup transition class on mount
+  // Cleanup transition class and check URL parameters on mount
   useEffect(() => {
-    // Remove any page transition classes when mounting
     if (typeof document !== 'undefined') {
+      // Remove any page transition classes when mounting
       document.body.classList.remove('page-transitioning');
+      
+      // Check for any URL parameters that might affect initialization
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Clean up URL if needed
+        if (urlParams.size > 0) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        
+        // Force the location if needed based on state
+        const { gameState } = useGameStateStore.getState();
+        if (gameState && gameState.player && gameState.player.name) {
+          console.log("Found existing player in state:", gameState.player.name);
+        }
+      }
     }
   }, []);
   
@@ -71,25 +92,30 @@ export default function Home() {
   }, [checkAuthStatus]);
   
   // Simple handlers
-  const handleStartNewGame = () => {
-    console.log("Starting new game - showing character creation");
-    setShowNameInput(true);
+  const handleStartNewGame = (saveSlotId: number) => {
+    console.log(`Page: Starting new game in slot ${saveSlotId}`);
+    setCurrentLocation('wizardStudy');
+    setGameStarted(true);
   };
   
-  const handleOpenSettings = () => setShowSettings(true);
+  const handleOpenSettings = () => {
+    console.log("Page: Opening settings");
+    // Settings are now handled in MainMenu component
+  };
+  
   const handleCloseSettings = () => setShowSettings(false);
-  const handleOpenHowToPlay = () => setShowHowToPlay(true);
+  
+  const handleOpenHowToPlay = () => {
+    console.log("Page: Opening how to play");
+    // How to play is now handled in MainMenu component
+  };
+  
   const handleCloseHowToPlay = () => setShowHowToPlay(false);
   
   // This handler will be called after character creation is complete
-  const handleCharacterCreationComplete = () => {
-    console.log("Character creation completed - entering game");
-    setShowNameInput(false);
-    
-    // First ensure the correct game state
-    navigateToWizardStudy();
-    
-    // Then switch to game view
+  const handleCharacterCreationComplete = (name: string) => {
+    console.log(`Page: Character creation complete for "${name}", navigating to wizard study`);
+    setCurrentLocation('wizardStudy');
     setGameStarted(true);
   };
   
@@ -119,15 +145,10 @@ export default function Home() {
     setGameStarted(false);
   };
   
-  // Handle manual navigation to wizard study
+  // Handle continuing a game
   const handleContinueGame = (saveSlotId: number) => {
-    console.log("=== CONTINUE GAME REQUESTED ===");
-    console.log("Continue game with save slot:", saveSlotId);
-    
-    // First ensure we are in the wizard study location
-    navigateToWizardStudy();
-    
-    // This is the direct, simple fix - immediately set gameStarted to true
+    console.log(`Page: Continuing game from slot ${saveSlotId}`);
+    setCurrentLocation('wizardStudy');
     setGameStarted(true);
   };
   
@@ -179,7 +200,7 @@ export default function Home() {
   
   // Main application container
   return (
-    <div className="app-container">
+    <div className={`app-container ${transitionClass}`}>
       {/* GameInitializer handles battle victory navigation */}
       <GameInitializer onGameStart={handleGameStartChange} />
       
@@ -203,6 +224,7 @@ export default function Home() {
             <CharacterCreation 
               onComplete={handleCharacterCreationComplete}
               onCancel={() => setShowNameInput(false)}
+              saveSlotId={selectedSaveSlot}
             />
           )}
         </>

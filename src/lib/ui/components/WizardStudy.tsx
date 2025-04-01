@@ -5,7 +5,7 @@ import React, { useState, useEffect, ErrorInfo } from 'react';
 import { useGameStateStore } from '../../game-state/gameStateStore';
 import { Wizard, Spell, Equipment, SpellScroll } from '../../types';
 import PotionCraftingScreen from './PotionCraftingScreen';
-import StreamlinedMarketUI from './StreamlinedMarketUI';
+import { MarketUI } from './MarketUI';
 import SpellCard from './SpellCard';
 import { PlayerProfileScreen } from './profile/PlayerProfileScreen';
 
@@ -144,7 +144,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
   if (isMarketOpen) {
     console.log('WizardStudy: About to render Market UI with error boundary');
     
-    // Use the StreamlinedMarketUI component with proper error handling
+    // Use the MarketUI component with proper error handling
     return (
       <ErrorBoundary
         fallback={
@@ -182,7 +182,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
           </div>
         }
       >
-        <StreamlinedMarketUI onClose={handleCloseMarket} />
+        <MarketUI onClose={handleCloseMarket} />
       </ErrorBoundary>
     );
   }

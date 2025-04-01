@@ -30,8 +30,8 @@ const WizardStats: React.FC<WizardStatsProps> = ({
       
       <div className={styles.statsBar}>
         <div className={styles.statGroup}>
-          <div className={styles.statLabel}>Health</div>
           <div className={styles.statBarContainer}>
+            <div className={styles.statLabel}>Health</div>
             <div 
               className={`${styles.statBarFill} ${styles.healthBar}`}
               style={{ width: `${(currentHealth / maxHealth) * 100}%` }}
@@ -43,8 +43,8 @@ const WizardStats: React.FC<WizardStatsProps> = ({
         </div>
 
         <div className={styles.statGroup}>
-          <div className={styles.statLabel}>Mana</div>
           <div className={styles.statBarContainer}>
+            <div className={styles.statLabel}>Mana</div>
             <div 
               className={`${styles.statBarFill} ${styles.manaBar}`}
               style={{ width: `${(currentMana / maxMana) * 100}%` }}

@@ -38,4 +38,159 @@ code {
 
 button:focus {
   outline: 2px solid #a885ff;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #2d1b4e;
+  border: 2px solid #8a4fff;
+  border-radius: 8px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 0 20px rgba(138, 79, 255, 0.5);
+  position: relative;
+  color: #fff;
+}
+
+.modal-title {
+  color: #b38dff;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 24px;
+  font-size: 24px;
+}
+
+.form-subtitle {
+  color: #b38dff;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.modal-close {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.modal-close:hover {
+  background-color: #444;
+}
+
+.save-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.save-slot {
+  border: 2px solid #8a4fff;
+  border-radius: 4px;
+  padding: 12px;
+  background-color: #3d2a5e;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  text-align: left;
+  min-height: 100px;
+}
+
+.save-slot--filled:hover {
+  background-color: #4d3a6e;
+  transform: translateY(-2px);
+}
+
+.save-slot--empty {
+  background-color: #33294a;
+  color: #aaa;
+  border-color: #666;
+}
+
+.save-slot--empty:hover {
+  background-color: #3b3154;
+}
+
+.save-slot__name {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #b38dff;
+}
+
+.save-slot__details {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.save-slot__level {
+  margin-bottom: 4px;
+}
+
+.save-slot__date {
+  font-style: italic;
+  color: #aaa;
+}
+
+.save-slot__warning {
+  color: #ff6b6b;
+  margin-top: 4px;
+}
+
+.save-slot__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #888;
+  font-style: italic;
+}
+
+.save-slot[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  color: #b38dff;
+}
+
+.text-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #8a4fff;
+  border-radius: 4px;
+  background-color: #1d1429;
+  color: white;
+  font-size: 16px;
 } 

@@ -10,8 +10,10 @@ import {
   IngredientRarity,
   SpellScroll
 } from '../../types';
+import { generateRandomIngredient } from '../procedural/ingredientGenerator';
+import { generateRandomPotion, generateRandomEquipment, generateRandomScroll } from '../items/itemGenerators';
+import { generateScrollsForMarket } from '../scrolls/scrollSystem';
 import {
-  generateRandomIngredient,
   generateHerbIngredient,
   generateCrystalIngredient,
   generateEssenceIngredient,
@@ -20,8 +22,7 @@ import {
   generateCoreIngredient
 } from '../procedural/ingredientGenerator';
 import { generateProceduralEquipment } from '../procedural/equipmentGenerator';
-import { generateScrollsForMarket, getScrollBasePrice } from '../scrolls/scrollSystem';
-import { generateRandomPotion, generateRandomEquipment, generateRandomScroll } from '../items/itemGenerators';
+import { getScrollBasePrice } from '../scrolls/scrollSystem';
 
 // Constants for market system
 const BASE_INGREDIENT_PRICES: Record<IngredientRarity, number> = {
@@ -104,7 +105,8 @@ export function initializeMarkets(): MarketLocation[] {
       lastRefreshed: today,
       inventory,
       priceMultiplier,
-      prices
+      prices,
+      sellPriceMultiplier: 0.6 // Default sell price is 60% of buy price
     };
   };
   
@@ -179,7 +181,7 @@ export function initializeMarkets(): MarketLocation[] {
       500,
       'potions',
       3.0,
-      20
+      21
     ),
     createMarket(
       'market-9',

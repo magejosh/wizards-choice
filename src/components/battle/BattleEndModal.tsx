@@ -4,10 +4,23 @@ import React from 'react';
 interface BattleEndModalProps {
   status: 'playerWon' | 'enemyWon' | 'active';
   onContinue: () => void;
+  onLootEnemy?: () => void; // Optional prop for handling enemy looting
 }
 
-const BattleEndModal: React.FC<BattleEndModalProps> = ({ status, onContinue }) => {
+const BattleEndModal: React.FC<BattleEndModalProps> = ({ status, onContinue, onLootEnemy }) => {
   if (status === 'active') return null;
+  
+  const buttonStyle = {
+    backgroundColor: '#6a4c93',
+    color: 'white',
+    border: 'none',
+    padding: '12px 24px',
+    borderRadius: '4px',
+    fontSize: '1.1rem',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s',
+    margin: '0 8px'
+  };
   
   return (
     <div style={{ 
@@ -40,21 +53,22 @@ const BattleEndModal: React.FC<BattleEndModalProps> = ({ status, onContinue }) =
             ? 'You gained experience and improved your magical prowess!' 
             : 'You have been defeated by the enemy wizard!'}
         </p>
-        <button 
-          onClick={onContinue}
-          style={{
-            backgroundColor: '#6a4c93',
-            color: 'white',
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: '4px',
-            fontSize: '1.1rem',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s'
-          }}
-        >
-          Continue to Wizard's Study
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '10px' }}>
+          {status === 'playerWon' && onLootEnemy && (
+            <button 
+              onClick={onLootEnemy}
+              style={buttonStyle}
+            >
+              Loot Enemy
+            </button>
+          )}
+          <button 
+            onClick={onContinue}
+            style={buttonStyle}
+          >
+            Continue to Wizard's Study
+          </button>
+        </div>
       </div>
     </div>
   );

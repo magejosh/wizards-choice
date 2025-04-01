@@ -2,7 +2,7 @@ import React from 'react';
 import MainMenu from '../lib/ui/components/MainMenu';
 
 interface MainMenuViewProps {
-  onStartNewGame: () => void;
+  onStartNewGame: (saveSlotId: number) => void;
   onContinueGame: (saveSlotId: number) => void;
   onOpenSettings: () => void;
   onOpenHowToPlay: () => void;

@@ -10,7 +10,7 @@ interface SettingsProps {
 }
 
 const Settings: React.FC<SettingsProps> = ({ onClose }) => {
-  const { gameState, updateSettings } = useGameStateStore();
+  const { gameState, updateSettings, saveGame } = useGameStateStore();
   const { settings } = gameState;
   
   const handleDifficultyChange = (difficulty: 'easy' | 'normal' | 'hard') => {
@@ -39,6 +39,13 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   
   const handleThemeChange = (theme: 'default' | 'dark' | 'light' | 'highContrast') => {
     updateSettings({ theme });
+  };
+  
+  const handleSaveAndClose = () => {
+    // Save the game state to ensure settings are persisted
+    saveGame();
+    // Close the settings menu
+    onClose();
   };
   
   return (
@@ -168,7 +175,7 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
         
         <button 
           className="settings__close-button"
-          onClick={onClose}
+          onClick={handleSaveAndClose}
         >
           Save & Close
         </button>

@@ -18,6 +18,7 @@ export interface MarketLocation {
   lastRefreshed: string;
   inventory: MarketInventory;
   priceMultiplier: number;
+  sellPriceMultiplier: number; // Multiplier for selling items (e.g. 0.6 for 60% of buy price)
   prices: Record<string, number>;
 }
 

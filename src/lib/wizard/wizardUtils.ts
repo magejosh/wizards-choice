@@ -1,5 +1,6 @@
 // src/lib/wizard/wizardUtils.ts
 import { Wizard, Equipment } from '../types';
+import { getDefaultSpells } from '../spells/spellData';
 
 /**
  * Generates a default wizard with starting stats
@@ -7,6 +8,22 @@ import { Wizard, Equipment } from '../types';
  * @returns A new wizard object with default stats
  */
 export function generateDefaultWizard(name: string): Wizard {
+  // Get default spells for the wizard
+  const defaultSpells = getDefaultSpells();
+  
+  // Select the first 3 spells for the equipped spells
+  const equippedSpells = defaultSpells.slice(0, 3);
+  
+  // Create a default deck
+  const defaultDeckId = `deck_default_${Date.now()}`;
+  const defaultDeck = {
+    id: defaultDeckId,
+    name: 'Starter Deck',
+    spells: defaultSpells,
+    dateCreated: new Date().toISOString(),
+    lastModified: new Date().toISOString()
+  };
+  
   return {
     id: `wizard_${Date.now()}`,
     name: name || 'Unnamed Wizard',
@@ -18,8 +35,8 @@ export function generateDefaultWizard(name: string): Wizard {
     mana: 100,
     maxMana: 100,
     manaRegen: 1, // Base mana regen equals player level
-    spells: [], // Will be populated with default spells
-    equippedSpells: [], // Will be populated with 3 selected spells
+    spells: defaultSpells,
+    equippedSpells: equippedSpells,
     equipment: {}, // No equipment at start
     inventory: [], // No items in inventory at start
     potions: [], // No potions at start
@@ -27,8 +44,8 @@ export function generateDefaultWizard(name: string): Wizard {
     ingredients: [], // No ingredients at start
     discoveredRecipes: [], // No discovered recipes at start
     levelUpPoints: 0,
-    decks: [], // Will be populated with default deck
-    activeDeckId: null, // Will be set to default deck ID
+    decks: [defaultDeck],
+    activeDeckId: defaultDeckId,
   };
 }
 

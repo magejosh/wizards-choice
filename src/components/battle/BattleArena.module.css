@@ -30,7 +30,7 @@
 .wizardInfo {
   position: absolute;
   top: 1rem;
-  width: 18.75rem;
+  width: 15rem;
   color: white;
   z-index: 10;
   padding: 1rem;
@@ -44,22 +44,43 @@
   right: 1rem;
 }
 
+.wizardInfo h2 {
+  margin-top: 0;
+}
+
+.wizardInfo.enemyInfo h2 {
+  text-align: right;
+}
+
+.wizardInfo.enemyInfo .statLabel {
+  left: auto;
+  right: 10px;
+}
+
+.wizardInfo.enemyInfo .effectsTitle {
+  text-align: right;
+}
+
 /* Health and mana bars */
 .statsBar {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .statGroup {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .statLabel {
   font-size: 14px;
-  color: #b3b3cc;
+  color: #f8f7fa;
+  position: absolute;
+  left: 10px;
+  line-height: 36px;
+  z-index: 2;
 }
 
 .statBarContainer {

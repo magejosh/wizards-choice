@@ -170,7 +170,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
             />
           </div>
 
-          <div className={styles.wizardInfo}>
+          <div className={`${styles.wizardInfo} ${styles.enemyInfo}`}>
             <WizardStats
               name="Enemy Wizard"
               currentHealth={enemyHealth}

@@ -181,6 +181,14 @@ export const createSaveModule = (set: Function, get: Function): SaveActions => (
   },
 
   initializeNewGame: (playerName, saveSlotId) => {
+    // First, clear any existing save data for this slot
+    try {
+      localStorage.removeItem(`wizardsChoice_saveSlot_${saveSlotId}`);
+      console.log(`Cleared existing save data in slot ${saveSlotId}`);
+    } catch (error) {
+      console.error('Failed to clear existing save data:', error);
+    }
+    
     // Initialize a new game with default values
     const initialGameState = getInitialGameState(playerName, saveSlotId);
     
@@ -196,10 +204,43 @@ export const createSaveModule = (set: Function, get: Function): SaveActions => (
   },
 
   resetState: () => {
-    // Reset to a default state (useful for debugging)
-    const initialGameState = getInitialGameState('Debug', 0);
+    // Reset to a default state with empty save slots
+    const initialGameState = getInitialGameState('', 0);
     
-    set({ gameState: initialGameState });
+    // Reset all save slots to empty
+    initialGameState.saveSlots = Array(3).fill(null).map((_, i) => ({
+      id: i,
+      playerName: '',
+      level: 0,
+      lastSaved: '',
+      isEmpty: true
+    }));
+    
+    // Clear all localStorage entries for save slots
+    try {
+      // Clear Zustand persisted store
+      localStorage.removeItem('wizards-choice-game-state');
+      
+      // Clear individual save slots
+      for (let i = 0; i < 3; i++) {
+        localStorage.removeItem(`wizardsChoice_saveSlot_${i}`);
+      }
+      
+      // Clear any other game-related data
+      localStorage.removeItem('wizardsChoice_currentSaveSlot');
+      localStorage.removeItem('wizardsChoice_gameState');
+      
+      console.log('All save data has been cleared from localStorage');
+    } catch (error) {
+      console.error('Failed to clear save data:', error);
+    }
+    
+    // Update the store state with empty save slots
+    set(() => ({
+      gameState: initialGameState
+    }));
+    
+    console.log('Game state has been reset with empty save slots');
   },
 
   updateSaveSlot: (slotId, data) => {

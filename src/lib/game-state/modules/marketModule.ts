@@ -1,11 +1,12 @@
 // src/lib/game-state/modules/marketModule.ts
 // Market-related state management
 
-import { MarketLocation, MarketData, MarketTransaction, MarketItem } from '../../types/market-types';
+import { MarketLocation, MarketData, MarketTransaction, MarketItem, MarketInventory } from '../../types/market-types';
 import { Equipment, Ingredient, Potion } from '../../types/equipment-types';
 import { SpellScroll, Spell } from '../../types/spell-types';
 import { Wizard } from '../../types/wizard-types';
 import { generateDefaultWizard } from '../../wizard/wizardUtils';
+import { refreshMarketInventory as importedRefreshMarketInventory } from '../../features/market/marketSystem';
 
 // Define the slice of state this module manages
 export interface MarketState {
@@ -24,7 +25,7 @@ export interface MarketActions {
   addGold: (amount: number) => void;
   removeGold: (amount: number) => boolean;
   recordTransaction: (transaction: Omit<MarketTransaction, 'id' | 'date'>) => void;
-  visitMarket: (marketId: string) => void;
+  visitMarket: (marketId: string) => boolean;
   toggleFavoriteMarket: (marketId: string) => void;
   refreshMarketInventory: (marketId: string) => void;
   updateMarketPrices: (marketId: string) => void;
@@ -34,8 +35,13 @@ export interface MarketActions {
   handleMarketAttackResult: (result: 'win' | 'lose' | 'flee') => void;
 }
 
-// Helper function to generate unique ID
-const generateId = () => Math.random().toString(36).substring(2, 15);
+// Helper function to generate IDs
+function generateId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2);
+}
+
+// Fix function name clash by renaming the imported function
+const generateMarketInventory = importedRefreshMarketInventory;
 
 // Create the module
 export const createMarketModule = (set: Function, get: Function): MarketActions => ({
@@ -181,8 +187,178 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
   },
 
   visitMarket: (marketId) => {
+    const markets = get().gameState.markets || [];
+    const marketIndex = markets.findIndex(m => m.id === marketId);
+    
+    if (marketIndex === -1) {
+      console.error(`Market not found: ${marketId}`);
+      return false;
+    }
+    
+    const market = markets[marketIndex];
+    console.log(`Visiting market: ${market.name}`);
+    
+    // Properly check if market inventory needs initialization
+    const needsInventory = 
+      !market.inventory || 
+      !Array.isArray(market.inventory.ingredients) || market.inventory.ingredients.length === 0 ||
+      !Array.isArray(market.inventory.potions) || market.inventory.potions.length === 0 ||
+      !Array.isArray(market.inventory.equipment) || market.inventory.equipment.length === 0 ||
+      !Array.isArray(market.inventory.scrolls) || market.inventory.scrolls.length === 0;
+    
+    if (needsInventory) {
+      console.log(`Initializing inventory for market: ${market.name}, level ${market.unlockLevel}`);
+      try {
+        // Call the correct function - refreshMarketInventory from marketSystem expects a MarketLocation
+        // while the local function doesn't accept parameters
+        console.log('Market before refresh:', JSON.stringify({
+          id: market.id,
+          name: market.name,
+          unlockLevel: market.unlockLevel
+        }));
+        
+        // Use the imported function that takes a market parameter
+        const updatedMarket = generateMarketInventory(market);
+        
+        if (updatedMarket && updatedMarket.inventory) {
+          markets[marketIndex] = updatedMarket;
+          console.log(`Market inventory refreshed successfully with:
+            ${updatedMarket.inventory.ingredients.length} ingredients, 
+            ${updatedMarket.inventory.potions.length} potions,
+            ${updatedMarket.inventory.equipment.length} equipment,
+            ${updatedMarket.inventory.scrolls.length} scrolls`
+          );
+        } else {
+          // If updatedMarket is undefined or has no inventory, fallback to creating inventory directly
+          console.log('Using fallback inventory generation due to error in market refresh');
+          const newInventory = {
+            ingredients: [],
+            potions: [],
+            equipment: [],
+            scrolls: []
+          };
+          
+          // Generate some basic inventory
+          const level = market.unlockLevel || 1;
+          
+          // Import the require inventory generation functions
+          const { 
+            generateRandomIngredient, 
+            generateRandomPotion,
+            generateRandomEquipment,
+            generateRandomScroll 
+          } = require('../../features/items/itemGenerators');
+          
+          // Populate with basic items
+          for (let i = 0; i < 5; i++) {
+            newInventory.ingredients.push({
+              item: generateRandomIngredient(level),
+              quantity: Math.floor(Math.random() * 5) + 1,
+              currentPrice: 50,
+              supply: 'common',
+              demand: 'moderate',
+              priceHistory: [50]
+            });
+            
+            if (i < 3) {
+              newInventory.potions.push({
+                item: generateRandomPotion(level),
+                quantity: Math.floor(Math.random() * 3) + 1,
+                currentPrice: 100,
+                supply: 'common',
+                demand: 'moderate',
+                priceHistory: [100]
+              });
+            }
+            
+            if (i < 2) {
+              newInventory.equipment.push({
+                item: generateRandomEquipment(level),
+                quantity: Math.floor(Math.random() * 2) + 1,
+                currentPrice: 200,
+                supply: 'limited',
+                demand: 'high',
+                priceHistory: [200]
+              });
+            }
+            
+            if (i < 1) {
+              newInventory.scrolls.push({
+                item: generateRandomScroll(level),
+                quantity: 1,
+                currentPrice: 300,
+                supply: 'rare',
+                demand: 'high',
+                priceHistory: [300]
+              });
+            }
+          }
+          
+          markets[marketIndex] = {
+            ...market,
+            inventory: newInventory,
+            lastRefreshed: new Date().toISOString()
+          };
+          
+          console.log('Fallback inventory generation complete');
+        }
+      } catch (err) {
+        console.error('Error generating market inventory:', err);
+        
+        // Create a minimal inventory to prevent crashes
+        const minimalInventory = {
+          ingredients: [],
+          potions: [],
+          equipment: [{
+            item: {
+              id: 'apprentice-robe',
+              name: 'Apprentice Robe',
+              description: 'A simple robe for novice wizards',
+              type: 'armor',
+              equipSlot: 'body',
+              rarity: 'common',
+              defense: 1,
+              magicDefense: 2,
+              effects: ['magic power +1']
+            },
+            quantity: 6,
+            currentPrice: 30,
+            supply: 'common',
+            demand: 'moderate',
+            priceHistory: [30]
+          }, {
+            item: {
+              id: 'wand-of-protection',
+              name: 'Wand of Protection',
+              description: 'A basic wand that provides magical protection',
+              type: 'weapon',
+              equipSlot: 'hand',
+              rarity: 'uncommon',
+              attack: 1,
+              magicAttack: 3,
+              effects: ['defense +5']
+            },
+            quantity: 1,
+            currentPrice: 100,
+            supply: 'limited',
+            demand: 'high',
+            priceHistory: [100]
+          }],
+          scrolls: []
+        };
+        
+        markets[marketIndex] = {
+          ...market,
+          inventory: minimalInventory,
+          lastRefreshed: new Date().toISOString()
+        };
+        
+        console.log('Created minimal inventory due to error');
+      }
+    }
+    
     set((state: any) => {
-      const visitedMarkets = [...state.gameState.marketData.visitedMarkets];
+      const visitedMarkets = [...(state.gameState.marketData.visitedMarkets || [])];
       
       // Add to visited markets if not already there
       if (!visitedMarkets.includes(marketId)) {
@@ -195,10 +371,13 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
           marketData: {
             ...state.gameState.marketData,
             visitedMarkets
-          }
+          },
+          markets
         }
       };
     });
+    
+    return true;
   },
 
   toggleFavoriteMarket: (marketId) => {
@@ -232,46 +411,20 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
       
       if (marketIndex === -1) return state;
       
-      // Function to generate random quantity based on rarity
-      const getRandomQuantity = (supply: string) => {
-        switch (supply) {
-          case 'abundant': return Math.floor(Math.random() * 10) + 10;
-          case 'common': return Math.floor(Math.random() * 6) + 5;
-          case 'limited': return Math.floor(Math.random() * 3) + 2;
-          case 'rare': return 1;
-          case 'unique': return 1;
-          default: return 1;
-        }
-      };
-      
-      // Generate new items based on market specialization
       const market = markets[marketIndex];
-      const specialization = market.specialization || 'equipment';
+      console.log(`Refreshing inventory for market: ${market.name}`);
       
-      // For simplicity, we're just creating placeholder logic
-      // In a real implementation, you'd generate actual items using item generators
-      const newInventory = {
-        ingredients: [] as MarketItem<Ingredient>[],
-        potions: [] as MarketItem<Potion>[],
-        equipment: [] as MarketItem<Equipment>[],
-        scrolls: [] as MarketItem<SpellScroll>[]
-      };
+      // Generate new inventory using the marketSystem function
+      const newInventory = generateMarketInventory(market);
       
-      // Generate more of the specialized items
-      const specializationCount = specialization === 'ingredients' ? 8 : 
-                                 specialization === 'potions' ? 8 :
-                                 specialization === 'equipment' ? 8 :
-                                 specialization === 'scrolls' ? 8 : 5;
-      
-      // Generate some items of other types
-      const otherCount = 2;
-      
-      // Update the market's inventory and refresh date
+      // Update the market with new inventory and refresh date
       markets[marketIndex] = {
         ...market,
         inventory: newInventory,
         lastRefreshed: new Date().toISOString()
       };
+      
+      console.log(`Market inventory refreshed with ${newInventory.ingredients.length} ingredients, ${newInventory.potions.length} potions, ${newInventory.equipment.length} equipment, ${newInventory.scrolls.length} scrolls`);
       
       return {
         gameState: {

@@ -10,6 +10,7 @@ import {
   executeSpellCast 
 } from '../../lib/combat/combatEngine';
 import { useGameStateStore } from '../../lib/game-state/gameStateStore';
+import { generateLoot, applyLoot, LootDrop } from '../../lib/features/loot/lootSystem';
 import '@/app/battle/battle.css';
 
 interface BattleViewProps {
@@ -24,6 +25,8 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [isEnemyTurnIndicatorVisible, setIsEnemyTurnIndicatorVisible] = useState(false);
   const [battleLog, setBattleLog] = useState<CombatLogEntry[]>([]);
+  const [hasLootedEnemy, setHasLootedEnemy] = useState(false);
+  const [lootNotification, setLootNotification] = useState<{show: boolean, message: string}>({show: false, message: ''});
   
   // Use refs to track state that shouldn't trigger re-renders
   const isProcessingEndRef = useRef(false);
@@ -34,7 +37,8 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
   const { 
     gameState,
     addExperience,
-    saveGame
+    saveGame,
+    updateGameState
   } = useGameStateStore();
   
   // Initialize combat once
@@ -149,20 +153,27 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         // Calculate experience based on difficulty
         const experienceMultiplier = 
           combatState.difficulty === 'easy' ? 10 : 
-          combatState.difficulty === 'normal' ? 1 : 0.1;
+          combatState.difficulty === 'normal' ? 1 : 
+          combatState.difficulty === 'hard' ? 0.1 : 1; // explicit hard case, default to normal
         
         const enemyWizard = combatState.enemyWizard.wizard;
-        const experience = Math.round(enemyWizard.level * 100 * experienceMultiplier);
+        const experience = Math.round(enemyWizard.level * 10 * experienceMultiplier); // changed 100 to 10
         
-        // Award experience to player
+        console.log('Adding experience:', experience, 'Difficulty multiplier:', experienceMultiplier);
+        
+        // Add experience to player
         addExperience(experience);
 
+        // Force save
+        saveGame();
+        
         // Add victory message to battle log
         setBattleLog(prev => [...prev, {
           turn: combatState.turn,
           round: combatState.round,
           actor: 'player',
           action: 'victory',
+          details: `Gained ${experience} experience!`,
           timestamp: Date.now()
         }]);
       } else if (combatState.status === 'enemyWon') {
@@ -189,6 +200,170 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       console.error("Error processing battle end:", error);
     }
   }, [combatState?.status, addExperience, saveGame]);
+
+  // Handle enemy looting
+  const handleLootEnemy = () => {
+    if (!combatState || hasLootedEnemy) return;
+    
+    try {
+      console.log("Looting enemy wizard");
+      
+      const difficulty = combatState.difficulty;
+      const playerWizard = gameState.player;
+      const enemyWizard = combatState.enemyWizard.wizard;
+      
+      // Determine success chance based on difficulty experienceMultiplier
+      let successChance = 0;
+      const experienceMultiplier = 
+        difficulty === 'easy' ? 10 : 
+        difficulty === 'normal' ? 1 : 
+        difficulty === 'hard' ? 0.1 : 1;
+      
+      // 10 times the experienceMultiplier as percentage
+      successChance = experienceMultiplier * 10;
+      
+      // For debugging, temporarily make success more likely
+      console.log(`Loot success chance: ${successChance}%`);
+      const roll = Math.random() * 100;
+      const isLootingSuccessful = roll <= successChance;
+      console.log(`Loot roll: ${roll}, Success: ${isLootingSuccessful}`);
+      
+      if (isLootingSuccessful) {
+        // Generate loot using the lootSystem
+        let lootDrop = generateLoot(
+          playerWizard,
+          enemyWizard,
+          true, // isWizardEnemy
+          difficulty
+        );
+        
+        console.log("Generated loot:", lootDrop);
+        
+        // Convert any spells to scrolls instead of directly adding them to the spell library
+        const scrollsFromSpells = lootDrop.spells.map(spell => ({
+          id: `scroll_${spell.id}_${Date.now()}`,
+          name: `Scroll: ${spell.name}`,
+          description: `A magical scroll containing the spell: ${spell.name}`,
+          type: 'scroll' as const,
+          rarity: spell.tier <= 2 ? 'common' as const : 
+                 spell.tier <= 4 ? 'uncommon' as const : 
+                 spell.tier <= 6 ? 'rare' as const : 
+                 'epic' as const,
+          spell: spell,
+          imagePath: spell.imagePath
+        }));
+        
+        // Remove spells from loot and add them as scrolls
+        lootDrop = {
+          ...lootDrop,
+          spells: [],
+          scrolls: [...lootDrop.scrolls, ...scrollsFromSpells]
+        };
+        
+        // Calculate gold based on enemy level and difficulty
+        const goldAmount = Math.floor((Math.random() * 30 + 20) * enemyWizard.level * experienceMultiplier);
+        
+        // Apply the loot to the player
+        console.log("Player before applying loot:", playerWizard);
+        const updatedWizard = applyLoot(playerWizard, lootDrop);
+        console.log("Player after applying loot:", updatedWizard);
+        
+        // Add gold to the market data
+        let updatedMarketData = {
+          ...gameState.marketData,
+          gold: (gameState.marketData.gold || 0) + goldAmount
+        };
+        console.log("Updated market data with gold:", updatedMarketData);
+        
+        // Update the game state directly using set state
+        useGameStateStore.setState((state) => ({
+          gameState: {
+            ...state.gameState,
+            player: updatedWizard,
+            marketData: updatedMarketData
+          }
+        }));
+        
+        // Force a save immediately
+        setTimeout(() => {
+          saveGame();
+          console.log("Game saved after loot applied");
+          
+          // Double-check that state was updated correctly
+          const currentState = useGameStateStore.getState().gameState;
+          console.log("Current player state after save:", currentState.player);
+          console.log("Current market data after save:", currentState.marketData);
+        }, 100);
+        
+        // Generate loot notification message
+        let lootMessage = "You looted: ";
+        if (scrollsFromSpells.length > 0) {
+          lootMessage += `${scrollsFromSpells.length} spell scroll${scrollsFromSpells.length !== 1 ? 's' : ''} (${scrollsFromSpells.map(s => s.name.replace('Scroll: ', '')).join(', ')}), `;
+        }
+        if (lootDrop.equipment.length > 0) {
+          lootMessage += `${lootDrop.equipment.length} equipment item${lootDrop.equipment.length !== 1 ? 's' : ''}, `;
+        }
+        if (lootDrop.ingredients.length > 0) {
+          lootMessage += `${lootDrop.ingredients.length} ingredient${lootDrop.ingredients.length !== 1 ? 's' : ''}, `;
+        }
+        if (lootDrop.scrolls.length - scrollsFromSpells.length > 0) {
+          const originalScrollCount = lootDrop.scrolls.length - scrollsFromSpells.length;
+          lootMessage += `${originalScrollCount} additional scroll${originalScrollCount !== 1 ? 's' : ''}, `;
+        }
+        lootMessage += `and ${goldAmount} gold!`;
+        
+        // Show loot notification
+        setLootNotification({
+          show: true,
+          message: lootMessage
+        });
+        
+        // Add loot message to battle log
+        setBattleLog(prev => [...prev, {
+          turn: combatState.turn,
+          round: combatState.round,
+          actor: 'player',
+          action: 'loot',
+          details: lootMessage,
+          timestamp: Date.now()
+        }]);
+      } else {
+        // Looting failed
+        setLootNotification({
+          show: true,
+          message: "You didn't find anything valuable on the enemy."
+        });
+        
+        // Add failure message to battle log
+        setBattleLog(prev => [...prev, {
+          turn: combatState.turn,
+          round: combatState.round,
+          actor: 'player',
+          action: 'loot',
+          details: "Failed to find anything valuable.",
+          timestamp: Date.now()
+        }]);
+      }
+      
+      // Mark enemy as looted
+      setHasLootedEnemy(true);
+      
+      // Hide notification after 5 seconds
+      setTimeout(() => {
+        setLootNotification({show: false, message: ''});
+      }, 5000);
+      
+    } catch (error) {
+      console.error("Error looting enemy:", error);
+      setLootNotification({
+        show: true,
+        message: "Error occurred while looting."
+      });
+      setTimeout(() => {
+        setLootNotification({show: false, message: ''});
+      }, 5000);
+    }
+  };
 
   // Handle player spell selection
   const handleSpellSelect = (spell: Spell) => {
@@ -581,6 +756,45 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     }
   }, [combatState, isAnimating]);
 
+  // Create a wrapped version of onReturnToWizardStudy to ensure game is saved before returning
+  const handleReturnToWizardStudy = () => {
+    try {
+      // Force an immediate state refresh
+      const currentState = useGameStateStore.getState().gameState;
+      console.log("Current game state before returning:", currentState);
+      
+      // Ensure we set the location properly
+      useGameStateStore.setState((state) => ({
+        gameState: {
+          ...state.gameState,
+          gameProgress: {
+            ...state.gameState.gameProgress,
+            currentLocation: 'wizardStudy'
+          }
+        }
+      }));
+      
+      // Final save to ensure all changes are persisted
+      saveGame();
+      console.log("Saving game before returning to wizard's study");
+      
+      // Short delay to ensure save completes
+      setTimeout(() => {
+        // Double-check that our state is correctly persisted
+        const finalState = useGameStateStore.getState().gameState;
+        console.log("Final player state:", finalState.player);
+        console.log("Final market data:", finalState.marketData);
+        
+        // Call the original handler
+        onReturnToWizardStudy();
+      }, 200); // Slightly longer delay to ensure save completes
+    } catch (error) {
+      console.error("Error saving game before returning to wizard's study:", error);
+      // Call the original handler even if there was an error
+      onReturnToWizardStudy();
+    }
+  };
+
   if (!combatState) {
     return <div className="loading">Initializing battle...</div>;
   }
@@ -594,78 +808,117 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
   }
 
   return (
-    <div className="battle-page">
-      <BattleArena
-        playerHealth={combatState.playerWizard.currentHealth}
-        playerMaxHealth={combatState.playerWizard.wizard.maxHealth}
-        playerMana={combatState.playerWizard.currentMana}
-        playerMaxMana={combatState.playerWizard.wizard.maxMana}
-        playerActiveEffects={combatState.playerWizard.activeEffects}
-        enemyHealth={combatState.enemyWizard.currentHealth}
-        enemyMaxHealth={combatState.enemyWizard.wizard.maxHealth}
-        enemyMana={combatState.enemyWizard.currentMana}
-        enemyMaxMana={combatState.enemyWizard.wizard.maxMana}
-        enemyActiveEffects={combatState.enemyWizard.activeEffects}
-        spells={combatState.playerWizard.hand}
-        battleLog={battleLog}
-        onSpellCast={handleSpellSelect}
-        onMysticPunch={handleMysticPunch}
-        onSkipTurn={handleSkipTurn}
-        onExitBattle={onReturnToWizardStudy}
-        isPlayerTurn={combatState.isPlayerTurn}
-        round={combatState.round}
-        turn={combatState.turn}
-        animating={isAnimating}
-        canCastSpell={(spell) => combatState.isPlayerTurn && combatState.playerWizard.currentMana >= spell.manaCost}
-        canUseMysticPunch={combatState.isPlayerTurn}
-      />
-      
-      {/* Enemy turn indicator */}
-      {isEnemyTurnIndicatorVisible && (
-        <div className="enemy-turn-indicator">
-          <div className="enemy-turn-indicator__content">
-            <h3>Enemy's Turn</h3>
-            <p>{combatState.enemyWizard.wizard.name} is casting a spell...</p>
+    <div className="battle-view">
+      {combatState && (
+        <>
+          <BattleArena 
+            playerHealth={combatState.playerWizard.currentHealth}
+            playerMaxHealth={combatState.playerWizard.wizard.maxHealth}
+            playerMana={combatState.playerWizard.currentMana}
+            playerMaxMana={combatState.playerWizard.wizard.maxMana}
+            playerActiveEffects={combatState.playerWizard.activeEffects}
+            enemyHealth={combatState.enemyWizard.currentHealth}
+            enemyMaxHealth={combatState.enemyWizard.wizard.maxHealth}
+            enemyMana={combatState.enemyWizard.currentMana}
+            enemyMaxMana={combatState.enemyWizard.wizard.maxMana}
+            enemyActiveEffects={combatState.enemyWizard.activeEffects}
+            spells={combatState.playerWizard.hand}
+            battleLog={battleLog}
+            onSpellCast={handleSpellSelect}
+            onMysticPunch={handleMysticPunch}
+            onSkipTurn={handleSkipTurn} 
+            onExitBattle={handleReturnToWizardStudy}
+            isPlayerTurn={combatState.isPlayerTurn}
+            round={combatState.round}
+            turn={combatState.turn}
+            animating={isAnimating}
+            canCastSpell={(spell) => combatState.isPlayerTurn && combatState.playerWizard.currentMana >= spell.manaCost}
+            canUseMysticPunch={combatState.isPlayerTurn}
+          />
+          
+          {/* Combat Status HUD */}
+          <div className="battle-status-hud">
+            <h3>Turn: {combatState.turn} | Round: {combatState.round}</h3>
+            <p>{combatState.isPlayerTurn ? "Your Turn" : "Enemy's Turn"}</p>
           </div>
-        </div>
-      )}
-      
-      {/* Mystic punch spell selection modal */}
-      {showMysticPunchSelection && (
-        <div className="mystic-punch-modal">
-          <div className="mystic-punch-modal__content">
-            <h3>Select a spell to power your Mystic Punch</h3>
-            <div className="mystic-punch-modal__spells">
-              {combatState.playerWizard.hand.map((spell) => (
-                <div 
-                  key={spell.id} 
-                  className="mystic-punch-modal__spell"
-                  onClick={() => executeMysticPunchWithSpell(spell)}
-                >
-                  <p>{spell.name} (Tier {spell.tier})</p>
-                  <p className="mystic-punch-modal__damage">
-                    Will deal {spell.tier + (combatState.difficulty === 'easy' ? 20 : combatState.difficulty === 'normal' ? 5 : 2)} damage
-                  </p>
-                </div>
-              ))}
+          
+          {/* Loot Notification */}
+          {lootNotification.show && (
+            <div className="loot-notification" style={{
+              position: 'fixed',
+              top: '20%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#1a1a2e',
+              border: '2px solid #e94560',
+              borderRadius: '8px',
+              padding: '15px',
+              zIndex: 10000,
+              color: 'white',
+              boxShadow: '0 0 20px rgba(233, 69, 96, 0.7)',
+              maxWidth: '80%',
+              textAlign: 'center'
+            }}>
+              <h3 style={{ color: '#e94560', marginBottom: '10px' }}>Loot Results</h3>
+              <p>{lootNotification.message}</p>
             </div>
-            <button 
-              className="mystic-punch-modal__cancel"
-              onClick={() => setShowMysticPunchSelection(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+          )}
+          
+          {/* Battle End Modal */}
+          <BattleEndModal 
+            status={combatState.status} 
+            onContinue={handleReturnToWizardStudy}
+            onLootEnemy={combatState.status === 'playerWon' ? handleLootEnemy : undefined}
+          />
+          
+          {/* Enemy turn indicator */}
+          {isEnemyTurnIndicatorVisible && (
+            <div className="enemy-turn-indicator">
+              <div className="enemy-turn-indicator__content">
+                <h3>Enemy's Turn</h3>
+                <p>{combatState.enemyWizard.wizard.name} is casting a spell...</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Mystic Punch Spell Selection Modal */}
+          {showMysticPunchSelection && (
+            <div className="modal mystic-punch-modal">
+              <div className="modal-content">
+                <h2>Select Spell for Mystic Punch</h2>
+                <p>Select a spell to amplify your mystic punch</p>
+                <div className="spell-grid">
+                  {combatState.playerWizard.hand.map(spell => (
+                    <div 
+                      key={spell.id} 
+                      className="spell-card"
+                      onClick={() => {
+                        setSelectedSpellForMysticPunch(spell);
+                        setShowMysticPunchSelection(false);
+                        executeMysticPunchWithSpell(spell);
+                      }}
+                    >
+                      <h3>{spell.name}</h3>
+                      <p>{spell.description}</p>
+                    </div>
+                  ))}
+                </div>
+                <button 
+                  className="modal-close-btn"
+                  onClick={() => setShowMysticPunchSelection(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
-
-      {/* Battle End Modal */}
-      <BattleEndModal 
-        status={combatState.status} 
-        onContinue={onReturnToWizardStudy} 
-      />
     </div>
   );
 };
 
 export default BattleView; 
+
+
+

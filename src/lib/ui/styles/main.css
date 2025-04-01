@@ -2707,3 +2707,252 @@ button:disabled {
   font-size: 24px;
   z-index: 10000;
 }
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 90%;
+  width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal-title {
+  color: #fff;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.save-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.save-slot {
+  background-color: #2a2a2a;
+  border: 2px solid #3a3a3a;
+  border-radius: 4px;
+  padding: 1rem;
+  text-align: left;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  color: #fff;
+}
+
+.save-slot:hover:not(:disabled) {
+  border-color: #4a90e2;
+  background-color: #303030;
+}
+
+.save-slot:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.save-slot--empty {
+  border-style: dashed;
+}
+
+.save-slot--filled {
+  border-style: solid;
+}
+
+.save-slot__empty {
+  color: #666;
+  text-align: center;
+  font-style: italic;
+}
+
+.save-slot__name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.save-slot__details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.save-slot__warning {
+  color: #ff4444;
+}
+
+.modal-close {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.modal-close:hover {
+  background-color: #444;
+}
+
+/* Character Creation Modal Styles */
+.name-input-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.name-input-content {
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  padding: 2rem;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.name-input-subtitle {
+  color: #999;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.name-input-field {
+  margin-bottom: 1.5rem;
+}
+
+.name-input-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.name-input-field input {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #2a2a2a;
+  border: 2px solid #3a3a3a;
+  border-radius: 4px;
+  color: #fff;
+}
+
+.name-input-field input:focus {
+  border-color: #4a90e2;
+  outline: none;
+}
+
+.name-input-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.name-input-buttons button {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.name-input-cancel {
+  background-color: #333;
+  color: #fff;
+  border: none;
+}
+
+.name-input-cancel:hover {
+  background-color: #444;
+}
+
+.name-input-submit {
+  background-color: #4a90e2;
+  color: #fff;
+  border: none;
+}
+
+.name-input-submit:hover:not(:disabled) {
+  background-color: #357abd;
+}
+
+.name-input-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modal-action {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-action--danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+}
+
+.modal-action--danger:hover {
+  background-color: #c82333;
+}
+
+.difficulty-buttons {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.difficulty-button {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #4a5568;
+  background: transparent;
+  color: #4a5568;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.difficulty-button:hover {
+  background: #4a556820;
+}
+
+.difficulty-button.active {
+  background: #4a5568;
+  color: white;
+}

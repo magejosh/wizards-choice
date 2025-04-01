@@ -34,7 +34,15 @@ export interface GameSettings {
   sfxVolume: number;
   colorblindMode: boolean;
   uiScale: number;
-  theme: 'default' | 'dark' | 'light' | 'highContrast';
+  theme: string;
+  // Accessibility settings
+  highContrastMode: boolean;
+  screenReaderMode: boolean;
+  textSize: 'small' | 'medium' | 'large';
+  // Display settings
+  showDamageNumbers: boolean;
+  showCombatLog: boolean;
+  showTutorialTips: boolean;
 }
 
 /**

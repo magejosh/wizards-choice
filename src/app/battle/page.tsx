@@ -55,8 +55,7 @@ export default function BattlePage() {
     
     isNavigatingAwayRef.current = true;
     
-    // IMPORTANT: Instead of showing the loading screen (which creates a flicker),
-    // add a transition class to the body to indicate loading
+    // Add transition class to the body to prevent UI flickering
     document.body.classList.add('page-transitioning');
     
     try {
@@ -75,13 +74,57 @@ export default function BattlePage() {
         console.log("Set localStorage flags for battle victory navigation");
         
         // STEP 4: Wait briefly to ensure state is saved
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 300));
         
-        // STEP 5: Navigate using a direct approach 
-        // Instead of using the router directly which may have race conditions,
-        // we'll use window.location for a more direct navigation
-        console.log("Initiating navigation to home page");
-        window.location.href = '/?forceBattleReturn=true';
+        // STEP 5: Navigate with explicit loading message
+        console.log("Initiating direct navigation to home page");
+        
+        // Special loading element to prevent UI flash
+        const loadingElement = document.createElement('div');
+        loadingElement.className = 'full-page-loader';
+        loadingElement.innerHTML = `
+          <div style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0f0f1a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+          ">
+            <div style="
+              border: 5px solid #333;
+              border-top: 5px solid #6a3de8;
+              border-radius: 50%;
+              width: 60px;
+              height: 60px;
+              animation: spin 1.5s linear infinite;
+              margin-bottom: 20px;
+            "></div>
+            <div style="
+              color: white;
+              font-family: 'Cinzel', serif;
+              font-size: 24px;
+            ">Returning to Wizard's Study...</div>
+            <style>
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            </style>
+          </div>
+        `;
+        
+        document.body.appendChild(loadingElement);
+        
+        // Navigate after a short delay to ensure the loading screen is displayed
+        setTimeout(() => {
+          window.location.href = '/?forceBattleReturn=true'; 
+        }, 100);
       }
     } catch (error) {
       console.error("Error returning to wizard's study:", error);

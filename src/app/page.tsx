@@ -35,6 +35,15 @@ const URLParamHandler = () => {
       
       if (forceBattleReturn) {
         console.log("*** URL Handler: Force battle return parameter detected ***");
+        console.log("URL params:", Object.fromEntries(searchParams.entries()));
+        
+        // Set this flag immediately using a type-safe approach
+        (window as any).battleReturnDetected = true;
+        
+        // Add the transition class during detection
+        document.body.classList.add('page-transitioning');
+        
+        // Clear URL and force location
         window.history.replaceState({}, document.title, window.location.pathname);
         setCurrentLocation('wizardStudy');
       }
@@ -52,11 +61,53 @@ export default function Home() {
   const [gameStarted, setGameStarted] = useState(false);
   const [selectedSaveSlot, setSelectedSaveSlot] = useState(0);
   const [transitionClass, setTransitionClass] = useState('');
+  const [isInitializing, setIsInitializing] = useState(true);
   
   // Custom hooks
   const { navigateToWizardStudy, navigateToBattle, navigateToMainMenu } = useGameNavigation();
   const router = useRouter();
   const { setCurrentLocation, gameState } = useGameStateStore();
+  
+  // Initialize and check for battle returns immediately
+  useEffect(() => {
+    console.log("=== HOME PAGE INITIAL LOAD ===");
+    if (typeof document !== 'undefined') {
+      document.body.classList.remove('page-transitioning');
+      
+      // Check if we're coming from battle
+      const forceBattleReturn = window.location.search.includes('forceBattleReturn=true');
+      const comingFromBattle = localStorage.getItem('comingFromBattleVictory') === 'true';
+      const battleReturnFlag = (window as any).battleReturnDetected;
+      
+      console.log("Navigation check:", {
+        directURL: forceBattleReturn,
+        localStorage: comingFromBattle,
+        windowFlag: battleReturnFlag
+      });
+      
+      if (forceBattleReturn || comingFromBattle || battleReturnFlag) {
+        // Set these values synchronously before any rendering
+        console.log("==== SETTING GAME STARTED FROM NAVIGATION CHECK ====");
+        setCurrentLocation('wizardStudy');
+        setGameStarted(true);
+        
+        // Clear flags
+        if (forceBattleReturn) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        if (comingFromBattle) {
+          localStorage.removeItem('comingFromBattleVictory');
+          localStorage.removeItem('forceWizardStudy');
+        }
+        if (battleReturnFlag) {
+          (window as any).battleReturnDetected = false;
+        }
+      }
+      
+      // Done initializing
+      setIsInitializing(false);
+    }
+  }, []);
   
   // Cleanup transition class on mount
   useEffect(() => {
@@ -131,6 +182,11 @@ export default function Home() {
   const handleLogout = () => {
     console.log("Logout clicked - no action needed");
   };
+
+  // Show loading during initial URL/localStorage check
+  if (isInitializing) {
+    return <LoadingScreen message="Loading..." />;
+  }
 
   return (
     <>

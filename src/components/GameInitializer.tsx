@@ -14,51 +14,58 @@ const GameInitializer: React.FC<GameInitializerProps> = ({ onGameStart }) => {
     
     // Remove transitioning class in case it's still present
     if (typeof document !== 'undefined') {
+      // Remove any transition class and loading elements
       document.body.classList.remove('page-transitioning');
-    }
-    
-    // Check if browser storage is available
-    if (typeof window !== 'undefined') {
-      // Check URL parameters first (highest priority)
-      const urlParams = new URLSearchParams(window.location.search);
-      const forceBattleReturn = urlParams.get('forceBattleReturn') === 'true';
       
-      if (forceBattleReturn) {
-        console.log("*** Force battle return parameter detected ***");
-        
-        // Clear the URL parameter
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // Force the location if needed
-        useGameStateStore.getState().setCurrentLocation('wizardStudy');
-        
-        // Set game started to true to show wizard study
-        console.log("Setting game started to true for battle return");
-        onGameStart(true);
-        return;
+      // Remove any battle return loader if it exists
+      const loader = document.getElementById('battle-return-loader');
+      if (loader && loader.parentNode) {
+        loader.parentNode.removeChild(loader);
       }
       
-      // Check localStorage flags for battle victory (second priority)
-      const comingFromBattle = localStorage.getItem('comingFromBattleVictory') === 'true';
-      if (comingFromBattle) {
-        console.log('===== BATTLE VICTORY NAVIGATION DETECTED =====');
+      // Check if browser storage is available
+      if (typeof window !== 'undefined') {
+        // Check URL parameters first (highest priority)
+        const urlParams = new URLSearchParams(window.location.search);
+        const forceBattleReturn = urlParams.get('forceBattleReturn') === 'true';
         
-        // Clear the flags
-        localStorage.removeItem('comingFromBattleVictory');
-        localStorage.removeItem('forceWizardStudy');
+        // Check localStorage flags for battle victory (second priority)
+        const comingFromBattle = localStorage.getItem('comingFromBattleVictory') === 'true';
+        const forceWizardStudy = localStorage.getItem('forceWizardStudy') === 'true';
         
-        // Set location to wizardStudy in game state
-        useGameStateStore.getState().setCurrentLocation('wizardStudy');
+        console.log("Battle navigation check:", {
+          forceBattleReturn,
+          comingFromBattle,
+          forceWizardStudy,
+          currentUrl: window.location.href
+        });
         
-        // Show the game view (wizard study)
-        console.log("Setting game started to true for battle victory");
-        onGameStart(true);
-        return;
+        if (forceBattleReturn || comingFromBattle || forceWizardStudy) {
+          console.log('===== NAVIGATION FROM BATTLE DETECTED =====');
+          
+          // Force the location to wizardStudy in game state
+          useGameStateStore.getState().setCurrentLocation('wizardStudy');
+          
+          // Clear the flags immediately to prevent loops
+          if (comingFromBattle) localStorage.removeItem('comingFromBattleVictory');
+          if (forceWizardStudy) localStorage.removeItem('forceWizardStudy');
+          
+          // Clean the URL parameters
+          if (forceBattleReturn && window.history && window.history.replaceState) {
+            const cleanUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+          }
+          
+          // Force game started state
+          console.log("Force setting game started to true for battle return");
+          setTimeout(() => {
+            onGameStart(true);
+          }, 0);
+          return;
+        }
       }
       
-      // IMPORTANT: We don't set anything to false here anymore!
-      // This allows manual actions like "Start New Game" and "Continue Game" to work
-      console.log("GameInitializer found no special flags or parameters - taking no action");
+      console.log("GameInitializer found no special flags - taking no action");
     }
   }, [onGameStart]);
 

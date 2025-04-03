@@ -155,26 +155,26 @@ function drawCards(
   
   // Draw cards
   for (let i = 0; i < actualCount; i++) {
-    // If draw pile is empty, shuffle discard pile into draw pile
-    if (drawPile.length === 0 && discardPile.length > 0) {
-      drawPile = shuffleArray(discardPile);
-      discardPile = [];
+    // If draw pile is empty, take damage instead of drawing
+    if (drawPile.length === 0) {
+      // Reduce health by 1
+      newState[wizard].currentHealth = Math.max(0, newState[wizard].currentHealth - 1);
       
       // Add to combat log
       newState.log.push(createLogEntry({
         turn: newState.turn,
         round: newState.round,
         actor: isPlayer ? 'player' : 'enemy',
-        action: 'shuffle_discard',
-        details: `${wizardName} shuffled the discard pile back into the draw pile.`,
+        action: 'failed_draw',
+        details: `${wizardName} couldn't draw a card and took 1 damage!`,
       }));
+      
+      continue; // Skip this draw attempt
     }
     
     // Draw a card if possible
-    if (drawPile.length > 0) {
-      const card = drawPile.pop()!;
-      hand.push(card);
-    }
+    const card = drawPile.pop()!;
+    hand.push(card);
   }
   
   // Update the state
@@ -200,13 +200,125 @@ function drawCards(
 }
 
 /**
+ * Shuffle the discard pile into the draw pile
+ * @param state The current combat state
+ * @param isPlayer Whether this is for the player
+ * @returns Updated combat state
+ */
+export function shuffleDiscardIntoDraw(
+  state: CombatState,
+  isPlayer: boolean
+): CombatState {
+  const newState = { ...state };
+  const wizard = isPlayer ? 'playerWizard' : 'enemyWizard';
+  const wizardName = isPlayer ? 'You' : 'Enemy';
+  
+  // Check if there are cards to shuffle
+  if (newState[wizard].discardPile.length > 0) {
+    // Get the existing piles
+    const drawPile = [...newState[wizard].drawPile];
+    const discardPile = [...newState[wizard].discardPile];
+    
+    // Shuffle the discard pile and add existing draw pile cards
+    const shuffledDeck = shuffleArray([...discardPile]);
+    const newDrawPile = [...shuffledDeck, ...drawPile];
+    
+    // Update the state
+    newState[wizard] = {
+      ...newState[wizard],
+      drawPile: newDrawPile,
+      discardPile: [],
+    };
+    
+    // Add to combat log
+    newState.log.push(createLogEntry({
+      turn: newState.turn,
+      round: newState.round,
+      actor: isPlayer ? 'player' : 'enemy',
+      action: 'shuffle_discard',
+      details: `${wizardName} shuffled the discard pile back into the draw pile.`,
+    }));
+  }
+  
+  return newState;
+}
+
+/**
+ * Process the end-of-turn discard phase
+ * @param state The current combat state
+ * @param isPlayerActive Whether the player is the active wizard
+ * @returns Updated combat state with a flag indicating if the player needs to discard
+ */
+export function processDiscardPhase(
+  state: CombatState,
+  isPlayerActive: boolean
+): { state: CombatState, needsPlayerDiscard: boolean } {
+  let newState = { ...state };
+  const wizard = isPlayerActive ? 'playerWizard' : 'enemyWizard';
+  const wizardName = isPlayerActive ? 'You' : 'Enemy';
+  
+  console.log(`DEBUG processDiscardPhase: Checking discard for ${wizardName}, hand size:`, newState[wizard].hand.length);
+  
+  // Add a log entry that we've entered discard phase
+  newState.log.push(createLogEntry({
+    turn: newState.turn,
+    round: newState.round,
+    actor: isPlayerActive ? 'player' : 'enemy',
+    action: 'phase_change',
+    details: `${wizardName} entered discard phase`,
+  }));
+  
+  // Check if hand size exceeds MAX_HAND_SIZE (which is 2)
+  const MAX_HAND_SIZE = 2;
+  if (newState[wizard].hand.length > MAX_HAND_SIZE) {
+    const cardsToDiscard = newState[wizard].hand.length - MAX_HAND_SIZE;
+    console.log(`DEBUG processDiscardPhase: Need to discard ${cardsToDiscard} cards`);
+    
+    // Add to combat log
+    newState.log.push(createLogEntry({
+      turn: newState.turn,
+      round: newState.round,
+      actor: isPlayerActive ? 'player' : 'enemy',
+      action: 'discard_required',
+      details: `${wizardName} must discard ${cardsToDiscard} card${cardsToDiscard !== 1 ? 's' : ''}`,
+    }));
+    
+    // For enemy, auto-discard (can be improved with better AI logic)
+    if (!isPlayerActive) {
+      // Simple AI: discard first card
+      const cardToDiscard = newState[wizard].hand[0];
+      newState = discardSpell(newState, cardToDiscard.id, false);
+      console.log('DEBUG processDiscardPhase: Enemy auto-discarded a card');
+      
+      return { state: newState, needsPlayerDiscard: false };
+    }
+    
+    // For player, flag that they need to discard
+    console.log('DEBUG processDiscardPhase: Player must discard, returning needsPlayerDiscard: true');
+    return { state: newState, needsPlayerDiscard: true };
+  }
+  
+  // No discard needed
+  console.log('DEBUG processDiscardPhase: No discard needed, hand size <= MAX_HAND_SIZE');
+  newState.log.push(createLogEntry({
+    turn: newState.turn,
+    round: newState.round,
+    actor: isPlayerActive ? 'player' : 'enemy',
+    action: 'phase_change',
+    details: `${wizardName} completed discard phase with ${newState[wizard].hand.length} cards in hand`,
+  }));
+  
+  return { state: newState, needsPlayerDiscard: false };
+}
+
+/**
  * Discard a spell from hand to the discard pile
  * @param state The current combat state
  * @param spellId The ID of the spell to discard
  * @param isPlayer Whether the player is discarding
  * @returns Updated combat state
  */
-function discardSpell(
+export function discardSpell(
   state: CombatState,
   spellId: string,
   isPlayer: boolean
@@ -275,10 +387,10 @@ export function selectSpell(
 }
 
 /**
- * Execute a mystic punch (discard a spell for direct damage)
+ * Execute a mystic punch attack
  * @param state The current combat state
- * @param spellTier The tier of the discarded spell
- * @param isPlayer Whether the mystic punch is being executed by the player
+ * @param spellTier The tier of the spell used for the punch
+ * @param isPlayer Whether the punch is being done by the player
  * @returns Updated combat state
  */
 export function executeMysticPunch(
@@ -293,6 +405,7 @@ export function executeMysticPunch(
   
   // Get the selected spell from the combat state
   const selectedSpell = newState[caster].selectedSpell;
+  console.log(`DEBUG executeMysticPunch: Selected spell for mystic punch:`, selectedSpell);
   
   // Calculate damage based on spell tier and difficulty
   let damageModifier = 0;
@@ -329,12 +442,22 @@ export function executeMysticPunch(
     damage,
   }));
   
-  // Move the spell from hand to discard pile
+  // Check if we have a selected spell to discard
   if (selectedSpell) {
+    console.log(`DEBUG executeMysticPunch: Attempting to discard spell ID ${selectedSpell.id}`);
+    
+    // Look for the spell in the hand by ID
     const spellInHand = newState[caster].hand.find(s => s.id === selectedSpell.id);
+    
     if (spellInHand) {
+      console.log(`DEBUG executeMysticPunch: Found spell in hand, discarding it:`, spellInHand.name);
+      // Correctly discard the spell using the discardSpell function
       newState = discardSpell(newState, selectedSpell.id, isPlayer);
+    } else {
+      console.log(`DEBUG executeMysticPunch: Warning - Selected spell not found in hand!`);
     }
+  } else {
+    console.log(`DEBUG executeMysticPunch: Warning - No selected spell to discard!`);
   }
   
   // Clear selected spell
@@ -352,11 +475,12 @@ export function executeMysticPunch(
     }));
   }
   
+  // Proceed with advancing turn (discard phase will be handled after both players have acted)
   return advanceTurn(newState);
 }
 
 /**
- * Execute a spell cast
+ * Execute the casting of a spell
  * @param state The current combat state
  * @param isPlayer Whether the spell is being cast by the player
  * @returns Updated combat state
@@ -366,8 +490,8 @@ export function executeSpellCast(
   isPlayer: boolean
 ): CombatState {
   let newState = { ...state };
+  const actor = isPlayer ? 'player' : 'enemy';
   const caster = isPlayer ? 'playerWizard' : 'enemyWizard';
-  const target = isPlayer ? 'enemyWizard' : 'playerWizard';
   const spell = newState[caster].selectedSpell;
   
   if (!spell) {
@@ -375,16 +499,19 @@ export function executeSpellCast(
     return advanceTurn(newState);
   }
   
-  // Check if caster has enough mana
+  // Check if the caster has enough mana to cast the spell
   if (newState[caster].currentMana < spell.manaCost) {
-    // Not enough mana, add to log and advance turn
+    // If not enough mana, log it and don't cast the spell
     newState.log.push(createLogEntry({
       turn: newState.turn,
       round: newState.round,
-      actor: isPlayer ? 'player' : 'enemy',
-      action: 'spell_failed',
-      details: `Not enough mana to cast ${spell.name}!`
+      actor,
+      action: 'cast_failed',
+      spellName: spell.name,
+      details: `${actor === 'player' ? 'You' : 'Enemy'} tried to cast ${spell.name} but didn't have enough mana!`,
     }));
+    
+    // Proceed with advancing turn without casting
     return advanceTurn(newState);
   }
   
@@ -395,14 +522,14 @@ export function executeSpellCast(
     selectedSpell: null, // Clear selected spell
   };
   
-  // Add to combat log
+  // Log spell cast
   newState.log.push(createLogEntry({
     turn: newState.turn,
     round: newState.round,
-    actor: isPlayer ? 'player' : 'enemy',
-    action: 'spell_cast',
-    details: `${isPlayer ? 'You' : 'Enemy'} cast ${spell.name}!`,
-    spellName: spell.name
+    actor,
+    action: 'cast',
+    spellName: spell.name,
+    details: `${actor === 'player' ? 'You' : 'Enemy'} cast ${spell.name}!`,
   }));
   
   // Apply spell effects
@@ -410,33 +537,30 @@ export function executeSpellCast(
     newState = applySpellEffect(newState, effect, isPlayer);
   });
   
-  // Check if combat has ended
-  if (newState.playerWizard.currentHealth <= 0) {
-    newState.status = 'enemyWon';
-    newState.log.push(createLogEntry({
-      turn: newState.turn,
-      round: newState.round,
-      actor: 'enemy',
-      action: 'combat_end',
-      details: 'Enemy won the duel!'
-    }));
-  } else if (newState.enemyWizard.currentHealth <= 0) {
-    newState.status = 'playerWon';
-    newState.log.push(createLogEntry({
-      turn: newState.turn,
-      round: newState.round,
-      actor: 'player',
-      action: 'combat_end',
-      details: 'You won the duel!'
-    }));
-  }
-  
   // Move the spell from hand to discard pile
   const spellInHand = newState[caster].hand.find(s => s.id === spell.id);
   if (spellInHand) {
     newState = discardSpell(newState, spell.id, isPlayer);
   }
   
+  // Check if combat has ended after applying damage
+  if (
+    (newState.playerWizard.currentHealth <= 0) ||
+    (newState.enemyWizard.currentHealth <= 0)
+  ) {
+    const winner = newState.playerWizard.currentHealth <= 0 ? 'enemy' : 'player';
+    newState.status = winner === 'player' ? 'playerWon' : 'enemyWon';
+    newState.log.push(createLogEntry({
+      turn: newState.turn,
+      round: newState.round,
+      actor: winner,
+      action: 'combat_end',
+      details: `${winner === 'player' ? 'You' : 'Enemy'} won the duel!`,
+    }));
+    return newState;
+  }
+  
+  // Proceed with advancing turn (discard phase will be handled after both players have acted)
   return advanceTurn(newState);
 }
 
@@ -743,11 +867,11 @@ function regenerateMana(
 }
 
 /**
- * Advance to the next turn
+ * Advance to the next turn in combat
  * @param state The current combat state
  * @returns Updated combat state
  */
-function advanceTurn(state: CombatState): CombatState {
+export function advanceTurn(state: CombatState): CombatState {
   // Don't advance turn if combat has ended
   if (state.status !== 'active') {
     return state;
@@ -776,14 +900,30 @@ function advanceTurn(state: CombatState): CombatState {
     newState.isPlayerTurn = extraTurnFor === 'player';
     
     return newState;
-  }
+  } 
   
   // Normal turn advancement
   if (newState.isPlayerTurn) {
     // If it was the player's turn, now it's the enemy's turn
     newState.isPlayerTurn = false;
+    console.log("DEBUG advanceTurn: Switching from player to enemy turn");
   } else {
-    // If it was the enemy's turn, advance to the next round and player's turn
+    // If it was the enemy's turn, process discard phase BEFORE drawing new cards
+    // This happens after both player and enemy have taken their turns
+    console.log("DEBUG advanceTurn: Enemy turn ending, processing discard phase");
+    console.log("DEBUG advanceTurn: Player hand size before discard phase:", newState.playerWizard.hand.length);
+    
+    const { state: stateAfterDiscard, needsPlayerDiscard } = processDiscardPhase(newState, true);
+    
+    // If player needs to discard, return the state without advancing turn
+    if (needsPlayerDiscard) {
+      console.log("DEBUG advanceTurn: Player needs to discard, hand size:", stateAfterDiscard.playerWizard.hand.length);
+      return stateAfterDiscard;
+    }
+    
+    // Otherwise, advance to the next round and player's turn
+    console.log("DEBUG advanceTurn: No discard needed or discard complete, advancing to next round");
+    newState = stateAfterDiscard;
     newState.isPlayerTurn = true;
     newState.round += 1;
     
@@ -795,9 +935,15 @@ function advanceTurn(state: CombatState): CombatState {
     newState = regenerateMana(newState, true); // Player mana
     newState = regenerateMana(newState, false); // Enemy mana
     
-    // Draw cards for the new round
+    // MOVED: Draw cards AFTER discard phase and at start of new round
+    console.log("DEBUG advanceTurn: Drawing cards for new round");
     newState = drawCards(newState, true, CARDS_PER_DRAW);
+    console.log("DEBUG advanceTurn: Player hand size after draw:", newState.playerWizard.hand.length);
     newState = drawCards(newState, false, CARDS_PER_DRAW);
+    
+    // MOVED: Shuffle discard piles AFTER discard phase and after drawing
+    newState = shuffleDiscardIntoDraw(newState, true);
+    newState = shuffleDiscardIntoDraw(newState, false);
   }
   
   // Increase turn counter
@@ -885,7 +1031,9 @@ export function calculateExperienceGained(state: CombatState): number {
     hard: 0.1,
   }[state.difficulty];
   
-  return Math.floor(enemyValue * difficultyMultiplier);
+  const experience = Math.floor(enemyValue * difficultyMultiplier);
+  console.log('Combat experience calculated:', experience);
+  return experience;
 }
 
 /**
@@ -897,3 +1045,29 @@ function createLogEntry(entry: Omit<CombatLogEntry, 'timestamp'>): CombatLogEntr
     timestamp: Date.now()
   };
 }
+
+/**
+ * Skip the current turn
+ * @param state The current combat state
+ * @param isPlayer Whether the player is skipping the turn
+ * @returns Updated combat state
+ */
+export function skipTurn(
+  state: CombatState,
+  isPlayer: boolean
+): CombatState {
+  let newState = { ...state };
+  
+  // Add to combat log
+  newState.log.push(createLogEntry({
+    turn: newState.turn,
+    round: newState.round,
+    actor: isPlayer ? 'player' : 'enemy',
+    action: 'skip_turn',
+    details: `${isPlayer ? 'You' : 'Enemy'} skipped the turn.`,
+  }));
+  
+  // Proceed with advancing turn (discard phase will be handled after both players have acted)
+  return advanceTurn(newState);
+}
+

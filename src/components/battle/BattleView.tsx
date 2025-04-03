@@ -7,11 +7,29 @@ import {
   initializeCombat, 
   selectSpell, 
   executeMysticPunch, 
-  executeSpellCast 
+  executeSpellCast,
+  skipTurn,
+  discardSpell,
+  processDiscardPhase,
+  advanceTurn
 } from '../../lib/combat/combatEngine';
 import { useGameStateStore } from '../../lib/game-state/gameStateStore';
 import { generateLoot, applyLoot, LootDrop } from '../../lib/features/loot/lootSystem';
 import '@/app/battle/battle.css';
+
+// Define battle phases
+type BattlePhase = 
+  | 'draw' 
+  | 'shuffle' 
+  | 'player_main' 
+  | 'enemy_main' 
+  | 'player_reaction' 
+  | 'enemy_reaction' 
+  | 'discard' 
+  | 'end';
+
+// Maximum number of cards a player can have in hand before requiring discard
+const MAX_HAND_SIZE = 2;
 
 interface BattleViewProps {
   onReturnToWizardStudy: () => void;
@@ -21,12 +39,15 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
   const [combatState, setCombatState] = useState<CombatState | null>(null);
   const [selectedSpellForMysticPunch, setSelectedSpellForMysticPunch] = useState<Spell | null>(null);
   const [showMysticPunchSelection, setShowMysticPunchSelection] = useState(false);
+  const [showDiscardSelection, setShowDiscardSelection] = useState(false);
+  const [numCardsToDiscard, setNumCardsToDiscard] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isEnemyTurnIndicatorVisible, setIsEnemyTurnIndicatorVisible] = useState(false);
   const [battleLog, setBattleLog] = useState<CombatLogEntry[]>([]);
   const [hasLootedEnemy, setHasLootedEnemy] = useState(false);
   const [lootNotification, setLootNotification] = useState<{show: boolean, message: string}>({show: false, message: ''});
+  const [currentPhase, setCurrentPhase] = useState<BattlePhase>('player_main');
   
   // Use refs to track state that shouldn't trigger re-renders
   const isProcessingEndRef = useRef(false);
@@ -40,6 +61,20 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     saveGame,
     updateGameState
   } = useGameStateStore();
+  
+  // Update the current phase based on combat state changes
+  useEffect(() => {
+    if (!combatState) return;
+    
+    // Set phase based on current state
+    if (showDiscardSelection) {
+      setCurrentPhase('discard');
+    } else if (combatState.isPlayerTurn) {
+      setCurrentPhase('player_main');
+    } else {
+      setCurrentPhase('enemy_main');
+    }
+  }, [combatState?.isPlayerTurn, showDiscardSelection]);
   
   // Initialize combat once
   useEffect(() => {
@@ -104,6 +139,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     
     setCombatState(initialCombatState);
     setIsInitialized(true);
+    setCurrentPhase('player_main');
 
     // Initialize battle log with starting message
     setBattleLog([{
@@ -370,6 +406,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     if (!combatState || !combatState.isPlayerTurn || isAnimating) return;
     
     setIsAnimating(true);
+    setCurrentPhase('player_main');
     
     try {
       // STEP 1: PLAYER TURN
@@ -394,225 +431,125 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         round: combatState.round,
         actor: 'player',
         action: 'cast_spell',
-        details: spell.name,
+        details: validatedSpell.name,
         timestamp: Date.now()
       }]);
       
-      // STEP 2: ENEMY TURN - process it after a delay with visual indicator
+      // Update combat state with player's turn result
+      setCombatState(playerTurnComplete);
+      
+      // Check if combat ended 
+      if (playerTurnComplete.status !== 'active') {
+        // The game end will be handled by the useEffect
+        setTimeout(() => setIsAnimating(false), 500);
+        return;
+      }
+      
+      // Wait for animation and then process enemy turn
       setTimeout(() => {
         // Show enemy turn indicator
         setIsEnemyTurnIndicatorVisible(true);
+        setCurrentPhase('enemy_main');
         
         setTimeout(() => {
-          try {
-            // Get the enemy wizard info
-            const enemyWizard = playerTurnComplete.enemyWizard.wizard;
-            
-            // Find any spell the enemy can cast
-            const availableSpells = enemyWizard.equippedSpells.filter(
-              spell => spell.manaCost <= playerTurnComplete.enemyWizard.currentMana
-            );
-            
-            // Pick a spell for the enemy
-            let enemySpell: Spell;
-            
-            if (availableSpells.length > 0) {
-              enemySpell = availableSpells[0];
-            } else {
-              // Create a basic spell if needed
-              enemySpell = {
-                id: `emergency_spell_${Date.now()}`,
-                name: "Emergency Magic",
-                description: "A basic magical attack",
-                manaCost: 0,
-                tier: 1,
-                type: "attack" as any,
-                element: "arcane" as any,
-                effects: [
-                  {
-                    type: "damage" as any,
-                    value: 5,
-                    target: "enemy",
-                    element: "arcane"
-                  }
-                ],
-                imagePath: '/images/spells/default-placeholder.jpg'
-              };
-            }
-            
-            // Execute enemy spell
-            const enemyStateWithSpell = selectSpell(playerTurnComplete, enemySpell, false);
-            const enemyTurnComplete = executeSpellCast(enemyStateWithSpell, false);
-
-            // Add enemy spell cast to battle log
-            setBattleLog(prev => [...prev, {
-              turn: combatState.turn,
-              round: combatState.round,
-              actor: 'enemy',
-              action: 'cast_spell',
-              details: enemySpell.name,
-              timestamp: Date.now()
-            }]);
-            
-            // Wait a moment before hiding the indicator
-            setTimeout(() => {
-              // Hide the enemy turn indicator
-              setIsEnemyTurnIndicatorVisible(false);
-              
-              // Update with the final state after both turns
-              setCombatState(enemyTurnComplete);
-              
-              // Reset animation state
-              setTimeout(() => {
-                setIsAnimating(false);
-              }, 500);
-            }, 1000);
-          } catch (error) {
-            console.error("Error in enemy turn:", error);
-            // If enemy turn fails, still update with player's turn
-            setCombatState(playerTurnComplete);
-            setIsAnimating(false);
-            setIsEnemyTurnIndicatorVisible(false);
-          }
-        }, 1000); // Wait 1 second after showing indicator before executing enemy turn
-      }, 1000); // Wait 1 second after player's turn before showing enemy turn indicator
+          // Process enemy turn
+          processEnemyTurn(playerTurnComplete);
+        }, 1000);
+      }, 1000);
     } catch (error) {
-      console.error("Error in player turn:", error);
+      console.error("Error in spell selection:", error);
       setIsAnimating(false);
       setIsEnemyTurnIndicatorVisible(false);
     }
   };
 
-  // Handle mystic punch option
-  const handleMysticPunch = () => {
+  // Handle mystic punch selection
+  const handleMysticPunchSelect = (spell: Spell) => {
     if (!combatState || !combatState.isPlayerTurn || isAnimating) return;
     
-    // Show spell selection for mystic punch
-    setShowMysticPunchSelection(true);
+    console.log(`DEBUG: Selected spell for Mystic Punch: ${spell.name} (ID: ${spell.id})`);
+    
+    // Store the selected spell for mystic punch
+    setSelectedSpellForMysticPunch(spell);
+    
+    // Close the selection modal
+    setShowMysticPunchSelection(false);
+    
+    // Execute mystic punch immediately with the selected spell - pass it directly
+    handleMysticPunch(spell);
   };
 
-  // Execute mystic punch with selected spell
-  const executeMysticPunchWithSpell = (spell: Spell) => {
-    if (!combatState || isAnimating) return;
+  // Execute a mystic punch with the selected spell
+  const handleMysticPunch = (spellToUse?: Spell) => {
+    // Use either the passed spell or the one from state
+    const spellForPunch = spellToUse || selectedSpellForMysticPunch;
     
+    if (!combatState || !combatState.isPlayerTurn || isAnimating) {
+      console.log("DEBUG: Cannot execute Mystic Punch - conditions not met:", { 
+        'combatState exists': !!combatState,
+        'isPlayerTurn': combatState?.isPlayerTurn,
+        'isAnimating': isAnimating,
+        'selectedSpell': spellForPunch?.name || 'none'
+      });
+      return;
+    }
+    
+    if (!spellForPunch) {
+      console.log("DEBUG: No spell selected for Mystic Punch");
+      return;
+    }
+    
+    console.log("DEBUG: Executing Mystic Punch with spell:", spellForPunch.name);
     setIsAnimating(true);
+    setCurrentPhase('player_main');
     
     try {
-      // Hide selection modal
-      setShowMysticPunchSelection(false);
+      // STEP 1: PLAYER TURN
+      console.log("PLAYER TURN: Player using mystic punch with spell:", spellForPunch.name);
       
-      // Make sure the spell has required properties
-      const validatedSpell: Spell = {
-        ...spell,
-        effects: spell.effects || [],
-        imagePath: spell.imagePath || '/images/spells/default-placeholder.jpg'
-      };
+      // First, select the spell in the combat state
+      const stateWithSelectedSpell = selectSpell(combatState, spellForPunch, true);
       
-      // STEP 1: PLAYER TURN - First select the spell
-      const playerStateWithSpell = selectSpell(combatState, validatedSpell, true);
+      // Execute mystic punch using the selected spell's tier
+      const spellTier = spellForPunch.tier;
+      const playerTurnComplete = executeMysticPunch(stateWithSelectedSpell, spellTier, true);
       
-      // Execute mystic punch with the spell tier
-      const playerTurnComplete = executeMysticPunch(
-        playerStateWithSpell,
-        validatedSpell.tier,
-        true // isPlayer = true
-      );
-
-      // Add mystic punch to battle log
+      // Add to battle log
       setBattleLog(prev => [...prev, {
         turn: combatState.turn,
         round: combatState.round,
         actor: 'player',
-        action: 'use_mystic_punch',
-        details: spell.name,
+        action: 'mystic_punch',
+        details: `Used ${spellForPunch.name} for Mystic Punch`,
         timestamp: Date.now()
       }]);
       
-      // Check if combat ended with player's turn
+      // Debug log to check hand size after mystic punch
+      console.log('DEBUG: Player hand size after mystic punch:', playerTurnComplete.playerWizard.hand.length);
+      console.log('DEBUG: Player hand after mystic punch:', playerTurnComplete.playerWizard.hand);
+      
+      // Update combat state with player's turn result
+      setCombatState(playerTurnComplete);
+      setSelectedSpellForMysticPunch(null);
+      
+      // Check if combat ended 
       if (playerTurnComplete.status !== 'active') {
-        setCombatState(playerTurnComplete);
+        // The game end will be handled by the useEffect
         setTimeout(() => setIsAnimating(false), 500);
         return;
       }
       
-      // STEP 2: ENEMY TURN - process it after a delay with visual indicator
+      // Wait for animation and then process enemy turn
       setTimeout(() => {
         // Show enemy turn indicator
         setIsEnemyTurnIndicatorVisible(true);
+        setCurrentPhase('enemy_main');
         
         setTimeout(() => {
-          try {
-            // Get the enemy wizard info
-            const enemyWizard = playerTurnComplete.enemyWizard.wizard;
-            
-            // Find any spell the enemy can cast
-            const availableSpells = enemyWizard.equippedSpells.filter(
-              spell => spell.manaCost <= playerTurnComplete.enemyWizard.currentMana
-            );
-            
-            // Pick a spell for the enemy
-            let enemySpell: Spell;
-            
-            if (availableSpells.length > 0) {
-              enemySpell = availableSpells[0];
-            } else {
-              // Create a basic spell if needed
-              enemySpell = {
-                id: `emergency_spell_${Date.now()}`,
-                name: "Emergency Magic",
-                description: "A basic magical attack",
-                manaCost: 0,
-                tier: 1,
-                type: "attack" as any,
-                element: "arcane" as any,
-                effects: [
-                  {
-                    type: "damage" as any,
-                    value: 5,
-                    target: "enemy",
-                    element: "arcane"
-                  }
-                ],
-                imagePath: '/images/spells/default-placeholder.jpg'
-              };
-            }
-            
-            // Execute enemy spell
-            const enemyStateWithSpell = selectSpell(playerTurnComplete, enemySpell, false);
-            const enemyTurnComplete = executeSpellCast(enemyStateWithSpell, false);
-
-            // Add enemy spell cast to battle log
-            setBattleLog(prev => [...prev, {
-              turn: combatState.turn,
-              round: combatState.round,
-              actor: 'enemy',
-              action: 'cast_spell',
-              details: enemySpell.name,
-              timestamp: Date.now()
-            }]);
-            
-            // Wait a moment before hiding the indicator
-            setTimeout(() => {
-              // Hide the enemy turn indicator
-              setIsEnemyTurnIndicatorVisible(false);
-              
-              // Update with the final state after both turns
-              setCombatState(enemyTurnComplete);
-              
-              // Reset animation state
-              setTimeout(() => {
-                setIsAnimating(false);
-              }, 500);
-            }, 1000);
-          } catch (error) {
-            console.error("Error in enemy turn:", error);
-            // If enemy turn fails, still update with player's turn
-            setCombatState(playerTurnComplete);
-            setIsAnimating(false);
-            setIsEnemyTurnIndicatorVisible(false);
-          }
-        }, 1000); // Wait 1 second after showing indicator before executing enemy turn
-      }, 1000); // Wait 1 second after player's turn before showing enemy turn indicator
+          // Process enemy turn
+          processEnemyTurn(playerTurnComplete);
+        }, 1000);
+      }, 1000);
     } catch (error) {
       console.error("Error executing mystic punch:", error);
       setIsAnimating(false);
@@ -625,111 +562,176 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     if (!combatState || !combatState.isPlayerTurn || isAnimating) return;
     
     setIsAnimating(true);
+    setCurrentPhase('player_main');
     
-    try {
-      // Create a log entry for skipping the turn
-      const skipTurnLog: CombatLogEntry = {
-        turn: combatState.turn,
-        round: combatState.round,
-        actor: 'player',
-        action: 'skip_turn',
-        details: 'You skipped your turn.',
-        timestamp: Date.now()
-      };
+    // Log the action
+    console.log('Skipping turn');
+    
+    // Skip the player's turn
+    const newState = skipTurn(combatState, true);
+    setCombatState(newState);
+    
+    // Check if the combat has ended
+    if (newState.status !== 'active') {
+      // The game end will be handled by the useEffect that watches combat state
+      setIsAnimating(false);
+      return;
+    }
+    
+    // Wait for animation and then process enemy turn
+    setTimeout(() => {
+      setIsEnemyTurnIndicatorVisible(true);
+      setCurrentPhase('enemy_main');
       
-      // Create state after player's skip
-      const playerTurnComplete = {
-        ...combatState,
-        isPlayerTurn: false,
-        turn: combatState.turn + 1,
-        log: [...combatState.log, skipTurnLog]
-      };
-
-      // Add skip turn to battle log
-      setBattleLog(prev => [...prev, skipTurnLog]);
-      
-      // STEP 2: ENEMY TURN - process it after a delay with visual indicator
       setTimeout(() => {
-        // Show enemy turn indicator
-        setIsEnemyTurnIndicatorVisible(true);
-        
-        setTimeout(() => {
-          try {
-            // Get the enemy wizard info
-            const enemyWizard = playerTurnComplete.enemyWizard.wizard;
-            
-            // Find any spell the enemy can cast
-            const availableSpells = enemyWizard.equippedSpells.filter(
-              spell => spell.manaCost <= playerTurnComplete.enemyWizard.currentMana
-            );
-            
-            // Pick a spell for the enemy
-            let enemySpell: Spell;
-            
-            if (availableSpells.length > 0) {
-              enemySpell = availableSpells[0];
-            } else {
-              // Create a basic spell if needed
-              enemySpell = {
-                id: `emergency_spell_${Date.now()}`,
-                name: "Emergency Magic",
-                description: "A basic magical attack",
-                manaCost: 0,
-                tier: 1,
-                type: "attack" as any,
-                element: "arcane" as any,
-                effects: [
-                  {
-                    type: "damage" as any,
-                    value: 5,
-                    target: "enemy",
-                    element: "arcane"
-                  }
-                ],
-                imagePath: '/images/spells/default-placeholder.jpg'
-              };
-            }
-            
-            // Execute enemy spell
-            const enemyStateWithSpell = selectSpell(playerTurnComplete, enemySpell, false);
-            const enemyTurnComplete = executeSpellCast(enemyStateWithSpell, false);
+        // Process enemy turn
+        processEnemyTurn(newState);
+      }, 1000);
+    }, 1000);
+  };
 
-            // Add enemy spell cast to battle log
-            setBattleLog(prev => [...prev, {
-              turn: combatState.turn,
-              round: combatState.round,
-              actor: 'enemy',
-              action: 'cast_spell',
-              details: enemySpell.name,
-              timestamp: Date.now()
-            }]);
-            
-            // Wait a moment before hiding the indicator
-            setTimeout(() => {
-              // Hide the enemy turn indicator
-              setIsEnemyTurnIndicatorVisible(false);
-              
-              // Update with the final state after both turns
-              setCombatState(enemyTurnComplete);
-              
-              // Reset animation state
-              setTimeout(() => {
-                setIsAnimating(false);
-              }, 500);
-            }, 1000);
-          } catch (error) {
-            console.error("Error in enemy turn:", error);
-            // If enemy turn fails, still update with player's turn
-            setCombatState(playerTurnComplete);
-            setIsAnimating(false);
-            setIsEnemyTurnIndicatorVisible(false);
+  // Handle enemy turn processing
+  const processEnemyTurn = (state: CombatState) => {
+    try {
+      // Get the enemy wizard info
+      const enemyWizard = state.enemyWizard.wizard;
+      
+      // Find any spell the enemy can cast
+      const availableSpells = enemyWizard.equippedSpells.filter(
+        spell => spell.manaCost <= state.enemyWizard.currentMana
+      );
+      
+      // Pick a spell for the enemy
+      let enemySpell: Spell;
+      
+      if (availableSpells.length > 0) {
+        enemySpell = availableSpells[0];
+      } else {
+        // Create a basic spell if needed
+        enemySpell = {
+          id: `emergency_spell_${Date.now()}`,
+          name: "Emergency Magic",
+          description: "A basic magical attack",
+          manaCost: 0,
+          tier: 1,
+          type: "attack" as any,
+          element: "arcane" as any,
+          effects: [
+            {
+              type: "damage" as any,
+              value: 5,
+              target: "enemy",
+              element: "arcane"
+            }
+          ],
+          imagePath: '/images/spells/default-placeholder.jpg'
+        };
+      }
+      
+      // Execute enemy spell
+      const enemyStateWithSpell = selectSpell(state, enemySpell, false);
+      const enemyTurnComplete = executeSpellCast(enemyStateWithSpell, false);
+
+      // Add enemy spell cast to battle log
+      setBattleLog(prev => [...prev, {
+        turn: state.turn,
+        round: state.round,
+        actor: 'enemy',
+        action: 'cast_spell',
+        details: enemySpell.name,
+        timestamp: Date.now()
+      }]);
+      
+      // Wait a moment before hiding the indicator
+      setTimeout(() => {
+        // Hide the enemy turn indicator
+        setIsEnemyTurnIndicatorVisible(false);
+        
+        // Update with the final state after both turns
+        setCombatState(enemyTurnComplete);
+        
+        // Debug log for hand size
+        console.log('DEBUG: Player hand size after enemy turn:', enemyTurnComplete.playerWizard.hand.length);
+        
+        // REMOVE DISCARD CHECK: The discard phase is already handled by the combatEngine
+        // in the advanceTurn function, which also handles drawing new cards.
+        // We're now in a new round with freshly drawn cards.
+        
+        // Show draw phase animation
+        setCurrentPhase('draw');
+        
+        // Small delay before switching to player's main phase
+        setTimeout(() => {
+          if (enemyTurnComplete.status === 'active') {
+            setCurrentPhase('player_main');
           }
-        }, 1000); // Wait 1 second after showing indicator before executing enemy turn
-      }, 1000); // Wait 1 second after player's turn before showing enemy turn indicator
+        }, 1500);
+        
+        // Reset animation state
+        setTimeout(() => {
+          setIsAnimating(false);
+        }, 500);
+      }, 1000);
     } catch (error) {
-      console.error("Error skipping turn:", error);
+      console.error("Error in enemy turn:", error);
+      // If enemy turn fails, still update UI state
       setIsAnimating(false);
       setIsEnemyTurnIndicatorVisible(false);
+    }
+  };
+
+  // Handle player's discard selection
+  const handlePlayerDiscard = (spell: Spell) => {
+    if (!combatState) return;
+    
+    try {
+      console.log('DEBUG: Discarding spell:', spell.name);
+      console.log('DEBUG: Hand size before discard:', combatState.playerWizard.hand.length);
+      
+      // Execute the discard
+      const updatedState = discardSpell(combatState, spell.id, true);
+      
+      console.log('DEBUG: Hand size after discard:', updatedState.playerWizard.hand.length);
+      setCombatState(updatedState);
+      
+      // Check if player still needs to discard more (hand size > MAX_HAND_SIZE)
+      if (updatedState.playerWizard.hand.length > MAX_HAND_SIZE) {
+        const remainingToDiscard = updatedState.playerWizard.hand.length - MAX_HAND_SIZE;
+        console.log(`DEBUG: Still need to discard ${remainingToDiscard} more cards`);
+        setNumCardsToDiscard(remainingToDiscard);
+      } else {
+        // All required discards complete - player has MAX_HAND_SIZE or fewer cards
+        console.log(`DEBUG: Discard complete, hand size is now ≤ ${MAX_HAND_SIZE}`);
+        setShowDiscardSelection(false);
+        setNumCardsToDiscard(0);
+        setCurrentPhase('end');
+        
+        // Continue with turn advancement if needed
+        if (updatedState.status === 'active') {
+          console.log('DEBUG: Advancing turn after discard phase');
+          const finalState = advanceTurn(updatedState);
+          setCombatState(finalState);
+          
+          // Show draw phase, then back to player main
+          setTimeout(() => {
+            setCurrentPhase('draw');
+            // Then after a short delay, show shuffle if needed
+            setTimeout(() => {
+              if (finalState.status === 'active') {
+                setCurrentPhase('shuffle');
+                // Then after another short delay, back to player main
+                setTimeout(() => {
+                  if (finalState.status === 'active') {
+                    setCurrentPhase('player_main');
+                  }
+                }, 500);
+              }
+            }, 500);
+          }, 500);
+        }
+      }
+    } catch (error) {
+      console.error("Error in discard selection:", error);
     }
   };
 
@@ -759,6 +761,55 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
   // Create a wrapped version of onReturnToWizardStudy to ensure game is saved before returning
   const handleReturnToWizardStudy = () => {
     try {
+      console.log("BattleView: Return to wizard study clicked");
+      
+      // Add transition class immediately to prevent UI flashing
+      if (typeof document !== 'undefined') {
+        document.body.classList.add('page-transitioning');
+        
+        // Create a more reliable full-screen loader
+        const fullscreenLoader = document.createElement('div');
+        fullscreenLoader.id = 'battle-return-loader';
+        fullscreenLoader.style.position = 'fixed';
+        fullscreenLoader.style.top = '0';
+        fullscreenLoader.style.left = '0';
+        fullscreenLoader.style.width = '100%';
+        fullscreenLoader.style.height = '100%';
+        fullscreenLoader.style.backgroundColor = '#0f0f1a';
+        fullscreenLoader.style.display = 'flex';
+        fullscreenLoader.style.flexDirection = 'column';
+        fullscreenLoader.style.justifyContent = 'center';
+        fullscreenLoader.style.alignItems = 'center';
+        fullscreenLoader.style.zIndex = '99999';
+        
+        // Add loading spinner
+        const spinner = document.createElement('div');
+        spinner.style.width = '60px';
+        spinner.style.height = '60px';
+        spinner.style.border = '5px solid #333';
+        spinner.style.borderTop = '5px solid #6a3de8';
+        spinner.style.borderRadius = '50%';
+        spinner.style.animation = 'spin 1.5s linear infinite';
+        spinner.style.marginBottom = '20px';
+        
+        // Add text
+        const text = document.createElement('div');
+        text.style.color = 'white';
+        text.style.fontFamily = "'Cinzel', serif";
+        text.style.fontSize = '24px';
+        text.innerText = 'Returning to Wizard\'s Study...';
+        
+        // Add animation style
+        const style = document.createElement('style');
+        style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+        
+        // Append elements
+        fullscreenLoader.appendChild(spinner);
+        fullscreenLoader.appendChild(text);
+        fullscreenLoader.appendChild(style);
+        document.body.appendChild(fullscreenLoader);
+      }
+      
       // Force an immediate state refresh
       const currentState = useGameStateStore.getState().gameState;
       console.log("Current game state before returning:", currentState);
@@ -774,23 +825,34 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         }
       }));
       
-      // Final save to ensure all changes are persisted
+      // Save game immediately
       saveGame();
       console.log("Saving game before returning to wizard's study");
       
-      // Short delay to ensure save completes
-      setTimeout(() => {
-        // Double-check that our state is correctly persisted
-        const finalState = useGameStateStore.getState().gameState;
-        console.log("Final player state:", finalState.player);
-        console.log("Final market data:", finalState.marketData);
+      // Set localStorage flags for home page detection
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('forceWizardStudy', 'true');
+        localStorage.setItem('comingFromBattleVictory', 'true');
+        console.log("Set localStorage flags for battle victory navigation");
         
-        // Call the original handler
-        onReturnToWizardStudy();
-      }, 200); // Slightly longer delay to ensure save completes
+        // Use a more reliable direct navigation approach
+        setTimeout(() => {
+          // Replace (not push) to home with the force parameter
+          console.log("Executing direct navigation to wizard study");
+          window.location.replace('/?forceBattleReturn=true&timestamp=' + Date.now());
+        }, 300);
+      }
     } catch (error) {
       console.error("Error saving game before returning to wizard's study:", error);
-      // Call the original handler even if there was an error
+      // Remove transition class if there was an error
+      if (typeof document !== 'undefined') {
+        document.body.classList.remove('page-transitioning');
+        const loader = document.getElementById('battle-return-loader');
+        if (loader) {
+          document.body.removeChild(loader);
+        }
+      }
+      // Call the original handler as fallback
       onReturnToWizardStudy();
     }
   };
@@ -824,17 +886,57 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
             enemyActiveEffects={combatState.enemyWizard.activeEffects}
             spells={combatState.playerWizard.hand}
             battleLog={battleLog}
+            isPlayerTurn={combatState.isPlayerTurn}
+            onMysticPunch={() => {
+              console.log("Mystic Punch button clicked, isPlayerTurn:", combatState.isPlayerTurn);
+              // Validate that the player can use Mystic Punch
+              if (!combatState.isPlayerTurn || isAnimating) {
+                console.log("Cannot use Mystic Punch - not player's turn or animation in progress");
+                return;
+              }
+              console.log("Opening Mystic Punch selection modal");
+              setShowMysticPunchSelection(true);
+            }}
             onSpellCast={handleSpellSelect}
-            onMysticPunch={handleMysticPunch}
             onSkipTurn={handleSkipTurn} 
             onExitBattle={handleReturnToWizardStudy}
-            isPlayerTurn={combatState.isPlayerTurn}
             round={combatState.round}
             turn={combatState.turn}
             animating={isAnimating}
             canCastSpell={(spell) => combatState.isPlayerTurn && combatState.playerWizard.currentMana >= spell.manaCost}
-            canUseMysticPunch={combatState.isPlayerTurn}
+            canUseMysticPunch={combatState.isPlayerTurn && !isAnimating}
           />
+          
+          {/* Phase Tracker */}
+          <div className="phase-tracker" style={{
+            position: 'absolute',
+            top: '10px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            borderRadius: '8px',
+            padding: '5px 10px',
+            zIndex: 1000
+          }}>
+            {['draw', 'player_main', 'enemy_main', 'discard', 'end'].map((phase) => (
+              <div 
+                key={phase}
+                style={{
+                  padding: '5px 10px',
+                  margin: '0 5px',
+                  backgroundColor: currentPhase === phase ? '#e94560' : 'transparent',
+                  color: currentPhase === phase ? 'white' : '#aaa',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: currentPhase === phase ? 'bold' : 'normal',
+                  textTransform: 'capitalize'
+                }}
+              >
+                {phase.replace('_', ' ')}
+              </div>
+            ))}
+          </div>
           
           {/* Combat Status HUD */}
           <div className="battle-status-hud">
@@ -893,22 +995,61 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
                       key={spell.id} 
                       className="spell-card"
                       onClick={() => {
-                        setSelectedSpellForMysticPunch(spell);
-                        setShowMysticPunchSelection(false);
-                        executeMysticPunchWithSpell(spell);
+                        console.log(`Selecting spell for Mystic Punch: ${spell.name}`);
+                        // Add a small delay to ensure the user sees the selection
+                        const selectedCard = document.getElementById(`mystic-punch-spell-${spell.id}`);
+                        if (selectedCard) {
+                          selectedCard.classList.add('selected');
+                        }
+                        
+                        // Slight delay to show the selection before closing the modal
+                        setTimeout(() => {
+                          handleMysticPunchSelect(spell);
+                        }, 200);
                       }}
+                      id={`mystic-punch-spell-${spell.id}`}
+                    >
+                      <h3>{spell.name}</h3>
+                      <p>{spell.description}</p>
+                      <div className="spell-tier">Tier {spell.tier}</div>
+                    </div>
+                  ))}
+                </div>
+                <button 
+                  className="modal-close-btn"
+                  onClick={() => {
+                    console.log("Closing Mystic Punch modal");
+                    setShowMysticPunchSelection(false);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+          
+          {/* Discard Phase Modal */}
+          {showDiscardSelection && numCardsToDiscard > 0 && (
+            <div className="modal discard-modal">
+              <div className="modal-content">
+                <h2>Discard Phase</h2>
+                <p>
+                  {numCardsToDiscard === 1 
+                    ? "Select 1 card to discard." 
+                    : `Select ${numCardsToDiscard} cards to discard.`}
+                </p>
+                <div className="spell-grid">
+                  {combatState.playerWizard.hand.map(spell => (
+                    <div 
+                      key={spell.id} 
+                      className="spell-card"
+                      onClick={() => handlePlayerDiscard(spell)}
                     >
                       <h3>{spell.name}</h3>
                       <p>{spell.description}</p>
                     </div>
                   ))}
                 </div>
-                <button 
-                  className="modal-close-btn"
-                  onClick={() => setShowMysticPunchSelection(false)}
-                >
-                  Cancel
-                </button>
               </div>
             </div>
           )}

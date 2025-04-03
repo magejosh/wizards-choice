@@ -1,7 +1,7 @@
 // src/lib/ui/components/MainMenu.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGameStateStore } from '../../game-state/gameStateStore';
 import { clearSaveGames } from '../../game-state/clearSaveGames';
 import { SaveSlot } from '../../types/game-types';
@@ -33,6 +33,35 @@ const MainMenu: React.FC<MainMenuProps> = ({
   const [isNewGame, setIsNewGame] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+  
+  // Track if we're on a mobile device or in landscape mode
+  const [isMobile, setIsMobile] = useState(false);
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState(0);
+  
+  // Check viewport width and orientation on component mount and window resize
+  useEffect(() => {
+    const checkDisplay = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      setViewportHeight(height);
+      setIsMobile(width <= 768);
+      setIsLandscape(width > height);
+    };
+    
+    // Check initially
+    checkDisplay();
+    
+    // Add resize and orientation change listeners
+    window.addEventListener('resize', checkDisplay);
+    window.addEventListener('orientationchange', checkDisplay);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('resize', checkDisplay);
+      window.removeEventListener('orientationchange', checkDisplay);
+    };
+  }, []);
   
   // Local settings state
   const [localSettings, setLocalSettings] = useState(settings);
@@ -194,18 +223,94 @@ const MainMenu: React.FC<MainMenuProps> = ({
     </div>
   );
   
+  // Determine appropriate styles based on device and orientation
+  const bannerHeight = isMobile 
+    ? (isLandscape ? '69vh' : '56vh') // Increased for better visibility on mobile
+    : '79vh'; // Taller on desktop
+  const titleSize = isMobile ? (isLandscape ? '1.8rem' : '2.2rem') : '2.5rem';
+  const subtitleSize = isMobile ? (isLandscape ? '1rem' : '1.2rem') : '1.25rem';
+  const contentPadding = isMobile ? (isLandscape ? '10px' : '15px') : '20px';
+  
   return (
-    <div className="main-menu">
-      <div className="main-menu__background">
+    <div className="main-menu" style={{ 
+      overflow: 'auto',
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'flex-start'
+    }}>
+      {/* Structure layering:
+          1. Background (lowest)
+          2. Banner (above background)
+          3. Content (highest) */}
+      
+      {/* Base background layer */}
+      <div className="main-menu__background" style={{ 
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 1
+      }}>
         {/* This would be a ThreeJS background scene in the full implementation */}
         <div className="main-menu__magical-particles"></div>
       </div>
       
-      <div className="main-menu__content" style={{ position: 'relative', zIndex: 10 }}>
-        <h1 className="main-menu__title">Wizard's Choice</h1>
-        <h2 className="main-menu__subtitle">A Tactical Spell-Casting Adventure</h2>
+      {/* Banner Image */}
+      <div style={{ 
+        width: '100%',
+        height: bannerHeight,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 2,
+        backgroundImage: `url('/images/default-placeholder.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center top',
+        backgroundRepeat: 'no-repeat'
+      }}>
+        {/* Gradient overlay at the bottom of the banner */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          height: '50%',
+          background: 'linear-gradient(to top, var(--ui-background) 0%, rgba(26, 26, 46, 0) 100%)',
+          zIndex: 3
+        }}></div>
+      </div>
+      
+      {/* Content layer */}
+      <div className="main-menu__content" style={{ 
+        position: 'relative',
+        zIndex: 10,
+        paddingLeft: contentPadding,
+        paddingRight: contentPadding,
+        paddingBottom: contentPadding,
+        paddingTop: 0,
+        flex: '1 0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        marginTop: `calc(${bannerHeight} * 0.65)` // Position titles partially over the banner
+      }}>
+        <h1 className="main-menu__title" style={{ 
+          fontSize: titleSize,
+          textShadow: '0 0 10px rgba(0, 0, 0, 0.7)' // Add shadow for better visibility
+        }}>Wizard's Choice</h1>
+        <h2 className="main-menu__subtitle" style={{ 
+          fontSize: subtitleSize,
+          textShadow: '0 0 8px rgba(0, 0, 0, 0.7)' // Add shadow for better visibility
+        }}>A Tactical Spell-Casting Adventure</h2>
         
-        <div className="main-menu__buttons">
+        <div className="main-menu__buttons" style={{ 
+          marginTop: '20px',
+          width: '100%',
+          maxWidth: '400px'
+        }}>
           <button 
             className="main-menu__button main-menu__button--primary"
             onClick={handleStartNewGame}
@@ -248,18 +353,17 @@ const MainMenu: React.FC<MainMenuProps> = ({
       </div>
 
       <div style={{
-        position: 'fixed',
-        bottom: '40px',
-        left: '0',
+        position: 'relative',
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '10px',
-        padding: '0 20px',
+        padding: '0 20px 20px 20px',
+        marginTop: 'auto',
+        marginBottom: '20px',
         zIndex: 10
       }}>
-        <div style={{ color: '#fff' }}>
+        <div style={{ color: '#fff', marginBottom: '10px', textAlign: 'center' }}>
           Brought to you by <a 
             href="https://mageworks.studio" 
             target="_blank" 
@@ -279,7 +383,8 @@ const MainMenu: React.FC<MainMenuProps> = ({
           style={{
             width: '100%',
             maxWidth: '400px',
-            display: 'block'
+            display: 'block',
+            margin: '0 auto'
           }}
         >
           <img 

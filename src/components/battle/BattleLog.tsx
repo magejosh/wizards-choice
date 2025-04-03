@@ -1,7 +1,7 @@
 // src/components/battle/BattleLog.tsx
 // Component to display the combat log
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, CSSProperties } from 'react';
 import { CombatLogEntry } from '../../lib/types/combat-types';
 import styles from './BattleArena.module.css';
 
@@ -11,6 +11,23 @@ interface BattleLogProps {
 
 const BattleLog: React.FC<BattleLogProps> = ({ entries }) => {
   const logContainerRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Check viewport width on component mount and window resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // Check initially
+    checkMobile();
+    
+    // Add resize listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Clean up
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Format log entries for display
   const formatLogEntries = (): string[] => {
@@ -67,12 +84,55 @@ const BattleLog: React.FC<BattleLogProps> = ({ entries }) => {
   
   const formattedEntries = formatLogEntries();
   
+  // Inline styles for mobile
+  const mobileStyles: {
+    container: CSSProperties;
+    title: CSSProperties;
+    entry: CSSProperties;
+  } = {
+    container: {
+      width: window.innerWidth <= 380 ? '100%' : 
+             window.innerWidth <= 480 ? '100%' : 
+             window.innerWidth <= 768 ? '100%' : '100%',
+      maxWidth: '100%',
+      height: 'auto',
+      maxHeight: '150px',
+      margin: '0',
+      fontSize: window.innerWidth <= 380 ? '0.8rem' : 
+               window.innerWidth <= 480 ? '0.9rem' : '1rem',
+      padding: window.innerWidth <= 380 ? '0.3rem' : 
+              window.innerWidth <= 480 ? '0.4rem' : '0.5rem',
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      borderRadius: '4px'
+    },
+    title: {
+      fontSize: '1rem',
+      marginBottom: '0.2rem',
+      textAlign: 'center' as 'center'
+    },
+    entry: {
+      fontSize: '0.75rem',
+      padding: '0.2rem 0.4rem',
+      lineHeight: '1.1'
+    }
+  };
+  
   return (
-    <div className={styles.battleLogContainer} ref={logContainerRef}>
-      <h3 className={styles.battleLogTitle}>Battle Log</h3>
+    <div 
+      className={styles.battleLogContainer} 
+      ref={logContainerRef}
+      style={isMobile ? mobileStyles.container : undefined}
+    >
+      <h3 className={styles.battleLogTitle} style={isMobile ? mobileStyles.title : undefined}>
+        Battle Log
+      </h3>
       <div className={styles.battleLogEntries}>
         {formattedEntries.map((entry, index) => (
-          <div key={index} className={styles.logEntry}>
+          <div 
+            key={index} 
+            className={styles.logEntry}
+            style={isMobile ? mobileStyles.entry : undefined}
+          >
             {entry}
           </div>
         ))}

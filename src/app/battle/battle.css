@@ -177,6 +177,98 @@
   }
 }
 
+/* Additional responsive adjustments for battle screen */
+@media (max-width: 768px) {
+  .battle-page {
+    padding: 0.5rem;
+  }
+  
+  /* Making sure touch targets are at least 44px */
+  .mystic-punch-modal__spell,
+  .battle-end-modal__continue,
+  .mystic-punch-modal__cancel {
+    min-height: 44px;
+    padding: 0.75rem; 
+  }
+  
+  /* Ensuring modals have appropriate size */
+  .mystic-punch-modal__content,
+  .battle-end-modal__content {
+    width: 95%;
+    max-height: 85vh;
+  }
+  
+  /* Scale down the enemy turn indicator */
+  .enemy-turn-indicator__content {
+    padding: 15px 30px;
+    transform: scale(0.9);
+  }
+  
+  .enemy-turn-indicator__content h3 {
+    font-size: 24px;
+  }
+  
+  .enemy-turn-indicator__content p {
+    font-size: 16px;
+  }
+}
+
+/* Medium mobile screens */
+@media (max-width: 480px) {
+  .mystic-punch-modal__content,
+  .battle-end-modal__content {
+    padding: 0.75rem;
+    width: 95%;
+  }
+  
+  /* Scale down the enemy turn indicator more */
+  .enemy-turn-indicator__content {
+    padding: 12px 20px;
+    transform: scale(0.8);
+  }
+  
+  .enemy-turn-indicator__content h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  
+  .enemy-turn-indicator__content p {
+    font-size: 14px;
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 380px) {
+  .mystic-punch-modal__content h2,
+  .battle-end-modal__content h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  
+  .mystic-punch-modal__spells {
+    gap: 0.5rem;
+  }
+  
+  .mystic-punch-modal__spell {
+    padding: 0.75rem;
+  }
+  
+  /* Scale down the enemy turn indicator significantly */
+  .enemy-turn-indicator__content {
+    padding: 10px 15px;
+    transform: scale(0.7);
+  }
+  
+  .enemy-turn-indicator__content h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+  }
+  
+  .enemy-turn-indicator__content p {
+    font-size: 12px;
+  }
+}
+
 /* Enemy turn indicator */
 .enemy-turn-indicator {
   position: fixed;
@@ -223,4 +315,162 @@
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  /* Make wizard panels smaller */
+  .player-wizard-info,
+  .enemy-wizard-info {
+    transform: scale(0.7);
+    transform-origin: top center;
+    margin-bottom: -15px;
+  }
+  
+  /* Adjust battle log width */
+  .battle-log-container {
+    width: 90%;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 480px) {
+  /* Make wizard panels even smaller */
+  .player-wizard-info,
+  .enemy-wizard-info {
+    transform: scale(0.5);
+    transform-origin: top center;
+    margin-bottom: -25px;
+  }
+  
+  /* Reduce battle log width further */
+  .battle-log-container {
+    width: 85%;
+    max-width: 85%;
+  }
+  
+  /* Adjust wizard titles */
+  .wizard-title {
+    font-size: 1.3rem;
+  }
+  
+  /* Make stats more compact */
+  .health-bar,
+  .mana-bar {
+    height: 25px;
+    margin-bottom: 6px;
+  }
+}
+
+/* Very small mobile screens - Add more specific and powerful selectors */
+@media (max-width: 380px) {
+  /* Target wizard panels with higher specificity */
+  .battle-page .battle-arena .YOUR_WIZARD,
+  .battle-page .battle-arena .ENEMY_WIZARD,
+  .battle-page .player-wizard-info,
+  .battle-page .enemy-wizard-info {
+    font-size: 1rem !important;
+    transform: scale(0.35) !important;
+    transform-origin: top center !important;
+    margin-bottom: -40px !important;
+  }
+  
+  /* Health and mana bars */
+  .battle-page .health-bar,
+  .battle-page .mana-bar,
+  .battle-page .battle-arena .status-bar {
+    transform: scale(0.5) !important;
+    transform-origin: center left !important;
+    height: 20px !important;
+    margin: 5px 0 !important;
+  }
+  
+  /* Battle log with higher specificity and stronger overrides */
+  .battle-page .battle-log-container,
+  .battle-page .battle-arena__log,
+  .battle-page .battle-arena .battle-log-container {
+    width: 75% !important;
+    max-width: 75% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    font-size: 0.8rem !important;
+    padding: 5px !important;
+  }
+
+  /* Battle arena canvas */
+  .battle-page .battle-arena__canvas,
+  .battle-page .battle-arena canvas {
+    height: 220px !important;
+    max-height: 220px !important;
+  }
+  
+  /* Active effects area */
+  .battle-page .battle-arena__active-effects,
+  .battle-page .active-effects {
+    transform: scale(0.5) !important;
+    transform-origin: top left !important;
+    margin-bottom: -15px !important;
+  }
+  
+  /* Battle UI container - add more spacing for mobile */
+  .battle-page .battle-arena__ui,
+  .battle-page .battle-arena {
+    gap: 0.25rem !important;
+    padding: 5px !important;
+  }
+  
+  /* ACTIVE EFFECTS text */
+  .battle-page .battle-arena .ACTIVE_EFFECTS {
+    font-size: 0.9rem !important;
+    margin: 0 !important;
+  }
+}
+
+/* Small & medium mobile screens - overrides with !important for higher priority */
+@media (min-width: 381px) and (max-width: 480px) {
+  /* Target wizard panels */
+  .battle-page .battle-arena .YOUR_WIZARD,
+  .battle-page .battle-arena .ENEMY_WIZARD,
+  .battle-page .player-wizard-info,
+  .battle-page .enemy-wizard-info {
+    transform: scale(0.45) !important;
+    transform-origin: top center !important;
+    margin-bottom: -30px !important;
+  }
+  
+  /* Battle log */
+  .battle-page .battle-log-container,
+  .battle-page .battle-arena__log,
+  .battle-page .battle-arena .battle-log-container {
+    width: 80% !important;
+    max-width: 80% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* Larger mobile screens */
+@media (min-width: 481px) and (max-width: 768px) {
+  /* Target wizard panels with higher specificity */
+  .battle-page .battle-arena .YOUR_WIZARD,
+  .battle-page .battle-arena .ENEMY_WIZARD,
+  .battle-page .player-wizard-info,
+  .battle-page .enemy-wizard-info {
+    transform: scale(0.6) !important;
+    transform-origin: top center !important;
+    margin-bottom: -20px !important;
+  }
+  
+  /* Battle log */
+  .battle-page .battle-log-container,
+  .battle-page .battle-arena__log,
+  .battle-page .battle-arena .battle-log-container {
+    width: 85% !important;
+    max-width: 85% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
 } 

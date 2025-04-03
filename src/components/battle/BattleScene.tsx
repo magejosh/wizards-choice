@@ -33,6 +33,7 @@ interface BattleSceneProps {
   enemyMaxHealth?: number;
   log?: CombatLogEntry[];
   animating?: boolean;
+  isMobile?: boolean;
 }
 
 // Create a separate component for the 3D scene content
@@ -42,12 +43,23 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
   const prevLogLength = useRef<number>(0);
   
   // Extract props - support both old and new formats
-  const combatState = props.combatState;
-  const log = props.log || (combatState ? combatState.log : []);
-  const playerHealth = props.playerHealth || (combatState ? combatState.playerWizard.currentHealth : 100);
-  const playerMaxHealth = props.playerMaxHealth || (combatState ? combatState.playerWizard.wizard.maxHealth : 100);
-  const enemyHealth = props.enemyHealth || (combatState ? combatState.enemyWizard.currentHealth : 100);
-  const enemyMaxHealth = props.enemyMaxHealth || (combatState ? combatState.enemyWizard.wizard.maxHealth : 100);
+  const { 
+    combatState,
+    playerHealth: propsPlayerHealth,
+    playerMaxHealth: propsPlayerMaxHealth,
+    enemyHealth: propsEnemyHealth,
+    enemyMaxHealth: propsEnemyMaxHealth,
+    log: propsLog,
+    animating = false,
+    isMobile = false
+  } = props;
+
+  // Use either props or fallback to combatState if available
+  const playerHealth = propsPlayerHealth ?? (combatState?.playerWizard.currentHealth ?? 100);
+  const playerMaxHealth = propsPlayerMaxHealth ?? (combatState?.playerWizard.wizard.maxHealth ?? 100);
+  const enemyHealth = propsEnemyHealth ?? (combatState?.enemyWizard.currentHealth ?? 100);
+  const enemyMaxHealth = propsEnemyMaxHealth ?? (combatState?.enemyWizard.wizard.maxHealth ?? 100);
+  const log = propsLog ?? (combatState?.log ?? []);
   
   // Theme colors for consistency
   const theme = {
@@ -160,6 +172,12 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
     );
   });
   
+  // Adjust orbit control parameters for mobile
+  const orbitMinPolarAngle = isMobile ? Math.PI / 3 : Math.PI / 2.8;
+  const orbitMaxPolarAngle = isMobile ? Math.PI / 2 : Math.PI / 2.2;
+  const orbitMinAzimuthAngle = isMobile ? -Math.PI / 6 : -Math.PI / 8;
+  const orbitMaxAzimuthAngle = isMobile ? Math.PI / 6 : Math.PI / 8;
+  
   return (
     <>
       {/* Environment and lighting */}
@@ -227,10 +245,10 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
       <OrbitControls 
         enableZoom={false} 
         enablePan={false}
-        maxPolarAngle={Math.PI / 2.2}
-        minPolarAngle={Math.PI / 2.8}
-        minAzimuthAngle={-Math.PI / 8}
-        maxAzimuthAngle={Math.PI / 8}
+        maxPolarAngle={orbitMaxPolarAngle}
+        minPolarAngle={orbitMinPolarAngle}
+        minAzimuthAngle={orbitMinAzimuthAngle}
+        maxAzimuthAngle={orbitMaxAzimuthAngle}
       />
     </>
   );
@@ -238,12 +256,39 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
 
 // Main BattleScene component that wraps the content in a Canvas
 const BattleScene: React.FC<BattleSceneProps> = (props) => {
+  // Detect if we're on a mobile device
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Check viewport width on component mount and window resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // Check initially
+    checkMobile();
+    
+    // Add resize listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Clean up
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // Adjust camera position for mobile
+  const cameraPosition: [number, number, number] = isMobile ? 
+    [0, 3.8, 7.5] : // move camera back and up slightly on mobile
+    [0, 3.5, 6];
+  
+  // Adjust field of view for mobile
+  const fov = isMobile ? 50 : 45;
+  
   return (
     <Canvas
-      camera={{ position: [0, 3.5, 6], fov: 45 }}
+      camera={{ position: cameraPosition, fov: fov }}
       style={{ width: '100%', height: '100%' }}
     >
-      <BattleSceneContent {...props} />
+      <BattleSceneContent {...props} isMobile={isMobile} />
     </Canvas>
   );
 };

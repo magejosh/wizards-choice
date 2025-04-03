@@ -10,7 +10,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "Wizard's Choice",
-  description: 'A magical card-based RPG game',
+  description: 'A magical card-based dueling RPG game',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/favicon.ico',
+  }
 };
 
 export default function RootLayout({

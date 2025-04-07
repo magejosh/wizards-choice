@@ -32,47 +32,26 @@ export function useGameNavigation() {
   const handleBattleVictory = async () => {
     console.log('=== PROCESSING BATTLE VICTORY ===');
     try {
-      // First update the game state location
-      console.log('DEBUG: Setting location to wizardStudy');
+      // Save current state before navigation
+      const currentState = useGameStateStore.getState();
+      console.log('Current player experience:', currentState.player.experience);
+      
+      // Set location
       setCurrentLocation('wizardStudy');
       
-      // Then save the game state
-      console.log('DEBUG: Saving game state');
+      // Ensure state persists
       await saveGame();
-      console.log('DEBUG: Game state saved successfully');
       
-      // Use a custom localStorage flag to force wizard study view
-      // This approach is more resilient than URL params
+      // Verify state after save
+      const savedState = useGameStateStore.getState();
+      console.log('Saved player experience:', savedState.player.experience);
+      
       if (typeof window !== 'undefined') {
-        // Check if flags already exist (shouldn't happen but let's check)
-        const existingFlags = {
-          forceWizardStudy: localStorage.getItem('forceWizardStudy'),
-          comingFromBattle: localStorage.getItem('comingFromBattleVictory')
-        };
-        console.log('DEBUG: Existing flags before setting:', existingFlags);
-        
-        // Set a dedicated flag for battle victory navigation
         localStorage.setItem('forceWizardStudy', 'true');
         localStorage.setItem('comingFromBattleVictory', 'true');
-        console.log('DEBUG: Set localStorage flags for battle victory navigation');
-        
-        // Verify flags were set correctly
-        const newFlags = {
-          forceWizardStudy: localStorage.getItem('forceWizardStudy'),
-          comingFromBattle: localStorage.getItem('comingFromBattleVictory')
-        };
-        console.log('DEBUG: New flags after setting:', newFlags);
-        
-        // Clear any reload flags to prevent conflicts
-        sessionStorage.removeItem('isPageRefresh');
       }
-      
-      // Now navigate to home using router to maintain state
-      console.log('DEBUG: About to navigate to home page');
-      router.push('/');
-      console.log('DEBUG: Navigation to home page triggered');
     } catch (error) {
-      console.error('Error handling battle victory:', error);
+      console.error('Battle victory processing error:', error);
     }
   };
   

@@ -1,0 +1,132 @@
+.phaseTrackerContainer {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.75);
+  transform-origin: bottom center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(10, 10, 25, 0.85);
+  border-radius: 8px;
+  padding: 5px 10px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(106, 61, 232, 0.7);
+  z-index: 10;
+  color: white;
+  font-family: 'Cinzel', serif;
+  width: fit-content;
+  max-width: 90%;
+  pointer-events: auto;
+}
+
+.headerInfo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.roundIndicator {
+  font-size: 0.9rem;
+  text-align: center;
+  color: #e94560;
+  font-weight: bold;
+}
+
+.phaseSeparator {
+  margin: 0 8px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.turnIndicator {
+  font-size: 0.9rem;
+  color: #ffffff;
+  text-align: center;
+}
+
+.phasesContainer {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 3px;
+}
+
+.phaseItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  min-width: 40px;
+  position: relative;
+}
+
+.phaseItem::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -4px;
+  height: 2px;
+  width: 4px;
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.phaseItem:last-child::after {
+  display: none;
+}
+
+.phaseIcon {
+  font-size: 1.2rem;
+  margin-bottom: 2px;
+}
+
+.phaseName {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.activePhase {
+  background-color: rgba(106, 61, 232, 0.8);
+  box-shadow: 0 0 20px rgba(106, 61, 232, 0.9);
+  transform: translateY(-3px) scale(1.1);
+  z-index: 2;
+}
+
+.completedPhase {
+  background-color: rgba(57, 150, 92, 0.3);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 768px) {
+  .phaseTrackerContainer {
+    padding: 8px 10px;
+    max-width: 90%;
+    transform: translateX(-50%) scale(0.5);
+  }
+  
+  .headerInfo {
+    font-size: 0.8rem;
+  }
+  
+  .phaseItem {
+    min-width: 40px;
+    padding: 5px;
+  }
+  
+  .phaseIcon {
+    font-size: 1.2rem;
+  }
+  
+  .phaseName {
+    font-size: 0.6rem;
+  }
+} 

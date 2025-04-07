@@ -34,6 +34,7 @@ interface BattleSceneProps {
   log?: CombatLogEntry[];
   animating?: boolean;
   isMobile?: boolean;
+  currentPhase?: string; // Current combat phase from the phase-based system
 }
 
 // Create a separate component for the 3D scene content

@@ -6,12 +6,12 @@ import { useGameStateStore } from '../../game-state/gameStateStore';
 import { Wizard, Spell, Equipment, SpellScroll } from '../../types';
 import PotionCraftingScreen from './PotionCraftingScreen';
 import { MarketUI } from './MarketUI';
-import SpellCard from './SpellCard';
+import SpellCard from '../../../components/ui/SpellCard';
 import { PlayerProfileScreen } from './profile/PlayerProfileScreen';
 
 // Error boundary to catch and display errors
 class ErrorBoundary extends React.Component<
-  { children: React.ReactNode, fallback: React.ReactNode }, 
+  { children: React.ReactNode, fallback: React.ReactNode },
   { hasError: boolean, error: Error | null, errorInfo: ErrorInfo | null }
 > {
   constructor(props: { children: React.ReactNode, fallback: React.ReactNode }) {
@@ -53,77 +53,77 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
 }) => {
   const { gameState, setCurrentLocation, getPlayerScrolls, consumeScrollToLearnSpell, checkIfScrollSpellKnown } = useGameStateStore();
   const { player } = gameState;
-  
+
   // Debug flag to check for hydration issues
   const [mounted, setMounted] = useState(false);
-  
+
   useEffect(() => {
     // This will ensure we're fully client-side rendered
     setMounted(true);
     console.log('WizardStudy: Component mounted');
   }, []);
-  
+
   // State to control the visibility of the potion crafting screen
   const [isPotionCraftingOpen, setIsPotionCraftingOpen] = useState(false);
-  
+
   // State to control the visibility of the market screen
   const [isMarketOpen, setIsMarketOpen] = useState(false);
-  
+
   // State to control the visibility of the player profile screen
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  
+
   // State to control the visibility of the spell scrolls screen
   const [showScrolls, setShowScrolls] = useState(false);
   const [selectedScroll, setSelectedScroll] = useState<SpellScroll | null>(null);
   const [scrollLearningResult, setScrollLearningResult] = useState<{ success: boolean; message: string } | null>(null);
-  
+
   // Handler for opening the potion crafting screen
   const handleOpenPotionCrafting = () => {
     setIsPotionCraftingOpen(true);
   };
-  
+
   // Handler for closing the potion crafting screen
   const handleClosePotionCrafting = () => {
     setIsPotionCraftingOpen(false);
   };
-  
+
   // Handler for opening the market screen
   const handleOpenMarket = () => {
     console.log('WizardStudy: Opening market');
     setIsMarketOpen(true);
   };
-  
+
   // Handler for closing the market screen
   const handleCloseMarket = () => {
     console.log('WizardStudy: Closing market');
     setIsMarketOpen(false);
   };
-  
+
   // Handler for opening the player profile screen
   const handleOpenProfile = () => {
     setIsProfileOpen(true);
   };
-  
+
   // Handler for closing the player profile screen
   const handleCloseProfile = () => {
     setIsProfileOpen(false);
   };
-  
+
   // Get player scrolls
   const playerScrolls = getPlayerScrolls();
-  
+
   // Function to handle learning a spell from a scroll
   const handleLearnSpell = (scrollId: string) => {
     const result = consumeScrollToLearnSpell(scrollId);
     setScrollLearningResult(result);
     setSelectedScroll(null);
-    
+
     // Show result message for a few seconds, then clear it
     setTimeout(() => {
       setScrollLearningResult(null);
     }, 3000);
   };
-  
+
   // Get active deck name
   const getActiveDeckName = (): string => {
     if (player.activeDeckId && player.decks && player.decks.length > 0) {
@@ -134,7 +134,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
     }
     return "Default Deck";
   };
-  
+
   // If potion crafting is open, render the potion crafting screen
   if (isPotionCraftingOpen) {
     return <PotionCraftingScreen onClose={handleClosePotionCrafting} />;
@@ -143,7 +143,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
   // If market is open, render the market screen with error boundary
   if (isMarketOpen) {
     console.log('WizardStudy: About to render Market UI with error boundary');
-    
+
     // Use the MarketUI component with proper error handling
     return (
       <ErrorBoundary
@@ -165,7 +165,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
           }}>
             <h2>Failed to load Market UI</h2>
             <p>There was an error loading the Market UI. Please try again later.</p>
-            <button 
+            <button
               onClick={handleCloseMarket}
               style={{
                 padding: '10px 20px',
@@ -191,7 +191,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
   if (isProfileOpen) {
     return <PlayerProfileScreen onClose={handleCloseProfile} />;
   }
-  
+
   return (
     <div className="wizard-study">
       <div className="wizard-study__header">
@@ -199,7 +199,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
         <div className="wizard-study__player-info">
           <h2 className="wizard-study__player-name">{player.name}</h2>
           <div className="wizard-study__player-level">Level {player.level}</div>
-          <button 
+          <button
             className="wizard-study__profile-button"
             onClick={handleOpenProfile}
           >
@@ -207,14 +207,14 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
           </button>
         </div>
       </div>
-      
+
       <div className="wizard-study__content">
         <div className="wizard-study__main-area">
           <div className="wizard-study__study-scene">
             <div className="wizard-study__study-background">
               {/* Background customization placeholder */}
               <div className="wizard-study__background-customization">
-                <button 
+                <button
                   className="wizard-study__action wizard-study__action--secondary"
                   onClick={() => {/* TODO: Implement background customization */}}
                 >
@@ -223,13 +223,13 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
               </div>
             </div>
           </div>
-          
+
           <div className="wizard-study__actions">
-            <button 
+            <button
               className="wizard-study__action wizard-study__action--primary"
               onClick={() => {
                 console.log('Starting duel from WizardStudy component');
-                
+
                 // Ensure the game state is saved before we navigate
                 try {
                   // This will be handled by onStartDuel, which updates location and navigates
@@ -241,40 +241,40 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
             >
               Start Next Duel
             </button>
-            
+
             <div className="wizard-study__action-group">
-              <button 
+              <button
                 className="wizard-study__action"
                 onClick={onOpenDeckBuilder}
               >
                 Deck Builder
               </button>
-              
-              <button 
+
+              <button
                 className="wizard-study__action"
                 onClick={onOpenInventory}
               >
                 Inventory
               </button>
             </div>
-            
+
             <div className="wizard-study__secondary-actions">
-              <button 
+              <button
                 className="wizard-study__action wizard-study__action--secondary"
                 onClick={handleOpenPotionCrafting}
               >
                 Potion Crafting
               </button>
-              
-              <button 
+
+              <button
                 className="wizard-study__action wizard-study__action--secondary"
                 onClick={handleOpenMarket}
               >
                 Marketplace
               </button>
             </div>
-            
-            <button 
+
+            <button
               className="wizard-study__action wizard-study__action--secondary"
               onClick={() => {
                 console.log('Return to Main Menu button clicked in WizardStudy');
@@ -286,7 +286,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
             </button>
           </div>
         </div>
-        
+
         <div className="wizard-study__sidebar">
           <div className="wizard-study__stats">
             <h3 className="wizard-study__stats-title">Wizard Stats</h3>
@@ -315,27 +315,27 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
               <span className="wizard-study__stat-value">{gameState.marketData.gold}</span>
             </div>
           </div>
-          
+
           <div className="wizard-study__active-deck-sidebar">
             <h3 className="wizard-study__active-deck-title">Active Deck</h3>
             <div className="wizard-study__active-deck-value">{getActiveDeckName()}</div>
           </div>
         </div>
       </div>
-      
+
       {/* Spell Scrolls Screen */}
       {showScrolls && (
         <div className="modal-overlay">
           <div className="modal-content scroll-collection">
             <h2>Spell Scrolls</h2>
             <p>Use spell scrolls to learn new spells permanently.</p>
-            
+
             {scrollLearningResult && (
               <div className={`result-message ${scrollLearningResult.success ? 'success' : 'error'}`}>
                 {scrollLearningResult.message}
               </div>
             )}
-            
+
             {selectedScroll ? (
               <div className="scroll-details">
                 <h3>{selectedScroll.name}</h3>
@@ -344,19 +344,19 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
                 </div>
                 <p>{selectedScroll.description}</p>
                 <p className="scroll-rarity">Rarity: {selectedScroll.rarity}</p>
-                
+
                 {checkIfScrollSpellKnown(selectedScroll.id) ? (
                   <p className="already-known">You already know this spell.</p>
                 ) : (
-                  <button 
+                  <button
                     onClick={() => handleLearnSpell(selectedScroll.id)}
                     className="learn-spell-button"
                   >
                     Learn Spell
                   </button>
                 )}
-                
-                <button 
+
+                <button
                   onClick={() => setSelectedScroll(null)}
                   className="back-button"
                 >
@@ -372,8 +372,8 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
                 ) : (
                   <div className="scrolls-grid">
                     {playerScrolls.map(scroll => (
-                      <div 
-                        key={scroll.id} 
+                      <div
+                        key={scroll.id}
                         className={`scroll-item ${checkIfScrollSpellKnown(scroll.id) ? 'already-known' : ''}`}
                         onClick={() => setSelectedScroll(scroll)}
                       >
@@ -388,7 +388,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
                 )}
               </>
             )}
-            
+
             <button onClick={() => setShowScrolls(false)} className="close-button">
               Close
             </button>

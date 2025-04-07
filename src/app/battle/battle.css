@@ -35,7 +35,8 @@
   border-radius: 8px;
   border: 2px solid #e94560;
   box-shadow: 0 0 20px rgba(233, 69, 96, 0.7);
-  max-width: 80%;
+  width: 80%;
+  max-width: 1200px;
   max-height: 80vh;
   overflow-y: auto;
   color: white;
@@ -55,47 +56,26 @@
 .mystic-punch-modal .spell-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
+  justify-items: center;
 }
 
-/* Make sure the buttons don't have a delay */
-.mystic-punch-modal .spell-card {
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  user-select: none;
-  border: 2px solid #0f3460;
-  border-radius: 8px;
-  padding: 0.7rem;
-  background-color: #16213e;
+/* Spell card wrapper for modals */
+.spell-card-wrapper {
   position: relative;
-}
-
-.mystic-punch-modal .spell-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(233, 69, 96, 0.5);
-  border-color: #e94560;
+  padding: 2px;
+  width: 180px;
+  aspect-ratio: 2/3;
+  margin: 0 auto;
 }
 
 /* Selected spell card style */
-.mystic-punch-modal .spell-card.selected {
-  border-color: #e94560;
+.spell-card-wrapper.selected {
+  outline: 3px solid #e94560;
+  border-radius: 8px;
   box-shadow: 0 0 20px rgba(233, 69, 96, 0.9);
-  transform: translateY(-5px) scale(1.05);
-  background-color: #1f2d54;
-}
-
-/* Spell tier display */
-.mystic-punch-modal .spell-tier {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background-color: rgba(233, 69, 96, 0.8);
-  color: white;
-  font-size: 0.75rem;
-  padding: 0.2rem 0.4rem;
-  border-radius: 3px;
-  font-weight: bold;
+  transform: scale(1.05);
 }
 
 .mystic-punch-modal__damage {
@@ -188,7 +168,7 @@
   .mystic-punch-modal__spells {
     grid-template-columns: 1fr;
   }
-  
+
   .battle-end-modal__content h2 {
     font-size: 1.5rem;
   }
@@ -206,32 +186,32 @@
   .battle-page {
     padding: 0.5rem;
   }
-  
+
   /* Making sure touch targets are at least 44px */
   .mystic-punch-modal__spell,
   .battle-end-modal__continue,
   .mystic-punch-modal__cancel {
     min-height: 44px;
-    padding: 0.75rem; 
+    padding: 0.75rem;
   }
-  
+
   /* Ensuring modals have appropriate size */
   .mystic-punch-modal__content,
   .battle-end-modal__content {
     width: 95%;
     max-height: 85vh;
   }
-  
+
   /* Scale down the enemy turn indicator */
   .enemy-turn-indicator__content {
     padding: 15px 30px;
     transform: scale(0.9);
   }
-  
+
   .enemy-turn-indicator__content h3 {
     font-size: 24px;
   }
-  
+
   .enemy-turn-indicator__content p {
     font-size: 16px;
   }
@@ -244,18 +224,18 @@
     padding: 0.75rem;
     width: 95%;
   }
-  
+
   /* Scale down the enemy turn indicator more */
   .enemy-turn-indicator__content {
     padding: 12px 20px;
     transform: scale(0.8);
   }
-  
+
   .enemy-turn-indicator__content h3 {
     font-size: 20px;
     margin-bottom: 8px;
   }
-  
+
   .enemy-turn-indicator__content p {
     font-size: 14px;
   }
@@ -268,26 +248,26 @@
     font-size: 1.25rem;
     margin-bottom: 1rem;
   }
-  
+
   .mystic-punch-modal__spells {
     gap: 0.5rem;
   }
-  
+
   .mystic-punch-modal__spell {
     padding: 0.75rem;
   }
-  
+
   /* Scale down the enemy turn indicator significantly */
   .enemy-turn-indicator__content {
     padding: 10px 15px;
     transform: scale(0.7);
   }
-  
+
   .enemy-turn-indicator__content h3 {
     font-size: 18px;
     margin-bottom: 5px;
   }
-  
+
   .enemy-turn-indicator__content p {
     font-size: 12px;
   }
@@ -350,7 +330,7 @@
     transform-origin: top center;
     margin-bottom: -15px;
   }
-  
+
   /* Adjust battle log width */
   .battle-log-container {
     width: 90%;
@@ -369,18 +349,18 @@
     transform-origin: top center;
     margin-bottom: -25px;
   }
-  
+
   /* Reduce battle log width further */
   .battle-log-container {
     width: 85%;
     max-width: 85%;
   }
-  
+
   /* Adjust wizard titles */
   .wizard-title {
     font-size: 1.3rem;
   }
-  
+
   /* Make stats more compact */
   .health-bar,
   .mana-bar {
@@ -401,7 +381,7 @@
     transform-origin: top center !important;
     margin-bottom: -40px !important;
   }
-  
+
   /* Health and mana bars */
   .battle-page .health-bar,
   .battle-page .mana-bar,
@@ -411,7 +391,7 @@
     height: 20px !important;
     margin: 5px 0 !important;
   }
-  
+
   /* Battle log with higher specificity and stronger overrides */
   .battle-page .battle-log-container,
   .battle-page .battle-arena__log,
@@ -430,7 +410,7 @@
     height: 220px !important;
     max-height: 220px !important;
   }
-  
+
   /* Active effects area */
   .battle-page .battle-arena__active-effects,
   .battle-page .active-effects {
@@ -438,14 +418,14 @@
     transform-origin: top left !important;
     margin-bottom: -15px !important;
   }
-  
+
   /* Battle UI container - add more spacing for mobile */
   .battle-page .battle-arena__ui,
   .battle-page .battle-arena {
     gap: 0.25rem !important;
     padding: 5px !important;
   }
-  
+
   /* ACTIVE EFFECTS text */
   .battle-page .battle-arena .ACTIVE_EFFECTS {
     font-size: 0.9rem !important;
@@ -464,7 +444,7 @@
     transform-origin: top center !important;
     margin-bottom: -30px !important;
   }
-  
+
   /* Battle log */
   .battle-page .battle-log-container,
   .battle-page .battle-arena__log,
@@ -487,7 +467,7 @@
     transform-origin: top center !important;
     margin-bottom: -20px !important;
   }
-  
+
   /* Battle log */
   .battle-page .battle-log-container,
   .battle-page .battle-arena__log,
@@ -518,10 +498,11 @@
   border: 2px solid #e94560; /* Different border color */
   border-radius: 8px;
   padding: 2rem;
-  width: 90%;
-  max-width: 500px;
+  width: 80%;
+  max-width: 1200px;
   max-height: 80vh;
   overflow-y: auto;
+  color: white;
 }
 
 .discard-modal .modal-content h2 {
@@ -534,30 +515,20 @@
 .discard-modal .spell-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
+  padding: 3px;
+  justify-items: center;
 }
 
-.discard-modal .spell-card {
-  background-color: #272640;
-  border: 2px solid #4a4a82;
-  border-radius: 8px;
-  padding: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.discard-modal .spell-card:hover {
-  border-color: #e94560;
-  transform: translateY(-5px);
-}
+/* Using unified spell card component */
 
 /* Responsive adjustments for discard modal */
 @media (max-width: 768px) {
   .discard-modal .spell-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .discard-modal .modal-content {
     width: 95%;
     padding: 1rem;
@@ -568,4 +539,4 @@
   .discard-modal .modal-content {
     padding: 0.75rem;
   }
-} 
+}

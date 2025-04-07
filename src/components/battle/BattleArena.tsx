@@ -7,7 +7,9 @@ import WizardStats from './WizardStats';
 import BattleLog from './BattleLog';
 import { Spell, ActiveEffect } from '../../lib/types/spell-types';
 import { CombatLogEntry } from '../../lib/types/combat-types';
-import SpellCard from './SpellCard';
+import SpellCard from '../../components/ui/SpellCard';
+import PhaseTracker from './PhaseTracker';
+import { CombatPhase } from '@/lib/types';
 
 interface BattleArenaProps {
   playerHealth: number;
@@ -32,6 +34,7 @@ interface BattleArenaProps {
   onSpellCast: (spell: Spell) => void;
   canCastSpell: (spell: Spell) => boolean;
   canUseMysticPunch: boolean;
+  currentPhase?: CombatPhase;
 }
 
 const BattleArena: React.FC<BattleArenaProps> = ({
@@ -56,13 +59,14 @@ const BattleArena: React.FC<BattleArenaProps> = ({
   spells,
   onSpellCast,
   canCastSpell,
-  canUseMysticPunch
+  canUseMysticPunch,
+  currentPhase
 }) => {
   // Track if we're on a mobile device
   const [isMobile, setIsMobile] = useState(false);
   // Track if we're in landscape mode
   const [isLandscape, setIsLandscape] = useState(false);
-  
+
   // Check viewport width and orientation on component mount and window resize
   useEffect(() => {
     const checkDisplay = () => {
@@ -71,14 +75,14 @@ const BattleArena: React.FC<BattleArenaProps> = ({
       setIsMobile(width <= 768);
       setIsLandscape(width > height);
     };
-    
+
     // Check initially
     checkDisplay();
-    
+
     // Add resize and orientation change listeners
     window.addEventListener('resize', checkDisplay);
     window.addEventListener('orientationchange', checkDisplay);
-    
+
     // Clean up
     return () => {
       window.removeEventListener('resize', checkDisplay);
@@ -89,21 +93,21 @@ const BattleArena: React.FC<BattleArenaProps> = ({
   // Restructure for mobile to put battle log at the bottom
   if (isMobile) {
     // Determine battle area height based on orientation
-    const battleAreaHeight = isLandscape 
+    const battleAreaHeight = isLandscape
       ? window.innerWidth <= 380 ? '300px' : '350px'  // taller in landscape
       : window.innerWidth <= 380 ? '250px' : '300px'; // regular in portrait
-      
+
     // Adjust spell area height based on orientation
     const spellAreaMaxHeight = isLandscape
       ? window.innerWidth <= 380 ? '200px' : '250px'  // shorter in landscape
       : window.innerWidth <= 380 ? '300px' : '400px'; // taller in portrait
-      
+
     // Adjust battle log based on orientation
     const battleLogMaxHeight = isLandscape ? '120px' : '150px';
-    
+
     return (
       <div className={styles.battleArena} style={{
-        flexDirection: 'column', 
+        flexDirection: 'column',
         padding: window.innerWidth <= 380 ? '0.5rem' : '1rem',
         gap: window.innerWidth <= 380 ? '0.5rem' : '1rem',
         overflow: 'auto',
@@ -116,12 +120,22 @@ const BattleArena: React.FC<BattleArenaProps> = ({
           position: 'relative'
         }}>
           <div className={styles.sceneContainer}>
+            {currentPhase && (
+              <div className={styles.phaseTrackerWrapper}>
+                <PhaseTracker
+                  currentPhase={currentPhase}
+                  isPlayerTurn={isPlayerTurn}
+                  round={round}
+                />
+              </div>
+            )}
             <BattleScene
               playerHealth={playerHealth}
               playerMaxHealth={playerMaxHealth}
               enemyHealth={enemyHealth}
               enemyMaxHealth={enemyMaxHealth}
               animating={animating}
+              currentPhase={currentPhase}
             />
           </div>
 
@@ -133,8 +147,16 @@ const BattleArena: React.FC<BattleArenaProps> = ({
             maxMana={playerMaxMana}
             activeEffects={playerActiveEffects || []}
             isPlayer={true}
+            style={!isLandscape ? {
+              position: 'absolute',
+              top: '5px',
+              left: '5px',
+              transform: 'scale(0.63)',
+              transformOrigin: 'top left',
+              zIndex: 5
+            } : undefined}
           />
-          
+
           <WizardStats
             name="Enemy Wizard"
             currentHealth={enemyHealth}
@@ -143,6 +165,14 @@ const BattleArena: React.FC<BattleArenaProps> = ({
             maxMana={enemyMaxMana}
             activeEffects={enemyActiveEffects || []}
             isPlayer={false}
+            style={!isLandscape ? {
+              position: 'absolute',
+              top: '5px',
+              right: '5px',
+              transform: 'scale(0.63)',
+              transformOrigin: 'top right',
+              zIndex: 5
+            } : undefined}
           />
         </div>
 
@@ -152,17 +182,18 @@ const BattleArena: React.FC<BattleArenaProps> = ({
           overflow: 'auto'
         }}>
           <div className={styles.spellsContainer} style={{
-            gridTemplateColumns: window.innerWidth <= 380 ? 'repeat(auto-fill, minmax(120px, 1fr))' : 
-                              window.innerWidth <= 480 ? 'repeat(auto-fill, minmax(140px, 1fr))' : 
+            gridTemplateColumns: window.innerWidth <= 380 ? 'repeat(auto-fill, minmax(120px, 1fr))' :
+                              window.innerWidth <= 480 ? 'repeat(auto-fill, minmax(140px, 1fr))' :
                               'repeat(auto-fill, minmax(12.5rem, 1fr))'
           }}>
             {spells?.map((spell, index) => (
-              <SpellCard
-                key={index}
-                spell={spell}
-                onClick={() => onSpellCast(spell)}
-                disabled={!canCastSpell(spell)}
-              />
+              <div key={index} className={styles.spellCardWrapper}>
+                <SpellCard
+                  spell={spell}
+                  onClick={() => onSpellCast(spell)}
+                  disabled={!canCastSpell(spell)}
+                />
+              </div>
             ))}
           </div>
           <div className={styles.actionButtons}>
@@ -204,7 +235,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
     );
   }
 
-  // Desktop layout (unchanged)
+  // Desktop layout
   return (
     <div className={styles.battleArena}>
       <div className={styles.mainContent}>
@@ -220,14 +251,24 @@ const BattleArena: React.FC<BattleArenaProps> = ({
               isPlayer={true}
             />
           </div>
-          
+
           <div className={styles.sceneContainer}>
+            {currentPhase && (
+              <div className={styles.phaseTrackerWrapper}>
+                <PhaseTracker
+                  currentPhase={currentPhase}
+                  isPlayerTurn={isPlayerTurn}
+                  round={round}
+                />
+              </div>
+            )}
             <BattleScene
               playerHealth={playerHealth}
               playerMaxHealth={playerMaxHealth}
               enemyHealth={enemyHealth}
               enemyMaxHealth={enemyMaxHealth}
               animating={animating}
+              currentPhase={currentPhase}
             />
           </div>
 
@@ -247,12 +288,13 @@ const BattleArena: React.FC<BattleArenaProps> = ({
         <div className={styles.spellsArea}>
           <div className={styles.spellsContainer}>
             {spells?.map((spell, index) => (
-              <SpellCard
-                key={index}
-                spell={spell}
-                onClick={() => onSpellCast(spell)}
-                disabled={!canCastSpell(spell)}
-              />
+              <div key={index} className={styles.spellCardWrapper}>
+                <SpellCard
+                  spell={spell}
+                  onClick={() => onSpellCast(spell)}
+                  disabled={!canCastSpell(spell)}
+                />
+              </div>
             ))}
           </div>
           <div className={styles.actionButtons}>
@@ -260,12 +302,20 @@ const BattleArena: React.FC<BattleArenaProps> = ({
               className={styles.mysticPunchButton}
               onClick={onMysticPunch}
               disabled={!canUseMysticPunch}
+              style={{
+                fontSize: window.innerWidth <= 380 ? '0.9rem' : '1rem',
+                padding: window.innerWidth <= 380 ? '0.4rem 0.6rem' : '0.5rem 1rem'
+              }}
             >
               Mystic Punch
             </button>
             <button
               className={styles.skipTurnButton}
               onClick={onSkipTurn}
+              style={{
+                fontSize: window.innerWidth <= 380 ? '0.9rem' : '1rem',
+                padding: window.innerWidth <= 380 ? '0.4rem 0.6rem' : '0.5rem 1rem'
+              }}
             >
               Skip Turn
             </button>
@@ -280,4 +330,4 @@ const BattleArena: React.FC<BattleArenaProps> = ({
   );
 };
 
-export default BattleArena; 
+export default BattleArena;

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useGameStateStore } from '@/lib/game-state/gameStateStore';
-import MainMenu from './MainMenu';
-import Settings from './Settings';
-import HowToPlay from './HowToPlay';
-import BattleArena from './BattleArena';
+import MainMenu from '../../../components/menu/MainMenu';
+import Settings from '../../../components/settings/Settings';
+import HowToPlay from '../../../components/help/HowToPlay';
+import BattleArena from '../../../components/battle/BattleArena';
 import WizardStudy from './WizardStudy';
 import ErrorBoundary from './ErrorBoundary';
 import { CombatState, Spell } from '@/lib/types';
@@ -124,4 +124,4 @@ const GameInterface: React.FC = () => {
   );
 };
 
-export default GameInterface; 
+export default GameInterface;

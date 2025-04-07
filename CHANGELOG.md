@@ -1,5 +1,40 @@
 # CHANGELOG
 
+## 2025-04-05
+- Refactoring Combat Logic Flow Continued
+  - Fixing visual and backend logic errors
+  - Ensuring proper state management and UI updates
+  - Playtesting-Refinement Loop
+  - Fixed Mystic Punch spell discard functionality
+  - Fixed second discard modal popup issue
+  - Added Upkeep phase to help the AI understand where the step to shuffle the discard pile into the deck is supposed to happen. Instead of it just doing it whenever it wanted to do so.
+
+
+## 2025-04-04
+- Refactor Combat Logic Flow
+  - Add initiative roll phase
+  - Add action phase
+  - Add response phase
+  - Add discard phase
+  - Add end phase
+  - Add phase tracker component
+  - Add phase transition logic
+  - Add phase-specific UI components
+  - Add phase-specific state management
+  - Add phase-specific combat logic
+  - Add phase-specific spell casting logic
+  - Add phase-specific spell effect logic
+  - Add phase-specific spell targeting logic
+
+## 2025-04-03
+- Done: fixed favicon and metacard info
+
+## 2025-04-02
+- Done: Implement phase tracker widget during duels
+
+## 2025-04-01
+- Done: Fixed mobile responsiveness for production version
+
 ## 2025-03-31
 - Done: Fixed battle arena 3D display and combat functionality
   - Resolved issue with the 3D battle scene not displaying properly

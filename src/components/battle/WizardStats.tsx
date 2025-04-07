@@ -13,6 +13,7 @@ interface WizardStatsProps {
   maxMana: number;
   activeEffects: ActiveEffect[];
   isPlayer: boolean;
+  style?: React.CSSProperties;
 }
 
 const WizardStats: React.FC<WizardStatsProps> = ({
@@ -22,7 +23,8 @@ const WizardStats: React.FC<WizardStatsProps> = ({
   currentMana,
   maxMana,
   activeEffects,
-  isPlayer
+  isPlayer,
+  style
 }) => {
   // Track if we're on a mobile device
   const [isMobile, setIsMobile] = useState(false);
@@ -106,7 +108,10 @@ const WizardStats: React.FC<WizardStatsProps> = ({
   };
 
   return (
-    <div style={isMobile ? mobileStyles.container : undefined} className={isMobile ? '' : isPlayer ? styles.playerSection : styles.enemySection}>
+    <div 
+      style={style || (isMobile ? mobileStyles.container : undefined)} 
+      className={isMobile ? '' : isPlayer ? styles.playerSection : styles.enemySection}
+    >
       <h2 style={isMobile ? mobileStyles.title : undefined}>{name}</h2>
       
       <div className={styles.statsBar}>

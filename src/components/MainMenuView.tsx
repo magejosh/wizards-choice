@@ -1,5 +1,5 @@
 import React from 'react';
-import MainMenu from '../lib/ui/components/MainMenu';
+import MainMenu from './menu/MainMenu';
 
 interface MainMenuViewProps {
   onStartNewGame: (saveSlotId: number) => void;
@@ -17,7 +17,7 @@ const MainMenuView: React.FC<MainMenuViewProps> = ({
   onLogout
 }) => {
   return (
-    <MainMenu 
+    <MainMenu
       onStartNewGame={onStartNewGame}
       onContinueGame={onContinueGame}
       onOpenSettings={onOpenSettings}
@@ -27,4 +27,4 @@ const MainMenuView: React.FC<MainMenuViewProps> = ({
   );
 };
 
-export default MainMenuView; 
+export default MainMenuView;

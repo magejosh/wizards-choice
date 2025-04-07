@@ -18,6 +18,54 @@ export interface CombatState {
   status: 'active' | 'playerWon' | 'enemyWon';
   difficulty: 'easy' | 'normal' | 'hard';
   extraTurn?: { for: 'player' | 'enemy' }; // For Time Warp spell effect
+
+  // New properties for enhanced combat flow
+  currentPhase: CombatPhase;
+  firstActor: 'player' | 'enemy'; // Who goes first based on initiative
+  initiative: {
+    player: number;
+    enemy: number;
+  };
+  actionState: {
+    player: ActionState;
+    enemy: ActionState;
+  };
+  // Queue of effects to resolve in the resolution phase
+  effectQueue: QueuedEffect[];
+  // Tracks if a response is pending
+  pendingResponse: {
+    active: boolean;
+    action: QueuedEffect | null;
+    respondingActor: 'player' | 'enemy' | null;
+    responseTimeRemaining: number;
+  };
+}
+
+/**
+ * Combat phases
+ */
+export type CombatPhase = 'initiative' | 'draw' | 'upkeep' | 'action' | 'response' | 'resolve' | 'discard' | 'end';
+
+/**
+ * Action states for each actor
+ */
+export interface ActionState {
+  hasActed: boolean;
+  hasResponded: boolean;
+}
+
+/**
+ * Queued effect to be resolved in the resolution phase
+ */
+export interface QueuedEffect {
+  id: string;
+  caster: 'player' | 'enemy';
+  spell: Spell | null; // null for mystic punch
+  spellTier?: number; // for mystic punch
+  target: 'player' | 'enemy';
+  timestamp: number;
+  wasResponded: boolean;
+  responseEffect?: QueuedEffect;
 }
 
 /**
@@ -46,6 +94,7 @@ export interface CombatLogEntry {
   value?: number;
   element?: ElementType;
   timestamp: number;
+  sequence?: number; // Explicit sequence number for ordering
   details?: string;
   damage?: number;
   healing?: number;
@@ -68,4 +117,4 @@ export interface PlayerState {
   discoveredRecipes: any[];
   currentEncounter: any | null;
   completedEncounters: string[];
-} 
+}

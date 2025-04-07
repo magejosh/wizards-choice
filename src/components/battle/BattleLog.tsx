@@ -4,6 +4,7 @@
 import React, { useEffect, useRef, useState, CSSProperties } from 'react';
 import { CombatLogEntry } from '../../lib/types/combat-types';
 import styles from './BattleArena.module.css';
+// We don't need to import battleLogManager here as we're just displaying entries
 
 interface BattleLogProps {
   entries: CombatLogEntry[];
@@ -12,37 +13,55 @@ interface BattleLogProps {
 const BattleLog: React.FC<BattleLogProps> = ({ entries }) => {
   const logContainerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
-  
+
   // Check viewport width on component mount and window resize
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
+
     // Check initially
     checkMobile();
-    
+
     // Add resize listener
     window.addEventListener('resize', checkMobile);
-    
+
     // Clean up
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  
+
+  // We no longer need to update the battle log manager with entries
+  // The battle log manager is the source of truth, and entries are just for rendering
+  // This prevents potential duplicate entries or ordering issues
+
   // Format log entries for display
-  const formatLogEntries = (): string[] => {
-    if (!entries || entries.length === 0) {
-      return ['The duel is about to begin!'];
+  const formatLogEntries = (entriesToFormat: CombatLogEntry[]): string[] => {
+    if (!entriesToFormat || entriesToFormat.length === 0) {
+      // Return an empty array instead of a default message
+      // The "duel has begun" message will be added by BattleView.tsx only once
+      return [];
     }
-    
-    return entries.map(entry => {
-      const actorName = entry.actor === 'player' ? 'You' : 
+
+    // Filter out initiative entries that might appear before the actual roll
+    const filteredEntries = entriesToFormat.filter(entry => {
+      // Don't show initiative entries that have "rolled X, Y" until after the modal is closed
+      if (entry.action === 'initiative' && entry.details && entry.details.includes('rolled')) {
+        const containsModal = document.querySelector('.modal');
+        if (containsModal && containsModal.classList.contains('initiativeRollModal')) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    return filteredEntries.map(entry => {
+      const actorName = entry.actor === 'player' ? 'You' :
                         entry.actor === 'enemy' ? 'Enemy' :
                         entry.actor;
-      const targetName = entry.target === 'player' ? 'you' : 
+      const targetName = entry.target === 'player' ? 'you' :
                          entry.target === 'enemy' ? 'enemy' :
                          entry.target;
-      
+
       switch (entry.action) {
         case 'spell_cast':
           if (entry.damage && entry.damage > 0) {
@@ -69,21 +88,65 @@ const BattleLog: React.FC<BattleLogProps> = ({ entries }) => {
           return `${entry.spellName || 'Effect'} expired on ${targetName}.`;
         case 'combat_start':
           return 'The duel has begun!';
+        case 'initiative':
+          // For the initial "Rolling for initiative..." message
+          return entry.details || 'Rolling for initiative...';
+        case 'initiative_roll':
+          // For individual player/enemy roll results
+          return entry.details || 'Rolling for initiative...';
+        case 'initiative_result':
+          // For the final result (who goes first)
+          return entry.details || 'Initiative determined.';
         default:
           return entry.details || 'Unknown action occurred.';
       }
     });
   };
-  
-  // Auto-scroll to bottom when new entries are added
+
+  // Auto-scroll to top when new entries are added (since newest entries are at the top)
   useEffect(() => {
     if (logContainerRef.current) {
-      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+      logContainerRef.current.scrollTop = 0;
     }
   }, [entries]);
-  
-  const formattedEntries = formatLogEntries();
-  
+
+  // Make sure entries are sorted by timestamp (newest first) before formatting
+  // This ensures consistent ordering even if the entries prop isn't already sorted
+  const sortedEntries = [...entries].sort((a, b) => b.timestamp - a.timestamp);
+  const formattedEntries = formatLogEntries(sortedEntries);
+
+  // Force a re-render when entries change to ensure proper ordering
+  useEffect(() => {
+    // This empty effect with entries dependency will trigger a re-render
+    // when entries change, ensuring the sorted order is applied
+  }, [entries]);
+
+  // Debug log to help diagnose ordering issues
+  console.log('BattleLog component rendering entries:', entries.length);
+  if (sortedEntries.length > 0) {
+    console.log('First entry (newest):', sortedEntries[0].details);
+    console.log('Last entry (oldest):', sortedEntries[sortedEntries.length - 1].details);
+
+    // Check for "The duel has begun" and "Rolling for initiative" entries
+    const duelBegunEntry = sortedEntries.find(entry =>
+      entry.action === 'combat_start' && entry.details?.includes('The duel has begun')
+    );
+
+    const initiativeEntry = sortedEntries.find(entry =>
+      entry.action === 'initiative' && entry.details === 'Rolling for initiative...'
+    );
+
+    if (duelBegunEntry) {
+      const index = sortedEntries.indexOf(duelBegunEntry);
+      console.log(`"The duel has begun" entry is at position ${index} of ${sortedEntries.length}`);
+    }
+
+    if (initiativeEntry) {
+      const index = sortedEntries.indexOf(initiativeEntry);
+      console.log(`"Rolling for initiative" entry is at position ${index} of ${sortedEntries.length}`);
+    }
+  }
+
   // Inline styles for mobile
   const mobileStyles: {
     container: CSSProperties;
@@ -91,16 +154,16 @@ const BattleLog: React.FC<BattleLogProps> = ({ entries }) => {
     entry: CSSProperties;
   } = {
     container: {
-      width: window.innerWidth <= 380 ? '100%' : 
-             window.innerWidth <= 480 ? '100%' : 
+      width: window.innerWidth <= 380 ? '100%' :
+             window.innerWidth <= 480 ? '100%' :
              window.innerWidth <= 768 ? '100%' : '100%',
       maxWidth: '100%',
       height: 'auto',
       maxHeight: '150px',
       margin: '0',
-      fontSize: window.innerWidth <= 380 ? '0.8rem' : 
+      fontSize: window.innerWidth <= 380 ? '0.8rem' :
                window.innerWidth <= 480 ? '0.9rem' : '1rem',
-      padding: window.innerWidth <= 380 ? '0.3rem' : 
+      padding: window.innerWidth <= 380 ? '0.3rem' :
               window.innerWidth <= 480 ? '0.4rem' : '0.5rem',
       backgroundColor: 'rgba(0, 0, 0, 0.7)',
       borderRadius: '4px'
@@ -116,10 +179,10 @@ const BattleLog: React.FC<BattleLogProps> = ({ entries }) => {
       lineHeight: '1.1'
     }
   };
-  
+
   return (
-    <div 
-      className={styles.battleLogContainer} 
+    <div
+      className={styles.battleLogContainer}
       ref={logContainerRef}
       style={isMobile ? mobileStyles.container : undefined}
     >
@@ -128,8 +191,8 @@ const BattleLog: React.FC<BattleLogProps> = ({ entries }) => {
       </h3>
       <div className={styles.battleLogEntries}>
         {formattedEntries.map((entry, index) => (
-          <div 
-            key={index} 
+          <div
+            key={index}
             className={styles.logEntry}
             style={isMobile ? mobileStyles.entry : undefined}
           >
@@ -141,4 +204,4 @@ const BattleLog: React.FC<BattleLogProps> = ({ entries }) => {
   );
 };
 
-export default BattleLog; 
+export default BattleLog;

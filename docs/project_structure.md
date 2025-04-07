@@ -7,9 +7,11 @@ This document provides an overview of the project structure and organization for
 ```
 wizard-choice/
 ├── docs/                    # Documentation files
-│   ├── code_review.md       # Code review and best practices
 │   ├── deployment_guide.md  # Deployment instructions
+│   ├── high-level-overview.md # High-level overview of the game
 │   ├── how_to_play.md       # Game mechanics and instructions
+│   ├── process_maps.md      # Process flow diagrams
+│   ├── project_structure.md # Project structure documentation
 │   ├── requirements.md      # Original requirements and specifications
 │   └── technical_documentation.md # Technical architecture and implementation details
 ├── public/                  # Static assets
@@ -102,14 +104,14 @@ wizard-choice/
 
 ### UI Components
 
-- **src/lib/ui/components/MainMenu.tsx**: Main menu interface
+- **src/components/menu/MainMenu.tsx**: Main menu interface
 - **src/components/battle/BattleArena.tsx**: Battle screen interface with UI panels
 - **src/components/battle/BattleScene.tsx**: 3D battle environment
 - **src/components/battle/WizardModel.tsx**: 3D wizard models with animations
 - **src/components/battle/effects/SpellEffect3D.tsx**: Dynamic 3D spell effects
 - **src/lib/ui/components/WizardStudy.tsx**: Hub area for between battles
 - **src/lib/ui/components/MarketUI.tsx**: Interface for buying and selling items
-- **src/lib/ui/components/SpellCard.tsx**: Displays spell information
+- **src/components/ui/SpellCard.tsx**: Displays spell information
 - **src/lib/ui/components/StatusBar.tsx**: Shows health and mana status
 - **src/lib/ui/theme.ts**: Defines color schemes and UI constants
 
@@ -125,7 +127,10 @@ wizard-choice/
 - **docs/technical_documentation.md**: Comprehensive technical overview
 - **docs/how_to_play.md**: Game mechanics and instructions
 - **docs/deployment_guide.md**: Deployment instructions for various platforms
-- **docs/code_review.md**: Code review and best practices
+- **docs/high-level-overview.md**: High-level overview of the game
+- **docs/process_maps.md**: Process flow diagrams
+- **docs/project_structure.md**: Project structure documentation
+- **docs/requirements.md**: Original requirements and specifications
 - **README.md**: Project overview and getting started guide
 
 ## Development Workflow

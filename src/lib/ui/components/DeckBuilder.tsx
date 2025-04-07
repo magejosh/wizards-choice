@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Spell, Deck } from '../../types';
 import { useGameStateStore } from '../../game-state/gameStateStore';
-import SpellCard from './SpellCard';
+import SpellCard from '../../../components/ui/SpellCard';
 
 // Minimum number of spells required in a deck
 const MIN_DECK_SIZE = 5;
@@ -15,7 +15,7 @@ interface DeckBuilderProps {
 const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
   const { gameState, updateGameState } = useGameStateStore();
   const { player } = gameState;
-  
+
   // State for managing decks
   const [decks, setDecks] = useState<Deck[]>(player.decks || []);
   const [activeDeckId, setActiveDeckId] = useState<string | null>(player.activeDeckId);
@@ -24,18 +24,18 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
   const [isCreatingDeck, setIsCreatingDeck] = useState<boolean>(false);
   const [isEditingDeck, setIsEditingDeck] = useState<boolean>(false);
   const [isHelpExpanded, setIsHelpExpanded] = useState<boolean>(false);
-  
+
   // State for active editing deck
   const [editingDeckSpells, setEditingDeckSpells] = useState<Spell[]>([]);
-  
+
   // State for filtering and sorting
   const [filter, setFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('tier');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  
+
   // All available spells the player has
   const availableSpells = player.spells;
-  
+
   // Create a default deck if none exists
   useEffect(() => {
     if (decks.length === 0) {
@@ -46,11 +46,11 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
         dateCreated: new Date().toISOString(),
         lastModified: new Date().toISOString()
       };
-      
+
       setDecks([defaultDeck]);
       setSelectedDeckId(defaultDeck.id);
       setActiveDeckId(defaultDeck.id);
-      
+
       // Update the game state with the new player properties
       updateGameState({
         player: {
@@ -62,12 +62,12 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
       });
     }
   }, []);
-  
+
   // Get the active deck being edited
   const getActiveDeck = (): Deck | undefined => {
     return decks.find(deck => deck.id === selectedDeckId);
   };
-  
+
   // Initialize editing deck whenever selected deck changes
   useEffect(() => {
     const activeDeck = getActiveDeck();
@@ -79,19 +79,19 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
       setIsEditingDeck(false);
     }
   }, [selectedDeckId]);
-  
+
   // Toggle help section expanded state
   const toggleHelpSection = () => {
     setIsHelpExpanded(!isHelpExpanded);
   };
-  
+
   // Apply filtering
   const filteredSpells = availableSpells.filter(spell => {
     // Text search filter
     if (searchQuery && !spell.name.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
-    
+
     // Category filter
     if (filter === 'all') return true;
     if (filter === 'equipped') return editingDeckSpells.some(s => s.id === spell.id);
@@ -99,11 +99,11 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
     if (filter === 'healing') return spell.type === 'healing';
     if (filter === 'buff') return spell.type === 'buff';
     if (filter === 'debuff') return spell.type === 'debuff';
-    
+
     // Element filter
     return spell.element === filter;
   });
-  
+
   // Apply sorting
   const sortedSpells = [...filteredSpells].sort((a, b) => {
     if (sortBy === 'name') return a.name.localeCompare(b.name);
@@ -111,17 +111,17 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
     if (sortBy === 'element') return a.element.localeCompare(b.element);
     return a.tier - b.tier; // Default sort by tier
   });
-  
+
   // Check if a spell is in the current editing deck
   const isSpellInDeck = (spell: Spell): boolean => {
     return editingDeckSpells.some(s => s.id === spell.id);
   };
-  
+
   // Get the position of a spell in the current editing deck
   const getSpellDeckPosition = (spell: Spell): number => {
     return editingDeckSpells.findIndex(s => s.id === spell.id);
   };
-  
+
   // Add or remove a spell from the editing deck
   const toggleSpellInDeck = (spell: Spell) => {
     if (isSpellInDeck(spell)) {
@@ -137,14 +137,14 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
       setEditingDeckSpells([...editingDeckSpells, spell]);
     }
   };
-  
+
   // Create a new deck
   const handleCreateDeck = () => {
     if (newDeckName.trim() === '') {
       alert('Please enter a deck name');
       return;
     }
-    
+
     const newDeck: Deck = {
       id: 'deck-' + Date.now(),
       name: newDeckName,
@@ -152,14 +152,14 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
       dateCreated: new Date().toISOString(),
       lastModified: new Date().toISOString()
     };
-    
+
     const updatedDecks = [...decks, newDeck];
     setDecks(updatedDecks);
     setSelectedDeckId(newDeck.id);
     setNewDeckName('');
     setIsCreatingDeck(false);
     setEditingDeckSpells([]);
-    
+
     // Update the game state
     updateGameState({
       player: {
@@ -168,17 +168,17 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
       }
     });
   };
-  
+
   // Save the current deck
   const handleSaveDeck = () => {
     if (!selectedDeckId) return;
-    
+
     // Check if deck meets minimum size requirement
     if (editingDeckSpells.length < MIN_DECK_SIZE) {
       alert(`Your deck must contain at least ${MIN_DECK_SIZE} spells to save.`);
       return;
     }
-    
+
     const updatedDecks = decks.map(deck => {
       if (deck.id === selectedDeckId) {
         return {
@@ -189,42 +189,42 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
       }
       return deck;
     });
-    
+
     setDecks(updatedDecks);
-    
+
     // Update the game state
     const updatedPlayer = {
       ...player,
       decks: updatedDecks
     };
-    
+
     // If this is the active deck, update equipped spells too
     if (selectedDeckId === activeDeckId) {
       updatedPlayer.equippedSpells = editingDeckSpells;
     }
-    
+
     updateGameState({
       player: updatedPlayer
     });
-    
+
     alert(`Deck "${getActiveDeck()?.name}" saved successfully!`);
   };
-  
+
   // Equip the selected deck (make it active)
   const handleEquipDeck = () => {
     if (!selectedDeckId) return;
-    
+
     const selectedDeck = decks.find(deck => deck.id === selectedDeckId);
     if (!selectedDeck) return;
-    
+
     // Check if deck meets minimum size requirement
     if (selectedDeck.spells.length < MIN_DECK_SIZE) {
       alert(`Your deck must contain at least ${MIN_DECK_SIZE} spells to equip.`);
       return;
     }
-    
+
     setActiveDeckId(selectedDeckId);
-    
+
     // Update the game state
     updateGameState({
       player: {
@@ -233,48 +233,48 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
         equippedSpells: selectedDeck.spells
       }
     });
-    
+
     alert(`Deck "${selectedDeck.name}" is now equipped!`);
   };
-  
+
   // Delete the selected deck
   const handleDeleteDeck = () => {
     if (!selectedDeckId) return;
-    
+
     if (decks.length <= 1) {
       alert('You cannot delete your only deck.');
       return;
     }
-    
+
     if (window.confirm('Are you sure you want to delete this deck?')) {
       const updatedDecks = decks.filter(deck => deck.id !== selectedDeckId);
       setDecks(updatedDecks);
-      
+
       // Set a new active/selected deck
       const newSelectedId = updatedDecks[0]?.id || null;
       setSelectedDeckId(newSelectedId);
-      
+
       const updatedPlayer = {
         ...player,
         decks: updatedDecks
       };
-      
+
       // If the deleted deck was active, update the active deck and equipped spells
       if (selectedDeckId === activeDeckId) {
         setActiveDeckId(newSelectedId);
-        
+
         const newActiveDeck = updatedDecks.find(deck => deck.id === newSelectedId);
         updatedPlayer.activeDeckId = newSelectedId;
         updatedPlayer.equippedSpells = newActiveDeck?.spells || [];
       }
-      
+
       // Update the game state
       updateGameState({
         player: updatedPlayer
       });
     }
   };
-  
+
   return (
     <div className="deck-builder">
       <div className="deck-builder__header">
@@ -283,10 +283,10 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
           Close
         </button>
       </div>
-      
+
       <div className="deck-builder__help">
-        <div 
-          className="deck-builder__help-header" 
+        <div
+          className="deck-builder__help-header"
           onClick={toggleHelpSection}
         >
           <h3>How to Use Deck Builder</h3>
@@ -294,7 +294,7 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
             {isHelpExpanded ? '−' : '+'}
           </span>
         </div>
-        
+
         {isHelpExpanded && (
           <div className="deck-builder__help-content">
             <p>
@@ -302,7 +302,7 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
               Create multiple decks for different strategies, and equip the one you want to use in battle.
             </p>
             <p>
-              <strong>Deck Mechanics:</strong> When you cast a spell in battle, it goes to your discard pile. 
+              <strong>Deck Mechanics:</strong> When you cast a spell in battle, it goes to your discard pile.
               After your next draw step, cards in the discard pile are shuffled back into your deck.
               Strategic deck building is crucial for maintaining spell flow in longer duels!
             </p>
@@ -315,10 +315,10 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
           </div>
         )}
       </div>
-      
+
       <div className="deck-builder__deck-management">
         <h3>Your Decks</h3>
-        
+
         <div className="deck-builder__decks-list">
           {decks.map(deck => (
             <div
@@ -334,24 +334,24 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
               </div>
             </div>
           ))}
-          
+
           <div className="deck-builder__deck-actions">
-            <button 
+            <button
               className="deck-builder__deck-action"
               onClick={() => setIsCreatingDeck(true)}
             >
               Create New Deck
             </button>
-            
-            <button 
+
+            <button
               className="deck-builder__deck-action"
               onClick={handleEquipDeck}
               disabled={!selectedDeckId || selectedDeckId === activeDeckId || (getActiveDeck() && getActiveDeck()!.spells.length < MIN_DECK_SIZE)}
             >
               Equip Selected Deck
             </button>
-            
-            <button 
+
+            <button
               className="deck-builder__deck-action deck-builder__deck-action--danger"
               onClick={handleDeleteDeck}
               disabled={!selectedDeckId || decks.length <= 1}
@@ -360,7 +360,7 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
             </button>
           </div>
         </div>
-        
+
         {isCreatingDeck && (
           <div className="deck-builder__create-deck">
             <h4>Create New Deck</h4>
@@ -372,13 +372,13 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
                 onChange={(e) => setNewDeckName(e.target.value)}
               />
               <div className="deck-builder__create-actions">
-                <button 
+                <button
                   className="deck-builder__create-action"
                   onClick={handleCreateDeck}
                 >
                   Create
                 </button>
-                <button 
+                <button
                   className="deck-builder__create-action deck-builder__create-action--cancel"
                   onClick={() => setIsCreatingDeck(false)}
                 >
@@ -389,13 +389,13 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
           </div>
         )}
       </div>
-      
+
       {isEditingDeck && (
         <>
           <div className="deck-builder__current-deck">
             <div className="deck-builder__current-header">
               <h3>Editing: {getActiveDeck()?.name}</h3>
-              <button 
+              <button
                 className="deck-builder__save-button"
                 onClick={handleSaveDeck}
                 disabled={editingDeckSpells.length < MIN_DECK_SIZE}
@@ -403,19 +403,19 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
                 Save Deck
               </button>
             </div>
-            
+
             <div className="deck-builder__deck-slots">
               {editingDeckSpells.map((spell, index) => (
                 <div key={spell.id} className="deck-builder__deck-slot">
-                  <SpellCard 
-                    spell={spell} 
+                  <SpellCard
+                    spell={spell}
                     onClick={() => toggleSpellInDeck(spell)}
                     isEquipped={true}
                     slotNumber={index + 1}
                   />
                 </div>
               ))}
-              
+
               {editingDeckSpells.length < MIN_DECK_SIZE && (
                 <div className="deck-builder__min-size-warning">
                   Add at least {MIN_DECK_SIZE - editingDeckSpells.length} more spell{MIN_DECK_SIZE - editingDeckSpells.length !== 1 ? 's' : ''}
@@ -423,7 +423,7 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
               )}
             </div>
           </div>
-          
+
           <div className="deck-builder__filters">
             <div className="deck-builder__search">
               <input
@@ -433,7 +433,7 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
+
             <div className="deck-builder__filter-group">
               <label>Filter by:</label>
               <select value={filter} onChange={(e) => setFilter(e.target.value)}>
@@ -453,7 +453,7 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
                 <option value="light">Light</option>
               </select>
             </div>
-            
+
             <div className="deck-builder__filter-group">
               <label>Sort by:</label>
               <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
@@ -464,24 +464,24 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
               </select>
             </div>
           </div>
-          
+
           <div className="deck-builder__collection">
             <h3>Spell Collection ({sortedSpells.length} spells)</h3>
             <div className="deck-builder__spells-grid">
               {sortedSpells.map(spell => (
-                <div 
-                  key={spell.id} 
+                <div
+                  key={spell.id}
                   className={`deck-builder__spell ${isSpellInDeck(spell) ? 'deck-builder__spell--in-deck' : ''}`}
                 >
-                  <SpellCard 
-                    spell={spell} 
+                  <SpellCard
+                    spell={spell}
                     onClick={() => toggleSpellInDeck(spell)}
                     isEquipped={isSpellInDeck(spell)}
                     slotNumber={isSpellInDeck(spell) ? getSpellDeckPosition(spell) + 1 : undefined}
                   />
                 </div>
               ))}
-              
+
               {sortedSpells.length === 0 && (
                 <div className="deck-builder__no-spells">
                   No spells match your filter criteria.
@@ -491,7 +491,7 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
           </div>
         </>
       )}
-      
+
       {!isEditingDeck && !isCreatingDeck && (
         <div className="deck-builder__empty-state">
           <p>Select a deck to edit or create a new one</p>
@@ -501,4 +501,4 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ onClose }) => {
   );
 };
 
-export default DeckBuilder; 
+export default DeckBuilder;

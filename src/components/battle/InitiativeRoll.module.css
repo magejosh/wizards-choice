@@ -1,0 +1,815 @@
+.initiativeRollContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-family: 'Cinzel', serif;
+  overflow: hidden;
+}
+
+/* New classes based on our updated component */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  font-family: 'Cinzel', serif;
+}
+
+.modalContent {
+  background-color: #1a1a1a;
+  border: 2px solid #6a3de8;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 30px rgba(106, 61, 232, 0.5);
+  width: 90%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.title {
+  color: #ffffff;
+  font-size: 2rem;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(106, 61, 232, 0.8);
+}
+
+.diceArea {
+  width: 100%;
+  height: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: rgba(20, 20, 40, 0.4);
+  position: relative;
+  perspective: 1200px;
+}
+
+.rollingDice {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  perspective: 1500px;
+  transform-style: preserve-3d;
+}
+
+/* D20 Dice */
+.d20 {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.1s;
+}
+
+.diceFace {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+  border-bottom: 50px solid #222;
+  text-align: center;
+  line-height: 40px;
+  color: #5cdcff;
+  font-weight: bold;
+  font-size: 20px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-origin: center center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Position the faces of the d20 */
+.f1 {
+  transform: translateZ(60px) rotateY(0deg);
+  border-bottom-color: #222;
+}
+
+.f2 {
+  transform: translateZ(-60px) rotateY(180deg) rotateZ(0deg);
+  border-bottom-color: #222;
+}
+
+.f3 {
+  transform: translateX(60px) rotateY(90deg);
+  border-bottom-color: #222;
+}
+
+.f4 {
+  transform: translateX(-60px) rotateY(-90deg);
+  border-bottom-color: #222;
+}
+
+.f5 {
+  transform: translateY(60px) rotateX(-90deg);
+  border-bottom-color: #222;
+}
+
+.f6 {
+  transform: translateY(-60px) rotateX(90deg);
+  border-bottom-color: #222;
+}
+
+.f7 {
+  transform: rotateY(45deg) rotateX(30deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f8 {
+  transform: rotateY(-45deg) rotateX(30deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f9 {
+  transform: rotateY(135deg) rotateX(30deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f10 {
+  transform: rotateY(-135deg) rotateX(30deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f11 {
+  transform: rotateY(45deg) rotateX(-30deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f12 {
+  transform: rotateY(-45deg) rotateX(-30deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f13 {
+  transform: rotateY(135deg) rotateX(-30deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f14 {
+  transform: rotateY(-135deg) rotateX(-30deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f15 {
+  transform: rotateY(90deg) rotateX(60deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f16 {
+  transform: rotateY(-90deg) rotateX(60deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f17 {
+  transform: rotateY(90deg) rotateX(-60deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f18 {
+  transform: rotateY(-90deg) rotateX(-60deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f19 {
+  transform: rotateY(180deg) rotateX(60deg) translateZ(60px);
+  border-bottom-color: #222;
+}
+
+.f20 {
+  transform: rotateY(0deg) rotateX(60deg) translateZ(60px);
+  border-bottom-color: #5cdcff;
+}
+
+.diceFace::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: linear-gradient(145deg, rgba(92, 220, 255, 0.15), rgba(92, 220, 255, 0.05));
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.diceResults {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.diceResult {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: rgba(106, 61, 232, 0.2);
+  border-radius: 4px;
+  animation: fadeIn 0.5s ease-out;
+  box-sizing: border-box;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.resultLabel {
+  font-size: 1.2rem;
+  color: #e1e1e6;
+}
+
+.resultValue {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #ff9e00;
+  text-shadow: 0 0 5px rgba(255, 158, 0, 0.5);
+}
+
+.resultMessage {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffd700;
+  text-align: center;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+  min-height: 40px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+.rollButton, 
+.continueButton {
+  padding: 0.8rem 1.8rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.rollButton {
+  background-color: #6a3de8;
+  color: white;
+  border: 2px solid #8a5dff;
+  box-shadow: 0 0 15px rgba(106, 61, 232, 0.5);
+}
+
+.rollButton:hover {
+  background-color: #8a5dff;
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(106, 61, 232, 0.8);
+}
+
+.continueButton {
+  background-color: #e94560;
+  color: white;
+  border: 2px solid #ff6b84;
+  box-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.continueButton:hover {
+  background-color: #ff6b84;
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(233, 69, 96, 0.8);
+}
+
+/* Dice section */
+.diceSection {
+  margin: 20px 0;
+  min-height: 200px;
+  position: relative;
+}
+
+/* 3D Dice styles */
+.diceCanvas {
+  width: 100%;
+  height: 250px;
+  position: relative;
+  background-color: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+/* Fallback dice styles */
+.fallbackDice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.diceRow {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.diceColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.diceLabel {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #c8a2c8;
+}
+
+.d20Dice {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: white;
+  position: relative;
+  margin: 0 auto 10px;
+  
+  /* Create an icosahedron (d20) shape using clip-path */
+  clip-path: polygon(
+    50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
+  );
+  
+  /* Add depth with multiple borders */
+  box-shadow: 
+    0 0 15px rgba(157, 78, 221, 0.6),
+    inset 0 0 10px rgba(255, 255, 255, 0.3);
+  
+  /* Add a background with gradient */
+  background: linear-gradient(135deg, #6a4c93, #9d4edd);
+  
+  /* Add cursor and hover effect to make it more clickable */
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.d20Dice:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 0 20px rgba(157, 78, 221, 0.8),
+    inset 0 0 12px rgba(255, 255, 255, 0.4);
+}
+
+.d20Dice:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 0 10px rgba(157, 78, 221, 0.5),
+    inset 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+/* Player dice variation */
+.playerDice {
+  background: linear-gradient(135deg, #7b2cbf, #c77dff);
+}
+
+/* Enemy dice variation */
+.enemyDice {
+  background: linear-gradient(135deg, #3a0ca3, #4361ee);
+}
+
+/* Results display */
+.resultDisplay {
+  margin: 20px 0;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: rgba(106, 76, 147, 0.2);
+}
+
+.resultDisplay h3 {
+  color: #ff9e00;
+  font-size: 1.5rem;
+  margin: 0 0 10px 0;
+  text-shadow: 0 0 5px rgba(255, 158, 0, 0.5);
+}
+
+.resultDetails {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.resultDetails span {
+  font-size: 1rem;
+}
+
+.resultDetails strong {
+  color: #ff9e00;
+  font-size: 1.2rem;
+}
+
+/* Controls section */
+.controls {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.actionButton {
+  background: linear-gradient(to bottom, #9d4edd, #7b2cbf);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 10px rgba(157, 78, 221, 0.3);
+}
+
+.actionButton:hover {
+  background: linear-gradient(to bottom, #c77dff, #9d4edd);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 15px rgba(157, 78, 221, 0.5);
+}
+
+.actionButton:active {
+  transform: translateY(0);
+}
+
+.loadingText {
+  color: #c8a2c8;
+  font-style: italic;
+  padding: 10px;
+}
+
+.errorMessage {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 0.9rem;
+}
+
+/* Keep existing classes below */
+.initiativeTitle {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.initiativeTitle h2 {
+  font-size: 2.5rem;
+  color: #6a3de8;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px rgba(106, 61, 232, 0.8);
+}
+
+.initiativeTitle p {
+  font-size: 1.2rem;
+  color: #e1e1e6;
+}
+
+.diceContainer {
+  width: 100%;
+  height: 60%;
+  max-height: 500px;
+  max-width: 800px;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #6a3de8;
+  box-shadow: 0 0 30px rgba(106, 61, 232, 0.5);
+}
+
+.rollResults {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  background-color: rgba(20, 20, 40, 0.8);
+  padding: 15px 30px;
+  border-radius: 10px;
+  border: 1px solid rgba(106, 61, 232, 0.6);
+}
+
+.playerRoll, .enemyRoll {
+  display: flex;
+  justify-content: space-between;
+  width: 200px;
+  margin-bottom: 10px;
+}
+
+.rollLabel {
+  font-weight: bold;
+  color: #e1e1e6;
+}
+
+.rollValue {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.playerRoll .rollValue {
+  color: #ff5555;
+}
+
+.enemyRoll .rollValue {
+  color: #5555ff;
+}
+
+.initiativeResult {
+  font-size: 1.5rem;
+  margin-top: 15px;
+  color: #e94560;
+  font-weight: bold;
+  text-shadow: 0 0 5px rgba(233, 69, 96, 0.7);
+}
+
+.closeButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(233, 69, 96, 0.2);
+  border: 2px solid #e94560;
+  color: white;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1010;
+}
+
+.closeButton:hover {
+  background-color: rgba(233, 69, 96, 0.6);
+  transform: scale(1.1);
+}
+
+.rollButton, .continueButton {
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-family: 'Cinzel', serif;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 15px rgba(106, 61, 232, 0.5);
+  margin: 0 10px;
+}
+
+.rollButton {
+  background-color: #6a3de8;
+  color: white;
+  border: 2px solid #8a5dff;
+}
+
+.rollButton:hover {
+  background-color: #8a5dff;
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(106, 61, 232, 0.8);
+}
+
+.continueButton {
+  background-color: #e94560;
+  color: white;
+  border: 2px solid #ff6b84;
+}
+
+.continueButton:hover {
+  background-color: #ff6b84;
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(233, 69, 96, 0.8);
+}
+
+@media (max-width: 768px) {
+  .initiativeTitle h2 {
+    font-size: 1.8rem;
+  }
+  
+  .initiativeTitle p {
+    font-size: 1rem;
+  }
+  
+  .diceContainer {
+    height: 50%;
+  }
+  
+  .rollResults {
+    padding: 10px 20px;
+  }
+  
+  .playerRoll, .enemyRoll {
+    width: 180px;
+  }
+  
+  .initiativeResult {
+    font-size: 1.2rem;
+  }
+  
+  .closeButton {
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    font-size: 1.2rem;
+  }
+  
+  .rollButton, .continueButton {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+}
+
+/* DicePicker styles */
+.diceCanvas {
+  width: 100%;
+  height: 250px;
+  position: relative;
+  background-color: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+/* Ensure DicePicker buttons are visible */
+.diceCanvas :global(.dice-picker) {
+  background-color: rgba(26, 26, 46, 0.8) !important;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.diceCanvas :global(.dice-picker button) {
+  background: linear-gradient(to bottom, #9d4edd, #7b2cbf);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 16px;
+  margin: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.diceCanvas :global(.dice-picker button:hover) {
+  background: linear-gradient(to bottom, #c77dff, #9d4edd);
+  transform: translateY(-2px);
+}
+
+.diceCanvas :global(.dice-picker .dice-count) {
+  color: white;
+  font-size: 1.2rem;
+  margin: 0 8px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+}
+
+.diceCanvas {
+  width: 100%;
+  height: 300px;
+  position: relative;
+  background-color: rgba(26, 26, 46, 0.8);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#diceContainer {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.rollButton {
+  position: relative;
+  z-index: 10;
+  margin-top: auto;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(to bottom, #9d4edd, #7b2cbf);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rollButton:hover:not(:disabled) {
+  background: linear-gradient(to bottom, #c77dff, #9d4edd);
+  transform: translateY(-2px);
+}
+
+.rollButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+}
+
+.message {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+}
+
+.continueButton {
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(to bottom, #4CAF50, #388E3C);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.continueButton:hover:not(:disabled) {
+  background: linear-gradient(to bottom, #66BB6A, #4CAF50);
+  transform: translateY(-2px);
+}
+
+.continueButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+} 

@@ -36,9 +36,9 @@ Main tasks are not to be marked complete until all subtasks are completed.
 
 ## Project Management
 - [ ] Update all documentation
-  - [ ] Clear all completed tasks from the docs/todo.md and move any remaining tasks to the todo.md in the project root at the bottom of the file. 
-  - [ ] Create a checklist of all files in the project using the docs/todo.md 
-  - [ ] Create a checklist of all docs files in the project using the docs/todo.md 
+  - [ ] Clear all completed tasks from the docs/todo.md and move any remaining tasks to the todo.md in the project root at the bottom of the file.
+  - [ ] Create a checklist of all files in the project using the docs/todo.md
+  - [ ] Create a checklist of all docs files in the project using the docs/todo.md
   - [ ] Compare the code in each file with each of the docs one at a time, step by step to verify accuracy of the docs to the actual code in the project and correct any errors in the docs without removing any information that might be from intended but unimplemented features. Note these in the docs/todo.md as up to two line comments at the bottom of the file.
   - [ ] Review and update deployment instructions.
 
@@ -55,3 +55,22 @@ Main tasks are not to be marked complete until all subtasks are completed.
 - [ ] Create deployment pipeline
 - [ ] User testing and feedback
 - [ ] Documentation updates
+
+## Future Features (From Archived Todo)
+- [ ] Implement spell progression tech tree system
+  - [ ] Design PoE-style spell tree with wizard at center
+  - [ ] Create data structure for spell nodes and connections
+  - [ ] Implement level-up point system for purchasing connected spells
+  - [ ] Design visual tech tree UI with connection paths and node states
+  - [ ] Add navigation and interaction for the spell tech tree
+
+- [ ] Add more enemy types
+  - [ ] Design new enemy wizards with unique abilities
+  - [ ] Create specialized AI strategies for each enemy
+  - [ ] Add visual representations for new enemies
+  - [ ] Implement enemy-specific loot tables
+
+- [ ] Create procedural content generation
+- [ ] Implement multiple difficulty levels
+- [ ] Balance spell system
+- [ ] Package game for download

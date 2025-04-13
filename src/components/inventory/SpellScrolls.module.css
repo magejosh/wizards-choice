@@ -1,8 +1,8 @@
 .scrollGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+  padding: 0.5rem;
 }
 
 .emptyScrolls {
@@ -10,135 +10,223 @@
   align-items: center;
   justify-content: center;
   height: 200px;
-  color: var(--muted-foreground);
+  color: #8a5dff;
   font-style: italic;
-  border: 2px dashed var(--border);
-  border-radius: 0.5rem;
+  border: 2px dashed #5a3a8e;
+  border-radius: 8px;
   margin: 1rem;
+  background: rgba(58, 42, 94, 0.3);
+  text-align: center;
+  padding: 1rem;
 }
 
 .scrollCard {
+  width: 100%;
+  aspect-ratio: 2/3;
+  background-color: #1a1a2e;
+  border-radius: 8px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
+  position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  color: #fff;
+  max-width: 180px;
+  margin: 0 auto;
+  border-left: 3px solid #c13bff;
 }
 
 .scrollCard:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: #d070ff;
 }
 
 .scrollHeader {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
+  min-height: 0;
 }
 
 .scrollName {
-  font-weight: 600;
-  color: var(--foreground);
+  font-size: 12px;
   margin: 0;
-  font-size: 1.1rem;
+  padding: 0;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  color: #fff;
+  line-height: 1;
+  max-width: 100%;
 }
 
-.rarity {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
+.rarityBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
   text-transform: capitalize;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }
 
 .common {
-  background-color: var(--common);
-  color: var(--common-foreground);
+  color: #aaaaaa;
 }
 
 .uncommon {
-  background-color: var(--uncommon);
-  color: var(--uncommon-foreground);
+  color: #1eff00;
 }
 
 .rare {
-  background-color: var(--rare);
-  color: var(--rare-foreground);
+  color: #0070dd;
 }
 
 .epic {
-  background-color: var(--epic);
-  color: var(--epic-foreground);
+  color: #a335ee;
 }
 
 .legendary {
-  background-color: var(--legendary);
-  color: var(--legendary-foreground);
+  color: #ff8000;
+}
+
+.scrollImage {
+  position: relative;
+  height: 100px;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  margin: 6px 0;
+}
+
+.scrollImage::before {
+  content: '📜';
+  font-size: 32px;
 }
 
 .spellInfo {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 4px;
+  flex: 1;
+  overflow: hidden;
 }
 
 .spellName {
-  font-weight: 600;
-  color: var(--foreground);
-  font-size: 1rem;
+  font-weight: bold;
+  color: #c13bff;
+  font-size: 12px;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  font-style: italic;
 }
 
 .spellDetails {
   display: flex;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: var(--muted-foreground);
+  justify-content: space-between;
+  padding: 4px 6px;
+  background-color: rgba(0, 0, 0, 0.7);
+  font-size: 10px;
+  margin-bottom: 2px;
+  border-radius: 4px;
 }
 
 .spellType,
 .spellElement,
-.spellTier {
-  padding: 0.25rem 0.5rem;
-  background-color: var(--secondary);
-  border-radius: 0.25rem;
+.spellTier,
+.rarity,
+.quantity {
+  padding: 2px 6px;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, 0.2);
   text-transform: capitalize;
+  font-weight: bold;
+  font-size: 11px;
 }
 
 .spellDescription {
-  font-size: 0.875rem;
-  color: var(--muted-foreground);
+  font-size: 11px;
+  color: #ccc;
   line-height: 1.4;
+  overflow-y: auto;
+  max-height: 50px;
+  margin-bottom: 4px;
+  padding: 2px 4px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
 }
 
 .scrollActions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   margin-top: auto;
 }
 
 .useButton {
   width: 100%;
+  background: linear-gradient(to bottom, #6a3de8, #5a2dd8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.useButton:hover {
+  background: linear-gradient(to bottom, #7a4df8, #6a3de8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .scrollGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 0.75rem;
-    padding: 0.5rem;
+    padding: 0.25rem;
   }
 
   .scrollCard {
-    padding: 0.75rem;
+    max-width: 150px;
+  }
+
+  .scrollImage {
+    height: 80px;
+  }
+
+  .spellDescription {
+    max-height: 40px;
   }
 
   .scrollName {
-    font-size: 1rem;
+    font-size: 10px;
   }
 
-  .spellDetails {
-    flex-wrap: wrap;
+  .spellType,
+  .spellElement,
+  .spellTier {
+    font-size: 10px;
   }
-} 
+}

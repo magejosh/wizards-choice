@@ -115,7 +115,7 @@ const SpellCard: React.FC<SpellCardProps> = ({
         </div>
       </div>
 
-      {isEquipped && (
+      {isEquipped && slotNumber === undefined && (
         <div className={styles.equippedBadge}>Equipped</div>
       )}
     </div>

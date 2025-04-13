@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Ingredient } from '@/lib/types';
 import styles from './Ingredients.module.css';
 
@@ -22,15 +21,18 @@ export function Ingredients({ ingredients, onUseIngredient }: IngredientsProps) 
     <div className={styles.ingredientsGrid}>
       {ingredients.map((ingredient) => (
         <Card key={ingredient.id} className={styles.ingredientCard}>
+
+
           <div className={styles.ingredientHeader}>
             <h3 className={styles.ingredientName}>{ingredient.name}</h3>
-            <span className={`${styles.rarity} ${styles[ingredient.rarity]}`}>
-              {ingredient.rarity}
-            </span>
           </div>
+
+          <div className={styles.ingredientImage}></div>
+
           <div className={styles.ingredientInfo}>
             <div className={styles.ingredientDetails}>
               <span className={styles.category}>{ingredient.category}</span>
+              <span className={`${styles.rarity} ${styles[ingredient.rarity]}`}>{ingredient.rarity}</span>
               <span className={styles.quantity}>x{ingredient.quantity}</span>
             </div>
             <p className={styles.description}>{ingredient.description}</p>
@@ -43,16 +45,15 @@ export function Ingredients({ ingredients, onUseIngredient }: IngredientsProps) 
             </div>
           </div>
           <div className={styles.ingredientActions}>
-            <Button
-              variant="outline"
+            <button
               className={styles.useButton}
               onClick={() => onUseIngredient(ingredient)}
             >
               Use Ingredient
-            </Button>
+            </button>
           </div>
         </Card>
       ))}
     </div>
   );
-} 
+}

@@ -1,92 +1,184 @@
 .equipmentSlots {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.5rem;
+  padding: 0.5rem;
 }
 
 .slotCard {
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  transition: all 0.2s ease;
+  width: 100%;
+  aspect-ratio: 2/3;
+  background-color: #1a1a2e;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  color: #fff;
+  max-width: 180px;
+  margin: 0 auto;
+  border-left: 3px solid #8a4fff;
 }
 
 .slotCard:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: #9370DB;
 }
 
 .slotHeader {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
+  min-height: 0;
 }
 
 .slotLabel {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--foreground);
+  font-size: 14px;
   margin: 0;
+  padding: 0;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  color: #fff;
+  line-height: 1;
 }
 
 .unequipButton {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
+  width: 100%;
+  background: linear-gradient(to bottom, #6a3de8, #5a2dd8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin-top: auto;
+}
+
+.unequipButton:hover {
+  background: linear-gradient(to bottom, #7a4df8, #6a3de8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 .slotContent {
-  min-height: 100px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin: 8px 0;
+  overflow: hidden;
 }
 
 .emptySlot {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100px;
-  color: var(--muted-foreground);
+  flex: 1;
+  color: #8a5dff;
   font-style: italic;
-  border: 2px dashed var(--border);
-  border-radius: 0.25rem;
+  border: 2px dashed #5a3a8e;
+  border-radius: 4px;
+  background: rgba(58, 42, 94, 0.3);
+  font-size: 12px;
+  padding: 8px;
 }
 
 .equippedItem {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 4px;
+  flex: 1;
+  position: relative;
 }
 
 .itemName {
-  font-weight: 600;
-  color: var(--foreground);
+  font-weight: bold;
+  color: #ffffff;
+  font-size: 12px;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin-bottom: 4px;
 }
 
 .itemRarity {
-  font-size: 0.875rem;
-  color: var(--muted-foreground);
+  font-size: 11px;
   text-transform: capitalize;
+  text-align: center;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.itemRarity[data-rarity="common"] {
+  color: #aaaaaa;
+}
+
+.itemRarity[data-rarity="uncommon"] {
+  color: #1eff00;
+}
+
+.itemRarity[data-rarity="rare"] {
+  color: #0070dd;
+}
+
+.itemRarity[data-rarity="epic"] {
+  color: #a335ee;
+}
+
+.itemRarity[data-rarity="legendary"] {
+  color: #ff8000;
 }
 
 .itemBonuses {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.875rem;
+  gap: 4px;
+  font-size: 11px;
+  margin: 6px 0;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 60px;
 }
 
 .bonus {
-  color: var(--muted-foreground);
+  padding: 2px 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  font-size: 11px;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .equipmentSlots {
-    grid-template-columns: 1fr;
-    padding: 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.5rem;
+    padding: 0.25rem;
   }
 
   .slotCard {
-    padding: 0.75rem;
+    max-width: 150px;
   }
-} 
+
+  .itemBonuses {
+    max-height: 50px;
+  }
+
+  .slotLabel {
+    font-size: 12px;
+  }
+}

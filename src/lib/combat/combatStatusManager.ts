@@ -72,16 +72,19 @@ export function calculateExperienceGained(state: CombatState): number {
     return 0;
   }
 
-  const enemyValue = state.enemyWizard.wizard.level * 10;
+  // Calculate base experience from enemy level
+  const enemyLevelValue = state.enemyWizard.wizard.level * 5;
 
-  // Apply difficulty multiplier
+  // Apply difficulty multiplier to a fixed value
   const difficultyMultiplier = {
     easy: 10,
     normal: 1,
     hard: 0.1,
   }[state.difficulty];
 
-  const experience = Math.floor(enemyValue * difficultyMultiplier);
-  console.log('Combat experience calculated:', experience);
+  // New formula: (enemy level × 5) + (10 × difficulty modifier)
+  const difficultyValue = 10 * difficultyMultiplier;
+  const experience = Math.floor(enemyLevelValue + difficultyValue);
+  console.log(`Combat experience calculated: ${enemyLevelValue} (enemy level) + ${difficultyValue} (difficulty) = ${experience}`);
   return experience;
 }

@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import { 
-  MarketLocation, 
-  MarketInventory, 
-  MarketItem, 
+import {
+  MarketLocation,
+  MarketInventory,
+  MarketItem,
   MarketTransaction,
   Ingredient,
   Potion,
@@ -62,7 +62,7 @@ function generateMarketId(name: string): string {
  */
 export function initializeMarkets(): MarketLocation[] {
   const today = new Date().toISOString();
-  
+
   const createMarket = (
     id: string,
     name: string,
@@ -74,26 +74,29 @@ export function initializeMarkets(): MarketLocation[] {
   ): MarketLocation => {
     const inventory = generateMarketInventory(unlockLevel);
     const prices: Record<string, number> = {};
-    
+
     // Initialize prices from inventory
     inventory.ingredients.forEach(item => {
       prices[item.item.id] = item.currentPrice;
     });
-    
+
     inventory.potions.forEach(item => {
       prices[item.item.id] = item.currentPrice;
     });
-    
+
     inventory.equipment.forEach(item => {
       prices[item.item.id] = item.currentPrice;
     });
-    
+
     if (inventory.scrolls) {
       inventory.scrolls.forEach(item => {
         prices[item.item.id] = item.currentPrice;
       });
     }
-    
+
+    // Calculate base gold based on market level and specialization
+    const baseGold = 1000 * unlockLevel;
+
     return {
       id,
       name,
@@ -106,10 +109,11 @@ export function initializeMarkets(): MarketLocation[] {
       inventory,
       priceMultiplier,
       prices,
-      sellPriceMultiplier: 0.6 // Default sell price is 60% of buy price
+      sellPriceMultiplier: 0.6, // Default sell price is 60% of buy price
+      currentGold: baseGold // Amount of gold the market has available for buying items from player
     };
   };
-  
+
   return [
     createMarket(
       'market-1',
@@ -300,31 +304,31 @@ const calculateBasePrice = (item: any, level: number): number => {
 export function updateMarketPrices(market: MarketLocation): MarketLocation {
   const updatedMarket = { ...market };
   const priceMultiplier = 1 + (Math.random() * 0.2 - 0.1); // ±10% price variation
-  
+
   // Initialize prices if undefined
   if (!updatedMarket.prices) {
     updatedMarket.prices = {};
   }
-  
+
   // Update prices for all items in inventory
   updatedMarket.inventory.ingredients.forEach(item => {
     updatedMarket.prices[item.item.id] = Math.round(item.currentPrice * priceMultiplier);
   });
-  
+
   updatedMarket.inventory.potions.forEach(item => {
     updatedMarket.prices[item.item.id] = Math.round(item.currentPrice * priceMultiplier);
   });
-  
+
   updatedMarket.inventory.equipment.forEach(item => {
     updatedMarket.prices[item.item.id] = Math.round(item.currentPrice * priceMultiplier);
   });
-  
+
   if (updatedMarket.inventory.scrolls) {
     updatedMarket.inventory.scrolls.forEach(item => {
       updatedMarket.prices[item.item.id] = Math.round(item.currentPrice * priceMultiplier);
     });
   }
-  
+
   return updatedMarket;
 }
 
@@ -369,10 +373,10 @@ export function createTransaction(
 export function shouldRefreshMarketInventory(market: MarketLocation): boolean {
   const lastRefreshed = new Date(market.lastRefreshed);
   const today = new Date();
-  
+
   // Calculate days since last refresh
   const daysSinceRefresh = Math.floor((today.getTime() - lastRefreshed.getTime()) / (1000 * 60 * 60 * 24));
-  
+
   return daysSinceRefresh >= market.inventoryRefreshDays;
 }
 
@@ -385,7 +389,10 @@ export function refreshMarketInventory(market: MarketLocation): MarketLocation {
   const updatedMarket = { ...market };
   updatedMarket.inventory = generateMarketInventory(market.unlockLevel);
   updatedMarket.lastRefreshed = new Date().toISOString();
-  
+
+  // Reset market gold based on level
+  updatedMarket.currentGold = 1000 * market.unlockLevel;
+
   // Update prices
   updatedMarket.prices = {};
   updatedMarket.inventory.ingredients.forEach(item => {
@@ -402,6 +409,6 @@ export function refreshMarketInventory(market: MarketLocation): MarketLocation {
       updatedMarket.prices[item.item.id] = item.currentPrice;
     });
   }
-  
+
   return updatedMarket;
-} 
+}

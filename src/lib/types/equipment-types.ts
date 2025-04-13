@@ -52,6 +52,7 @@ export interface Equipment {
   requiredLevel?: number;
   requiredAchievements?: string[];
   requiredStats?: { stat: string; value: number; }[];
+  quantity?: number; // For stackable items
   bonus?: {
     health?: number;
     mana?: number;
@@ -78,6 +79,7 @@ export interface Potion {
   };
   description: string;
   imagePath?: string;
+  quantity?: number;
 }
 
 /**
@@ -120,4 +122,4 @@ export interface PotionRecipe {
   }[];
   discovered: boolean;
   description: string;
-} 
+}

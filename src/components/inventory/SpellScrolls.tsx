@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { SpellScroll } from '@/lib/types';
 import styles from './SpellScrolls.module.css';
 
@@ -24,21 +23,25 @@ export function SpellScrolls({ scrolls, onUseScroll }: SpellScrollsProps) {
     <div className={styles.scrollGrid}>
       {scrolls.map((scroll) => (
         <Card key={scroll.id} className={styles.scrollCard}>
+
+
           <div className={styles.scrollHeader}>
-            <h3 className={styles.scrollName}>{scroll.name}</h3>
-            <span className={`${styles.rarity} ${styles[scroll.rarity]}`}>
-              {scroll.rarity}
-            </span>
+            <h3 className={styles.scrollName}>{scroll.spell.name}</h3>
           </div>
+
+          <div className={styles.scrollImage}></div>
 
           <div className={styles.spellInfo}>
             <div className={styles.spellName}>
-              {scroll.spell.name}
+              Spell Scroll
             </div>
             <div className={styles.spellDetails}>
               <span className={styles.spellType}>{scroll.spell.type}</span>
+              <span className={`${styles.rarity} ${styles[scroll.rarity]}`}>{scroll.rarity}</span>
               <span className={styles.spellElement}>{scroll.spell.element}</span>
-              <span className={styles.spellTier}>Tier {scroll.spell.tier}</span>
+              {scroll.quantity && scroll.quantity > 1 && (
+                <span className={styles.quantity}>x{scroll.quantity}</span>
+              )}
             </div>
             <div className={styles.spellDescription}>
               {scroll.spell.description}
@@ -46,17 +49,15 @@ export function SpellScrolls({ scrolls, onUseScroll }: SpellScrollsProps) {
           </div>
 
           <div className={styles.scrollActions}>
-            <Button
-              variant="default"
-              size="sm"
+            <button
               onClick={() => onUseScroll(scroll)}
               className={styles.useButton}
             >
               {scroll.isConsumable ? 'Use Scroll' : 'Learn Spell'}
-            </Button>
+            </button>
           </div>
         </Card>
       ))}
     </div>
   );
-} 
+}

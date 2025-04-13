@@ -40,11 +40,11 @@ export function Inventory({
     <Card className={styles.inventoryContainer}>
       <Tabs defaultValue="equipment" className={styles.tabs}>
         <TabsList className={styles.tabsList}>
-          <TabsTrigger value="equipment">Equipment</TabsTrigger>
-          <TabsTrigger value="items">Items</TabsTrigger>
-          <TabsTrigger value="scrolls">Spell Scrolls</TabsTrigger>
-          <TabsTrigger value="ingredients">Ingredients</TabsTrigger>
-          <TabsTrigger value="potions">Potions</TabsTrigger>
+          <TabsTrigger value="equipment" className={styles.tabsTrigger}>Equipment</TabsTrigger>
+          <TabsTrigger value="items" className={styles.tabsTrigger}>Items</TabsTrigger>
+          <TabsTrigger value="scrolls" className={styles.tabsTrigger}>Spell Scrolls</TabsTrigger>
+          <TabsTrigger value="ingredients" className={styles.tabsTrigger}>Ingredients</TabsTrigger>
+          <TabsTrigger value="potions" className={styles.tabsTrigger}>Potions</TabsTrigger>
         </TabsList>
 
         <TabsContent value="equipment" className={styles.tabContent}>
@@ -85,4 +85,4 @@ export function Inventory({
       </Tabs>
     </Card>
   );
-} 
+}

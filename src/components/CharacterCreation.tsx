@@ -6,12 +6,14 @@ interface CharacterCreationProps {
   onComplete: (name: string) => void;
   onCancel: () => void;
   saveSlotId: number;
+  saveUuid?: string;  // Optional UUID for the save slot
 }
 
 const CharacterCreation: React.FC<CharacterCreationProps> = ({
   onComplete,
   onCancel,
-  saveSlotId
+  saveSlotId,
+  saveUuid
 }) => {
   const [name, setName] = useState('');
   const { initializeNewGame } = useGameStateStore();
@@ -19,7 +21,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      console.log(`CharacterCreation: Creating character "${name}" in slot ${saveSlotId}`);
+      console.log(`CharacterCreation: Creating character "${name}" in slot ${saveSlotId} with UUID ${saveUuid}`);
       initializeNewGame(name, saveSlotId);
       onComplete(name);
     }
@@ -30,7 +32,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({
       <div className="name-input-content">
         <h2 className="modal-title">Create Your Character</h2>
         <p className="name-input-subtitle">Choose a name for your wizard</p>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="name-input-field">
             <label htmlFor="characterName">Character Name:</label>
@@ -43,7 +45,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({
               autoFocus
             />
           </div>
-          
+
           <div className="name-input-buttons">
             <button
               type="button"

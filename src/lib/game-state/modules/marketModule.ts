@@ -7,6 +7,7 @@ import { SpellScroll, Spell } from '../../types/spell-types';
 import { Wizard } from '../../types/wizard-types';
 import { generateDefaultWizard } from '../../wizard/wizardUtils';
 import { refreshMarketInventory as importedRefreshMarketInventory } from '../../features/market/marketSystem';
+import { getWizard, updateWizard, updateGameProgress } from '../gameStateStore';
 
 // Define the slice of state this module manages
 export interface MarketState {
@@ -67,14 +68,14 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
     set((state: any) => {
       const markets = [...state.gameState.markets];
       const marketIndex = markets.findIndex(m => m.id === marketId);
-      
+
       if (marketIndex === -1) return state;
-      
+
       markets[marketIndex] = {
         ...markets[marketIndex],
         ...updatedMarket
       };
-      
+
       return {
         gameState: {
           ...state.gameState,
@@ -85,81 +86,88 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
   },
 
   getPlayerGold: () => {
-    return get().gameState.marketData.gold;
+    // Use the getWizard function to get the player data
+    const player = getWizard();
+    return player?.gold || 0;
   },
 
   updatePlayerGold: (amount) => {
-    set((state: any) => ({
-      gameState: {
-        ...state.gameState,
-        marketData: {
-          ...state.gameState.marketData,
-          gold: amount
-        }
-      }
+    // Use the updateWizard function to update the player data
+    const player = getWizard();
+    if (!player) return;
+
+    updateWizard(wizard => ({
+      ...wizard,
+      gold: amount
     }));
   },
 
   addGold: (amount) => {
-    set((state: any) => {
-      const currentGold = state.gameState.marketData.gold;
-      
-      // Update player stats
-      const playerStats = state.gameState.gameProgress.playerStats
-        ? {
-            ...state.gameState.gameProgress.playerStats,
-            goldEarned: state.gameState.gameProgress.playerStats.goldEarned + amount
-          }
-        : undefined;
-      
+    // Use the updateWizard function to update the player data
+    const player = getWizard();
+    if (!player) return;
+
+    const currentGold = player.gold || 0;
+
+    // Update the player data
+    updateWizard(wizard => ({
+      ...wizard,
+      gold: currentGold + amount
+    }));
+
+    // Update the game progress data
+    updateGameProgress(gameProgress => {
+      if (!gameProgress) return gameProgress;
+
+      // Create a new playerStats object with updated gold earned
+      const updatedPlayerStats = {
+        ...gameProgress.playerStats,
+        goldEarned: (gameProgress.playerStats?.goldEarned || 0) + amount
+      };
+
+      // Return the updated game progress
       return {
-        gameState: {
-          ...state.gameState,
-          marketData: {
-            ...state.gameState.marketData,
-            gold: currentGold + amount
-          },
-          gameProgress: {
-            ...state.gameState.gameProgress,
-            playerStats: playerStats || state.gameState.gameProgress.playerStats
-          }
-        }
+        ...gameProgress,
+        playerStats: updatedPlayerStats
       };
     });
   },
 
   removeGold: (amount) => {
-    const currentGold = get().gameState.marketData.gold;
-    
+    // Use the getWizard function to get the player data
+    const player = getWizard();
+    if (!player) return false;
+
+    const currentGold = player.gold || 0;
+
     // Check if player has enough gold
     if (currentGold < amount) {
       return false;
     }
-    
-    set((state: any) => {
-      // Update player stats
-      const playerStats = state.gameState.gameProgress.playerStats
-        ? {
-            ...state.gameState.gameProgress.playerStats,
-            goldSpent: state.gameState.gameProgress.playerStats.goldSpent + amount
-          }
-        : undefined;
-      
+
+    // Update the player data
+    updateWizard(wizard => ({
+      ...wizard,
+      gold: currentGold - amount
+    }));
+
+    // Update the game progress data
+    updateGameProgress(gameProgress => {
+      if (!gameProgress) return gameProgress;
+
+      // Create a new playerStats object with updated gold spent
+      const updatedPlayerStats = {
+        ...gameProgress.playerStats,
+        goldSpent: (gameProgress.playerStats?.goldSpent || 0) + amount
+      };
+
+      // Return the updated game progress
       return {
-        gameState: {
-          ...state.gameState,
-          marketData: {
-            ...state.gameState.marketData,
-            gold: currentGold - amount
-          },
-          gameProgress: {
-            ...state.gameState.gameProgress,
-            playerStats: playerStats || state.gameState.gameProgress.playerStats
-          }
-        }
+        ...gameProgress,
+        playerStats: updatedPlayerStats
       };
     });
-    
+
     return true;
   },
 
@@ -170,7 +178,7 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
         id: generateId(),
         date: new Date().toISOString()
       };
-      
+
       return {
         gameState: {
           ...state.gameState,
@@ -189,23 +197,23 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
   visitMarket: (marketId) => {
     const markets = get().gameState.markets || [];
     const marketIndex = markets.findIndex(m => m.id === marketId);
-    
+
     if (marketIndex === -1) {
       console.error(`Market not found: ${marketId}`);
       return false;
     }
-    
+
     const market = markets[marketIndex];
     console.log(`Visiting market: ${market.name}`);
-    
+
     // Properly check if market inventory needs initialization
-    const needsInventory = 
-      !market.inventory || 
+    const needsInventory =
+      !market.inventory ||
       !Array.isArray(market.inventory.ingredients) || market.inventory.ingredients.length === 0 ||
       !Array.isArray(market.inventory.potions) || market.inventory.potions.length === 0 ||
       !Array.isArray(market.inventory.equipment) || market.inventory.equipment.length === 0 ||
       !Array.isArray(market.inventory.scrolls) || market.inventory.scrolls.length === 0;
-    
+
     if (needsInventory) {
       console.log(`Initializing inventory for market: ${market.name}, level ${market.unlockLevel}`);
       try {
@@ -216,14 +224,14 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
           name: market.name,
           unlockLevel: market.unlockLevel
         }));
-        
+
         // Use the imported function that takes a market parameter
         const updatedMarket = generateMarketInventory(market);
-        
+
         if (updatedMarket && updatedMarket.inventory) {
           markets[marketIndex] = updatedMarket;
           console.log(`Market inventory refreshed successfully with:
-            ${updatedMarket.inventory.ingredients.length} ingredients, 
+            ${updatedMarket.inventory.ingredients.length} ingredients,
             ${updatedMarket.inventory.potions.length} potions,
             ${updatedMarket.inventory.equipment.length} equipment,
             ${updatedMarket.inventory.scrolls.length} scrolls`
@@ -237,18 +245,18 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
             equipment: [],
             scrolls: []
           };
-          
+
           // Generate some basic inventory
           const level = market.unlockLevel || 1;
-          
+
           // Import the require inventory generation functions
-          const { 
-            generateRandomIngredient, 
+          const {
+            generateRandomIngredient,
             generateRandomPotion,
             generateRandomEquipment,
-            generateRandomScroll 
+            generateRandomScroll
           } = require('../../features/items/itemGenerators');
-          
+
           // Populate with basic items
           for (let i = 0; i < 5; i++) {
             newInventory.ingredients.push({
@@ -259,7 +267,7 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
               demand: 'moderate',
               priceHistory: [50]
             });
-            
+
             if (i < 3) {
               newInventory.potions.push({
                 item: generateRandomPotion(level),
@@ -270,7 +278,7 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
                 priceHistory: [100]
               });
             }
-            
+
             if (i < 2) {
               newInventory.equipment.push({
                 item: generateRandomEquipment(level),
@@ -281,7 +289,7 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
                 priceHistory: [200]
               });
             }
-            
+
             if (i < 1) {
               newInventory.scrolls.push({
                 item: generateRandomScroll(level),
@@ -293,18 +301,18 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
               });
             }
           }
-          
+
           markets[marketIndex] = {
             ...market,
             inventory: newInventory,
             lastRefreshed: new Date().toISOString()
           };
-          
+
           console.log('Fallback inventory generation complete');
         }
       } catch (err) {
         console.error('Error generating market inventory:', err);
-        
+
         // Create a minimal inventory to prevent crashes
         const minimalInventory = {
           ingredients: [],
@@ -346,25 +354,25 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
           }],
           scrolls: []
         };
-        
+
         markets[marketIndex] = {
           ...market,
           inventory: minimalInventory,
           lastRefreshed: new Date().toISOString()
         };
-        
+
         console.log('Created minimal inventory due to error');
       }
     }
-    
+
     set((state: any) => {
       const visitedMarkets = [...(state.gameState.marketData.visitedMarkets || [])];
-      
+
       // Add to visited markets if not already there
       if (!visitedMarkets.includes(marketId)) {
         visitedMarkets.push(marketId);
       }
-      
+
       return {
         gameState: {
           ...state.gameState,
@@ -376,14 +384,14 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
         }
       };
     });
-    
+
     return true;
   },
 
   toggleFavoriteMarket: (marketId) => {
     set((state: any) => {
       const favoriteMarkets = [...state.gameState.marketData.favoriteMarkets];
-      
+
       // Toggle favorite status
       if (favoriteMarkets.includes(marketId)) {
         const index = favoriteMarkets.indexOf(marketId);
@@ -391,7 +399,7 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
       } else {
         favoriteMarkets.push(marketId);
       }
-      
+
       return {
         gameState: {
           ...state.gameState,
@@ -408,24 +416,24 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
     set((state: any) => {
       const markets = [...state.gameState.markets];
       const marketIndex = markets.findIndex(m => m.id === marketId);
-      
+
       if (marketIndex === -1) return state;
-      
+
       const market = markets[marketIndex];
       console.log(`Refreshing inventory for market: ${market.name}`);
-      
+
       // Generate new inventory using the marketSystem function
       const newInventory = generateMarketInventory(market);
-      
+
       // Update the market with new inventory and refresh date
       markets[marketIndex] = {
         ...market,
         inventory: newInventory,
         lastRefreshed: new Date().toISOString()
       };
-      
+
       console.log(`Market inventory refreshed with ${newInventory.ingredients.length} ingredients, ${newInventory.potions.length} potions, ${newInventory.equipment.length} equipment, ${newInventory.scrolls.length} scrolls`);
-      
+
       return {
         gameState: {
           ...state.gameState,
@@ -439,47 +447,47 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
     set((state: any) => {
       const markets = [...state.gameState.markets];
       const marketIndex = markets.findIndex(m => m.id === marketId);
-      
+
       if (marketIndex === -1) return state;
-      
+
       const market = markets[marketIndex];
-      
+
       // Function to adjust prices based on supply and demand
       const adjustPrice = (item: MarketItem<any>) => {
         // Base price fluctuation - random 5-10% change
         const fluctuation = (Math.random() * 0.05) + 0.05;
-        
+
         // Direction of change (up or down)
         const direction = Math.random() > 0.5 ? 1 : -1;
-        
+
         // Supply and demand factors
-        const supplyFactor = item.supply === 'abundant' ? -0.1 : 
+        const supplyFactor = item.supply === 'abundant' ? -0.1 :
                             item.supply === 'common' ? -0.05 :
                             item.supply === 'limited' ? 0.05 :
                             item.supply === 'rare' ? 0.1 : 0.2;
-                            
+
         const demandFactor = item.demand === 'unwanted' ? -0.1 :
                             item.demand === 'low' ? -0.05 :
                             item.demand === 'moderate' ? 0 :
                             item.demand === 'high' ? 0.1 : 0.2;
-        
+
         // Calculate price change
         const change = item.currentPrice * fluctuation * direction;
         const supplyDemandChange = item.currentPrice * (supplyFactor + demandFactor);
-        
+
         // Apply change and ensure price doesn't go below 1
         const newPrice = Math.max(1, item.currentPrice + change + supplyDemandChange);
-        
+
         // Update price history
         const priceHistory = [...item.priceHistory, item.currentPrice].slice(-10);
-        
+
         return {
           ...item,
           currentPrice: Math.round(newPrice),
           priceHistory
         };
       };
-      
+
       // Update prices for all items in inventory
       const updatedInventory = {
         ingredients: market.inventory.ingredients.map(adjustPrice),
@@ -487,12 +495,12 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
         equipment: market.inventory.equipment.map(adjustPrice),
         scrolls: market.inventory.scrolls.map(adjustPrice)
       };
-      
+
       markets[marketIndex] = {
         ...market,
         inventory: updatedInventory
       };
-      
+
       return {
         gameState: {
           ...state.gameState,
@@ -557,7 +565,7 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
 
     // Update market inventory - reduce quantity or remove if all purchased
     const updatedInventory = { ...market.inventory };
-    
+
     if (marketItem.quantity <= quantity) {
       // Remove the item from market inventory
       switch (itemType) {
@@ -614,61 +622,113 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
       }
     }
 
-    // Update market with new inventory
-    get().updateMarket(marketId, { inventory: updatedInventory });
+    // Update market with new inventory and increase market gold
+    get().updateMarket(marketId, {
+      inventory: updatedInventory,
+      currentGold: (market.currentGold || 0) + totalCost // Increase market gold
+    });
 
     // Add item to player inventory
     const itemToAdd = { ...marketItem.item };
-    
+
     switch (itemType) {
       case 'ingredient':
+        // Get player data using getWizard
+        const playerData = getWizard();
+        if (!playerData) {
+          return { success: false, message: 'Player data not found.' };
+        }
+
         // Handle ingredient quantity
-        const existingIngredient = get().gameState.player.ingredients?.find(i => i.id === itemId);
+        const existingIngredient = playerData.ingredients?.find(i => i.id === itemId);
         if (existingIngredient) {
           // Update existing ingredient quantity
-          const updatedIngredients = get().gameState.player.ingredients.map(i => 
-            i.id === itemId ? { ...i, quantity: i.quantity + quantity } : i
-          );
-          set((state: any) => ({
-            gameState: {
-              ...state.gameState,
-              player: {
-                ...state.gameState.player,
-                ingredients: updatedIngredients
-              }
-            }
+          updateWizard(wizard => ({
+            ...wizard,
+            ingredients: (wizard.ingredients || []).map(i =>
+              i.id === itemId ? { ...i, quantity: i.quantity + quantity } : i
+            )
           }));
         } else {
-          // Add new ingredient
-          itemToAdd.quantity = quantity;
-          const ingredients = get().gameState.player.ingredients || [];
-          set((state: any) => ({
-            gameState: {
-              ...state.gameState,
-              player: {
-                ...state.gameState.player,
-                ingredients: [...ingredients, itemToAdd]
-              }
-            }
+          // Add new ingredient with a unique ID
+          const ingredientToAdd = {
+            ...itemToAdd,
+            id: `ingredient-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            quantity: quantity
+          };
+          updateWizard(wizard => ({
+            ...wizard,
+            ingredients: [...(wizard.ingredients || []), ingredientToAdd]
           }));
         }
         break;
       case 'potion':
-        get().addPotionToInventory(itemToAdd as Potion);
+        // Get player data using getWizard
+        const potionPlayerData = getWizard();
+        if (!potionPlayerData) {
+          return { success: false, message: 'Player data not found.' };
+        }
+
+        // Ensure the potion has the correct structure and a unique ID
+        const potionToAdd: Potion = {
+          id: `potion-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          name: itemToAdd.name,
+          type: itemToAdd.type as any,
+          rarity: itemToAdd.rarity,
+          description: itemToAdd.description || `A ${itemToAdd.rarity} ${itemToAdd.name}`,
+          effect: itemToAdd.effect || { value: 10 },
+          imagePath: itemToAdd.imagePath,
+          quantity: 1
+        };
+
+        // Add potion to inventory
+        updateWizard(wizard => ({
+          ...wizard,
+          potions: [...(wizard.potions || []), potionToAdd]
+        }));
         break;
       case 'equipment':
-        get().addItemToInventory(itemToAdd as Equipment);
+        // Get player data using getWizard
+        const equipPlayerData = getWizard();
+        if (!equipPlayerData) {
+          return { success: false, message: 'Player data not found.' };
+        }
+
+        // Ensure equipment has a unique ID
+        const equipToAdd: Equipment = {
+          ...itemToAdd as Equipment,
+          id: `equip-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+        };
+
+        // Add equipment to inventory
+        updateWizard(wizard => ({
+          ...wizard,
+          inventory: [...(wizard.inventory || []), equipToAdd]
+        }));
         break;
       case 'scroll':
+        // Get player data using getWizard
+        const scrollPlayerData = getWizard();
+        if (!scrollPlayerData) {
+          return { success: false, message: 'Player data not found.' };
+        }
+
         // Scrolls are added as equipment with type "scroll" and a spell reference
-        get().addItemToInventory({
+        const scrollToAdd = {
           ...itemToAdd,
+          id: `scroll-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
           type: 'scroll',
           slot: 'hand',
           equipped: false,
           unlocked: true,
           bonuses: []
-        } as unknown as Equipment);
+        } as unknown as Equipment;
+
+        // Add scroll to inventory
+        updateWizard(wizard => ({
+          ...wizard,
+          inventory: [...(wizard.inventory || []), scrollToAdd]
+        }));
         break;
     }
 
@@ -684,9 +744,9 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
       totalAmount: totalCost
     });
 
-    return { 
-      success: true, 
-      message: `Purchased ${quantity} ${itemToAdd.name} for ${totalCost} gold.` 
+    return {
+      success: true,
+      message: `Purchased ${quantity} ${itemToAdd.name} for ${totalCost} gold.`
     };
   },
 
@@ -702,27 +762,50 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
 
     switch (itemType) {
       case 'ingredient':
-        playerItems = get().gameState.player.ingredients || [];
+        // Get player data using getWizard
+        const playerData = getWizard();
+        if (!playerData) {
+          return { success: false, message: 'Player data not found.' };
+        }
+
+        playerItems = playerData.ingredients || [];
         playerItem = playerItems.find(i => i.id === itemId);
         if (!playerItem || playerItem.quantity < quantity) {
-          return { 
-            success: false, 
-            message: playerItem ? `You only have ${playerItem.quantity} of this item.` : 'Item not found in your inventory.' 
+          return {
+            success: false,
+            message: playerItem ? `You only have ${playerItem.quantity} of this item.` : 'Item not found in your inventory.'
           };
         }
         break;
       case 'potion':
-        playerItems = get().gameState.player.potions || [];
+        // Get player data using getWizard
+        const wizardData = getWizard();
+        if (!wizardData) {
+          return { success: false, message: 'Player data not found.' };
+        }
+
+        playerItems = wizardData.potions || [];
         playerItem = playerItems.find(i => i.id === itemId);
         if (!playerItem) {
           return { success: false, message: 'Potion not found in your inventory.' };
         }
         break;
       case 'equipment':
-        playerItems = get().gameState.player.inventory || [];
-        playerItem = playerItems.find(i => i.id === itemId && i.type !== 'scroll');
+        // Get player data using getWizard
+        const player = getWizard();
+        if (!player) {
+          return { success: false, message: 'Player data not found.' };
+        }
+
+        // Get inventory items that are not equipped
+        playerItems = (player.inventory || []).filter(item =>
+          item.type !== 'scroll' &&
+          !(player.equipment || []).some(eq => eq.id === item.id)
+        );
+
+        playerItem = playerItems.find(i => i.id === itemId);
         if (!playerItem) {
-          return { success: false, message: 'Equipment not found in your inventory.' };
+          return { success: false, message: 'Equipment not found in your unequipped inventory.' };
         }
         break;
       case 'scroll':
@@ -742,47 +825,167 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
     const sellPrice = Math.floor((playerItem.value || 10) * marketFactor);
     const totalValue = sellPrice * quantity;
 
+    // Check if market has enough gold
+    const marketGold = market.currentGold || 0;
+    if (marketGold < totalValue) {
+      return { success: false, message: `The market doesn't have enough gold (${marketGold}) to buy this item for ${totalValue}.` };
+    }
+
     // Add gold to player
     get().addGold(totalValue);
+
+    // Add the sold item to the market's inventory
+    const updatedInventory = { ...market.inventory };
+
+    // Create a market item from the player item
+    const marketItem = {
+      item: { ...playerItem },
+      quantity: quantity,
+      currentPrice: Math.ceil(sellPrice / market.sellPriceMultiplier), // Original buy price
+      supply: 'common',
+      demand: 'moderate',
+      priceHistory: [Math.ceil(sellPrice / market.sellPriceMultiplier)]
+    };
+
+    // Add to the appropriate inventory array
+    switch (itemType) {
+      case 'ingredient':
+        // Check if the ingredient already exists in the market
+        const existingIngredientIndex = updatedInventory.ingredients.findIndex(i =>
+          i.item.id === itemId || i.item.name === playerItem.name
+        );
+        if (existingIngredientIndex >= 0) {
+          // Update existing ingredient quantity
+          updatedInventory.ingredients[existingIngredientIndex].quantity += quantity;
+        } else {
+          // Add new ingredient
+          updatedInventory.ingredients.push(marketItem);
+        }
+        break;
+      case 'potion':
+        // Check if the potion already exists in the market
+        const existingPotionIndex = updatedInventory.potions.findIndex(i =>
+          i.item.id === itemId || i.item.name === playerItem.name
+        );
+        if (existingPotionIndex >= 0) {
+          // Update existing potion quantity
+          updatedInventory.potions[existingPotionIndex].quantity += quantity;
+        } else {
+          // Add new potion
+          updatedInventory.potions.push(marketItem);
+        }
+        break;
+      case 'equipment':
+        // Check if the equipment already exists in the market
+        const existingEquipmentIndex = updatedInventory.equipment.findIndex(i =>
+          i.item.id === itemId || i.item.name === playerItem.name
+        );
+        if (existingEquipmentIndex >= 0) {
+          // Update existing equipment quantity
+          updatedInventory.equipment[existingEquipmentIndex].quantity += quantity;
+        } else {
+          // Add new equipment
+          updatedInventory.equipment.push(marketItem);
+        }
+        break;
+      case 'scroll':
+        // For scrolls, we need to ensure the item has the correct structure for a SpellScroll
+        const scrollItem = {
+          ...marketItem,
+          item: {
+            id: playerItem.id,
+            name: playerItem.name,
+            type: 'scroll',
+            rarity: playerItem.rarity || 'common',
+            description: playerItem.description || `A scroll containing the ${playerItem.spell?.name || 'unknown'} spell.`,
+            spell: playerItem.spell || null,
+            imagePath: playerItem.imagePath || '/images/scrolls/default_scroll.png'
+          }
+        };
+
+        // Check if the scroll already exists in the market
+        const existingScrollIndex = updatedInventory.scrolls.findIndex(i =>
+          i.item.id === itemId || i.item.name === playerItem.name
+        );
+        if (existingScrollIndex >= 0) {
+          // Update existing scroll quantity
+          updatedInventory.scrolls[existingScrollIndex].quantity += quantity;
+        } else {
+          // Add new scroll
+          updatedInventory.scrolls.push(scrollItem);
+        }
+        break;
+    }
+
+    // Update market with new inventory and reduced gold
+    get().updateMarket(marketId, {
+      inventory: updatedInventory,
+      currentGold: marketGold - totalValue
+    });
 
     // Remove item from player inventory
     switch (itemType) {
       case 'ingredient':
         // Handle ingredient quantity
+        const currentWizard = getWizard();
+        if (!currentWizard) {
+          return { success: false, message: 'Player data not found.' };
+        }
+
         if (playerItem.quantity <= quantity) {
           // Remove the ingredient entirely
-          const updatedIngredients = get().gameState.player.ingredients.filter(i => i.id !== itemId);
-          set((state: any) => ({
-            gameState: {
-              ...state.gameState,
-              player: {
-                ...state.gameState.player,
-                ingredients: updatedIngredients
-              }
-            }
+          updateWizard(wizard => ({
+            ...wizard,
+            ingredients: (wizard.ingredients || []).filter(i => i.id !== itemId)
           }));
         } else {
           // Reduce quantity
-          const updatedIngredients = get().gameState.player.ingredients.map(i => 
-            i.id === itemId ? { ...i, quantity: i.quantity - quantity } : i
-          );
-          set((state: any) => ({
-            gameState: {
-              ...state.gameState,
-              player: {
-                ...state.gameState.player,
-                ingredients: updatedIngredients
-              }
-            }
+          updateWizard(wizard => ({
+            ...wizard,
+            ingredients: (wizard.ingredients || []).map(i =>
+              i.id === itemId ? { ...i, quantity: i.quantity - quantity } : i
+            )
           }));
         }
         break;
       case 'potion':
-        get().removePotionFromInventory(itemId);
+        // Get player data using getWizard
+        const wizardData = getWizard();
+        if (!wizardData) {
+          return { success: false, message: 'Player data not found.' };
+        }
+
+        // Remove potion from inventory
+        updateWizard(wizard => ({
+          ...wizard,
+          potions: (wizard.potions || []).filter(p => p.id !== itemId)
+        }));
         break;
       case 'equipment':
+        // Get player data using getWizard
+        const equipWizard = getWizard();
+        if (!equipWizard) {
+          return { success: false, message: 'Player data not found.' };
+        }
+
+        // Remove equipment from inventory
+        updateWizard(wizard => ({
+          ...wizard,
+          inventory: (wizard.inventory || []).filter(i => i.id !== itemId)
+        }));
+        break;
       case 'scroll': // Scrolls are stored as equipment with type "scroll"
-        get().removeItemFromInventory(itemId);
+        // Get player data using getWizard
+        const scrollWizard = getWizard();
+        if (!scrollWizard) {
+          return { success: false, message: 'Player data not found.' };
+        }
+
+        // Remove scroll from inventory
+        updateWizard(wizard => ({
+          ...wizard,
+          inventory: (wizard.inventory || []).filter(i => i.id !== itemId)
+        }));
         break;
     }
 
@@ -798,9 +1001,9 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
       totalAmount: totalValue
     });
 
-    return { 
-      success: true, 
-      message: `Sold ${quantity} ${playerItem.name} for ${totalValue} gold.` 
+    return {
+      success: true,
+      message: `Sold ${quantity} ${playerItem.name} for ${totalValue} gold.`
     };
   },
 
@@ -815,25 +1018,31 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
     const difficultyMultiplier = get().gameState.settings.difficulty === 'easy' ? 0.5 :
                                 get().gameState.settings.difficulty === 'normal' ? 1 :
                                 get().gameState.settings.difficulty === 'hard' ? 1.5 : 1;
-    
+
     const attackChance = baseChance * difficultyMultiplier;
-    
+
     // Roll for attack
     const roll = Math.random();
     if (roll <= attackChance) {
-      // Generate an attacker
-      const playerLevel = get().gameState.player.level;
+      // Get the player data using getWizard
+      const player = getWizard();
+      if (!player) {
+        return { attacked: false, attacker: null };
+      }
+
+      // Generate an attacker based on player level
+      const playerLevel = player.level;
       const attackerLevel = Math.max(1, Math.floor(playerLevel * 0.8));
-      
+
       // Generate a bandit/thief wizard with appropriate level
       const attackerWizard = generateDefaultWizard('Market Bandit');
-      
+
       // Manually set the attacker's level
       attackerWizard.level = attackerLevel;
-      
+
       return { attacked: true, attacker: attackerWizard };
     }
-    
+
     return { attacked: false, attacker: null };
   },
 
@@ -844,73 +1053,64 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
         // Award some bonus gold and potentially rare items
         const goldReward = Math.floor(Math.random() * 50) + 50; // 50-100 gold
         get().addGold(goldReward);
-        
+
         // Update player stats
-        set((state: any) => {
-          const playerStats = { 
-            ...state.gameState.gameProgress.playerStats,
-            marketAttacksWon: (state.gameState.gameProgress.playerStats.marketAttacksWon || 0) + 1
+        updateGameProgress(gameProgress => {
+          if (!gameProgress) return gameProgress;
+
+          const updatedPlayerStats = {
+            ...gameProgress.playerStats,
+            marketAttacksWon: (gameProgress.playerStats?.marketAttacksWon || 0) + 1
           };
-          
+
           return {
-            gameState: {
-              ...state.gameState,
-              gameProgress: {
-                ...state.gameState.gameProgress,
-                playerStats
-              }
-            }
+            ...gameProgress,
+            playerStats: updatedPlayerStats
           };
         });
         break;
-        
+
       case 'lose':
         // Lose some gold
         const goldLoss = Math.floor(get().getPlayerGold() * 0.1); // Lose 10% of gold
         get().removeGold(goldLoss);
-        
+
         // Update player stats
-        set((state: any) => {
-          const playerStats = { 
-            ...state.gameState.gameProgress.playerStats,
-            marketAttacksLost: (state.gameState.gameProgress.playerStats.marketAttacksLost || 0) + 1
+        updateGameProgress(gameProgress => {
+          if (!gameProgress) return gameProgress;
+
+          const updatedPlayerStats = {
+            ...gameProgress.playerStats,
+            marketAttacksLost: (gameProgress.playerStats?.marketAttacksLost || 0) + 1
           };
-          
+
           return {
-            gameState: {
-              ...state.gameState,
-              gameProgress: {
-                ...state.gameState.gameProgress,
-                playerStats
-              }
-            }
+            ...gameProgress,
+            playerStats: updatedPlayerStats
           };
         });
         break;
-        
+
       case 'flee':
         // Lose a smaller amount of gold
         const fleeGoldLoss = Math.floor(get().getPlayerGold() * 0.05); // Lose 5% of gold
         get().removeGold(fleeGoldLoss);
-        
+
         // Update player stats
-        set((state: any) => {
-          const playerStats = { 
-            ...state.gameState.gameProgress.playerStats,
-            marketAttacksFled: (state.gameState.gameProgress.playerStats.marketAttacksFled || 0) + 1
+        updateGameProgress(gameProgress => {
+          if (!gameProgress) return gameProgress;
+
+          const updatedPlayerStats = {
+            ...gameProgress.playerStats,
+            marketAttacksFled: (gameProgress.playerStats?.marketAttacksFled || 0) + 1
           };
-          
+
           return {
-            gameState: {
-              ...state.gameState,
-              gameProgress: {
-                ...state.gameState.gameProgress,
-                playerStats
-              }
-            }
+            ...gameProgress,
+            playerStats: updatedPlayerStats
           };
         });
         break;
     }
   }
-}); 
+});

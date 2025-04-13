@@ -10,10 +10,10 @@ import { getDefaultSpells } from '../spells/spellData';
 export function generateDefaultWizard(name: string): Wizard {
   // Get default spells for the wizard
   const defaultSpells = getDefaultSpells();
-  
+
   // Select the first 3 spells for the equipped spells
   const equippedSpells = defaultSpells.slice(0, 3);
-  
+
   // Create a default deck
   const defaultDeckId = `deck_default_${Date.now()}`;
   const defaultDeck = {
@@ -23,7 +23,7 @@ export function generateDefaultWizard(name: string): Wizard {
     dateCreated: new Date().toISOString(),
     lastModified: new Date().toISOString()
   };
-  
+
   return {
     id: `wizard_${Date.now()}`,
     name: name || 'Unnamed Wizard',
@@ -44,6 +44,8 @@ export function generateDefaultWizard(name: string): Wizard {
     ingredients: [], // No ingredients at start
     discoveredRecipes: [], // No discovered recipes at start
     levelUpPoints: 0,
+    gold: 100, // Starting gold
+    skillPoints: 0,
     decks: [defaultDeck],
     activeDeckId: defaultDeckId,
   };
@@ -56,7 +58,7 @@ export function generateDefaultWizard(name: string): Wizard {
  */
 export function calculateWizardStats(wizard: Wizard): Wizard {
   const calculatedWizard = { ...wizard };
-  
+
   // Start with base stats
   let totalMaxHealth = wizard.maxHealth;
   let totalMaxMana = wizard.maxMana;
@@ -66,69 +68,69 @@ export function calculateWizardStats(wizard: Wizard): Wizard {
   let totalExtraCardDraw = 0; // Base extra card draw
   let canDiscardAndDraw = false; // Whether the wizard can discard and draw a card
   let totalPotionSlots = 0; // Total potion slots from belt
-  
+
   // Process equipped items by slot
   const equipment = wizard.equipment;
-  
+
   // Array of all equipped items
   const equippedItems = [
     equipment.head,
-    equipment.hand, 
+    equipment.hand,
     equipment.body,
     equipment.neck,
     equipment.finger1,
     equipment.finger2,
     equipment.belt
   ].filter(Boolean) as Equipment[];
-  
+
   // Add equipment bonuses
   equippedItems.forEach(item => {
     // Add maxHealth bonus
     if (item.bonuses.maxHealth) {
       totalMaxHealth += item.bonuses.maxHealth;
     }
-    
+
     // Add maxMana bonus
     if (item.bonuses.maxMana) {
       totalMaxMana += item.bonuses.maxMana;
     }
-    
+
     // Add manaRegen bonus
     if (item.bonuses.manaRegen) {
       totalManaRegen += item.bonuses.manaRegen;
     }
-    
+
     // Add mystic punch power
     if (item.bonuses.mysticPunchPower) {
       totalMysticPunchPower += item.bonuses.mysticPunchPower;
     }
-    
+
     // Add bleed effect
     if (item.bonuses.bleedEffect) {
       totalBleedEffect += item.bonuses.bleedEffect;
     }
-    
+
     // Add extra card draw
     if (item.bonuses.extraCardDraw) {
       totalExtraCardDraw += item.bonuses.extraCardDraw;
     }
-    
+
     // Check for discard and draw ability
     if (item.bonuses.discardAndDraw) {
       canDiscardAndDraw = true;
     }
-    
+
     // Check for potion slots on belt
     if (item.slot === 'belt' && item.bonuses.potionSlots) {
       totalPotionSlots = item.bonuses.potionSlots;
     }
   });
-  
+
   // Update the wizard with calculated stats
   calculatedWizard.maxHealth = totalMaxHealth;
   calculatedWizard.maxMana = totalMaxMana;
   calculatedWizard.manaRegen = totalManaRegen;
-  
+
   // Store combat-specific stats in a separate property to avoid polluting the core wizard object
   calculatedWizard.combatStats = {
     mysticPunchPower: totalMysticPunchPower,
@@ -137,7 +139,7 @@ export function calculateWizardStats(wizard: Wizard): Wizard {
     canDiscardAndDraw: canDiscardAndDraw,
     potionSlots: totalPotionSlots
   };
-  
+
   return calculatedWizard;
 }
 

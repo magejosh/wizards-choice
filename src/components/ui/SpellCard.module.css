@@ -4,7 +4,6 @@
   width: 100%;
   aspect-ratio: 2/3;
   background-color: #1a1a2e;
-  border: 2px solid #333;
   border-radius: 8px;
   padding: 8px;
   display: flex;
@@ -15,12 +14,14 @@
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   color: #fff;
+  max-width: 180px;
+  margin: 0 auto;
 }
 
 .spellCard:hover:not(.disabled) {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  border-color: var(--primary-main);
+  border-color: #9370DB;
 }
 
 .disabled {
@@ -31,28 +32,31 @@
 .disabled:hover {
   transform: none;
   box-shadow: none;
-  border-color: var(--ui-card-border);
+  border-color: #3a3a5c;
 }
 
 .header {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 2px;
+  margin-bottom: 0;
   background-color: rgba(0, 0, 0, 0.3);
-  padding: 4px 6px;
+  padding: 1px 6px;
   border-radius: 4px;
+  min-height: 0;
 }
 
 .name {
   font-size: 14px;
   margin: 0;
+  padding: 0;
   font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
   color: #fff;
+  line-height: 1;
 }
 
 .tierManaRow {
@@ -195,45 +199,46 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #7a3de8;
+  background-color: #9370DB;
   color: white;
   border-radius: 50%;
   font-weight: bold;
   font-size: 14px;
   z-index: 1;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
 /* Element-specific styles */
 .fire {
-  border-color: #ff3b3b;
+  border-left: 3px solid #ff3b3b;
 }
 
 .water {
-  border-color: #3b9eff;
+  border-left: 3px solid #3b9eff;
 }
 
 .earth {
-  border-color: #a67c52;
+  border-left: 3px solid #a67c52;
 }
 
 .air {
-  border-color: #faffb3;
+  border-left: 3px solid #b3e0ff;
 }
 
 .arcane {
-  border-color: #940dd2;
+  border-left: 3px solid #940dd2;
 }
 
 .nature {
-  border-color: #7aff3b;
+  border-left: 3px solid #7aff3b;
 }
 
 .shadow {
-  border-color: #746798;
+  border-left: 3px solid #746798;
 }
 
 .light {
-  border-color: #f7f6f5;
+  border-left: 3px solid #f7f6f5;
 }
 
 /* Element text colors */

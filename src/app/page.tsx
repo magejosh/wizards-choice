@@ -22,7 +22,7 @@ import GameView from '../components/GameView';
 import CharacterCreation from '../components/CharacterCreation';
 
 // Import styles
-import '../lib/ui/styles/main.css';
+import '../styles/main.css';
 
 // Separate component for URL parameter handling
 const URLParamHandler = () => {
@@ -121,8 +121,8 @@ export default function Home() {
   }, [gameState]);
 
   // Simple handlers
-  const handleStartNewGame = (saveSlotId: number) => {
-    console.log(`Page: Starting new game in slot ${saveSlotId}`);
+  const handleStartNewGame = (saveSlotId: number, saveUuid: string) => {
+    console.log(`Page: Starting new game in slot ${saveSlotId} with UUID ${saveUuid}`);
     setCurrentLocation('wizardStudy');
     setGameStarted(true);
   };
@@ -161,10 +161,21 @@ export default function Home() {
     setGameStarted(false);
   };
 
-  const handleContinueGame = (saveSlotId: number) => {
-    console.log(`Page: Continuing game from slot ${saveSlotId}`);
-    setCurrentLocation('wizardStudy');
-    setGameStarted(true);
+  const handleContinueGame = (saveSlotId: number, saveUuid: string) => {
+    console.log(`Page: Continuing game from slot ${saveSlotId} with UUID ${saveUuid}`);
+
+    // Load the save slot data
+    const loadResult = useGameStateStore.getState().loadGame(saveUuid);
+
+    if (loadResult) {
+      console.log(`Successfully loaded save slot ${saveSlotId} with UUID ${saveUuid}`);
+      setCurrentLocation('wizardStudy');
+      setGameStarted(true);
+    } else {
+      console.error(`Failed to load save slot ${saveSlotId} with UUID ${saveUuid}`);
+      // Show an error notification or alert to the user
+      alert(`Failed to load save slot ${saveSlotId}. The save data may be corrupted.`);
+    }
   };
 
   const handleGameStartChange = (shouldStartGame: boolean) => {

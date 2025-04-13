@@ -10,6 +10,83 @@ import { INITIAL_HAND_SIZE, CARDS_PER_DRAW } from './combatInitializer';
 export const MAX_HAND_SIZE = 2;
 
 /**
+ * Validate the current phase state before transitioning to the next phase
+ * @param state The current combat state
+ * @param phase The current phase to validate
+ * @returns Boolean indicating if the state is valid for transitioning
+ */
+function validatePhaseState(state: CombatState, phase: CombatPhase): boolean {
+  // Check if combat has ended - always valid to transition in this case
+  if (state.status !== 'active') {
+    return true;
+  }
+
+  switch (phase) {
+    case 'discard':
+      // Check if player needs to discard but hasn't
+      const playerDiscardCheck = needsToDiscard(state, true, MAX_HAND_SIZE);
+      if (playerDiscardCheck.needsDiscard) {
+        console.log(`Player still needs to discard ${playerDiscardCheck.cardsToDiscard} cards`);
+        return false;
+      }
+      return true;
+
+    case 'action':
+      // Check if both players have acted
+      if (!state.actionState.player.hasActed || !state.actionState.enemy.hasActed) {
+        console.log('Not all players have acted yet');
+        return false;
+      }
+      return true;
+
+    case 'response':
+      // For response phase, we need to be more flexible
+      // If there are no effects in the queue, we can always advance
+      if (state.effectQueue.length === 0) {
+        console.log('No effects in queue, can advance from response phase');
+        return true;
+      }
+
+      // If both players have already responded, we can advance
+      if (state.actionState.player.hasResponded && state.actionState.enemy.hasResponded) {
+        console.log('Both players have responded, can advance from response phase');
+        return true;
+      }
+
+      // If player has no reaction spells they can cast, auto-respond for them
+      if (!state.actionState.player.hasResponded) {
+        const playerReactionSpells = state.playerWizard.hand.filter(
+          spell => spell.type === 'reaction' && spell.manaCost <= state.playerWizard.currentMana
+        );
+
+        if (playerReactionSpells.length === 0) {
+          console.log('Player has no reaction spells to cast, auto-responding');
+          return true;
+        }
+      }
+
+      // If enemy has no reaction spells they can cast, auto-respond for them
+      if (!state.actionState.enemy.hasResponded) {
+        const enemyReactionSpells = state.enemyWizard.hand.filter(
+          spell => spell.type === 'reaction' && spell.manaCost <= state.enemyWizard.currentMana
+        );
+
+        if (enemyReactionSpells.length === 0) {
+          console.log('Enemy has no reaction spells to cast, auto-responding');
+          return true;
+        }
+      }
+
+      console.log('Some players still need to respond');
+      return false;
+
+    // For other phases, always valid to transition
+    default:
+      return true;
+  }
+}
+
+/**
  * Advance the combat phase to the next phase
  * @param state The current combat state
  * @returns Updated combat state with the next phase
@@ -29,6 +106,16 @@ export function advancePhase(state: CombatState): CombatState {
   // Get the current phase and determine the next phase
   const currentPhase = newState.currentPhase;
   let nextPhase: CombatPhase;
+
+  // Log the phase transition attempt for debugging
+  console.log(`Attempting to advance from ${currentPhase} phase in round ${newState.round}`);
+
+  // Validate current phase state before transitioning
+  if (!validatePhaseState(newState, currentPhase)) {
+    console.error(`Invalid state for ${currentPhase} phase, cannot advance`);
+    // Return current state without advancing to avoid getting stuck
+    return newState;
+  }
 
   switch (currentPhase) {
     case 'initiative':
@@ -91,6 +178,10 @@ export function advancePhase(state: CombatState): CombatState {
       // Only advance to response if there are effects in the queue
       if (newState.effectQueue.length > 0) {
         nextPhase = 'response';
+
+        // Reset response state for the new response phase
+        newState.actionState.player.hasResponded = false;
+        newState.actionState.enemy.hasResponded = false;
 
         // Log phase change using the battle log manager
         createLogEntry({
@@ -504,7 +595,16 @@ export class PhaseManager {
    * @param combatState Current combat state
    */
   handlePhaseChange(combatState: CombatState): void {
-    if (!combatState) return;
+    if (!combatState) {
+      console.error('handlePhaseChange called with null combatState');
+      return;
+    }
+
+    // Log the current state for debugging
+    console.log(`Phase change handler: ${combatState.currentPhase} in round ${combatState.round}`);
+    console.log(`Action state: player.hasActed=${combatState.actionState?.player?.hasActed}, player.hasResponded=${combatState.actionState?.player?.hasResponded}`);
+    console.log(`Action state: enemy.hasActed=${combatState.actionState?.enemy?.hasActed}, enemy.hasResponded=${combatState.actionState?.enemy?.hasResponded}`);
+    console.log(`Effect queue length: ${combatState.effectQueue?.length || 0}`);
 
     // Check if combat has ended
     if (combatState.status !== 'active') {
@@ -635,6 +735,26 @@ export class PhaseManager {
     this.setShowDiscardSelection(false);
     this.setNumCardsToDiscard(0);
 
+    // Reset action state if needed
+    let updatedState = { ...combatState };
+    let stateChanged = false;
+
+    // Ensure action state is properly initialized
+    if (updatedState.actionState === undefined) {
+      console.log('Action state was undefined, initializing');
+      updatedState.actionState = {
+        player: { hasActed: false, hasResponded: false },
+        enemy: { hasActed: false, hasResponded: false }
+      };
+      stateChanged = true;
+    }
+
+    // If we made changes to the state, update it
+    if (stateChanged) {
+      this.setCombatState(updatedState);
+      combatState = updatedState;
+    }
+
     // If enemy goes first based on initiative, process their turn
     if (combatState.firstActor === 'enemy' && !combatState.actionState.enemy.hasActed) {
       console.log('Enemy goes first - processing enemy action');
@@ -651,10 +771,24 @@ export class PhaseManager {
     this.setShowDiscardSelection(false);
     this.setNumCardsToDiscard(0);
 
+    // If there are no effects in the queue, we can skip the response phase entirely
+    if (combatState.effectQueue.length === 0) {
+      console.log('No effects in queue, skipping response phase entirely');
+      setTimeout(() => {
+        const nextPhaseState = advancePhase(combatState);
+        this.setCombatState(nextPhaseState);
+      }, 500);
+      return;
+    }
+
+    // Create a local copy of the state to track changes
+    let updatedState = { ...combatState };
+    let needToAdvancePhase = false;
+
     // Check if player has any reaction spells they can cast
-    if (!combatState.actionState.player.hasResponded) {
-      const playerReactionSpells = combatState.playerWizard.hand.filter(
-        spell => spell.type === 'reaction' && spell.manaCost <= combatState.playerWizard.currentMana
+    if (!updatedState.actionState.player.hasResponded) {
+      const playerReactionSpells = updatedState.playerWizard.hand.filter(
+        spell => spell.type === 'reaction' && spell.manaCost <= updatedState.playerWizard.currentMana
       );
 
       if (playerReactionSpells.length === 0) {
@@ -662,7 +796,6 @@ export class PhaseManager {
         console.log('Player has no reaction spells - auto-skipping response');
 
         // Mark player as having responded (skipped)
-        const updatedState = { ...combatState };
         updatedState.actionState.player.hasResponded = true;
 
         // Add to combat log using the manager
@@ -677,79 +810,89 @@ export class PhaseManager {
         // Update the log in the state
         updatedState.log = battleLogManager.getEntries();
 
-        this.setCombatState(updatedState);
-
-        // If both players have responded or skipped, advance to resolve phase
+        // Check if we can advance the phase
         if (updatedState.actionState.enemy.hasResponded) {
-          setTimeout(() => {
-            const nextPhaseState = advancePhase(updatedState);
-            this.setCombatState(nextPhaseState);
-          }, 1000);
-          return;
+          needToAdvancePhase = true;
         }
       }
     }
 
     // If enemy needs to respond and hasn't yet
-    if (!combatState.actionState.enemy.hasResponded) {
+    if (!updatedState.actionState.enemy.hasResponded) {
       // Check if enemy has any reaction spells they can cast
-      const enemyReactionSpells = combatState.enemyWizard.hand.filter(
-        spell => spell.type === 'reaction' && spell.manaCost <= combatState.enemyWizard.currentMana
+      const enemyReactionSpells = updatedState.enemyWizard.hand.filter(
+        spell => spell.type === 'reaction' && spell.manaCost <= updatedState.enemyWizard.currentMana
       );
 
-      if (enemyReactionSpells.length > 0) {
-        // Enemy has reaction spells - choose one to cast
-        setTimeout(() => {
-          // Simple AI: just pick the first reaction spell
-          const reactionSpell = enemyReactionSpells[0];
-
-          // Queue the reaction spell
-          const updatedState = queueAction(combatState, {
-            caster: 'enemy',
-            spell: reactionSpell,
-            target: 'player'
-          }, true); // true indicates this is a response
-
-          this.setCombatState(updatedState);
-
-          // If both players have responded or skipped, advance to resolve phase
-          if (updatedState.actionState.player.hasResponded) {
-            setTimeout(() => {
-              const nextPhaseState = advancePhase(updatedState);
-              this.setCombatState(nextPhaseState);
-            }, 1000);
-          }
-        }, 1500);
-      } else {
+      if (enemyReactionSpells.length === 0) {
         // Enemy has no reaction spells - auto-skip
-        setTimeout(() => {
-          // Mark enemy as having responded (skipped)
-          const updatedState = { ...combatState };
-          updatedState.actionState.enemy.hasResponded = true;
+        console.log('Enemy has no reaction spells - auto-skipping response');
 
-          // Add to combat log using the manager
-          battleLogManager.addEntry({
-            turn: updatedState.turn,
-            round: updatedState.round,
-            actor: 'enemy',
-            action: 'auto_skip_response',
-            details: 'Enemy had no reaction spells to cast.'
-          });
+        // Mark enemy as having responded (skipped)
+        updatedState.actionState.enemy.hasResponded = true;
 
-          // Update the log in the state
-          updatedState.log = battleLogManager.getEntries();
+        // Add to combat log using the manager
+        battleLogManager.addEntry({
+          turn: updatedState.turn,
+          round: updatedState.round,
+          actor: 'enemy',
+          action: 'auto_skip_response',
+          details: 'Enemy had no reaction spells to cast.'
+        });
 
+        // Update the log in the state
+        updatedState.log = battleLogManager.getEntries();
+
+        // Check if we can advance the phase
+        if (updatedState.actionState.player.hasResponded) {
+          needToAdvancePhase = true;
+        }
+      } else {
+        // Enemy has reaction spells - choose one to cast
+        // Only process this if we haven't already decided to advance the phase
+        if (!needToAdvancePhase) {
+          // Update the state first
           this.setCombatState(updatedState);
 
-          // If both players have responded or skipped, advance to resolve phase
-          if (updatedState.actionState.player.hasResponded) {
-            setTimeout(() => {
-              const nextPhaseState = advancePhase(updatedState);
-              this.setCombatState(nextPhaseState);
-            }, 1000);
-          }
-        }, 1000);
+          setTimeout(() => {
+            // Simple AI: just pick the first reaction spell
+            const reactionSpell = enemyReactionSpells[0];
+
+            // Queue the reaction spell
+            const stateAfterEnemyResponse = queueAction(updatedState, {
+              caster: 'enemy',
+              spell: reactionSpell,
+              target: 'player'
+            }, true); // true indicates this is a response
+
+            // Mark enemy as having responded
+            stateAfterEnemyResponse.actionState.enemy.hasResponded = true;
+
+            this.setCombatState(stateAfterEnemyResponse);
+
+            // If both players have responded or skipped, advance to resolve phase
+            if (stateAfterEnemyResponse.actionState.player.hasResponded) {
+              setTimeout(() => {
+                const nextPhaseState = advancePhase(stateAfterEnemyResponse);
+                this.setCombatState(nextPhaseState);
+              }, 1000);
+            }
+          }, 1500);
+          return; // Exit early since we're handling this asynchronously
+        }
       }
+    }
+
+    // Update the state with any changes
+    this.setCombatState(updatedState);
+
+    // If we need to advance the phase, do it after a short delay
+    if (needToAdvancePhase) {
+      setTimeout(() => {
+        console.log('Both players have responded or skipped, advancing to resolve phase');
+        const nextPhaseState = advancePhase(updatedState);
+        this.setCombatState(nextPhaseState);
+      }, 1000);
     }
   }
 
@@ -772,6 +915,18 @@ export class PhaseManager {
   private handleDiscardPhase(combatState: CombatState): void {
     console.log(`In discard phase - Player hand: ${combatState.playerWizard.hand.length}, Enemy hand: ${combatState.enemyWizard.hand.length}`);
 
+    // First, process enemy discard to ensure it completes synchronously
+    if (combatState.enemyWizard.hand.length > this.MAX_HAND_SIZE) {
+      console.log('Processing enemy discard first');
+      const stateAfterEnemyDiscard = processEnemyDiscard(combatState, this.MAX_HAND_SIZE);
+
+      // Update the combat state with the enemy's discards
+      this.setCombatState(stateAfterEnemyDiscard);
+
+      // Continue with the updated state
+      combatState = stateAfterEnemyDiscard;
+    }
+
     // Use the cardManager function to check if player needs to discard
     const { needsDiscard, cardsToDiscard } = needsToDiscard(combatState, true, this.MAX_HAND_SIZE);
 
@@ -787,14 +942,21 @@ export class PhaseManager {
       this.setShowDiscardSelection(false);
       this.setNumCardsToDiscard(0);
 
-      // Advance to next phase
-      setTimeout(() => {
-        if (combatState && combatState.currentPhase === 'discard') {
-          console.log('Discard phase complete, advancing to end phase');
-          const updatedState = advancePhase(combatState);
-          this.setCombatState(updatedState);
-        }
-      }, 1000);
+      // Verify that enemy has also completed discarding
+      if (combatState.enemyWizard.hand.length <= this.MAX_HAND_SIZE) {
+        // Both player and enemy have completed discarding, advance to next phase
+        console.log('Discard phase complete for both players, advancing to end phase');
+
+        // Advance to next phase with a slight delay to ensure UI updates
+        setTimeout(() => {
+          if (combatState && combatState.currentPhase === 'discard') {
+            const updatedState = advancePhase(combatState);
+            this.setCombatState(updatedState);
+          }
+        }, 1000);
+      } else {
+        console.error('Enemy discard not complete, cannot advance phase');
+      }
     }
   }
 
@@ -806,47 +968,80 @@ export class PhaseManager {
     this.setShowDiscardSelection(false);
     this.setNumCardsToDiscard(0);
 
+    // Make sure we're not animating
+    this.setIsAnimating(false);
+
     // Allow time for end phase animations to play out
     setTimeout(() => {
-      // Double-check that we're still in the end phase
-      if (combatState && combatState.currentPhase === 'end') {
+      // Double-check that we're still in the end phase and combat is active
+      if (combatState && combatState.currentPhase === 'end' && combatState.status === 'active') {
         console.log('End phase complete, advancing to initiative phase for next round');
 
-        // Create a new state with the next phase
-        const updatedState = advancePhase(combatState);
+        try {
+          // Create a new state with the next phase
+          const updatedState = advancePhase(combatState);
 
-        // Log the phase transition for debugging
-        console.log(`Phase transition: ${combatState.currentPhase} -> ${updatedState.currentPhase}`);
-        console.log(`Round transition: ${combatState.round} -> ${updatedState.round}`);
+          // Log the phase transition for debugging
+          console.log(`Phase transition: ${combatState.currentPhase} -> ${updatedState.currentPhase}`);
+          console.log(`Round transition: ${combatState.round} -> ${updatedState.round}`);
 
-        // Store the updated state so we have it for the initiative roll
-        this.setCombatState(updatedState);
-
-        // Wait for the state update to complete before showing the initiative roll
-        setTimeout(() => {
-          // Verify we're in the initiative phase
-          if (updatedState.currentPhase === 'initiative') {
-            // By this point the phase should be 'initiative'
-            this.setPhase('initiative');
-
-            // Make absolutely sure discard modal is closed before showing initiative
-            this.setShowDiscardSelection(false);
-            this.setNumCardsToDiscard(0);
-
-            // Show the initiative roll UI
-            console.log('Showing initiative roll UI for new round');
-            this.setShowInitiativeRoll(true);
-          } else {
-            console.error('Expected initiative phase after end phase, but got:', updatedState.currentPhase);
+          // Verify that the phase actually changed
+          if (updatedState.currentPhase !== 'initiative') {
+            console.error(`Phase transition failed: expected initiative, got ${updatedState.currentPhase}`);
 
             // Force the initiative phase if something went wrong
             const fixedState = { ...updatedState, currentPhase: 'initiative' };
             this.setCombatState(fixedState);
             this.setPhase('initiative');
-            this.setShowInitiativeRoll(true);
+
+            // Make sure all modals are closed
+            this.setShowDiscardSelection(false);
+            this.setNumCardsToDiscard(0);
+
+            // Show the initiative roll UI
             console.log('Forced transition to initiative phase');
+            this.setShowInitiativeRoll(true);
+            return;
           }
-        }, 200);
+
+          // Store the updated state so we have it for the initiative roll
+          this.setCombatState(updatedState);
+
+          // Wait for the state update to complete before showing the initiative roll
+          setTimeout(() => {
+            // Verify we're in the initiative phase
+            if (updatedState.currentPhase === 'initiative') {
+              // By this point the phase should be 'initiative'
+              this.setPhase('initiative');
+
+              // Make absolutely sure discard modal is closed before showing initiative
+              this.setShowDiscardSelection(false);
+              this.setNumCardsToDiscard(0);
+
+              // Show the initiative roll UI
+              console.log('Showing initiative roll UI for new round');
+              this.setShowInitiativeRoll(true);
+            } else {
+              console.error('Expected initiative phase after end phase, but got:', updatedState.currentPhase);
+
+              // Force the initiative phase if something went wrong
+              const fixedState = { ...updatedState, currentPhase: 'initiative' };
+              this.setCombatState(fixedState);
+              this.setPhase('initiative');
+              this.setShowInitiativeRoll(true);
+              console.log('Forced transition to initiative phase');
+            }
+          }, 200);
+        } catch (error) {
+          console.error('Error during end phase transition:', error);
+
+          // Force the initiative phase if something went wrong
+          const fixedState = { ...combatState, currentPhase: 'initiative', round: combatState.round + 1 };
+          this.setCombatState(fixedState);
+          this.setPhase('initiative');
+          this.setShowInitiativeRoll(true);
+          console.log('Forced transition to initiative phase after error');
+        }
       }
     }, 1500);
   }

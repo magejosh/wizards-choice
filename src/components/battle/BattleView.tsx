@@ -16,7 +16,7 @@ import {
 import { initializeCombat } from '../../lib/combat/combatInitializer';
 import { discardCard, needsToDiscard } from '../../lib/combat/cardManager';
 import { PhaseManager } from '../../lib/combat/phaseManager';
-import { useGameStateStore } from '../../lib/game-state/gameStateStore';
+import { useGameStateStore, getWizard, updateWizard } from '../../lib/game-state/gameStateStore';
 import { generateLoot, applyLoot, LootDrop } from '../../lib/features/loot/lootSystem';
 import '@/app/battle/battle.css';
 import PhaseTracker from './PhaseTracker';
@@ -78,6 +78,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
   const [currentPhase, setCurrentPhase] = useState<CombatPhase>('action');
   const [showInitiativeRoll, setShowInitiativeRoll] = useState(false);
   const [initiativeRolls, setInitiativeRolls] = useState<InitiativeRollResults | null>(null);
+  const [experienceGained, setExperienceGained] = useState<number | undefined>(undefined);
 
   // Use refs to track state that shouldn't trigger re-renders
   const isProcessingEndRef = useRef(false);
@@ -108,13 +109,13 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     if (!combatState) return;
 
     // Log the phase change for debugging
-    console.log(`Phase changed to: ${combatState.currentPhase} in round ${combatState.round}`);
+    console.log(`BattleView detected phase change to: ${combatState.currentPhase} in round ${combatState.round}`);
 
     // Safety check: If we're in initiative phase but the initiative roll UI isn't showing,
     // make sure it gets shown
     if (combatState.currentPhase === 'initiative' && !showInitiativeRoll) {
       console.log('Safety check: In initiative phase but initiative roll UI not showing - fixing');
-      setTimeout(() => setShowInitiativeRoll(true), 100);
+      setShowInitiativeRoll(true);
     }
 
     // Let the phase manager handle the phase change
@@ -157,7 +158,11 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     useGameStateStore.getState().setCurrentLocation('duel');
 
     // Generate enemy wizard
-    const playerWizard = gameState.player;
+    const playerWizard = getWizard();
+    if (!playerWizard) {
+      console.error('Player wizard not found');
+      return;
+    }
     console.log("Player wizard for battle:", playerWizard.name, "Level:", playerWizard.level);
     const enemyWizard = {
       id: 'enemy-1',
@@ -298,6 +303,9 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
         console.log('Adding experience:', experience);
 
+        // Store the experience gained for display in the victory modal
+        setExperienceGained(experience);
+
         // Add experience to player
         addExperience(experience);
 
@@ -406,26 +414,26 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         // Calculate gold based on enemy level and difficulty
         const goldAmount = Math.floor((Math.random() * 30 + 20) * enemyWizard.level * experienceMultiplier);
 
+        // Get the current player
+        const currentPlayer = getWizard();
+        if (!currentPlayer) {
+          console.error('Player not found when applying loot');
+          return;
+        }
+
         // Apply the loot to the player
-        console.log("Player before applying loot:", playerWizard);
-        const updatedWizard = applyLoot(playerWizard, lootDrop);
+        console.log("Player before applying loot:", currentPlayer);
+        const updatedWizard = applyLoot(currentPlayer, lootDrop);
         console.log("Player after applying loot:", updatedWizard);
 
-        // Add gold to the market data
-        let updatedMarketData = {
-          ...gameState.marketData,
-          gold: (gameState.marketData.gold || 0) + goldAmount
-        };
-        console.log("Updated market data with gold:", updatedMarketData);
+        // Add gold to the updated wizard
+        const currentGold = currentPlayer.gold || 0;
+        updatedWizard.gold = currentGold + goldAmount;
 
-        // Update the game state directly using set state
-        useGameStateStore.setState((state) => ({
-          gameState: {
-            ...state.gameState,
-            player: updatedWizard,
-            marketData: updatedMarketData
-          }
-        }));
+        // Update the player in the game state using updateWizard
+        // This will update both the save slot and top-level player data
+        updateWizard(() => updatedWizard);
+        console.log("Added gold to player:", goldAmount);
 
         // Force a save immediately
         setTimeout(() => {
@@ -435,7 +443,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
           // Double-check that state was updated correctly
           const currentState = useGameStateStore.getState().gameState;
           console.log("Current player state after save:", currentState.player);
-          console.log("Current market data after save:", currentState.marketData);
+          console.log("Current player gold after save:", currentState.player.gold);
         }, 100);
 
         // Generate loot notification message
@@ -836,21 +844,38 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         setShowDiscardSelection(false);
         setNumCardsToDiscard(0);
 
-        // Then advance to the end phase
-        console.log('DEBUG: Advancing phase after discard phase');
+        // Verify that enemy has also completed discarding
+        if (updatedState.enemyWizard.hand.length <= MAX_HAND_SIZE) {
+          // Both player and enemy have completed discarding, advance to next phase
+          console.log('DEBUG: Both player and enemy discard complete, advancing to end phase');
 
-        // Make sure we're still in the discard phase before advancing
-        if (updatedState.currentPhase === 'discard') {
-          const finalState = advancePhase(updatedState);
-          // Update the combat state with the new phase
-          setCombatState(finalState);
+          // Make sure we're still in the discard phase before advancing
+          if (updatedState.currentPhase === 'discard') {
+            // Add a slight delay to ensure UI updates
+            setTimeout(() => {
+              const finalState = advancePhase(updatedState);
+              // Update the combat state with the new phase
+              setCombatState(finalState);
+            }, 500);
+          } else {
+            // Just update the state without advancing the phase
+            setCombatState(updatedState);
+          }
         } else {
-          // Just update the state without advancing the phase
-          setCombatState(updatedState);
-        }
+          console.log('DEBUG: Player discard complete, but enemy still needs to discard');
+          // Process enemy discard first
+          const stateAfterEnemyDiscard = processEnemyDiscard(updatedState, MAX_HAND_SIZE);
 
-        // Let the phase transition effect handle the rest
-        // The useEffect watching combatState.currentPhase will take care of the phase transitions
+          // Then advance to the end phase
+          if (stateAfterEnemyDiscard.currentPhase === 'discard') {
+            setTimeout(() => {
+              const finalState = advancePhase(stateAfterEnemyDiscard);
+              setCombatState(finalState);
+            }, 500);
+          } else {
+            setCombatState(stateAfterEnemyDiscard);
+          }
+        }
       }
     } catch (error) {
       console.error("Error in discard selection:", error);
@@ -939,16 +964,9 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       const currentState = useGameStateStore.getState().gameState;
       console.log("Current game state before returning:", currentState);
 
-      // Ensure we set the location properly
-      useGameStateStore.setState((state) => ({
-        gameState: {
-          ...state.gameState,
-          gameProgress: {
-            ...state.gameState.gameProgress,
-            currentLocation: 'wizardStudy'
-          }
-        }
-      }));
+      // Ensure we set the location properly using the setCurrentLocation function
+      // This will update both the save slot and top-level gameProgress data
+      useGameStateStore.getState().setCurrentLocation('wizardStudy');
 
       // Save game immediately
       saveGame();
@@ -1309,6 +1327,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
             status={combatState.status}
             onContinue={handleReturnToWizardStudy}
             onLootEnemy={combatState.status === 'playerWon' ? handleLootEnemy : undefined}
+            experienceGained={experienceGained}
           />
 
           {/* Enemy turn indicator */}

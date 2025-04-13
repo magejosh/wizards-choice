@@ -1,0 +1,278 @@
+.potionCrafting {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--ui-background);
+  color: var(--ui-text);
+  padding: 20px;
+  overflow: hidden;
+}
+
+.potionCraftingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ui-card-border);
+}
+
+.potionCraftingTitle {
+  font-size: 28px;
+  color: var(--primary-light);
+  margin: 0;
+}
+
+.potionCraftingCloseButton {
+  padding: 8px 16px;
+  background-color: var(--ui-button);
+  color: var(--ui-text);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.potionCraftingCloseButton:hover {
+  background-color: var(--ui-button-hover);
+}
+
+.potionCraftingTabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--ui-card-border);
+}
+
+.potionCraftingTab {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  color: var(--ui-text);
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+}
+
+.potionCraftingTab:hover {
+  color: var(--primary-light);
+}
+
+.potionCraftingTabActive {
+  color: var(--primary-light);
+  border-bottom-color: var(--primary-main);
+}
+
+.potionCraftingContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.potionCraftingBrewMode,
+.potionCraftingExperimentMode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.potionCraftingRecipes,
+.potionCraftingIngredients {
+  background-color: var(--ui-card);
+  border-radius: 8px;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.potionCraftingBrewingArea,
+.potionCraftingExperimentationArea {
+  background-color: var(--ui-card);
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.potionCraftingSectionTitle {
+  font-size: 20px;
+  color: var(--primary-light);
+  margin-top: 0;
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--ui-card-border);
+}
+
+.potionCraftingRecipesList,
+.potionCraftingIngredientsList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.potionCraftingRecipe,
+.potionCraftingIngredient {
+  background-color: var(--ui-card-inner);
+  border: 1px solid var(--ui-card-border);
+  border-radius: 8px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.potionCraftingRecipe:hover,
+.potionCraftingIngredient:hover {
+  box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.3);
+  border-color: var(--primary-dark);
+}
+
+.potionCraftingRecipeSelected,
+.potionCraftingIngredientSelected {
+  border: 2px solid var(--primary-main);
+  box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.3);
+}
+
+.potionCraftingRecipeHeader,
+.potionCraftingIngredientHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.potionCraftingRecipeName,
+.potionCraftingIngredientName {
+  font-weight: bold;
+  font-size: 18px;
+  color: var(--primary-light);
+}
+
+.potionCraftingRecipeTier,
+.potionCraftingIngredientCategory {
+  font-size: 14px;
+  color: var(--ui-text-secondary);
+}
+
+.potionCraftingRecipeIngredients,
+.potionCraftingIngredientProperties {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.potionCraftingRecipeIngredients ul,
+.potionCraftingSelectedIngredients ul {
+  margin: 5px 0;
+  padding-left: 20px;
+}
+
+.potionCraftingRecipeDescription,
+.potionCraftingIngredientDescription {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--ui-text-secondary);
+}
+
+.potionCraftingSelectedRecipe {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.potionCraftingRecipeTitle {
+  font-size: 22px;
+  color: var(--primary-light);
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.potionCraftingRecipeDescription {
+  margin-bottom: 20px;
+}
+
+.potionCraftingRecipeDetails {
+  margin-bottom: 20px;
+}
+
+.potionCraftingCraftButton,
+.potionCraftingExperimentButton {
+  padding: 10px 20px;
+  background-color: var(--primary-main);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: auto;
+  transition: background-color 0.2s;
+}
+
+.potionCraftingCraftButton:hover,
+.potionCraftingExperimentButton:hover {
+  background-color: var(--primary-light);
+}
+
+.potionCraftingCraftButton:disabled,
+.potionCraftingExperimentButton:disabled {
+  background-color: var(--ui-card-border);
+  color: var(--ui-text-secondary);
+  cursor: not-allowed;
+}
+
+.potionCraftingNoSelection {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--ui-text-secondary);
+  font-style: italic;
+}
+
+.potionCraftingSelectedIngredients {
+  margin-bottom: 20px;
+}
+
+.potionCraftingWarning {
+  margin-top: 15px;
+  color: #ff6b6b;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.potionCraftingResult {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.potionCraftingResultSuccess {
+  background-color: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+  border: 1px solid #2ecc71;
+}
+
+.potionCraftingResultFailure {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+  border: 1px solid #e74c3c;
+}
+
+.potionCraftingEmptyMessage {
+  padding: 20px;
+  text-align: center;
+  color: var(--ui-text-secondary);
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .potionCraftingBrewMode,
+  .potionCraftingExperimentMode {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+}

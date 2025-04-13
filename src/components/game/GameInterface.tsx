@@ -4,7 +4,7 @@ import MainMenu from '../menu/MainMenu';
 import Settings from '../settings/Settings';
 import HowToPlay from '../help/HowToPlay';
 import BattleArena from '../battle/BattleArena';
-import WizardStudy from '../../lib/ui/components/WizardStudy';
+import WizardStudy from '../study/WizardStudy';
 import ErrorBoundary from '../error/ErrorBoundary';
 import { CombatState, Spell } from '@/lib/types';
 
@@ -18,17 +18,17 @@ const GameInterface: React.FC = () => {
     animating: boolean;
   } | null>(null);
 
-  const handleStartNewGame = (saveSlotId: number) => {
+  const handleStartNewGame = (saveSlotId: number, saveUuid: string) => {
     updateGameState({
-      currentSaveSlot: saveSlotId,
+      currentSaveSlot: saveUuid,
       // Add other initialization logic
     });
     setCurrentView('study');
   };
 
-  const handleContinueGame = (saveSlotId: number) => {
+  const handleContinueGame = (saveSlotId: number, saveUuid: string) => {
     updateGameState({
-      currentSaveSlot: saveSlotId,
+      currentSaveSlot: saveUuid,
       // Add loading logic
     });
     setCurrentView('study');

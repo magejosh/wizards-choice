@@ -250,22 +250,35 @@ export function getEnemyDeck(wizard: Wizard): Spell[] {
 export function processEnemyDiscard(state: CombatState, maxHandSize: number): CombatState {
   let newState = { ...state };
 
-  // Check if enemy needs to discard
-  if (newState.enemyWizard.hand.length > maxHandSize) {
-    // Enemy needs to discard down to maxHandSize
-    const numToDiscard = newState.enemyWizard.hand.length - maxHandSize;
-    console.log(`Enemy needs to discard ${numToDiscard} cards`);
+  try {
+    // Check if enemy needs to discard
+    if (newState.enemyWizard.hand.length > maxHandSize) {
+      // Enemy needs to discard down to maxHandSize
+      const numToDiscard = newState.enemyWizard.hand.length - maxHandSize;
+      console.log(`Enemy needs to discard ${numToDiscard} cards`);
 
-    // Discard the lowest mana cost cards first (simple AI)
-    const sortedHand = [...newState.enemyWizard.hand].sort((a, b) => a.manaCost - b.manaCost);
-    for (let i = 0; i < numToDiscard; i++) {
-      if (sortedHand.length > 0) {
-        const cardToDiscard = sortedHand.shift();
-        if (cardToDiscard) {
-          newState = discardCard(newState, cardToDiscard.id, false);
+      // Discard the lowest mana cost cards first (simple AI)
+      const sortedHand = [...newState.enemyWizard.hand].sort((a, b) => a.manaCost - b.manaCost);
+      for (let i = 0; i < numToDiscard; i++) {
+        if (sortedHand.length > 0) {
+          const cardToDiscard = sortedHand.shift();
+          if (cardToDiscard) {
+            newState = discardCard(newState, cardToDiscard.id, false);
+          }
         }
       }
+
+      // Verify discard was successful
+      if (newState.enemyWizard.hand.length > maxHandSize) {
+        console.error(`Enemy discard failed, hand size: ${newState.enemyWizard.hand.length}, max: ${maxHandSize}`);
+      } else {
+        console.log(`Enemy discard successful, new hand size: ${newState.enemyWizard.hand.length}`);
+      }
+    } else {
+      console.log(`Enemy hand size (${newState.enemyWizard.hand.length}) is within limits, no discard needed`);
     }
+  } catch (error) {
+    console.error('Error in processEnemyDiscard:', error);
   }
 
   return newState;
@@ -279,9 +292,30 @@ export function processEnemyDiscard(state: CombatState, maxHandSize: number): Co
  * @returns Boolean indicating if discard is needed and number of cards to discard
  */
 export function needsToDiscard(state: CombatState, isPlayer: boolean, maxHandSize: number): { needsDiscard: boolean, cardsToDiscard: number } {
+  if (!state) {
+    console.error('Invalid state passed to needsToDiscard');
+    return { needsDiscard: false, cardsToDiscard: 0 };
+  }
+
   const wizard = isPlayer ? 'playerWizard' : 'enemyWizard';
+
+  // Validate that the wizard exists in the state
+  if (!state[wizard]) {
+    console.error(`Wizard ${wizard} not found in state`);
+    return { needsDiscard: false, cardsToDiscard: 0 };
+  }
+
+  // Validate that the hand exists
+  if (!state[wizard].hand) {
+    console.error(`Hand not found for ${wizard}`);
+    return { needsDiscard: false, cardsToDiscard: 0 };
+  }
+
   const handSize = state[wizard].hand.length;
   const cardsToDiscard = Math.max(0, handSize - maxHandSize);
+
+  const actorName = isPlayer ? 'Player' : 'Enemy';
+  console.log(`${actorName} hand size: ${handSize}, max: ${maxHandSize}, needs to discard: ${cardsToDiscard > 0 ? 'yes' : 'no'}`);
 
   return {
     needsDiscard: cardsToDiscard > 0,

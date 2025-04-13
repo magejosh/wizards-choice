@@ -43,7 +43,7 @@ class BattleLogManager {
    * @param entry The log entry to add (without timestamp)
    * @returns The complete log entry with timestamp
    */
-  public addEntry(entry: Omit<CombatLogEntry, 'timestamp'> & { timestamp?: number }): CombatLogEntry {
+  public addEntry(entry: Omit<CombatLogEntry, 'timestamp'> & { timestamp?: number, sequence?: number }): CombatLogEntry {
     // Check if this is the "duel has begun" message
     const isDuelBegunMessage = entry.action === 'combat_start' &&
                               entry.details?.includes('The duel has begun');
@@ -59,9 +59,13 @@ class BattleLogManager {
       timestamp = Math.max(now, this.lastEntryTimestamp + 1);
     }
 
+    // Add sequence number for additional ordering precision
+    const sequence = entry.sequence !== undefined ? entry.sequence : this.entryCounter++;
+
     const logEntry: CombatLogEntry = {
       ...entry,
-      timestamp
+      timestamp,
+      sequence
     };
 
     // Check for potential duplicates
@@ -75,15 +79,12 @@ class BattleLogManager {
       this.hasDuelBegunMessage = true;
     }
 
-    // Increment counter for next entry
-    this.entryCounter++;
-
     // Add to log - we'll sort when retrieving
     this.logEntries.push(logEntry);
     this.lastEntryTimestamp = timestamp;
 
     // Log to console for debugging
-    console.log(`[Battle Log] Added: ${entry.actor} ${entry.action}: ${entry.details} (timestamp: ${timestamp})`);
+    console.log(`[Battle Log] Added: ${entry.actor} ${entry.action}: ${entry.details} (timestamp: ${timestamp}, sequence: ${sequence})`);
 
     return logEntry;
   }
@@ -96,9 +97,14 @@ class BattleLogManager {
     // Create a completely new array to avoid modifying the original
     const allEntries = [...this.logEntries];
 
-    // Simply sort all entries by timestamp (newest first)
-    // This will ensure ALL entries follow the same reverse chronological order
-    const sortedEntries = allEntries.sort((a, b) => b.timestamp - a.timestamp);
+    // Sort by timestamp first, then by sequence number if timestamps are equal
+    const sortedEntries = allEntries.sort((a, b) => {
+      if (b.timestamp === a.timestamp) {
+        // If timestamps are equal, use sequence number
+        return (b.sequence || 0) - (a.sequence || 0);
+      }
+      return b.timestamp - a.timestamp;
+    });
 
     return sortedEntries;
   }

@@ -1,3 +1,7 @@
 # Known Bugs and Issues
-- Sometimes game glitches when enemy wizard discards a card causing the phase advancement to get stuck between the discard and the end phase.
-- Spellcard layouts reverted to legacy styling during agent/augmentCode.md refactor plan from agent/augmentCode_todo.md.
+- Sometimes game glitches when enemy wizard discards a card causing the phase advancement to get stuck between the discard and the initiative phase of the next round. Possibly race conditions related to state management. There should be only one source of truth for phase state with components it calls on to manage each phase of the round. Unless you have a better idea or insight into the root cause of the issue.
+- Save slots need Unique ID's to hopefully fix the issue with only the last used save slot being saved or usable.
+- Market sell function not working as intended/expected. It never shows any items in the player inventory to sell and it should if the player has items in their inventory that are not equipped currently. Needs code audit with intent to hook up this functionality. Markets should have a limited amount of gold to buy items with that resets when the inventory refreshes.
+- Potion crafting seems like it's not implemented completely or properly hooked up. Needs code audit.
+- Equipping an item in inventory to a slot with an item already equipped overwrites the already equipped item effectively deleting it. It should unequipt the already equipped item when equipping a new item to the same slot.
+- Market Attacks seem like they are not triggering when leaving markets, which seems odd given it did work earlier in development. Needs code audit. Expectation, when clicking leave market or when traveling to a new market there is a random chance of triggering a market attack as described in docs/requirements.md

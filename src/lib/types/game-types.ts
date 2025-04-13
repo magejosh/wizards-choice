@@ -16,7 +16,7 @@ export interface GameProgress {
   craftedRecipes?: string[];
   currentLocation: 'wizardStudy' | 'duel' | 'levelUp' | 'market';
   questProgress: Record<string, any>;
-  
+
   // Player profile data
   achievements?: Achievement[];
   titles?: PlayerTitle[];
@@ -49,11 +49,14 @@ export interface GameSettings {
  * Save slot information
  */
 export interface SaveSlot {
-  id: number;
+  id: number;  // Keep for backward compatibility and UI display
+  saveUuid: string;  // Unique identifier for the save slot
   playerName: string;
   level: number;
   lastSaved: string;
   isEmpty: boolean;
+  player?: Wizard;  // Player data specific to this save slot
+  gameProgress?: GameProgress;  // Game progress specific to this save slot
 }
 
 /**
@@ -74,12 +77,16 @@ export interface GameNotification {
  * Complete game state
  */
 export interface GameState {
-  player: Wizard;
-  gameProgress: GameProgress;
   settings: GameSettings;
   saveSlots: SaveSlot[];
-  currentSaveSlot: number;
+  currentSaveSlot: string;  // Changed from number to string (saveUuid)
   markets: MarketLocation[];
   marketData: MarketData;
   notifications: GameNotification[];
-} 
+  version: number;  // Added for migration purposes
+
+  // These properties are kept for backward compatibility
+  // but will be deprecated in favor of accessing them through the current save slot
+  player?: Wizard;
+  gameProgress?: GameProgress;
+}

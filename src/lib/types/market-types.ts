@@ -20,6 +20,7 @@ export interface MarketLocation {
   priceMultiplier: number;
   sellPriceMultiplier: number; // Multiplier for selling items (e.g. 0.6 for 60% of buy price)
   prices: Record<string, number>;
+  currentGold?: number; // Amount of gold the market has available for buying items from player
 }
 
 /**
@@ -68,4 +69,4 @@ export interface MarketTransaction {
   price: number;
   type: 'buy' | 'sell';
   date: string; // ISO date string
-} 
+}

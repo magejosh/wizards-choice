@@ -1,0 +1,1348 @@
+/* Global styles for components */
+
+/* Wizard Study styles */
+.wizard-study {
+  display: flex;
+  flex-direction: column;
+  width: 97%;
+  height: 100vh;
+  background-color: #1d1a2e; /* Dark blue/purple background */
+  color: #ffffff;
+  padding: 2px;
+  overflow: hidden;
+  font-family: 'Raleway', sans-serif;
+  margin: 0 auto; /* Center the container */
+}
+
+.wizard-study__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #3a3a5c;
+  background-color: #1a1a2e; /* Same as main background */
+  position: relative;
+}
+
+/* Ensure header elements are properly spaced */
+.wizard-study__title {
+  flex: 1;
+  text-align: left;
+}
+
+.wizard-study__player-info {
+  flex: 2;
+  text-align: center;
+}
+
+.wizard-study__sidebar-toggle {
+  text-align: right;
+  margin-left: auto;
+  width: auto;
+}
+
+/* Title styling */
+.wizard-study__title {
+  font-size: 28px;
+  color: #9370DB; /* Purple color for the title */
+  margin: 0;
+  font-family: 'Cinzel', serif;
+}
+
+/* Player info additional styling */
+.wizard-study__player-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wizard-study__player-name {
+  font-size: 20px;
+  margin: 0;
+  color: #ffffff;
+  text-align: center;
+}
+
+.wizard-study__player-level {
+  font-size: 16px;
+  color: #9370DB;
+  margin-left: 5px;
+  display: inline;
+}
+
+.wizard-study__profile-button {
+  padding: 5px 15px;
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid #9370DB;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.wizard-study__profile-button:hover {
+  background-color: rgba(147, 112, 219, 0.2);
+}
+
+.wizard-study__content {
+  display: flex;
+  flex: 1;
+  gap: 2px;
+  overflow: hidden;
+  height: calc(100vh - 60px); /* Adjust height to fill the viewport minus header */
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
+}
+
+/* Ensure main area takes full width on mobile */
+.wizard-study__main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+  width: 100%;
+  order: 1; /* Ensure main area comes before sidebar */
+}
+
+.wizard-study__study-scene {
+  flex: 1;
+  background-color: #13132b; /* Darker than the main background */
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #3a3a5c;
+}
+
+.wizard-study__study-background {
+  width: 100%;
+  height: 100%;
+  background-color: #13132b; /* Darker background */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2px;
+  position: relative; /* Ensure this is present for absolute positioning of children */
+}
+
+.wizard-study__background-customization {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  margin-bottom: 0;
+}
+
+.wizard-study__background-customization .wizard-study__action {
+  background-color: transparent;
+  color: #9370DB;
+  border: 1px solid #3a3a5c;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.wizard-study__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-self: center;
+  width: 80%;
+  max-width: 600px;
+  margin-bottom: 20px;
+  margin-top: auto; /* Push to the bottom of the container */
+  z-index: 10; /* Ensure buttons are above other elements */
+  position: relative; /* Create stacking context */
+}
+
+.wizard-study__action {
+  padding: 12px 20px;
+  background-color: transparent;
+  color: #9370DB;
+  border: 1px solid #3a3a5c;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.wizard-study__action:hover {
+  background-color: rgba(147, 112, 219, 0.1);
+  border-color: #9370DB;
+}
+
+.wizard-study__action--primary {
+  background-color: #9370DB;
+  color: white;
+  font-size: 18px;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 4px;
+}
+
+.wizard-study__action--primary:hover {
+  background-color: #a280e9;
+}
+
+.wizard-study__action--secondary {
+  background-color: transparent;
+  font-size: 14px;
+}
+
+.wizard-study__action--secondary:hover {
+  background-color: rgba(147, 112, 219, 0.1);
+}
+
+.wizard-study__action-group {
+  display: flex;
+  gap: 10px;
+}
+
+.wizard-study__action-group .wizard-study__action {
+  flex: 1;
+}
+
+.wizard-study__secondary-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.wizard-study__secondary-actions .wizard-study__action {
+  flex: 1;
+}
+
+.wizard-study__sidebar {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto; /* Change from overflow-y: auto to prevent scrollbars */
+  background-color: #13132b; /* Darker than the main background */
+  border-radius: 8px;
+  padding: 2px;
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
+  position: relative; /* Add position relative to establish stacking context */
+}
+
+.wizard-study__sidebar .wizard-study__action {
+  width: 100%;
+  margin-top: 5px;
+}
+
+.wizard-study__deck-selector {
+  width: 100%;
+  position: relative;
+  margin: 0 auto; /* Center the element */
+}
+
+.wizard-study__deck-dropdown {
+  text-align: center;
+  position: relative;
+  width: 100%;
+  background-color: transparent;
+  color: #9370DB;
+  border: 1px solid #3a3a5c;
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
+  cursor: pointer;
+}
+
+.wizard-study__deck-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #1a1a2e;
+  border: 1px solid #3a3a5c;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.wizard-study__deck-dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #3a3a5c;
+  transition: background-color 0.2s;
+}
+
+.wizard-study__deck-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.wizard-study__deck-dropdown-item:hover {
+  background-color: rgba(147, 112, 219, 0.1);
+}
+
+.wizard-study__deck-dropdown-item--active {
+  background-color: rgba(147, 112, 219, 0.2);
+  font-weight: bold;
+}
+
+.wizard-study__active-indicator {
+  color: #9370DB;
+  margin-left: 5px;
+}
+
+.wizard-study__deck-card-count {
+  font-size: 12px;
+  color: #cccccc;
+}
+
+.wizard-study__player-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: transparent;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #3a3a5c;
+  width: 95%;
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
+  margin: 0 auto; /* Center the element */
+}
+
+
+.wizard-study__equipped-deck,
+.wizard-study__equipment,
+.wizard-study__scrolls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 95%;
+  background-color: transparent;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #3a3a5c;
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
+  margin: 0 auto; /* Center the element */
+}
+
+.wizard-study__sidebar-title {
+  font-size: 18px;
+  color: #9370DB;
+  margin-top: 0;
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #3a3a5c;
+  font-family: 'Cinzel', serif;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.wizard-study__stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
+}
+
+.wizard-study__stat-label {
+  color: #cccccc;
+}
+
+.wizard-study__stat-value {
+  font-weight: bold;
+  color: #9370DB;
+  text-align: right;
+}
+
+.wizard-study__spells-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.wizard-study__spell-item {
+  width: 100%;
+}
+
+.wizard-study__no-spells {
+  color: #cccccc;
+  font-style: italic;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.wizard-study__equipment-list {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wizard-study__equipment-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  background-color: rgba(26, 26, 46, 0.7);
+  border-radius: 4px;
+  border: 1px solid #3a3a5c;
+}
+
+.wizard-study__equipment-name {
+  font-weight: bold;
+}
+
+.wizard-study__equipment-slot {
+  color: #cccccc;
+  font-size: 14px;
+}
+
+/* Modal styles for spell scrolls */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(147, 112, 219, 0.3);
+  border-radius: 50%;
+  border-top-color: #9370DB;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.modal-content {
+  background-color: var(--ui-background);
+  border-radius: 8px;
+  padding: 20px;
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content h2 {
+  color: var(--primary-light);
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.scroll-collection p {
+  color: var(--ui-text-secondary);
+  margin-bottom: 20px;
+}
+
+.scrolls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.scroll-item {
+  background-color: var(--ui-card);
+  border-radius: 8px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.scroll-item:hover {
+  box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.3);
+  transform: translateY(-2px);
+}
+
+.scroll-item h4 {
+  margin: 0 0 10px;
+  color: var(--primary-light);
+}
+
+.scroll-rarity {
+  color: var(--ui-text-secondary);
+  font-size: 14px;
+}
+
+.already-known {
+  color: var(--ui-text-secondary);
+  font-style: italic;
+}
+
+.known-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--ui-text-secondary);
+  color: var(--ui-background);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.scroll-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scroll-details h3 {
+  color: var(--primary-light);
+  margin-bottom: 15px;
+}
+
+.scroll-spell-preview {
+  width: 200px;
+  margin-bottom: 20px;
+}
+
+.learn-spell-button {
+  padding: 10px 20px;
+  background-color: var(--primary-main);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 20px;
+  transition: background-color 0.2s;
+}
+
+.learn-spell-button:hover {
+  background-color: var(--primary-light);
+}
+
+.back-button,
+.close-button {
+  padding: 8px 16px;
+  background-color: var(--ui-button);
+  color: var(--ui-text);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.2s;
+}
+
+.back-button:hover,
+.close-button:hover {
+  background-color: var(--ui-button-hover);
+}
+
+.result-message {
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.success {
+  background-color: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+  border: 1px solid #2ecc71;
+}
+
+.error {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+  border: 1px solid #e74c3c;
+}
+
+.no-scrolls {
+  text-align: center;
+  color: var(--ui-text-secondary);
+  font-style: italic;
+  padding: 20px 0;
+}
+
+/* Main Menu styles */
+.main-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #1a1a2e; /* Dark blue/purple background */
+  background-image: url('/images/main-menu-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  padding: 20px;
+  font-family: 'Raleway', sans-serif;
+}
+
+.main-menu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1;
+}
+
+.main-menu__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.main-menu__logo {
+  margin-bottom: 40px;
+  max-width: 100%;
+  height: auto;
+}
+
+.main-menu__title {
+  font-size: 48px;
+  color: #9370DB; /* Medium Purple */
+  margin: 0 0 20px;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  text-shadow: 0 0 10px rgba(147, 112, 219, 0.5);
+}
+
+.main-menu__subtitle {
+  font-size: 24px;
+  color: #ffffff;
+  margin: 0 0 40px;
+  text-align: center;
+  font-style: italic;
+}
+
+.main-menu__buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.main-menu__button {
+  padding: 15px 20px;
+  background-color: transparent;
+  color: #9370DB;
+  border: 1px solid #3a3a5c;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.main-menu__button:hover {
+  background-color: rgba(147, 112, 219, 0.1);
+  border-color: #9370DB;
+  transform: translateY(-2px);
+}
+
+.main-menu__button--primary {
+  background-color: #9370DB;
+  color: white;
+  border: none;
+}
+
+.main-menu__button--primary:hover {
+  background-color: #a280e9;
+}
+
+.main-menu__button--secondary {
+  background-color: transparent;
+  border-color: #3a3a5c;
+  color: #9370DB;
+}
+
+.main-menu__button--secondary:hover {
+  background-color: rgba(147, 112, 219, 0.1);
+  border-color: #9370DB;
+}
+
+.main-menu__footer {
+  margin-top: 40px;
+  display: flex;
+  gap: 20px;
+}
+
+.main-menu__footer-button {
+  padding: 8px 16px;
+  background-color: transparent;
+  color: #cccccc;
+  border: 1px solid #3a3a5c;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.main-menu__footer-button:hover {
+  color: #ffffff;
+  border-color: #9370DB;
+  background-color: rgba(147, 112, 219, 0.1);
+}
+
+.main-menu__version {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  color: #cccccc;
+  font-size: 12px;
+  z-index: 2;
+}
+
+/* Save slots */
+.save-slots {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 30px;
+}
+
+.save-slots__title {
+  font-size: 24px;
+  color: #9370DB;
+  margin: 0 0 20px;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+}
+
+.save-slots__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.save-slot {
+  background-color: rgba(26, 26, 46, 0.5);
+  border: 1px solid #3a3a5c;
+  border-radius: 4px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-slot:hover {
+  border-color: #9370DB;
+  transform: translateY(-2px);
+  background-color: rgba(26, 26, 46, 0.7);
+}
+
+.save-slot--selected {
+  border-color: #9370DB;
+  box-shadow: 0 0 10px rgba(147, 112, 219, 0.5);
+}
+
+.save-slot--empty {
+  border-style: dashed;
+}
+
+.save-slot__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.save-slot__name {
+  font-weight: bold;
+  font-size: 18px;
+  color: #9370DB;
+  margin: 0;
+}
+
+.save-slot__slot-number {
+  font-size: 14px;
+  color: #cccccc;
+}
+
+.save-slot__details {
+  margin-bottom: 15px;
+}
+
+.save-slot__detail {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.save-slot__detail-label {
+  color: #cccccc;
+}
+
+.save-slot__detail-value {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.save-slot__empty-message {
+  color: #cccccc;
+  font-style: italic;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.save-slot__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.save-slot__action {
+  flex: 1;
+  padding: 8px 0;
+  font-size: 14px;
+  background-color: transparent;
+  color: #9370DB;
+  border: 1px solid #3a3a5c;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.save-slot__action:hover {
+  background-color: rgba(147, 112, 219, 0.1);
+  border-color: #9370DB;
+}
+
+.save-slot__action--primary {
+  background-color: #9370DB;
+  color: white;
+  border: none;
+}
+
+.save-slot__action--primary:hover {
+  background-color: #a280e9;
+}
+
+.save-slot__action--danger {
+  background-color: transparent;
+  color: #e74c3c;
+  border: 1px solid #e74c3c;
+}
+
+.save-slot__action--danger:hover {
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+/* Support Devs Modal Styles */
+.support-devs-content {
+  margin-bottom: 20px;
+}
+
+.donation-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.donation-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: rgba(26, 26, 46, 0.7);
+  border-radius: 4px;
+  border: 1px solid #3a3a5c;
+  transition: all 0.3s ease;
+}
+
+.donation-option:hover {
+  background-color: rgba(147, 112, 219, 0.1);
+  border-color: #9370DB;
+}
+
+.donation-option img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.donation-option a {
+  color: #9370DB;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.donation-option a:hover {
+  text-decoration: underline;
+}
+
+/* Collapsible Sidebar Styles */
+.wizard-study__sidebar-container {
+  position: relative;
+  z-index: 10;
+  order: 2; /* Move to the end of the flex container */
+}
+
+/* Style the sidebar content */
+.wizard-study__sidebar {
+  background-color: #13132b !important;
+  border-color: #3a3a5c !important;
+}
+
+/* Style the sidebar links */
+.wizard-study__sidebar a {
+  color: #9370DB;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.wizard-study__sidebar a:hover {
+  color: #ffffff;
+}
+
+/* Ensure icon and text are on the same line */
+.wizard-study__sidebar a span {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Quickactions section styling */
+.wizard-study__quickactions-section {
+  background-color: rgba(19, 19, 43, 0.5);
+  border: 1px solid #3a3a5c;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+/* Custom styling for accordion in sidebar */
+.wizard-study__sidebar [data-radix-accordion-content] {
+  background-color: rgba(19, 19, 43, 0.3);
+  border-radius: 4px;
+  margin-top: 4px;
+  padding: 4px 0;
+}
+
+/* Removed default accordion trigger styling in favor of using the wizard-study__action classes */
+.wizard-study__sidebar [data-radix-accordion-trigger] {
+  width: 100%;
+  text-align: center;
+}
+
+/* Removed hover styling in favor of using the wizard-study__action classes */
+
+/* Removed open state styling in favor of using the wizard-study__action classes */
+
+/* Hide the default chevron in accordion trigger */
+.sidebar-accordion-trigger > svg {
+  display: none;
+}
+
+/* Make sidebar scrollable */
+.wizard-study__sidebar {
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a5c #13132b;
+  padding-bottom: 30px; /* Add padding to the bottom to ensure all content is visible */
+}
+
+.wizard-study__sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wizard-study__sidebar::-webkit-scrollbar-track {
+  background: #13132b;
+}
+
+.wizard-study__sidebar::-webkit-scrollbar-thumb {
+  background-color: #3a3a5c;
+  border-radius: 6px;
+}
+
+/* Style for collapsed sidebar icons */
+.sidebar-icon-collapsed {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: 45px !important;
+}
+
+.sidebar-icon-collapsed svg {
+  width: 75% !important;
+  height: 75% !important;
+  min-width: 45px !important;
+  min-height: 45px !important;
+}
+
+/* Style the mobile menu button */
+.wizard-study__sidebar-container svg {
+  color: #9370DB !important;
+}
+
+/* Style the sidebar toggle button */
+.wizard-study__sidebar-toggle {
+  background-color: #13132b;
+  border: 2px solid #3a3a5c;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(147, 112, 219, 0.5);
+  animation: pulse-border 4s infinite;
+  transition: all 0.2s ease;
+}
+
+.wizard-study__sidebar-toggle:hover {
+  box-shadow: 0 0 20px rgba(147, 112, 219, 0.8);
+  transform: scale(1.1);
+  background-color: #2d2d42;
+}
+
+@keyframes pulse-border {
+  0% { border-color: #3a3a5c; box-shadow: 0 0 10px rgba(147, 112, 219, 0.3); }
+  50% { border-color: #9370DB; box-shadow: 0 0 15px rgba(147, 112, 219, 0.7); }
+  100% { border-color: #3a3a5c; box-shadow: 0 0 10px rgba(147, 112, 219, 0.3); }
+}
+
+/* Sidebar icon styles */
+.wizard-study__sidebar-icon-title {
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #9370DB;
+}
+
+.wizard-study__equipment-emoji {
+  font-size: 1.25rem;
+  display: block;
+  text-align: center;
+}
+
+/* Stat styles for sidebar */
+.wizard-study__sidebar-container .wizard-study__stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+/* Fix for duplicate wizard stats component */
+.wizard-study__player-stats {
+  position: relative;
+  z-index: 10;
+}
+
+.wizard-study__equipment-section {
+  position: relative;
+  z-index: 5;
+}
+
+.wizard-study__equipped-deck {
+  position: relative;
+  z-index: 5;
+}
+
+/* Ensure scrolls section is visible */
+.scrolls-container {
+  position: relative;
+  z-index: 5;
+}
+
+/* Fix for hidden components in sidebar */
+.wizard-study__sidebar > div > * {
+  position: relative;
+  z-index: auto;
+}
+
+/* Fix for duplicate wizard stats component */
+.relative.wizard-study__sidebar-container {
+  position: relative;
+  z-index: 1;
+}
+
+.relative.hidden.md\:block.h-full {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix for sidebar overflow */
+.h-full.hidden.md\:flex.md\:flex-col.bg-neutral-900.dark\:bg-\[\#13132b\].w-\[300px\].flex-shrink-0.border-l.border-\[\#3a3a5c\].absolute.right-0.overflow-y-auto.px-4.py-4.wizard-study__sidebar-container {
+  overflow: visible !important;
+}
+
+/* Fix for hidden elements in sidebar */
+.wizard-study__sidebar-container .wizard-study__equipment-section,
+.wizard-study__sidebar-container .wizard-study__equipped-deck {
+  display: block !important;
+  visibility: visible !important;
+  position: relative;
+  z-index: 5;
+}
+
+/* Fix for duplicate wizard stats component */
+.wizard-study__sidebar > div > div:not(.wizard-study__player-stats) + .wizard-study__player-stats {
+  display: none !important;
+}
+
+/* Fix for hidden elements in sidebar */
+.wizard-study__sidebar > div > div.wizard-study__equipment-section {
+  display: block !important;
+  visibility: visible !important;
+  position: relative;
+  z-index: 5;
+  margin-top: 10px;
+}
+
+/* Fix for hidden elements in sidebar */
+.wizard-study__sidebar > div > div.flex.flex-col.gap-6.h-full > div.wizard-study__equipment-section {
+  display: block !important;
+  visibility: visible !important;
+  position: relative;
+  z-index: 5;
+  margin-top: 10px;
+}
+
+/* Fix for duplicate wizard stats component */
+.wizard-study__sidebar > div > div.flex.flex-col.gap-6.h-full > div.wizard-study__player-stats ~ div.wizard-study__player-stats {
+  display: none !important;
+}
+
+/* Fix for hidden elements in sidebar */
+.wizard-study__sidebar > div > div.flex.flex-col.gap-6.h-full > div.wizard-study__player-stats ~ div.wizard-study__equipment-section {
+  display: block !important;
+  visibility: visible !important;
+  position: relative;
+  z-index: 5;
+  margin-top: 10px;
+}
+
+/* Fix for hidden elements in sidebar */
+.wizard-study__sidebar > div > div.flex.flex-col.gap-6.h-full > div.wizard-study__player-stats ~ div.wizard-study__equipped-deck {
+  display: block !important;
+  visibility: visible !important;
+  position: relative;
+  z-index: 5;
+  margin-top: 10px;
+}
+
+/* Fix for duplicate wizard stats component */
+div.wizard-study__player-stats:nth-of-type(2) {
+  display: none !important;
+}
+
+.wizard-study__stat-icon {
+  display: inline-block;
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.wizard-study__stat-text {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.wizard-study__stat-label {
+  display: flex;
+  align-items: center;
+}
+
+/* Adjust sidebar width when collapsed */
+.wizard-study__sidebar-container .wizard-study__sidebar {
+  transition: width 0.3s ease;
+}
+
+/* Ensure sidebar body has proper overflow handling */
+.wizard-study__sidebar > div {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix for duplicate wizard stats component */
+.wizard-study__sidebar-container .wizard-study__sidebar-title {
+  position: relative;
+  z-index: 10;
+}
+
+/* Hide any duplicate wizard stats components */
+.wizard-study__sidebar .wizard-study__player-stats:nth-of-type(n+2) {
+  display: none !important;
+}
+
+/* Ensure equipment section is properly positioned */
+.wizard-study__equipment-section {
+  margin-top: 10px;
+  position: relative;
+  z-index: 5;
+  display: block !important;
+  visibility: visible !important;
+  margin-bottom: 20px; /* Add bottom margin to ensure it's not cut off */
+}
+
+/* Ensure scrolls section is properly positioned */
+.wizard-study__scrolls-section {
+  margin-top: 10px;
+  position: relative;
+  z-index: 5;
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .wizard-study__content {
+    height: calc(100vh - 60px);
+  }
+
+  /* Force right alignment and correct border for mobile sidebar component */
+  .mobile-sidebar {
+    border-left: none !important;
+    border-right: 1px solid #3a3a5c !important;
+    right: 0 !important;
+    left: auto !important;
+  }
+
+  /* Ensure the component's own container doesn't interfere */
+  .mobile-sidebar-container {
+    flex-shrink: 0;
+  }
+
+  /* Ensure action buttons are visible and above sidebar */
+  .wizard-study__actions {
+    width: 90%;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(19, 19, 43, 0.9);
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  /* Ensure main content doesn't get hidden and allows overflow */
+  .wizard-study__main-area {
+     width: 100%;
+     position: relative;
+     z-index: 1;
+     min-height: 300px;
+     overflow: visible;
+  }
+
+  /* Simplify individual action styles on mobile */
+  .wizard-study__action {
+    display: block !important;
+    visibility: visible !important;
+    position: static;
+    z-index: auto;
+    text-align: center;
+  }
+
+  /* Keep existing rules for collapsed sidebar links/icons */
+  [data-state="closed"] .sidebar-link,
+  [data-state="closed"] button {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 10px 0 !important;
+    text-align: center !important;
+  }
+
+  [data-state="closed"] .sidebar-link svg,
+  [data-state="closed"] button svg,
+  [data-state="closed"] .sidebar-link span,
+  [data-state="closed"] button span {
+    width: 24px !important;
+    height: 24px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  [data-state="closed"] .sidebar-link,
+  [data-state="closed"] button {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .sidebar-icon {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .sidebar-icon-collapsed {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  /* Keep other existing mobile styles */
+  .wizard-study__header {
+    padding: 10px 15px;
+  }
+
+  .wizard-study__action-group,
+  .wizard-study__secondary-actions {
+    flex-direction: column;
+  }
+
+  .main-menu__title {
+    font-size: 36px;
+  }
+
+  .main-menu__subtitle {
+    font-size: 18px;
+  }
+
+  .save-slots__list {
+    grid-template-columns: 1fr;
+  }
+}

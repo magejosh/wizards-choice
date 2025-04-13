@@ -1,8 +1,8 @@
 .ingredientsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+  padding: 0.5rem;
 }
 
 .emptyIngredients {
@@ -10,148 +10,222 @@
   align-items: center;
   justify-content: center;
   height: 200px;
-  color: var(--muted-foreground);
+  color: #8a5dff;
   font-style: italic;
-  border: 2px dashed var(--border);
-  border-radius: 0.5rem;
+  border: 2px dashed #5a3a8e;
+  border-radius: 8px;
   margin: 1rem;
+  background: rgba(58, 42, 94, 0.3);
+  text-align: center;
+  padding: 1rem;
 }
 
 .ingredientCard {
+  width: 100%;
+  aspect-ratio: 2/3;
+  background-color: #1a1a2e;
+  border-radius: 8px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
+  position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  color: #fff;
+  max-width: 180px;
+  margin: 0 auto;
+  border-left: 3px solid #7aff3b;
 }
 
 .ingredientCard:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: #8aff5b;
 }
 
 .ingredientHeader {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
+  min-height: 0;
 }
 
 .ingredientName {
-  font-weight: 600;
-  color: var(--foreground);
+  font-size: 14px;
   margin: 0;
-  font-size: 1.1rem;
+  padding: 0;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  color: #fff;
+  line-height: 1;
 }
 
-.rarity {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
+.rarityBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
   text-transform: capitalize;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }
 
 .common {
-  background-color: var(--common);
-  color: var(--common-foreground);
+  color: #aaaaaa;
 }
 
 .uncommon {
-  background-color: var(--uncommon);
-  color: var(--uncommon-foreground);
+  color: #1eff00;
 }
 
 .rare {
-  background-color: var(--rare);
-  color: var(--rare-foreground);
+  color: #0070dd;
 }
 
 .epic {
-  background-color: var(--epic);
-  color: var(--epic-foreground);
+  color: #a335ee;
 }
 
 .legendary {
-  background-color: var(--legendary);
-  color: var(--legendary-foreground);
+  color: #ff8000;
+}
+
+.ingredientImage {
+  position: relative;
+  height: 100px;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  margin: 6px 0;
+}
+
+.ingredientImage::before {
+  content: '🌿';
+  font-size: 32px;
 }
 
 .ingredientInfo {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 4px;
+  flex: 1;
+  overflow: hidden;
 }
 
 .ingredientDetails {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  font-size: 0.875rem;
-  color: var(--muted-foreground);
+  padding: 4px 6px;
+  background-color: rgba(0, 0, 0, 0.7);
+  font-size: 10px;
+  margin-bottom: 2px;
+  border-radius: 4px;
 }
 
-.category {
-  padding: 0.25rem 0.5rem;
-  background-color: var(--secondary);
-  border-radius: 0.25rem;
-  text-transform: capitalize;
-}
-
+.category,
+.rarity,
 .quantity {
-  font-weight: 600;
-  color: var(--foreground);
+  padding: 2px 6px;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, 0.2);
+  text-transform: capitalize;
+  font-weight: bold;
+  font-size: 11px;
 }
 
 .description {
-  font-size: 0.875rem;
-  color: var(--muted-foreground);
+  font-size: 11px;
+  color: #ccc;
   line-height: 1.4;
-  margin: 0;
+  overflow-y: auto;
+  max-height: 50px;
+  margin: 0 0 4px 0;
+  padding: 2px 4px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
 }
 
 .effects {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  margin-bottom: 4px;
 }
 
 .effect {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  background-color: var(--accent);
-  color: var(--accent-foreground);
-  border-radius: 0.25rem;
+  padding: 2px 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  font-size: 11px;
 }
 
 .ingredientActions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   margin-top: auto;
 }
 
 .useButton {
   width: 100%;
+  background: linear-gradient(to bottom, #6a3de8, #5a2dd8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.useButton:hover {
+  background: linear-gradient(to bottom, #7a4df8, #6a3de8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .ingredientsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 0.75rem;
-    padding: 0.5rem;
+    padding: 0.25rem;
   }
 
   .ingredientCard {
-    padding: 0.75rem;
+    max-width: 150px;
+  }
+
+  .ingredientImage {
+    height: 80px;
+  }
+
+  .description {
+    max-height: 40px;
   }
 
   .ingredientName {
-    font-size: 1rem;
+    font-size: 12px;
   }
 
-  .effects {
-    gap: 0.25rem;
+  .category,
+  .quantity {
+    font-size: 10px;
   }
-} 
+}

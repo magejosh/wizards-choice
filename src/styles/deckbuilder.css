@@ -1,0 +1,485 @@
+/* DeckBuilder styles */
+.deck-builder {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  background-color: #0c0c1d;
+  color: #ffffff;
+  padding: 20px;
+  overflow: auto;
+  font-family: 'Raleway', sans-serif;
+}
+
+.deck-builder__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.deck-builder__header h2 {
+  font-size: 28px;
+  color: #9370DB;
+  margin: 0;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.deck-builder__close {
+  padding: 8px 16px;
+  background-color: #9370DB;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-weight: bold;
+}
+
+.deck-builder__close:hover {
+  background-color: #a280e9;
+}
+
+.deck-builder__help {
+  background-color: #13132b;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.deck-builder__help-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #3a3a5c;
+}
+
+.deck-builder__help-header h3 {
+  margin: 0;
+  color: #9370DB;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.deck-builder__help-toggle {
+  font-size: 20px;
+  color: #9370DB;
+  transition: transform 0.3s;
+}
+
+.deck-builder__help-toggle.expanded {
+  transform: rotate(180deg);
+}
+
+.deck-builder__help-content {
+  padding: 15px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #cccccc;
+}
+
+.deck-builder__help-content p {
+  margin-bottom: 10px;
+}
+
+.deck-builder__help-content ul {
+  margin-left: 20px;
+  list-style-type: none;
+}
+
+.deck-builder__help-content ul li {
+  position: relative;
+  padding-left: 15px;
+  margin-bottom: 5px;
+}
+
+.deck-builder__help-content ul li:before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #9370DB;
+}
+
+.deck-builder__content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 20px;
+}
+
+.deck-builder__decks {
+  margin-bottom: 20px;
+}
+
+.deck-builder__decks h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #9370DB;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 18px;
+}
+
+.deck-builder__decks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.deck-builder__deck-item {
+  background-color: #13132b;
+  border: 1px solid #3a3a5c;
+  border-radius: 4px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.deck-builder__deck-item:hover {
+  border-color: #9370DB;
+  box-shadow: 0 0 10px rgba(147, 112, 219, 0.3);
+}
+
+.deck-builder__deck-item--selected {
+  border-color: #9370DB;
+  background-color: rgba(147, 112, 219, 0.1);
+}
+
+.deck-builder__deck-item--active {
+  border-width: 2px;
+}
+
+.deck-builder__deck-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.deck-builder__active-badge {
+  color: #9370DB;
+  font-size: 12px;
+  margin-left: 5px;
+  font-weight: normal;
+}
+
+.deck-builder__deck-info {
+  font-size: 12px;
+  color: #cccccc;
+}
+
+.deck-builder__warning {
+  color: #e74c3c;
+}
+
+.deck-builder__deck-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.deck-builder__deck-action {
+  padding: 10px 16px;
+  background-color: #9370DB;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex: 1;
+  font-weight: bold;
+  text-align: center;
+}
+
+.deck-builder__deck-action:hover:not(:disabled) {
+  background-color: #a280e9;
+}
+
+.deck-builder__deck-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deck-builder__deck-action--danger {
+  background-color: #e74c3c;
+}
+
+.deck-builder__deck-action--danger:hover:not(:disabled) {
+  background-color: #c0392b;
+}
+
+.deck-builder__editing {
+  margin-top: 20px;
+}
+
+.deck-builder__editing h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #9370DB;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deck-builder__save-button {
+  padding: 8px 16px;
+  background-color: #9370DB;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.deck-builder__save-button:hover {
+  background-color: #a280e9;
+}
+
+.deck-builder__deck-slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 20px;
+  padding: 3px;
+}
+
+.deck-builder__deck-slot {
+  position: relative;
+  padding: 2px;
+  width: 200px;
+  aspect-ratio: 2/3;
+  margin: 0 auto;
+}
+
+.deck-builder__min-size-warning {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #e74c3c;
+  padding: 10px;
+  background-color: rgba(231, 76, 60, 0.1);
+  border-radius: 4px;
+  border: 1px solid #e74c3c;
+}
+
+.deck-builder__filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.deck-builder__search {
+  flex: 1;
+  min-width: 200px;
+}
+
+.deck-builder__search input {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: #13132b;
+  border: 1px solid #3a3a5c;
+  border-radius: 4px;
+  color: #ffffff;
+}
+
+.deck-builder__search input:focus {
+  outline: none;
+  border-color: #9370DB;
+}
+
+.deck-builder__filter-group {
+  display: flex;
+  gap: 10px;
+}
+
+.deck-builder__filter-select {
+  padding: 8px 12px;
+  background-color: #13132b;
+  border: 1px solid #3a3a5c;
+  border-radius: 4px;
+  color: #ffffff;
+}
+
+.deck-builder__filter-select:focus {
+  outline: none;
+  border-color: #9370DB;
+}
+
+.deck-builder__collection {
+  margin-top: 20px;
+}
+
+.deck-builder__collection h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #9370DB;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 18px;
+}
+
+.deck-builder__spells-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.5rem;
+  padding: 2px;
+}
+
+.deck-builder__spell {
+  position: relative;
+  padding: 2px;
+  width: 200px;
+  aspect-ratio: 2/3;
+  margin: 0 auto;
+}
+
+/* Ensure consistent styling for spell cards in deck builder */
+.deck-builder .spellCard h3,
+.deck-builder__spell h3,
+.deck-builder__deck-slot h3 {
+  font-size: 14px !important;
+  color: #fff !important;
+  font-family: inherit !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+}
+
+/* Fix header spacing in deck builder spell cards */
+.deck-builder .spellCard .header,
+.deck-builder__spell .header,
+.deck-builder__deck-slot .header {
+  padding: 1px 6px !important;
+  margin-bottom: 0 !important;
+  min-height: 0 !important;
+}
+
+/* Ensure description area is consistent */
+.deck-builder .description,
+.deck-builder__spell .description,
+.deck-builder__deck-slot .description {
+  font-size: 12px !important;
+  color: #ccc !important;
+  max-height: 50px !important;
+  margin-bottom: 2px !important;
+  padding: 2px !important;
+  line-height: 1.4 !important;
+}
+
+.deck-builder__spell--in-deck {
+  opacity: 0.7;
+}
+
+.deck-builder__no-spells {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #cccccc;
+  padding: 20px;
+}
+
+.deck-builder__create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.deck-builder__create-form h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #9370DB;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 18px;
+}
+
+.deck-builder__form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.deck-builder__form-group input {
+  padding: 10px 12px;
+  background-color: #13132b;
+  border: 1px solid #3a3a5c;
+  border-radius: 4px;
+  color: #ffffff;
+  width: 100%;
+}
+
+.deck-builder__form-group input:focus {
+  outline: none;
+  border-color: #9370DB;
+}
+
+.deck-builder__form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.deck-builder__form-button {
+  padding: 10px 16px;
+  background-color: #9370DB;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex: 1;
+  font-weight: bold;
+  text-align: center;
+}
+
+.deck-builder__form-button:hover {
+  background-color: #a280e9;
+}
+
+.deck-builder__form-button--cancel {
+  background-color: #13132b;
+  border: 1px solid #3a3a5c;
+  color: #ffffff;
+}
+
+.deck-builder__form-button--cancel:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .deck-builder {
+    padding: 10px;
+  }
+
+  .deck-builder__deck-actions {
+    flex-direction: column;
+  }
+
+  .deck-builder__filters {
+    flex-direction: column;
+  }
+
+  .deck-builder__filter-group {
+    flex-wrap: wrap;
+  }
+}

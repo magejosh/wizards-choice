@@ -1,0 +1,146 @@
+.inventoryScreen {
+  display: flex;
+  flex-direction: column;
+  width: 95%;
+  height: 95vh;
+  max-height: 95vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #2d1b4e 0%, #1a1a2e 100%);
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  animation: modalFloat 6s ease-in-out infinite;
+  font-family: 'Raleway', sans-serif;
+  margin: 0 auto;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes modalFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.inventoryScreen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(138, 79, 255, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 70% 60%, rgba(106, 61, 232, 0.1) 0%, transparent 40%);
+  animation: backgroundShift 15s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes backgroundShift {
+  0% { transform: rotate(0deg) scale(1); }
+  100% { transform: rotate(5deg) scale(1.1); }
+}
+
+.inventoryScreenHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #8a4fff;
+  position: relative;
+  z-index: 1;
+}
+
+.inventoryScreenHeader::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #8a4fff, transparent);
+}
+
+.inventoryScreenTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(179, 141, 255, 0.7), 0 0 20px rgba(179, 141, 255, 0.5);
+}
+
+.inventoryScreenCloseButton {
+  padding: 10px 20px;
+  background: linear-gradient(to bottom, #6a3de8, #5a2dd8);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'Raleway', sans-serif;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(106, 61, 232, 0.3);
+  z-index: 1;
+}
+
+.inventoryScreenCloseButton:hover {
+  background: linear-gradient(to bottom, #7a4df8, #6a3de8);
+  box-shadow:
+    0 5px 15px rgba(106, 61, 232, 0.5),
+    0 0 10px rgba(106, 61, 232, 0.3);
+  transform: translateY(-2px);
+}
+
+.inventoryScreenContent {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  z-index: 1;
+  max-height: 80vh;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(138, 79, 255, 0.3);
+}
+
+/* Divider */
+.divider {
+  height: 2px;
+  background: linear-gradient(to right, transparent, #8a4fff, transparent);
+  margin: 1rem 0;
+  position: relative;
+}
+
+.divider::before {
+  content: '✧';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #8a4fff;
+  background-color: #2d1b4e;
+  padding: 0 10px;
+  font-size: 1rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .inventoryScreen {
+    padding: 1.5rem;
+  }
+
+  .inventoryScreenTitle {
+    font-size: 1.8rem;
+  }
+
+  .inventoryScreenCloseButton {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+
+  .inventoryScreenContent {
+    max-height: 75vh;
+  }
+}

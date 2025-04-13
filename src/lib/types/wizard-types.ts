@@ -27,6 +27,8 @@ export interface Wizard {
   ingredients?: Ingredient[];
   discoveredRecipes?: PotionRecipe[];
   levelUpPoints: number;
+  gold: number;
+  skillPoints?: number;
   decks?: {
     id: string;
     name: string;
@@ -42,4 +44,4 @@ export interface Wizard {
     canDiscardAndDraw?: boolean;
     potionSlots?: number;
   };
-} 
+}

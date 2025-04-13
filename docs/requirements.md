@@ -32,6 +32,18 @@
   - Returning to the Wizard's Study
 - Multiple save slots functionality, active one selected on start new game or continue game button press from main menu.
 
+#### Save Slot System Requirements
+- Each save slot must maintain completely isolated game data, including:
+  - Player character data (name, level, stats, etc.)
+  - Game progress (completed duels, unlocked content, etc.)
+  - Inventory (spells, equipment, items, gold, etc.)
+  - Game state (current location, active quests, etc.)
+- Save slots must be uniquely identified by UUID rather than array indices
+- Loading a save slot must restore the exact state of that save slot without any data leakage from other slots
+- All game state modifications must update both the current save slot data and any top-level state references
+- The system must maintain backward compatibility with existing code while ensuring data isolation
+- The save system must handle migration of older save formats to newer versions
+
 ### Game Initialization
 - Players start with 5 initial spells (3 defaults, 2 random Tier 1)
 - Players select 3 spells from these for their first duel
@@ -68,7 +80,7 @@
 - Winner's Health and Mana reset fully; all lingering effects end
 
 ### Experience & Leveling
-- Experience gained = enemy value × difficulty multiplier (Easy ×10, Normal ×1, Hard ×0.1)
+- Experience gained = (enemy level × 5) + (10 × difficulty multiplier) where difficulty multipliers are: Easy ×10, Normal ×1, Hard ×0.1
 - Level-up requirement: current level × 100 experience points
 - Level-up points awarded based on difficulty: Easy (1), Normal (2), Hard (5)
 
@@ -109,9 +121,9 @@
   - Buy/Sell Mode
   - Market specializations (ingredients, potions, equipment, scrolls)
   - Dynamic supply and demand affecting prices (simulated with randomization generated at market initialization/refresh)
-  - Inventory refresh cycles varying by market tier
-  - Market attacks on travel to new market location with random chance of attack based on distance where distance is relative to market unlock scale
-  
+  - Inventory refresh cycles varying by market tier, with countdown to refresh timer to show how long to the player
+  - Market attacks on clicking leave market or travel to new market location with random chance of triggering a market attack. Random chance is weighted by difficulty setting player has set from the main menu. Easy is really low chance (mayb 5%), normal is say maybe 25%, and hard is probably 50% chance of triggering a market attack. Attacker is a rogue or bandit or magical creature, and will steal gold or ingredients in inventory (most magical creatures but dragons prefer the ingredients) if the player loses the battle. Player will loot something if they win instead.
+
 
 ### Procedural Content & Replayability
 - Enemy wizards and creatures procedurally match player's level and earned points
@@ -122,6 +134,8 @@
 - Different loot tendencies for wizards vs. magical creatures
 
 ## UI/UX Requirements
+
+Standards documented in `docs/ui_design_standards.md`
 
 ### Accessibility
 - UI scaling options

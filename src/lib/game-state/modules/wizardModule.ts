@@ -18,7 +18,7 @@ export interface WizardActions {
   equipSpell: (spellId: string, index: number) => void;
   unequipSpell: (index: number) => void;
   equipItem: (item: Equipment) => void;
-  unequipItem: (slot: string) => void;
+  unequipItem: (slot: string, isSecondFinger?: boolean) => void;
   addSpell: (spell: Spell) => void;
   addExperience: (amount: number) => void;
   spendLevelUpPoints: (stat: 'health' | 'mana' | 'manaRegen', amount: number) => boolean;
@@ -39,6 +39,9 @@ export interface WizardActions {
   updatePlayerGold: (amount: number) => void;
   addGold: (amount: number) => void;
   removeGold: (amount: number) => boolean;
+  equipSpellScroll: (scroll: Equipment) => void;
+  unequipSpellScroll: (scrollId: string) => void;
+  unequipAllSpellScrolls: () => void;
 }
 
 // Create the module
@@ -94,58 +97,104 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
   },
 
   equipItem: (item) => {
-    // Get the current player data
     const player = get().gameState.player;
     if (!player) return;
 
-    // Create a copy of equipment
+    // Ensure all equipment slots exist
+    const defaultSlots = ['head', 'hand', 'body', 'neck', 'belt', 'finger1', 'finger2'];
     const equipment = { ...player.equipment };
-    equipment[item.slot] = item;
+    for (const slot of defaultSlots) {
+      if (!(slot in equipment)) equipment[slot] = undefined;
+    }
+    let inventory = player.inventory ? [...player.inventory] : [];
+    let equippedPotions = player.equippedPotions ? [...player.equippedPotions] : [];
+    let equippedSpellScrolls = player.equippedSpellScrolls ? [...player.equippedSpellScrolls] : [];
 
-    // Mark the item as equipped
-    const equippedItem = { ...item, equipped: true };
+    if (item.slot === 'finger') {
+      if (!equipment.finger1) {
+        equipment.finger1 = { ...item, equipped: true };
+      } else if (!equipment.finger2) {
+        equipment.finger2 = { ...item, equipped: true };
+      } else {
+        const oldRing = equipment.finger1;
+        if (oldRing) {
+          inventory.push({ ...oldRing, equipped: false });
+        }
+        equipment.finger1 = { ...item, equipped: true };
+      }
+      inventory = inventory.filter((i: Equipment) => i.id !== item.id);
+    } else {
+      // Map slot to correct key
+      const slotKey = item.slot;
+      const oldItem = equipment[slotKey];
+      // Special handling for robes (body) and belts
+      if (slotKey === 'body' && oldItem) {
+        // Unequip all spell scrolls before replacing robe
+        if (player.equippedSpellScrolls && player.equippedSpellScrolls.length > 0) {
+          inventory.push(...player.equippedSpellScrolls.map(s => ({ ...s, equipped: false })));
+          equippedSpellScrolls = [];
+        }
+      }
+      if (slotKey === 'belt' && oldItem) {
+        // Unequip all potions before replacing belt
+        if (player.equippedPotions && player.equippedPotions.length > 0) {
+          inventory.push(...player.equippedPotions);
+          equippedPotions = [];
+        }
+      }
+      if (oldItem) {
+        inventory.push({ ...oldItem, equipped: false });
+      }
+      equipment[slotKey] = { ...item, equipped: true };
+      inventory = inventory.filter((i: Equipment) => i.id !== item.id);
+    }
 
-    // Update inventory to reflect equipped status
-    const inventory = player.inventory ?
-      player.inventory.map((i: Equipment) =>
-        i.id === item.id ? { ...i, equipped: true } : i
-      ) : [];
-
-    // Update the player data in the save slot and top-level state
     updateWizardInSaveSlot(player => ({
       ...player,
       equipment,
-      inventory
+      inventory,
+      equippedPotions,
+      equippedSpellScrolls
     }));
   },
 
-  unequipItem: (slot) => {
-    // Get the current player data
+  unequipItem: (slot, isSecondFinger = false) => {
     const player = get().gameState.player;
     if (!player) return;
 
-    // Create a copy of equipment
+    // Ensure all equipment slots exist
+    const defaultSlots = ['head', 'hand', 'body', 'neck', 'belt', 'finger1', 'finger2'];
     const equipment = { ...player.equipment };
-    const item = equipment[slot];
-
+    for (const s of defaultSlots) {
+      if (!(s in equipment)) equipment[s] = undefined;
+    }
+    let item: Equipment | undefined;
+    if (slot === 'finger') {
+      if (isSecondFinger) {
+        item = equipment.finger2;
+        if (item) equipment.finger2 = undefined;
+      } else {
+        item = equipment.finger1;
+        if (item) equipment.finger1 = undefined;
+      }
+    } else {
+      item = equipment[slot];
+      if (item) equipment[slot] = undefined;
+    }
     if (!item) return;
 
-    // Mark the item as unequipped
-    const unequippedItem = { ...item, equipped: false };
-    equipment[slot] = undefined;
+    let inventory = player.inventory ? [...player.inventory] : [];
+    inventory.push({ ...item, equipped: false });
 
-    // Update inventory to reflect unequipped status
-    const inventory = player.inventory ?
-      player.inventory.map((i: Equipment) =>
-        i.id === item.id ? { ...i, equipped: false } : i
-      ) : [];
-
-    // Update the player data in the save slot and top-level state
     updateWizardInSaveSlot(player => ({
       ...player,
       equipment,
       inventory
     }));
+
+    if (slot === 'body') {
+      get().unequipAllSpellScrolls();
+    }
   },
 
   addSpell: (spell) => {
@@ -313,20 +362,10 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
   },
 
   removeItemFromInventory: (itemId) => {
-    set((state: any) => {
-      const inventory = state.gameState.player.inventory || [];
-      const filteredInventory = inventory.filter((item: Equipment) => item.id !== itemId);
-
-      return {
-        gameState: {
-          ...state.gameState,
-          player: {
-            ...state.gameState.player,
-            inventory: filteredInventory
-          }
-        }
-      };
-    });
+    updateWizardInSaveSlot(player => ({
+      ...player,
+      inventory: player.inventory ? player.inventory.filter((item: Equipment) => item.id !== itemId) : []
+    }));
   },
 
   updatePlayerPotions: (potions) => {
@@ -590,5 +629,51 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
     });
 
     return true;
+  },
+
+  equipSpellScroll: (scroll: Equipment) => {
+    const player = getWizard();
+    if (!player) return;
+    // Only allow if a robe is equipped
+    const robe = player.equipment.body;
+    if (!robe) return;
+    // Determine slot limit (default 0 if not found)
+    const slotBonus = robe.bonuses.find(b => b.stat === 'scrollSlots');
+    const maxScrollSlots = slotBonus ? slotBonus.value : 0;
+    if (player.equippedSpellScrolls.length >= maxScrollSlots) return;
+    // Add scroll to equippedSpellScrolls, remove from inventory
+    const newEquipped = [...player.equippedSpellScrolls, scroll];
+    const newInventory = player.inventory?.filter(i => i.id !== scroll.id) || [];
+    updateWizardInSaveSlot(player => ({
+      ...player,
+      equippedSpellScrolls: newEquipped,
+      inventory: newInventory
+    }));
+  },
+
+  unequipSpellScroll: (scrollId: string) => {
+    const player = getWizard();
+    if (!player) return;
+    const scrollToUnequip = player.equippedSpellScrolls.find(s => s.id === scrollId);
+    if (!scrollToUnequip) return;
+    const newEquipped = player.equippedSpellScrolls.filter(s => s.id !== scrollId);
+    const newInventory = [...(player.inventory || []), scrollToUnequip];
+    updateWizardInSaveSlot(player => ({
+      ...player,
+      equippedSpellScrolls: newEquipped,
+      inventory: newInventory
+    }));
+  },
+
+  unequipAllSpellScrolls: () => {
+    const player = getWizard();
+    if (!player) return;
+    if (!player.equippedSpellScrolls.length) return;
+    const newInventory = [...(player.inventory || []), ...player.equippedSpellScrolls];
+    updateWizardInSaveSlot(player => ({
+      ...player,
+      equippedSpellScrolls: [],
+      inventory: newInventory
+    }));
   }
 });

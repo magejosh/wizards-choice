@@ -24,6 +24,7 @@ export interface Wizard {
   inventory?: Equipment[];
   potions: Potion[];
   equippedPotions: Potion[];
+  equippedSpellScrolls: Equipment[];
   ingredients?: Ingredient[];
   discoveredRecipes?: PotionRecipe[];
   levelUpPoints: number;

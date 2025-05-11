@@ -524,3 +524,9 @@
   - Fixed TypeScript path aliases for proper module resolution
   - Implemented responsive grid layouts for all inventory sections
   - Added consistent styling and empty state handling 
+
+## 2025-03-25
+- Done: Fixed bug where spell scrolls were not removed from inventory after learning a spell. Refactored removeItemFromInventory to use updateWizardInSaveSlot for save slot consistency. 
+
+## 2025-03-25
+- Done: Task Group 5: Equipment Slot Overwriting. Implemented robust equip/unequip logic to prevent overwriting equipped items and ensure proper handling of finger slots. Updated docs and process maps accordingly. 

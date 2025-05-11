@@ -226,7 +226,7 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
         }));
 
         // Use the imported function that takes a market parameter
-        const updatedMarket = generateMarketInventory(market);
+        const updatedMarket = importedRefreshMarketInventory(market);
 
         if (updatedMarket && updatedMarket.inventory) {
           markets[marketIndex] = updatedMarket;
@@ -423,16 +423,12 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
       console.log(`Refreshing inventory for market: ${market.name}`);
 
       // Generate new inventory using the marketSystem function
-      const newInventory = generateMarketInventory(market);
+      const updatedMarket = importedRefreshMarketInventory(market);
 
       // Update the market with new inventory and refresh date
-      markets[marketIndex] = {
-        ...market,
-        inventory: newInventory,
-        lastRefreshed: new Date().toISOString()
-      };
+      markets[marketIndex] = updatedMarket;
 
-      console.log(`Market inventory refreshed with ${newInventory.ingredients.length} ingredients, ${newInventory.potions.length} potions, ${newInventory.equipment.length} equipment, ${newInventory.scrolls.length} scrolls`);
+      console.log(`Market inventory refreshed with ${updatedMarket.inventory.ingredients.length} ingredients, ${updatedMarket.inventory.potions.length} potions, ${updatedMarket.inventory.equipment.length} equipment, ${updatedMarket.inventory.scrolls.length} scrolls`);
 
       return {
         gameState: {
@@ -1013,13 +1009,16 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
       return { attacked: false, attacker: null };
     }
 
-    // Get attack chance based on market level and game difficulty
-    const baseChance = market.attackChance || 0.05; // 5% default chance
-    const difficultyMultiplier = get().gameState.settings.difficulty === 'easy' ? 0.5 :
-                                get().gameState.settings.difficulty === 'normal' ? 1 :
-                                get().gameState.settings.difficulty === 'hard' ? 1.5 : 1;
-
-    const attackChance = baseChance * difficultyMultiplier;
+    // Set attack chance based on difficulty
+    let attackChance = 0.05; // default to 5%
+    const difficulty = get().gameState.settings.difficulty;
+    if (difficulty === 'easy') {
+      attackChance = 0.05; // 5%
+    } else if (difficulty === 'normal') {
+      attackChance = 0.25; // 25%
+    } else if (difficulty === 'hard') {
+      attackChance = 0.5; // 50%
+    }
 
     // Roll for attack
     const roll = Math.random();

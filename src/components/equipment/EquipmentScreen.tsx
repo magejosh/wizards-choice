@@ -23,85 +23,18 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
   // Handle equipping an item
   const handleEquipItem = (item: Equipment) => {
     if (!player) return;
-
-    // Create new equipment object
-    const newEquipment = { ...player.equipment };
-
-    // Handle different equipment slots
-    if (item.slot === 'finger') {
-      // For rings (finger slot), we have two slots: finger1 and finger2
-      if (!newEquipment.finger1) {
-        newEquipment.finger1 = item;
-      } else if (!newEquipment.finger2) {
-        newEquipment.finger2 = item;
-      } else {
-        // Both slots are filled, replace finger1
-        const oldRing = newEquipment.finger1;
-        newEquipment.finger1 = item;
-        // Add old ring to inventory
-        const newInventory = player.inventory.filter(invItem => invItem.id !== item.id);
-        newInventory.push(oldRing);
-        updatePlayerInventory(newInventory);
-        updatePlayerEquipment(newEquipment);
-        setSelectedItem(item);
-        return;
-      }
-    } else {
-      // For other slots, simply assign to the corresponding slot
-      newEquipment[item.slot] = item;
-    }
-
-    // Create new inventory array without the equipped item
-    const newInventory = player.inventory.filter(invItem => invItem.id !== item.id);
-
-    // Update player state
-    updatePlayerEquipment(newEquipment);
-    updatePlayerInventory(newInventory);
-
-    // Update selected item
+    // Use the updated equipItem from the store, which now handles slot overwriting and inventory updates
+    useGameStateStore.getState().equipItem(item);
     setSelectedItem(item);
   };
 
   // Handle unequipping an item
   const handleUnequipItem = (slot: EquipmentSlot, isSecondFinger: boolean = false) => {
     if (!player) return;
-
-    // Create new equipment object
-    const newEquipment = { ...player.equipment };
-
-    let itemToUnequip: Equipment | undefined;
-
-    if (slot === 'finger' && isSecondFinger) {
-      // Handle unequipping the second ring
-      itemToUnequip = newEquipment.finger2;
-      if (itemToUnequip) {
-        delete newEquipment.finger2;
-      }
-    } else if (slot === 'finger') {
-      // Handle unequipping the first ring
-      itemToUnequip = newEquipment.finger1;
-      if (itemToUnequip) {
-        delete newEquipment.finger1;
-      }
-    } else {
-      // Handle other equipment slots
-      itemToUnequip = newEquipment[slot];
-      if (itemToUnequip) {
-        delete newEquipment[slot];
-      }
-    }
-
-    if (!itemToUnequip) return;
-
-    // Create new inventory array with the unequipped item
-    const newInventory = [...player.inventory, itemToUnequip];
-
-    // Update player state
-    updatePlayerEquipment(newEquipment);
-    updatePlayerInventory(newInventory);
-
+    // Use the updated unequipItem from the store, which now supports isSecondFinger for rings
+    useGameStateStore.getState().unequipItem(slot, isSecondFinger);
     // Clear selected item if it was the unequipped one
-    if (selectedItem && selectedItem.id === itemToUnequip.id) {
+    if (selectedItem && ((slot === 'finger' && selectedItem.slot === 'finger') || selectedItem.slot === slot)) {
       setSelectedItem(null);
     }
   };

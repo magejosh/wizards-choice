@@ -122,7 +122,7 @@ The spell scroll system provides an alternative method for players to acquire an
 - Different scroll rarities based on the enclosed spell's tier
 
 ### Implementation Details
-- Scrolls are generated procedurally based on player level
+- **Spell scrolls are NOT procedurally generated as equipment.** Instead, scrolls are generated from the set of spells loaded in the game, with random selection and tier/rarity logic. The scroll generator creates a scroll for a specific spell, not as a random equipment item.
 - Market scroll availability depends on market specialization and level
 - Scrolls for rare or powerful spells have correspondingly lower drop rates
 - The system integrates with both the loot system and market system
@@ -366,6 +366,22 @@ The equipment system allows players to customize their wizard with:
 - **AXIOM 14**: Design equipment bonuses to complement different play styles rather than having clear "best" items.
 - **AXIOM 15**: Implement equipment as composable modifiers to wizard stats for flexibility.
 - **AXIOM 16**: Balance equipment bonuses against progression to maintain game challenge.
+
+- **All equipment (robes, belts, etc.) is procedurally generated using the equipment generator.**
+- **Spell scrolls are not generated as equipment and are not part of the procedural equipment system.**
+
+## Equipment Slot Overwriting Prevention
+
+The equipment system ensures that when a player equips an item, any item already occupying the target slot is first moved back to the player's inventory before the new item is equipped. This prevents accidental overwriting and loss of equipped items.
+
+Special handling is implemented for 'finger' slots (rings):
+- The player has two ring slots, `finger1` and `finger2`.
+- When equipping a ring, the system checks for an empty slot. If both are filled, the first slot (`finger1`) is replaced, and the previously equipped ring is returned to inventory.
+- Unequipping a ring requires specifying which slot to remove from.
+
+This logic is implemented in both the state management (wizardModule.ts) and the UI (EquipmentScreen.tsx), ensuring robust and consistent behavior.
+
+For a visual overview, see the process map in [process_maps.md](process_maps.md#equipment-slot-handling-process).
 
 ## Inventory System
 

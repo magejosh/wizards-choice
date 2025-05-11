@@ -15,6 +15,8 @@ import authService from '../../lib/auth/authService';
 import { Sidebar, SidebarBody, SidebarLink } from '../ui/collapsible-sidebar';
 import { Book, Scroll, Shield, User, Beaker, ShoppingBag, Home, Swords, Menu, ChevronRight, Image, Palette } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
+import { Button } from '../ui/button';
 // Using global CSS classes from src/styles/components.css
 
 interface WizardStudyProps {
@@ -67,6 +69,10 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
 
   // State for sidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Add state for market attack modal
+  const [marketAttack, setMarketAttack] = useState<{ attacker: any; open: boolean } | null>(null);
+  const [attackResult, setAttackResult] = useState<'win' | 'flee' | null>(null);
 
   // Effect for initial mount and client-side rendering
   useEffect(() => {
@@ -128,13 +134,19 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
   };
 
   // Handler for opening the market
-  const handleOpenMarket = () => {
+  const handleOpenMarket = (attackInfo?: any) => {
     setIsMarketOpen(true);
+    if (attackInfo && attackInfo.attacked) {
+      setMarketAttack({ attacker: attackInfo.attacker, open: true });
+    }
   };
 
   // Handler for closing the market
-  const handleCloseMarket = () => {
+  const handleCloseMarket = (attackInfo?: any) => {
     setIsMarketOpen(false);
+    if (attackInfo && attackInfo.attacked) {
+      setMarketAttack({ attacker: attackInfo.attacker, open: true });
+    }
   };
 
   // Handler for opening the player profile screen
@@ -320,7 +332,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
             <h2>Failed to load Market UI</h2>
             <p>There was an error loading the Market UI. Please try again later.</p>
             <button
-              onClick={handleCloseMarket}
+              onClick={() => handleCloseMarket()}
               style={{
                 padding: '10px 20px',
                 backgroundColor: 'white',
@@ -359,6 +371,63 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
   // If inventory screen is open, render the inventory screen
   if (isInventoryOpen) {
     return <InventoryScreen onClose={handleCloseInventory} />;
+  }
+
+  // Market attack modal actions
+  const handleAttackResult = (result: 'win' | 'flee') => {
+    if (result === 'win') {
+      // Start a duel with the market bandit
+      const player = getWizard();
+      if (player && marketAttack?.attacker) {
+        useGameStateStore.getState().initializeCombat(player, marketAttack.attacker, gameState.settings.difficulty);
+        setMarketAttack(null);
+        setAttackResult(null);
+        onStartDuel(); // Switch to battle view
+      }
+      return;
+    }
+    // Flee logic (lose some gold, show result, then close modal)
+    useGameStateStore.getState().handleMarketAttackResult('flee');
+    setAttackResult('flee');
+    setTimeout(() => {
+      setMarketAttack(null);
+      setAttackResult(null);
+    }, 1500);
+  };
+
+  // If market attack modal is open, render it exclusively
+  if (marketAttack && marketAttack.open) {
+    return (
+      <div className="market-attack-modal-overlay">
+        <div className="market-attack-modal">
+          <div className="market-attack-modal-title">Market Attack!</div>
+          <div className="market-attack-modal-divider" />
+          <div className="market-attack-modal-content">
+            {attackResult === 'flee' ? (
+              'You fled and lost a small amount of gold.'
+            ) : (
+              <>
+                A bandit attacks you as you leave the market!<br />
+                <strong>{marketAttack.attacker?.name || 'Unknown Bandit'}</strong> (Level {marketAttack.attacker?.level || '?'})<br />
+                What will you do?
+              </>
+            )}
+          </div>
+          <div className="market-attack-modal-divider" />
+          {!attackResult && (
+            <div className="market-attack-modal-buttons">
+              <button className="magical-button--primary" onClick={() => handleAttackResult('win')}>Fight</button>
+              <button className="magical-button--secondary" onClick={() => handleAttackResult('flee')}>Flee</button>
+            </div>
+          )}
+          {attackResult === 'flee' && (
+            <div className="market-attack-modal-buttons">
+              <button className="magical-button--primary" onClick={() => { setMarketAttack(null); setAttackResult(null); }}>OK</button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -502,7 +571,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
                         label: "Visit Market",
                         href: "#",
                         icon: <ShoppingBag className="h-5 w-5 text-purple-400" />,
-                        onClick: handleOpenMarket
+                        onClick: () => handleOpenMarket()
                       }}
                     />
                     <SidebarLink
@@ -606,7 +675,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
                               label: "Visit Market",
                               href: "#",
                               icon: <ShoppingBag className="h-5 w-5 text-purple-400" />,
-                              onClick: handleOpenMarket
+                              onClick: () => handleOpenMarket()
                             }}
                           />
                           <SidebarLink
@@ -675,8 +744,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
                       )}
                     </div>
                   </div>
-
-                  {/* Equipment section removed */}
+                  {/* Equipment section removed intentionally */}
                 </>
               )}
             </div>
@@ -697,10 +765,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
                   className="wizard-study__action wizard-study__action--primary"
                   onClick={() => {
                     console.log('Starting duel from WizardStudy component');
-
-                    // Ensure the game state is saved before we navigate
                     try {
-                      // This will be handled by onStartDuel, which updates location and navigates
                       onStartDuel();
                     } catch (error) {
                       console.error('Error starting duel:', error);
@@ -736,7 +801,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
 
                   <button
                     className="wizard-study__action wizard-study__action--secondary"
-                    onClick={handleOpenMarket}
+                    onClick={() => handleOpenMarket()}
                   >
                     Marketplace
                   </button>
@@ -746,7 +811,6 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
                   className="wizard-study__action wizard-study__action--secondary"
                   onClick={() => {
                     console.log('Return to Main Menu button clicked in WizardStudy');
-                    // Just call the parent handler - no need for fallback navigation now
                     onReturnToMainMenu();
                   }}
                 >
@@ -756,8 +820,6 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
             </div>
           </div>
         </div>
-
-
       </div>
 
       {/* Spell Scrolls Screen */}
@@ -768,9 +830,7 @@ const WizardStudy: React.FC<WizardStudyProps> = ({
             <p>Use spell scrolls to learn new spells permanently.</p>
 
             {scrollLearningResult && (
-              <div className={`result-message ${scrollLearningResult.success ? 'success' : 'error'}`}>
-                {scrollLearningResult.message}
-              </div>
+              <div className={`result-message ${scrollLearningResult.success ? 'success' : 'error'}`}>{scrollLearningResult.message}</div>
             )}
 
             {selectedScroll ? (

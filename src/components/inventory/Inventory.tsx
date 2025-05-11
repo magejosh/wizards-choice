@@ -13,13 +13,16 @@ import styles from './Inventory.module.css';
 
 interface InventoryProps {
   equipment: Record<string, Equipment | undefined>;
-  inventory: Equipment[];
+  inventory: (Equipment | Potion)[];
   spellScrolls: SpellScroll[];
+  equippedSpellScrolls: Equipment[];
   ingredients: Ingredient[];
   potions: Potion[];
-  onEquipItem: (item: Equipment) => void;
+  onEquipItem: (item: Equipment | Potion) => void;
   onUnequipItem: (slot: string) => void;
   onUseSpellScroll: (scroll: SpellScroll) => void;
+  onEquipSpellScroll: (scroll: Equipment) => void;
+  onUnequipSpellScroll: (scrollId: string) => void;
   onUsePotion: (potion: Potion) => void;
   onUseIngredient: (ingredient: Ingredient) => void;
 }
@@ -28,11 +31,14 @@ export function Inventory({
   equipment,
   inventory,
   spellScrolls,
+  equippedSpellScrolls,
   ingredients,
   potions,
   onEquipItem,
   onUnequipItem,
   onUseSpellScroll,
+  onEquipSpellScroll,
+  onUnequipSpellScroll,
   onUsePotion,
   onUseIngredient,
 }: InventoryProps) {
@@ -65,7 +71,10 @@ export function Inventory({
         <TabsContent value="scrolls" className={styles.tabContent}>
           <SpellScrolls
             scrolls={spellScrolls}
+            equippedSpellScrolls={equippedSpellScrolls}
             onUseScroll={onUseSpellScroll}
+            onEquipScroll={onEquipSpellScroll}
+            onUnequipScroll={onUnequipSpellScroll}
           />
         </TabsContent>
 

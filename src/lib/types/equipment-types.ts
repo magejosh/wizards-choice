@@ -28,7 +28,7 @@ export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
  * Stat bonus configuration
  */
 export interface StatBonus {
-  stat: 'health' | 'maxHealth' | 'mana' | 'maxMana' | 'damage' | 'defense' | 'spellPower' | 'manaRegen' | 'manaCostReduction' | 'mysticPunchPower' | 'bleedEffect' | 'extraCardDraw' | 'potionSlots' | 'potionEffectiveness' | 'elementalAffinity';
+  stat: 'health' | 'maxHealth' | 'mana' | 'maxMana' | 'damage' | 'defense' | 'spellPower' | 'manaRegen' | 'manaCostReduction' | 'mysticPunchPower' | 'bleedEffect' | 'extraCardDraw' | 'potionSlots' | 'potionEffectiveness' | 'elementalAffinity' | 'scrollSlots';
   value: number;
   element?: ElementType; // For elemental affinity bonuses
 }

@@ -11,9 +11,11 @@ import {
 } from '../../lib/types';
 import ErrorBoundary from '../error/ErrorBoundary';
 import styles from './MarketUI.module.css';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
+import { Button } from '../ui/button';
 
 // Main MarketUI component
-export const MarketUI: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+export const MarketUI: React.FC<{ onClose: (attackInfo?: any) => void }> = ({ onClose }) => {
   // UI state
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +34,9 @@ export const MarketUI: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     troubleshootMarkets,
     buyItem,
     sellItem,
-    refreshMarketInventory
+    refreshMarketInventory,
+    checkForMarketAttack,
+    handleMarketAttackResult
   } = useGameStateStore();
 
   // Get player's gold directly
@@ -214,7 +218,18 @@ export const MarketUI: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   // Handle close
   const handleClose = () => {
-    onClose();
+    let triggeredAttack = false;
+    if (selectedMarketId) {
+      const attack = checkForMarketAttack(selectedMarketId);
+      if (attack.attacked) {
+        // Instead of showing modal here, call onClose and pass attack info
+        triggeredAttack = true;
+        onClose(attack);
+      }
+    }
+    if (!triggeredAttack) {
+      onClose();
+    }
     setSelectedMarketId(null);
     setSelectedTab('ingredients');
     setMode('buy');
@@ -230,7 +245,18 @@ export const MarketUI: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     if (!selectedMarketId) return [];
 
     const market = getMarkets().find(m => m.id === selectedMarketId);
-    if (!market || !market.inventory) return [];
+    if (!market) return [];
+
+    // Defensive: If inventory is missing or malformed, trigger refresh and show error
+    if (!market.inventory ||
+        !Array.isArray(market.inventory.ingredients) ||
+        !Array.isArray(market.inventory.potions) ||
+        !Array.isArray(market.inventory.equipment) ||
+        !Array.isArray(market.inventory.scrolls)) {
+      setError('Market inventory is missing or corrupted. Attempting to refresh...');
+      refreshMarketInventory(selectedMarketId);
+      return [];
+    }
 
     if (mode === 'buy') {
       // For buy mode, show market inventory
@@ -240,58 +266,94 @@ export const MarketUI: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         return market.inventory[selectedTab] || [];
       }
     } else {
-      // For sell mode, show player inventory based on tab
+      // For sell mode, aggregate/stack duplicate items by name
       const player = getWizard();
       if (!player) return [];
 
       switch (selectedTab) {
-        case 'ingredients':
-          // Return ingredients as MarketItem format
-          return (player.ingredients || []).map(item => ({
-            item,
-            quantity: item.quantity || 1,
-            currentPrice: Math.floor((item.value || 10) * (market.sellPriceMultiplier || 0.6)),
-            supply: 'common',
-            demand: 'moderate',
-            priceHistory: []
-          }));
-        case 'potions':
-          // Return potions as MarketItem format
-          return (player.potions || []).map(item => ({
-            item,
-            quantity: 1,
-            currentPrice: Math.floor((item.value || 20) * (market.sellPriceMultiplier || 0.6)),
-            supply: 'common',
-            demand: 'moderate',
-            priceHistory: []
-          }));
-        case 'equipment':
-          // Return unequipped equipment (excluding scrolls) as MarketItem format
-          return (player.inventory || [])
+        case 'ingredients': {
+          // Aggregate ingredients by name
+          const ingredientMap = new Map();
+          (player.ingredients || []).forEach(item => {
+            if (ingredientMap.has(item.name)) {
+              ingredientMap.get(item.name).quantity += item.quantity || 1;
+            } else {
+              ingredientMap.set(item.name, {
+                item: { ...item },
+                quantity: item.quantity || 1,
+                currentPrice: Math.floor((item.value || 10) * (market.sellPriceMultiplier || 0.6)),
+                supply: 'common',
+                demand: 'moderate',
+                priceHistory: []
+              });
+            }
+          });
+          return Array.from(ingredientMap.values());
+        }
+        case 'potions': {
+          // Aggregate potions by name
+          const potionMap = new Map();
+          (player.potions || []).forEach(item => {
+            if (potionMap.has(item.name)) {
+              potionMap.get(item.name).quantity += item.quantity || 1;
+            } else {
+              potionMap.set(item.name, {
+                item: { ...item },
+                quantity: item.quantity || 1,
+                currentPrice: Math.floor((item.value || 20) * (market.sellPriceMultiplier || 0.6)),
+                supply: 'common',
+                demand: 'moderate',
+                priceHistory: []
+              });
+            }
+          });
+          return Array.from(potionMap.values());
+        }
+        case 'equipment': {
+          // Aggregate unequipped equipment by name
+          const equipmentMap = new Map();
+          (player.inventory || [])
             .filter(item =>
               item.type !== 'scroll' &&
               !(player.equipment || []).some(eq => eq.id === item.id)
             )
-            .map(item => ({
-              item,
-              quantity: 1,
-              currentPrice: Math.floor((item.value || 50) * (market.sellPriceMultiplier || 0.6)),
-              supply: 'common',
-              demand: 'moderate',
-              priceHistory: []
-            }));
-        case 'spellScrolls':
-          // Return scrolls as MarketItem format
-          return (player.inventory || [])
+            .forEach(item => {
+              if (equipmentMap.has(item.name)) {
+                equipmentMap.get(item.name).quantity += item.quantity || 1;
+              } else {
+                equipmentMap.set(item.name, {
+                  item: { ...item },
+                  quantity: item.quantity || 1,
+                  currentPrice: Math.floor((item.value || 50) * (market.sellPriceMultiplier || 0.6)),
+                  supply: 'common',
+                  demand: 'moderate',
+                  priceHistory: []
+                });
+              }
+            });
+          return Array.from(equipmentMap.values());
+        }
+        case 'spellScrolls': {
+          // Aggregate scrolls by name
+          const scrollMap = new Map();
+          (player.inventory || [])
             .filter(item => item.type === 'scroll')
-            .map(item => ({
-              item,
-              quantity: 1,
-              currentPrice: Math.floor((item.value || 100) * (market.sellPriceMultiplier || 0.6)),
-              supply: 'common',
-              demand: 'moderate',
-              priceHistory: []
-            }));
+            .forEach(item => {
+              if (scrollMap.has(item.name)) {
+                scrollMap.get(item.name).quantity += item.quantity || 1;
+              } else {
+                scrollMap.set(item.name, {
+                  item: { ...item },
+                  quantity: item.quantity || 1,
+                  currentPrice: Math.floor((item.value || 100) * (market.sellPriceMultiplier || 0.6)),
+                  supply: 'common',
+                  demand: 'moderate',
+                  priceHistory: []
+                });
+              }
+            });
+          return Array.from(scrollMap.values());
+        }
         default:
           return [];
       }

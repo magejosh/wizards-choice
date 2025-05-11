@@ -357,7 +357,8 @@ const BASE_EQUIPMENT: Record<EquipmentSlot, BaseEquipment[]> = {
       description: 'A simple robe that provides basic magical protection.',
       bonuses: [
         { stat: 'maxHealth', value: 10 },
-        { stat: 'maxMana', value: 10 }
+        { stat: 'maxMana', value: 10 },
+        { stat: 'scrollSlots', value: 1 }
       ],
       minLevel: 1,
     },
@@ -368,7 +369,8 @@ const BASE_EQUIPMENT: Record<EquipmentSlot, BaseEquipment[]> = {
       bonuses: [
         { stat: 'maxHealth', value: 20 },
         { stat: 'maxMana', value: 20 },
-        { stat: 'spellPower', value: 5 }
+        { stat: 'spellPower', value: 5 },
+        { stat: 'scrollSlots', value: 2 }
       ],
       minLevel: 5,
     },

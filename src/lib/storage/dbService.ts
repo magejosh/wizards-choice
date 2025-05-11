@@ -42,11 +42,15 @@ export const dbService = {
   saveGameState: async (userId: string, gameState: GameState): Promise<void> => {
     if (!dbPromise) return;
     const db = await dbPromise;
-    await db.put('gameStates', {
-      userId,
-      gameState,
-      lastUpdated: new Date().toISOString()
-    });
+    try {
+      await db.put('gameStates', {
+        userId,
+        gameState,
+        lastUpdated: new Date().toISOString()
+      });
+    } catch (err) {
+      // Handle or log error
+    }
   },
   
   /**
@@ -68,7 +72,11 @@ export const dbService = {
   saveUser: async (user: User & { password: string }): Promise<void> => {
     if (!dbPromise) return;
     const db = await dbPromise;
-    await db.put('users', user);
+    try {
+      await db.put('users', user);
+    } catch (err) {
+      // Handle or log error
+    }
   },
   
   /**
@@ -111,7 +119,11 @@ export const dbService = {
   deleteUser: async (userId: string): Promise<void> => {
     if (!dbPromise) return;
     const db = await dbPromise;
-    await db.delete('users', userId);
+    try {
+      await db.delete('users', userId);
+    } catch (err) {
+      // Handle or log error
+    }
   }
 };
 

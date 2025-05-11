@@ -101,44 +101,44 @@ Additional guidelines:
     - [x] Ensure switching between save slots correctly loads the appropriate data
 
 #### Task Group 3: Market Sell Function
-- [ ] Refactor sellItem Logic
-  - [ ] Review `src/lib/game-state/modules/marketModule.ts`, focusing on the `sellItem` function
-  - [ ] Ensure sellItem correctly fetches the player's unequipped inventory items (excluding items in player.equipment)
-  - [ ] Verify quantity checks and gold calculations are correct
+- [x] Refactor sellItem Logic
+  - [x] Review `src/lib/game-state/modules/marketModule.ts`, focusing on the `sellItem` function
+  - [x] Ensure sellItem correctly fetches the player's unequipped inventory items (excluding items in player.equipment)
+  - [x] Verify quantity checks and gold calculations are correct
 
-- [ ] Update MarketUI.tsx Sell Mode
-  - [ ] Review `src/components/market/MarketUI.tsx`, focusing on sell mode functionality
-  - [ ] Implement the logic to display the correct player inventory items when mode is 'sell'
-  - [ ] Ensure the UI passes the correct item details to the sellItem action
-  - [ ] Examine how the UI switches between buy and sell modes
+- [x] Update MarketUI.tsx Sell Mode
+  - [x] Review `src/components/market/MarketUI.tsx`, focusing on sell mode functionality
+  - [x] Implement the logic to display the correct player inventory items when mode is 'sell'
+  - [x] Ensure the UI passes the correct item details to the sellItem action
+  - [x] Examine how the UI switches between buy and sell modes
 
-- [ ] Implement Market Gold Limits
-  - [ ] Add a currentGold property to the MarketLocation type
-  - [ ] Modify sellItem in marketModule.ts to check if market.currentGold >= totalValue
-  - [ ] Modify buyItem to increase market.currentGold
-  - [ ] Add logic to refreshMarketInventory to reset market.currentGold to a base value
-  - [ ] Verify that gold limits reset when inventory refreshes as specified in the requirements
+- [x] Implement Market Gold Limits
+  - [x] Add a currentGold property to the MarketLocation type
+  - [x] Modify sellItem in marketModule.ts to check if market.currentGold >= totalValue
+  - [x] Modify buyItem to increase market.currentGold
+  - [x] Add logic to refreshMarketInventory to reset market.currentGold to a base value
+  - [x] Verify that gold limits reset when inventory refreshes as specified in the requirements
 
 #### Task Group 4: Market Attacks Not Triggering
-- [ ] Verify Attack Trigger Points
-  - [ ] Review `src/lib/features/market/marketAttacks.ts` and related functions
-  - [ ] Ensure checkForMarketAttack (from marketModule.ts) is correctly called within MarketUI.tsx's handleClose function
-  - [ ] If navigation involves changing currentLocation state, ensure the attack check happens before or is integrated into that process
+- [x] Verify Attack Trigger Points
+  - [x] Review `src/lib/features/market/marketAttacks.ts` and related functions
+  - [x] Ensure checkForMarketAttack (from marketModule.ts) is correctly called within MarketUI.tsx's handleClose function
+  - [x] If navigation involves changing currentLocation state, ensure the attack check happens before or is integrated into that process
 
-- [ ] Review Attack Probability Logic
-  - [ ] Debug shouldMarketAttackOccur in marketAttacks.ts to ensure probabilities are calculated correctly
-  - [ ] Check how difficulty settings affect attack chances (Easy ~5%, Normal ~25%, Hard ~50% as per requirements)
-  - [ ] Examine how market attacks are integrated with the game flow
-  - [ ] Check for proper handling of attack results (win/lose/flee)
+- [x] Review Attack Probability Logic
+  - [x] Debug shouldMarketAttackOccur in marketAttacks.ts to ensure probabilities are calculated correctly
+  - [x] Check how difficulty settings affect attack chances (Easy ~5%, Normal ~25%, Hard ~50% as per requirements)
+  - [x] Examine how market attacks are integrated with the game flow
+  - [x] Check for proper handling of attack results (win/lose/flee)
 
 #### Task Group 5: Equipment Slot Overwriting
-- [ ] Modify Equipping Logic
-  - [ ] Review `src/components/equipment/EquipmentScreen.tsx` and related components
-  - [ ] In handleEquipItem (or the corresponding action in wizardModule.ts), check if the target slot is already occupied
-  - [ ] If occupied, retrieve the currently equipped item and add it back to player.inventory
-  - [ ] Then, place the new item into the player.equipment slot and remove it from player.inventory
-  - [ ] Handle the edge case for the two 'finger' slots correctly
-  - [ ] Verify that items are properly moved between inventory and equipment slots
+- [x] Modify Equipping Logic
+  - [x] Review `src/components/equipment/EquipmentScreen.tsx` and related components
+  - [x] In handleEquipItem (or the corresponding action in wizardModule.ts), check if the target slot is already occupied
+  - [x] If occupied, retrieve the currently equipped item and add it back to player.inventory
+  - [x] Then, place the new item into the player.equipment slot and remove it from player.inventory
+  - [x] Handle the edge case for the two 'finger' slots correctly
+  - [x] Verify that items are properly moved between inventory and equipment slots
 
 #### Task Group 6: Potion Crafting System
 - [ ] Implement Core Crafting Logic

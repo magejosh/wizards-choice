@@ -5,7 +5,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { GameState } from '../types/game-types';
 import { generateDefaultWizard } from '../wizard/wizardUtils';
-import { initializeMarkets } from '../features/market/marketSystem';
+import { initializeMarkets, refreshMarketInventory } from '../features/market/marketSystem';
 
 // Import all modules
 import { createWizardModule, WizardActions } from './modules/wizardModule';
@@ -22,6 +22,19 @@ import { v4 as uuidv4 } from 'uuid';
 const getInitialState = (): { gameState: GameState } => {
   const defaultWizard = generateDefaultWizard('');
   const defaultMarkets = initializeMarkets();
+
+  // Defensive: Validate and recover market inventory structure
+  const validatedMarkets = defaultMarkets.map((market: any) => {
+    if (!market.inventory ||
+        !Array.isArray(market.inventory.ingredients) ||
+        !Array.isArray(market.inventory.potions) ||
+        !Array.isArray(market.inventory.equipment) ||
+        !Array.isArray(market.inventory.scrolls)) {
+      console.warn(`Market ${market.name} inventory missing or malformed. Regenerating...`);
+      return refreshMarketInventory(market);
+    }
+    return market;
+  });
 
   // Default game progress
   const defaultGameProgress: GameProgress = {
@@ -117,7 +130,7 @@ const getInitialState = (): { gameState: GameState } => {
       },
       saveSlots: saveSlots,
       currentSaveSlot: saveSlots[0].saveUuid,  // Use the UUID of the first slot
-      markets: defaultMarkets,
+      markets: validatedMarkets,
       marketData: {
         transactions: [],
         reputationLevels: {},

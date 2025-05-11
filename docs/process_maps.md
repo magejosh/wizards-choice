@@ -287,12 +287,12 @@ flowchart TD
     Usage --> BattleUse[Use in Battle]
     
     WizardStudy --> LearnSpell[Learn Spell Permanently]
-    LearnSpell --> RemoveScroll1[Remove Scroll from Inventory]
+    LearnSpell --> RemoveScroll1[Remove Scroll from Inventory\n(Use updateWizardInSaveSlot for save slot consistency)]
     LearnSpell --> AddSpell[Add Spell to Wizard's Collection]
     
     BattleUse --> CastWithoutMana[Cast Without Mana Cost]
     CastWithoutMana --> ApplySpellEffect[Apply Spell Effect]
-    CastWithoutMana --> RemoveScroll2[Remove Scroll from Inventory]
+    CastWithoutMana --> RemoveScroll2[Remove Scroll from Inventory\n(Use updateWizardInSaveSlot for save slot consistency)]
     
     ScrollInventory --> ScrollUI[Scroll UI Interfaces]
     ScrollUI --> StudyInterface[Wizard's Study Interface]
@@ -724,3 +724,60 @@ flowchart TD
 ```
 
 ## Market UI Workflow
+
+## Item and Scroll Generation Workflow
+
+```mermaid
+flowchart TD
+    subgraph Equipment Generation
+        E1[Player Level] --> E2[Equipment Generator]
+        E2 --> E3[Procedural Equipment (Robes, Belts, etc.)]
+    end
+
+    subgraph Spell Scroll Generation
+        S1[Loaded Spells]
+        S2[Random Selection & Tier/Rarity Logic]
+        S1 --> S2
+        S2 --> S3[Spell Scroll Generator]
+        S3 --> S4[Spell Scrolls (from Spells)]
+    end
+
+    E3 -.->|Not used for scrolls| S4
+    S4 -.->|Not equipment| E3
+```
+
+## Equipment Slot Handling Process
+
+```mermaid
+graph TD
+    A[Start Equip Item] --> B{Is slot 'finger'?}
+    B -- No --> C[Check if slot occupied]
+    C -- Yes --> D[Move old item to inventory]
+    C -- No --> E[Proceed]
+    D --> E
+    E[Equip new item in slot]
+    E --> F[Remove new item from inventory]
+    F --> G[End]
+
+    B -- Yes --> H{finger1 empty?}
+    H -- Yes --> I[Equip in finger1]
+    I --> F
+    H -- No --> J{finger2 empty?}
+    J -- Yes --> K[Equip in finger2]
+    K --> F
+    J -- No --> L[Move finger1 to inventory]
+    L --> M[Equip new item in finger1]
+    M --> F
+
+    subgraph Unequip Item
+      U1[Start Unequip] --> U2{Is slot 'finger'?}
+      U2 -- No --> U3[Remove item from slot]
+      U3 --> U4[Add item to inventory]
+      U4 --> U5[End]
+      U2 -- Yes --> U6{IsSecondFinger?}
+      U6 -- Yes --> U7[Remove finger2]
+      U7 --> U4
+      U6 -- No --> U8[Remove finger1]
+      U8 --> U4
+    end
+```

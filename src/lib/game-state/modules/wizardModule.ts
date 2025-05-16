@@ -4,8 +4,8 @@
 import { Wizard } from '../../types/wizard-types';
 import { Spell, SpellScroll } from '../../types/spell-types';
 import { Equipment, Potion } from '../../types/equipment-types';
-import { calculateExperienceForLevel } from '../../wizard/wizardUtils';
-import { updateWizard as updateWizardInSaveSlot, updateGameProgress, getWizard } from '../gameStateStore';
+import { calculateExperienceForLevel, calculateWizardStats } from '../../wizard/wizardUtils';
+import { updateWizard as updateWizardInSaveSlot, updateGameProgress, getWizard, dedupeAndMergePotions } from '../gameStateStore';
 
 // Define the slice of state this module manages
 export interface WizardState {
@@ -140,6 +140,8 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
         if (player.equippedPotions && player.equippedPotions.length > 0) {
           inventory.push(...player.equippedPotions);
           equippedPotions = [];
+          // Deduplicate and merge potions in inventory after unequipping belt
+          inventory = dedupeAndMergePotions(inventory);
         }
       }
       if (oldItem) {
@@ -149,13 +151,16 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
       inventory = inventory.filter((i: Equipment) => i.id !== item.id);
     }
 
-    updateWizardInSaveSlot(player => ({
+    // Recalculate stats after equipment change
+    const updatedPlayer = calculateWizardStats({
       ...player,
       equipment,
       inventory,
       equippedPotions,
       equippedSpellScrolls
-    }));
+    });
+
+    updateWizardInSaveSlot(() => updatedPlayer);
   },
 
   unequipItem: (slot, isSecondFinger = false) => {
@@ -186,11 +191,14 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
     let inventory = player.inventory ? [...player.inventory] : [];
     inventory.push({ ...item, equipped: false });
 
-    updateWizardInSaveSlot(player => ({
+    // Recalculate stats after equipment change
+    const updatedPlayer = calculateWizardStats({
       ...player,
       equipment,
       inventory
-    }));
+    });
+
+    updateWizardInSaveSlot(() => updatedPlayer);
 
     if (slot === 'body') {
       get().unequipAllSpellScrolls();
@@ -284,15 +292,16 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
       // Deduct points
       updatedPlayer.levelUpPoints -= amount;
 
-      // Apply stat increase
+      // Apply stat increase using new stat structure
+      // - progressionMaxHealth: permanent upgrades from level-ups, quests, etc.
+      // - progressionMaxMana: permanent upgrades from level-ups, quests, etc.
+      // Deprecated: maxHealth/maxMana are set by calculateWizardStats for compatibility
       switch (stat) {
         case 'health':
-          updatedPlayer.maxHealth += amount * 10;
-          updatedPlayer.health = updatedPlayer.maxHealth; // Fully heal on level up
+          updatedPlayer.progressionMaxHealth = (updatedPlayer.progressionMaxHealth || 0) + amount * 10;
           break;
         case 'mana':
-          updatedPlayer.maxMana += amount * 5;
-          updatedPlayer.mana = updatedPlayer.maxMana; // Fully restore mana on level up
+          updatedPlayer.progressionMaxMana = (updatedPlayer.progressionMaxMana || 0) + amount * 5;
           break;
         case 'manaRegen':
           updatedPlayer.manaRegen += amount;
@@ -322,27 +331,33 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
   },
 
   updatePlayerEquipment: (equipment) => {
-    set((state: any) => ({
-      gameState: {
-        ...state.gameState,
-        player: {
-          ...state.gameState.player,
-          equipment
+    set((state: any) => {
+      const updatedPlayer = calculateWizardStats({
+        ...state.gameState.player,
+        equipment
+      });
+      return {
+        gameState: {
+          ...state.gameState,
+          player: updatedPlayer
         }
-      }
-    }));
+      };
+    });
   },
 
   updatePlayerInventory: (inventory) => {
-    set((state: any) => ({
-      gameState: {
-        ...state.gameState,
-        player: {
-          ...state.gameState.player,
-          inventory
+    set((state: any) => {
+      const updatedPlayer = calculateWizardStats({
+        ...state.gameState.player,
+        inventory
+      });
+      return {
+        gameState: {
+          ...state.gameState,
+          player: updatedPlayer
         }
-      }
-    }));
+      };
+    });
   },
 
   addItemToInventory: (item) => {
@@ -374,7 +389,7 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
         ...state.gameState,
         player: {
           ...state.gameState.player,
-          potions
+          potions: dedupeAndMergePotions(potions)
         }
       }
     }));
@@ -386,7 +401,7 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
         ...state.gameState,
         player: {
           ...state.gameState.player,
-          equippedPotions
+          equippedPotions: dedupeAndMergePotions(equippedPotions)
         }
       }
     }));
@@ -395,13 +410,13 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
   addPotionToInventory: (potion) => {
     set((state: any) => {
       const potions = state.gameState.player.potions || [];
-
+      const merged = dedupeAndMergePotions([...potions, potion]);
       return {
         gameState: {
           ...state.gameState,
           player: {
             ...state.gameState.player,
-            potions: [...potions, potion]
+            potions: merged
           }
         }
       };
@@ -428,6 +443,7 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
   equipPotion: (potion) => {
     set((state: any) => {
       const equippedPotions = state.gameState.player.equippedPotions || [];
+      const potions = state.gameState.player.potions || [];
       const maxPotionSlots = state.gameState.player.combatStats?.potionSlots || 2;
 
       // Check if already at max capacity
@@ -436,12 +452,29 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
         return state;
       }
 
+      // Remove one from stack by name/type/rarity
+      let found = false;
+      const newPotions = potions.map(p => {
+        if (!found && p.name === potion.name && p.type === potion.type && p.rarity === potion.rarity) {
+          found = true;
+          const qty = p.quantity || 1;
+          if (qty > 1) {
+            return { ...p, quantity: qty - 1 };
+          }
+          // else, don't return (removes from inventory)
+          return null;
+        }
+        return p;
+      }).filter(Boolean);
+      const mergedEquipped = dedupeAndMergePotions([...equippedPotions, { ...potion, quantity: 1 }]);
+      const mergedPotions = dedupeAndMergePotions(newPotions);
       return {
         gameState: {
           ...state.gameState,
           player: {
             ...state.gameState.player,
-            equippedPotions: [...equippedPotions, potion]
+            equippedPotions: mergedEquipped,
+            potions: mergedPotions
           }
         }
       };
@@ -451,14 +484,29 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
   unequipPotion: (potionId) => {
     set((state: any) => {
       const equippedPotions = state.gameState.player.equippedPotions || [];
-      const filteredPotions = equippedPotions.filter((potion: Potion) => potion.id !== potionId);
-
+      const potions = state.gameState.player.potions || [];
+      const potionToUnequip = equippedPotions.find((p: Potion) => p.id === potionId);
+      if (!potionToUnequip) return state;
+      const newEquipped = equippedPotions.filter((p: Potion) => p.id !== potionId);
+      // Merge with stack if exists
+      let merged = false;
+      const newPotions = potions.map(p => {
+        if (!merged && p.name === potionToUnequip.name && p.type === potionToUnequip.type && p.rarity === potionToUnequip.rarity) {
+          merged = true;
+          return { ...p, quantity: (p.quantity || 1) + 1 };
+        }
+        return p;
+      });
+      if (!merged) newPotions.push({ ...potionToUnequip, quantity: 1 });
+      const mergedEquipped = dedupeAndMergePotions(newEquipped);
+      const mergedPotions = dedupeAndMergePotions(newPotions);
       return {
         gameState: {
           ...state.gameState,
           player: {
             ...state.gameState.player,
-            equippedPotions: filteredPotions
+            equippedPotions: mergedEquipped,
+            potions: mergedPotions
           }
         }
       };
@@ -641,9 +689,22 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
     const slotBonus = robe.bonuses.find(b => b.stat === 'scrollSlots');
     const maxScrollSlots = slotBonus ? slotBonus.value : 0;
     if (player.equippedSpellScrolls.length >= maxScrollSlots) return;
-    // Add scroll to equippedSpellScrolls, remove from inventory
-    const newEquipped = [...player.equippedSpellScrolls, scroll];
-    const newInventory = player.inventory?.filter(i => i.id !== scroll.id) || [];
+    // Remove one from stack by name/rarity/spell
+    let found = false;
+    const newInventory = (player.inventory || []).map(i => {
+      if (!found && i.type === 'scroll' && i.spell?.name === scroll.spell?.name && i.rarity === scroll.rarity) {
+        found = true;
+        const qty = i.quantity || 1;
+        if (qty > 1) {
+          return { ...i, quantity: qty - 1 };
+        }
+        // else, don't return (removes from inventory)
+        return null;
+      }
+      return i;
+    }).filter(Boolean);
+    // Add scroll to equippedSpellScrolls
+    const newEquipped = [...player.equippedSpellScrolls, { ...scroll, quantity: 1 }];
     updateWizardInSaveSlot(player => ({
       ...player,
       equippedSpellScrolls: newEquipped,
@@ -657,7 +718,16 @@ export const createWizardModule = (set: Function, get: Function): WizardActions 
     const scrollToUnequip = player.equippedSpellScrolls.find(s => s.id === scrollId);
     if (!scrollToUnequip) return;
     const newEquipped = player.equippedSpellScrolls.filter(s => s.id !== scrollId);
-    const newInventory = [...(player.inventory || []), scrollToUnequip];
+    // Merge with stack if exists
+    let merged = false;
+    const newInventory = (player.inventory || []).map(s => {
+      if (!merged && s.type === 'scroll' && s.spell?.name === scrollToUnequip.spell?.name && s.rarity === scrollToUnequip.rarity) {
+        merged = true;
+        return { ...s, quantity: (s.quantity || 1) + 1 };
+      }
+      return s;
+    });
+    if (!merged) newInventory.push({ ...scrollToUnequip, quantity: 1 });
     updateWizardInSaveSlot(player => ({
       ...player,
       equippedSpellScrolls: newEquipped,

@@ -833,6 +833,39 @@
   text-shadow: 0 0 5px rgba(255, 107, 132, 0.5);
 }
 
+.save-slot__delete-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #ff6b84 60%, #b3002d 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(255, 107, 132, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.save-slot__delete-btn:hover, .save-slot__delete-btn:focus {
+  background: linear-gradient(135deg, #ff3b3b 80%, #b3002d 100%);
+  box-shadow: 0 4px 16px rgba(255, 59, 59, 0.4);
+  outline: none;
+  transform: scale(1.08);
+}
+
+.save-slot__delete-btn:active {
+  background: linear-gradient(135deg, #b3002d 80%, #ff6b84 100%);
+  transform: scale(0.96);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .settings-modal__content,

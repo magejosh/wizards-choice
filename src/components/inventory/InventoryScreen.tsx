@@ -22,7 +22,7 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ onClose }) => {
     unequipSpellScroll,
     updatePlayerEquippedPotions
   } = useGameStateStore();
-  const player = getWizard();
+  const player = useGameStateStore(state => state.gameState.player);
 
   // Handler for equipping an item
   const handleEquipItem = (item: Equipment) => {
@@ -96,17 +96,23 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ onClose }) => {
     if (!player) return;
     // If it's a potion (has 'effect'), handle potion equip
     if ('effect' in item) {
-      if (!player.equipment.belt) return;
-      const maxPotionSlots = player.combatStats?.potionSlots || 0;
-      if (player.equippedPotions.length >= maxPotionSlots) return;
-      const newEquippedPotions = [...player.equippedPotions, item];
-      const newPotions = player.potions.filter(p => p.id !== item.id);
-      updatePlayerEquippedPotions(newEquippedPotions);
-      updatePlayerPotions(newPotions);
+      useGameStateStore.getState().equipPotion(item);
       return;
     }
     // Otherwise, use the canonical store action
     handleEquipItem(item);
+  };
+
+  // Handler for equipping a potion to the belt
+  const handleEquipPotion = (potion: Potion) => {
+    if (!player || !player.equipment.belt) return;
+    useGameStateStore.getState().equipPotion(potion);
+  };
+
+  // Handler for unequipping a potion from the belt
+  const handleUnequipPotion = (potionId: string) => {
+    if (!player) return;
+    useGameStateStore.getState().unequipPotion(potionId);
   };
 
   return (
@@ -125,17 +131,20 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ onClose }) => {
       <div className={styles.inventoryScreenContent}>
         <Inventory
           equipment={player.equipment}
-          inventory={[...groupEquipmentItems(player.inventory || []), ...groupPotions(player.potions || [])]}
+          inventory={groupEquipmentItems((player.inventory || []).filter(item => item.type !== 'scroll' && !('effect' in item)))}
           spellScrolls={groupSpellScrolls((player.inventory?.filter(item => 'spell' in item && item.type === 'scroll') as SpellScroll[]) || [])}
           equippedSpellScrolls={player.equippedSpellScrolls || []}
           ingredients={groupIngredients(player.ingredients || [])}
           potions={groupPotions(player.potions || [])}
+          equippedPotions={player.equippedPotions || []}
           onEquipItem={handleEquipItemOrPotion}
           onUnequipItem={handleUnequipItem}
           onUseSpellScroll={handleUseSpellScroll}
           onEquipSpellScroll={handleEquipSpellScroll}
           onUnequipSpellScroll={handleUnequipSpellScroll}
           onUsePotion={handleUsePotion}
+          onEquipPotion={handleEquipPotion}
+          onUnequipPotion={handleUnequipPotion}
           onUseIngredient={handleUseIngredient}
         />
       </div>

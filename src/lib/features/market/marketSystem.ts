@@ -8,10 +8,11 @@ import {
   Potion,
   Equipment,
   IngredientRarity,
-  SpellScroll
+  SpellScroll,
+  EquipmentSlot
 } from '../../types';
 import { generateRandomIngredient } from '../procedural/ingredientGenerator';
-import { generateRandomPotion, generateRandomEquipment, generateRandomScroll } from '../items/itemGenerators';
+import { generateRandomPotion, generateRandomScroll } from '../items/itemGenerators';
 import { generateScrollsForMarket } from '../scrolls/scrollSystem';
 import {
   generateHerbIngredient,
@@ -70,7 +71,7 @@ export function initializeMarkets(): MarketLocation[] {
     unlockLevel: number,
     specialization?: 'ingredients' | 'potions' | 'equipment' | 'scrolls',
     priceMultiplier: number = 1.0,
-    inventoryRefreshDays: number = 3
+    inventoryRefreshMinutes: number = 72
   ): MarketLocation => {
     const inventory = generateMarketInventory(unlockLevel);
     const prices: Record<string, number> = {};
@@ -104,7 +105,7 @@ export function initializeMarkets(): MarketLocation[] {
       unlockLevel,
       specialization,
       reputationLevel: 0,
-      inventoryRefreshDays,
+      inventoryRefreshMinutes,
       lastRefreshed: today,
       inventory,
       priceMultiplier,
@@ -122,7 +123,7 @@ export function initializeMarkets(): MarketLocation[] {
       1,
       undefined,
       1.0,
-      3
+      72
     ),
     createMarket(
       'market-2',
@@ -131,7 +132,7 @@ export function initializeMarkets(): MarketLocation[] {
       5,
       'ingredients',
       0.9,
-      5
+      72
     ),
     createMarket(
       'market-3',
@@ -140,7 +141,7 @@ export function initializeMarkets(): MarketLocation[] {
       10,
       'equipment',
       1.2,
-      7
+      72
     ),
     createMarket(
       'market-4',
@@ -149,7 +150,7 @@ export function initializeMarkets(): MarketLocation[] {
       15,
       'potions',
       1.0,
-      5
+      72
     ),
     createMarket(
       'market-5',
@@ -158,7 +159,7 @@ export function initializeMarkets(): MarketLocation[] {
       20,
       'scrolls',
       1.5,
-      10
+      72
     ),
     createMarket(
       'market-6',
@@ -167,7 +168,7 @@ export function initializeMarkets(): MarketLocation[] {
       150,
       'ingredients',
       2.2,
-      14
+      72
     ),
     createMarket(
       'market-7',
@@ -176,7 +177,7 @@ export function initializeMarkets(): MarketLocation[] {
       250,
       'equipment',
       2.5,
-      16
+      72
     ),
     createMarket(
       'market-8',
@@ -185,7 +186,7 @@ export function initializeMarkets(): MarketLocation[] {
       500,
       'potions',
       3.0,
-      21
+      72
     ),
     createMarket(
       'market-9',
@@ -194,7 +195,7 @@ export function initializeMarkets(): MarketLocation[] {
       1000,
       'scrolls',
       4.0,
-      30
+      72
     )
   ];
 }
@@ -227,10 +228,17 @@ export function generateMarketInventory(level: number): MarketInventory {
     inventory.potions.push(generateMarketItem(potion, level, 3));
   }
 
+  // Determine allowed slots for this market level
+  let allowedSlots: EquipmentSlot[] = ['hand', 'body', 'belt'];
+  if (level >= 5) allowedSlots.push('head');
+  if (level >= 10) allowedSlots.push('neck');
+  if (level >= 15) allowedSlots.push('finger');
+
   // Generate equipment
   const equipmentCount = Math.min(2 + level, 8);
   for (let i = 0; i < equipmentCount; i++) {
-    const equipment = generateRandomEquipment(level);
+    const slot = allowedSlots[Math.floor(Math.random() * allowedSlots.length)];
+    const equipment = generateProceduralEquipment(level, slot);
     inventory.equipment.push(generateMarketItem(equipment, level, 2));
   }
 
@@ -374,10 +382,10 @@ export function shouldRefreshMarketInventory(market: MarketLocation): boolean {
   const lastRefreshed = new Date(market.lastRefreshed);
   const today = new Date();
 
-  // Calculate days since last refresh
-  const daysSinceRefresh = Math.floor((today.getTime() - lastRefreshed.getTime()) / (1000 * 60 * 60 * 24));
+  // Calculate minutes since last refresh
+  const minutesSinceRefresh = Math.floor((today.getTime() - lastRefreshed.getTime()) / (1000 * 60));
 
-  return daysSinceRefresh >= market.inventoryRefreshDays;
+  return minutesSinceRefresh >= market.inventoryRefreshMinutes;
 }
 
 /**

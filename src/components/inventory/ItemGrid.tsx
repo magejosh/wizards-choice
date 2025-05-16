@@ -84,10 +84,13 @@ export function ItemGrid({ items, onEquipItem }: ItemGridProps) {
             : undefined;
         return (
           <Card key={item.id} className={`${styles.itemCard} ${isSpellScroll ? styles.scrollCard : ''}`}>
-            <div className={styles.itemHeader}>
-              <h3 className={styles.itemName}>
+            <div className={styles.itemHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 className={styles.itemName} style={{ flex: 1, textAlign: 'left' }}>
                 {item.type === 'scroll' && item.spell ? item.spell.name : item.name}
               </h3>
+              {item.quantity && item.quantity > 1 && (
+                <span className={styles.quantity} style={{ marginLeft: 4 }}>x{item.quantity}</span>
+              )}
             </div>
             <div className={styles.itemImage}>
               <div style={{ fontSize: '24px' }}>
@@ -105,18 +108,12 @@ export function ItemGrid({ items, onEquipItem }: ItemGridProps) {
                   <div className={styles.spellType}>{item.spell.type}</div>
                   <div className={`${styles.rarity} ${styles[item.rarity]}`}>{item.rarity}</div>
                   <div className={styles.spellElement}>{item.spell.element}</div>
-                  {item.quantity && item.quantity > 1 && (
-                    <div className={styles.quantity}>x{item.quantity}</div>
-                  )}
                 </>
               ) : (
                 <>
                   <div className={styles.slot}>{item.type === 'scroll' ? 'Robes' : item.slot}</div>
                   <div className={`${styles.rarity} ${styles[item.rarity]}`}>{item.rarity}</div>
                   {item.type && <div className={styles.type}>{item.type}</div>}
-                  {item.quantity && item.quantity > 1 && (
-                    <div className={styles.quantity}>x{item.quantity}</div>
-                  )}
                 </>
               )}
             </div>

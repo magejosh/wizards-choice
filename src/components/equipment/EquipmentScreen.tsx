@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useGameStateStore, getWizard } from '../../lib/game-state/gameStateStore';
+import React, { useState, useEffect } from 'react';
+import { useGameStateStore } from '../../lib/game-state/gameStateStore';
+import { getWizard } from '../../lib/game-state/gameStateStore';
 import { Equipment, EquipmentSlot, HandEquipment, Potion } from '../../lib/types';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card';
 
 interface EquipmentScreenProps {
   onClose: () => void;
@@ -11,8 +13,35 @@ interface EquipmentScreenProps {
 const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
   onClose
 }) => {
-  const { updatePlayerEquipment, updatePlayerInventory, updatePlayerPotions, updatePlayerEquippedPotions } = useGameStateStore();
+  // Get the wizard object directly to avoid store structure issues
   const player = getWizard();
+  const { updatePlayerEquipment, updatePlayerInventory, updatePlayerPotions, updatePlayerEquippedPotions } = useGameStateStore();
+
+  // Early return or loading state if player data is not yet available
+  if (!player) {
+    return <div>Loading player data...</div>; // Or some other loading indicator
+  }
+
+  // Helper to deduplicate by id, keeping first occurrence
+  const deduplicateById = <T extends { id: string }>(arr: T[]): T[] => {
+    const seen = new Set<string>();
+    const deduped: T[] = [];
+    for (const item of arr) {
+      if (!seen.has(item.id)) {
+        seen.add(item.id);
+        deduped.push(item);
+      }
+    }
+    return deduped;
+  };
+
+  // Memoized unique potion arrays for rendering
+  const uniqueEquippedPotions: Potion[] = React.useMemo(() => deduplicateById<Potion>(player.equippedPotions || []), [player.equippedPotions]);
+
+  const uniqueInventoryPotions: Potion[] = React.useMemo(() => {
+    const equippedIds = new Set(uniqueEquippedPotions.map(p => p.id));
+    return deduplicateById<Potion>((player.potions || []).filter(p => !equippedIds.has(p.id)));
+  }, [player.potions, uniqueEquippedPotions]);
 
   // State for selected item
   const [selectedItem, setSelectedItem] = useState<Equipment | null>(null);
@@ -39,6 +68,46 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
     }
   };
 
+  // Function to safely get potions with no duplicates
+  const getSafePotions = () => {
+    if (!player || !player.potions) return [];
+    
+    // Map to track seen IDs
+    const seenIds = new Map();
+    const result = [];
+    
+    for (const potion of player.potions) {
+      if (!seenIds.has(potion.id)) {
+        seenIds.set(potion.id, true);
+        result.push(potion);
+      } else {
+        console.warn(`Duplicate potion ID found and filtered: ${potion.id}`);
+      }
+    }
+    
+    return result;
+  };
+  
+  // Function to safely get equipped potions with no duplicates
+  const getSafeEquippedPotions = () => {
+    if (!player || !player.equippedPotions) return [];
+    
+    // Map to track seen IDs
+    const seenIds = new Map();
+    const result = [];
+    
+    for (const potion of player.equippedPotions) {
+      if (!seenIds.has(potion.id)) {
+        seenIds.set(potion.id, true);
+        result.push(potion);
+      } else {
+        console.warn(`Duplicate equipped potion ID found and filtered: ${potion.id}`);
+      }
+    }
+    
+    return result;
+  };
+
   // Handle equipping a potion to the belt
   const handleEquipPotion = (potion: Potion) => {
     if (!player || !player.equipment.belt) return;
@@ -47,14 +116,14 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
     const maxPotionSlots = player.combatStats?.potionSlots || 0;
 
     // Check if there's room on the belt
-    if (player.equippedPotions.length >= maxPotionSlots) {
+    if ((player.equippedPotions || []).length >= maxPotionSlots) {
       // Belt is full, can't equip more potions
       return;
     }
 
     // Create new potion arrays
-    const newEquippedPotions = [...player.equippedPotions, potion];
-    const newPotions = player.potions.filter(p => p.id !== potion.id);
+    const newEquippedPotions = [...(player.equippedPotions || []), potion];
+    const newPotions = (player.potions || []).filter(p => p.id !== potion.id);
 
     // Update player state
     updatePlayerEquippedPotions(newEquippedPotions);
@@ -68,12 +137,12 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
   const handleUnequipPotion = (potionId: string) => {
     if (!player) return;
 
-    const potionToUnequip = player.equippedPotions.find(p => p.id === potionId);
+    const potionToUnequip = (player.equippedPotions || []).find(p => p.id === potionId);
     if (!potionToUnequip) return;
 
     // Create new potion arrays
-    const newEquippedPotions = player.equippedPotions.filter(p => p.id !== potionId);
-    const newPotions = [...player.potions, potionToUnequip];
+    const newEquippedPotions = (player.equippedPotions || []).filter(p => p.id !== potionId);
+    const newPotions = [...(player.potions || []), potionToUnequip];
 
     // Update player state
     updatePlayerEquippedPotions(newEquippedPotions);
@@ -86,7 +155,7 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
   };
 
   // Filter inventory items by tab
-  const filteredInventory = player.inventory.filter(item => {
+  const filteredInventory = (player.inventory || []).filter(item => {
     if (activeTab === 'all') return true;
     if (activeTab === 'hands') return item.slot === 'hand';
     if (activeTab === 'heads') return item.slot === 'head';
@@ -116,13 +185,57 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
     return equippedItem ? equippedItem.id === item.id : false;
   };
 
-  // Render a single equipment slot
+  // Utility: get image for equipment
+  const getEquipmentImage = (item: Equipment): string => {
+    if (item.imagePath) return item.imagePath;
+    // fallback by slot/type
+    switch (item.slot) {
+      case 'head': return '/images/equipment/head.png';
+      case 'hand':
+        if (item.type === 'wand') return '/images/equipment/wand.png';
+        if (item.type === 'staff') return '/images/equipment/staff.png';
+        if (item.type === 'dagger') return '/images/equipment/dagger.png';
+        if (item.type === 'spellbook') return '/images/equipment/spellbook.png';
+        return '/images/equipment/hand.png';
+      case 'body': return '/images/equipment/robe.png';
+      case 'neck': return '/images/equipment/amulet.png';
+      case 'finger': return '/images/equipment/ring.png';
+      case 'belt': return '/images/equipment/belt.png';
+      default: return '/images/equipment/default.png';
+    }
+  };
+
+  // Utility: render icons for slot-specific features
+  const renderSlotIcons = (item: Equipment) => {
+    return (
+      <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+        {item.bonuses?.find(b => b.stat === 'scrollSlots') && (
+          <span title="Scroll Slots" role="img" aria-label="Scroll Slots">📜 x{item.bonuses.find(b => b.stat === 'scrollSlots')?.value}</span>
+        )}
+        {item.bonuses?.find(b => b.stat === 'potionSlots') && (
+          <span title="Potion Slots" role="img" aria-label="Potion Slots">🧪 x{item.bonuses.find(b => b.stat === 'potionSlots')?.value}</span>
+        )}
+      </div>
+    );
+  };
+
+  // Helper function to get rarity color
+  const getRarityColor = (rarity: string): string => {
+    switch (rarity.toLowerCase()) {
+      case 'common': return 'gray-300';
+      case 'uncommon': return 'green-400';
+      case 'rare': return 'blue-400';
+      case 'epic': return 'purple-400';
+      case 'legendary': return 'yellow-400';
+      default: return 'gray-300';
+    }
+  };
+
+  // Restore renderEquipmentSlot for equipped items area
   const renderEquipmentSlot = (slot: EquipmentSlot, label: string, isSecondFinger: boolean = false) => {
     const item = getItemBySlot(slot, isSecondFinger);
     const isHovered = hoveredSlot === slot && (!isSecondFinger || (isSecondFinger && slot === 'finger'));
-
     const slotDisplayName = isSecondFinger ? 'Ring 2' : label;
-
     return (
       <div
         className={`equipment-slot ${item ? 'equipment-slot--filled' : 'equipment-slot--empty'} ${isHovered ? 'equipment-slot--hovered' : ''}`}
@@ -134,9 +247,7 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
         <div className="equipment-slot__item">
           {item ? (
             <>
-              <span className={`equipment-slot__name text-${getRarityColor(item.rarity)}`}>
-                {item.name}
-              </span>
+              <span className={`equipment-slot__name text-${getRarityColor(item.rarity)}`}>{item.name}</span>
               <button
                 className="equipment-slot__unequip"
                 onClick={(e) => {
@@ -155,10 +266,62 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
     );
   };
 
+  // Refactored renderItemCard
+  const renderItemCard = (item: Equipment) => {
+    const equipped = isItemEquipped(item);
+    return (
+      <Card className={`equipment-card ${equipped ? 'equipment-card--equipped' : ''}`} tabIndex={0} aria-label={item.name}>
+        <CardHeader className="equipment-card__header">
+          <CardTitle className={`equipment-card__name text-${getRarityColor(item.rarity)}`}>{item.name}</CardTitle>
+          <span className="equipment-card__slot">{getSlotDisplayName(item.slot)}{item.type ? ` – ${item.type}` : ''}</span>
+        </CardHeader>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 8 }}>
+          <img src={getEquipmentImage(item)} alt={item.name} style={{ width: 64, height: 64, objectFit: 'contain' }} />
+          {renderSlotIcons(item)}
+        </div>
+        <CardContent className="equipment-card__bonuses">
+          {item.bonuses && item.bonuses.length > 0 ? (
+            item.bonuses.map((bonus, idx) => {
+              const bonusKey = bonus.stat || (bonus as any).type;
+              if (!bonusKey) {
+                return (
+                  <div key={idx} className="equipment-card__bonus">
+                    Unknown Bonus
+                  </div>
+                );
+              }
+              return (
+                <div key={idx} className="equipment-card__bonus">
+                  {formatBonusName(bonusKey)}: {formatBonusValue(bonusKey, bonus.value)}
+                  {bonus.element && ` (${bonus.element})`}
+                </div>
+              );
+            })
+          ) : (
+            <div className="equipment-card__bonus">No bonuses</div>
+          )}
+        </CardContent>
+        <CardDescription className="equipment-card__description">
+          {item.description}
+        </CardDescription>
+        <CardFooter className="equipment-card__footer">
+          <span className="equipment-card__rarity">{item.rarity}</span>
+          {!equipped && (
+            <button
+              className="equipment-card__action"
+              onClick={e => { e.stopPropagation(); handleEquipItem(item); }}
+            >Equip</button>
+          )}
+        </CardFooter>
+      </Card>
+    );
+  };
+
   // Render potion slots
   const renderPotionSlots = () => {
     const maxPotionSlots = player.combatStats?.potionSlots || 0;
-    const equippedPotions = player.equippedPotions || [];
+    // Get deduplicated equipped potions
+    const equippedPotions = getSafeEquippedPotions();
 
     // If no belt is equipped, show a message
     if (!player.equipment.belt) {
@@ -174,7 +337,7 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
       <div className="potion-slots">
         <div className="potion-slots__label">Potion Belt ({equippedPotions.length}/{maxPotionSlots})</div>
         <div className="potion-slots__container">
-          {equippedPotions.map((potion, index) => (
+          {equippedPotions.map((potion) => (
             <div
               key={potion.id}
               className={`potion-slot potion-slot--${potion.type}`}
@@ -206,60 +369,82 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
     );
   };
 
-  // Render the item card
-  const renderItemCard = (item: Equipment) => {
+  // Refactored equipment detail view
+  const renderItemDetail = (item: Equipment) => {
     const equipped = isItemEquipped(item);
-
     return (
-      <div
-        className={`equipment-card ${equipped ? 'equipment-card--equipped' : ''}`}
-        onClick={() => setSelectedItem(item)}
-      >
-        <div className="equipment-card__header">
-          <span className={`equipment-card__name text-${getRarityColor(item.rarity)}`}>
-            {item.name}
-          </span>
-          <span className="equipment-card__slot">{getSlotDisplayName(item.slot)}</span>
-          {item.type && <span className="equipment-card__type">{item.type}</span>}
+      <Card className="equipment-detail" tabIndex={0} aria-label={item.name}>
+        <CardHeader>
+          <CardTitle className={`equipment-detail__name text-${getRarityColor(item.rarity)}`}>{item.name}</CardTitle>
+          <div className="equipment-detail__type">{getSlotDisplayName(item.slot)}{item.type ? ` – ${item.type}` : ''}</div>
+        </CardHeader>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 8 }}>
+          <img src={getEquipmentImage(item)} alt={item.name} style={{ width: 96, height: 96, objectFit: 'contain' }} />
+          {renderSlotIcons(item)}
         </div>
-
-        <div className="equipment-card__bonuses">
-          {Object.entries(item.bonuses).map(([key, value]) => {
-            if (!value) return null;
-            return (
-              <div key={key} className="equipment-card__bonus">
-                {formatBonusName(key)}: {formatBonusValue(key, value)}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="equipment-card__footer">
-          <span className="equipment-card__rarity">{item.rarity}</span>
-          {!equipped && (
+        <CardContent>
+          <h4 className="equipment-detail__subtitle">Properties</h4>
+          <ul className="equipment-detail__list">
+            {selectedItem.bonuses && selectedItem.bonuses.length > 0 ? (
+              selectedItem.bonuses.map((bonus, idx) => {
+                const bonusKey = bonus.stat || (bonus as any).type;
+                if (!bonusKey) {
+                  return (
+                    <li key={idx} className="equipment-detail__bonus">
+                      Unknown Bonus
+                    </li>
+                  );
+                }
+                return (
+                  <li key={idx} className="equipment-detail__bonus">
+                    {formatBonusName(bonusKey)}: {formatBonusValue(bonusKey, bonus.value)}
+                    {bonus.element && ` (${bonus.element})`}
+                  </li>
+                );
+              })
+            ) : (
+              <li className="equipment-detail__bonus">No bonuses</li>
+            )}
+          </ul>
+          <div className="equipment-detail__description">{item.description}</div>
+        </CardContent>
+        <CardFooter className="equipment-detail__actions">
+          {isItemEquipped(item) ? (
             <button
-              className="equipment-card__action"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEquipItem(item);
+              className="equipment-detail__action equipment-detail__action--unequip"
+              onClick={() => {
+                if (item.slot === 'finger') {
+                  const finger1 = player.equipment.finger1;
+                  if (finger1 && finger1.id === item.id) {
+                    handleUnequipItem('finger', false);
+                  } else {
+                    handleUnequipItem('finger', true);
+                  }
+                } else {
+                  handleUnequipItem(item.slot);
+                }
               }}
-            >
-              Equip
-            </button>
+            >Unequip</button>
+          ) : (
+            <button
+              className="equipment-detail__action equipment-detail__action--equip"
+              onClick={() => handleEquipItem(item)}
+            >Equip</button>
           )}
-        </div>
-      </div>
+        </CardFooter>
+      </Card>
     );
   };
 
   // Render a potion card
   const renderPotionCard = (potion: Potion) => {
-    const isEquipped = player.equippedPotions.some(p => p.id === potion.id);
+    const isEquipped = getSafeEquippedPotions().some(p => p.id === potion.id);
     const maxPotionSlots = player.combatStats?.potionSlots || 0;
-    const canEquip = !isEquipped && player.equippedPotions.length < maxPotionSlots && player.equipment.belt;
+    const canEquip = !isEquipped && getSafeEquippedPotions().length < maxPotionSlots && player.equipment.belt;
 
     return (
       <div
+        key={potion.id}
         className={`potion-card potion-card--${potion.type} ${isEquipped ? 'potion-card--equipped' : ''}`}
         onClick={() => setSelectedPotion(potion)}
       >
@@ -294,18 +479,6 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
         </div>
       </div>
     );
-  };
-
-  // Helper function to get rarity color
-  const getRarityColor = (rarity: string): string => {
-    switch (rarity.toLowerCase()) {
-      case 'common': return 'gray-300';
-      case 'uncommon': return 'green-400';
-      case 'rare': return 'blue-400';
-      case 'epic': return 'purple-400';
-      case 'legendary': return 'yellow-400';
-      default: return 'gray-300';
-    }
   };
 
   // Get display name for equipment slot
@@ -377,6 +550,22 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
     return `${value}`;
   };
 
+  // Deduplicate potions and equippedPotions by id on mount
+  useEffect(() => {
+    if (!player) return;
+    const dedupedPotions = deduplicateById<Potion>(player.potions || []);
+    const dedupedEquipped = deduplicateById<Potion>(player.equippedPotions || []);
+    let changed = false;
+    if (dedupedPotions.length !== (player.potions || []).length) changed = true;
+    if (dedupedEquipped.length !== (player.equippedPotions || []).length) changed = true;
+    if (changed) {
+      updatePlayerPotions(dedupedPotions);
+      updatePlayerEquippedPotions(dedupedEquipped);
+      // Optionally log for debugging
+      console.log('[EquipmentScreen] Duplicate potion IDs found and removed.');
+    }
+  }, [player, updatePlayerPotions, updatePlayerEquippedPotions]);
+
   return (
     <div className="equipment-screen">
       <div className="equipment-screen__header">
@@ -405,61 +594,7 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
 
         <div className="equipment-screen__detail-area">
           {selectedItem ? (
-            <div className="equipment-detail">
-              <h3 className={`equipment-detail__name text-${getRarityColor(selectedItem.rarity)}`}>
-                {selectedItem.name}
-              </h3>
-              <div className="equipment-detail__type">
-                {getSlotDisplayName(selectedItem.slot)}
-                {selectedItem.type && ` - ${selectedItem.type}`}
-              </div>
-
-              <h4 className="equipment-detail__subtitle">Properties</h4>
-              <ul className="equipment-detail__list">
-                {Object.entries(selectedItem.bonuses).map(([key, value]) => {
-                  if (!value) return null;
-                  return (
-                    <li key={key} className="equipment-detail__bonus">
-                      {formatBonusName(key)}: {formatBonusValue(key, value)}
-                    </li>
-                  );
-                })}
-              </ul>
-
-              <div className="equipment-detail__description">
-                {selectedItem.description}
-              </div>
-
-              <div className="equipment-detail__actions">
-                {isItemEquipped(selectedItem) ? (
-                  <button
-                    className="equipment-detail__action equipment-detail__action--unequip"
-                    onClick={() => {
-                      // Determine if it's finger1 or finger2 for rings
-                      if (selectedItem.slot === 'finger') {
-                        const finger1 = player.equipment.finger1;
-                        if (finger1 && finger1.id === selectedItem.id) {
-                          handleUnequipItem('finger', false);
-                        } else {
-                          handleUnequipItem('finger', true);
-                        }
-                      } else {
-                        handleUnequipItem(selectedItem.slot);
-                      }
-                    }}
-                  >
-                    Unequip
-                  </button>
-                ) : (
-                  <button
-                    className="equipment-detail__action equipment-detail__action--equip"
-                    onClick={() => handleEquipItem(selectedItem)}
-                  >
-                    Equip
-                  </button>
-                )}
-              </div>
-            </div>
+            renderItemDetail(selectedItem)
           ) : selectedPotion ? (
             <div className="potion-detail">
               <h3 className={`potion-detail__name text-${getRarityColor(selectedPotion.rarity)}`}>
@@ -478,7 +613,7 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
               </div>
 
               <div className="potion-detail__actions">
-                {player.equippedPotions.some(p => p.id === selectedPotion.id) ? (
+                {getSafeEquippedPotions().some(p => p.id === selectedPotion.id) ? (
                   <button
                     className="potion-detail__action potion-detail__action--unequip"
                     onClick={() => handleUnequipPotion(selectedPotion.id)}
@@ -486,7 +621,7 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
                     Unequip
                   </button>
                 ) : (
-                  player.equipment.belt && player.equippedPotions.length < (player.combatStats?.potionSlots || 0) && (
+                  player.equipment.belt && getSafeEquippedPotions().length < (player.combatStats?.potionSlots || 0) && (
                     <button
                       className="potion-detail__action potion-detail__action--equip"
                       onClick={() => handleEquipPotion(selectedPotion)}
@@ -560,19 +695,70 @@ const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
 
           <div className="equipment-screen__items">
             {activeTab === 'potions' ? (
-              // Render potions grid
+              // Render potions grid with direct JSX to avoid key issues
               <div className="potion-grid">
-                {player.potions.length > 0 ? (
-                  player.potions.map(potion => (
-                    <React.Fragment key={potion.id}>
-                      {renderPotionCard(potion)}
-                    </React.Fragment>
-                  ))
-                ) : (
-                  <div className="potion-grid__empty">
-                    No potions in inventory
-                  </div>
-                )}
+                {function renderPotions() {
+                  if (!player || !player.potions || player.potions.length === 0) {
+                    return <div className="potion-grid__empty">No potions in inventory</div>;
+                  }
+                  
+                  // Create a safe list without duplicates
+                  const uniquePotions = [];
+                  const seenIds = new Set();
+                  
+                  for (const p of player.potions) {
+                    if (!seenIds.has(p.id)) {
+                      seenIds.add(p.id);
+                      uniquePotions.push(p);
+                    }
+                  }
+                  
+                  // Render each potion with index-only keys
+                  return uniquePotions.map((potion) => {
+                    // Inline the potion card rendering to avoid any potential issues
+                    const isEquipped = player.equippedPotions?.some(p => p.id === potion.id) || false;
+                    const maxPotionSlots = player.combatStats?.potionSlots || 0;
+                    const canEquip = !isEquipped && 
+                      player.equippedPotions && 
+                      player.equippedPotions.length < maxPotionSlots && 
+                      player.equipment?.belt;
+                    
+                    return (
+                      <div
+                        key={potion.id}
+                        className={`potion-card potion-card--${potion.type} ${isEquipped ? 'potion-card--equipped' : ''}`}
+                        onClick={() => setSelectedPotion(potion)}
+                      >
+                        <div className="potion-card__header">
+                          <span className={`potion-card__name text-${getRarityColor(potion.rarity)}`}>
+                            {potion.name}
+                          </span>
+                          <span className="potion-card__type">{getPotionTypeDisplayName(potion.type)}</span>
+                        </div>
+                        <div className="potion-card__effect">
+                          Effect: {potion.effect.value} {potion.effect.duration ? `(${potion.effect.duration} turns)` : ''}
+                        </div>
+                        <div className="potion-card__description">
+                          {potion.description}
+                        </div>
+                        <div className="potion-card__footer">
+                          <span className="potion-card__rarity">{potion.rarity}</span>
+                          {canEquip && (
+                            <button
+                              className="potion-card__action"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEquipPotion(potion);
+                              }}
+                            >
+                              Equip
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  });
+                }()}
               </div>
             ) : (
               // Render equipment grid

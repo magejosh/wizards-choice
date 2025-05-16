@@ -59,43 +59,60 @@ export function SpellScrolls({ scrolls, equippedSpellScrolls, onUseScroll, onEqu
         )}
       </div>
       <hr className={styles.scrollDivider} />
+      <div className={styles.unequippedScrollsHeader}>
+        <strong>Unequipped Spell Scrolls</strong>
+      </div>
       <div className={styles.scrollGrid}>
         {scrolls.length === 0 ? (
           <div className={styles.emptyScrolls}>You have no spell scrolls</div>
         ) : (
-          scrolls.map((scroll) => (
-            <Card key={scroll.id} className={styles.scrollCard}>
-              <div className={styles.scrollHeader}>
-                <h3 className={styles.scrollName}>{scroll.spell.name}</h3>
-              </div>
-              <div className={styles.scrollImage}></div>
-              <div className={styles.spellInfo}>
-                <div className={styles.spellName}>Spell Scroll</div>
-                <div className={styles.spellDetails}>
-                  <span className={styles.spellType}>{scroll.spell.type}</span>
-                  <span className={`${styles.rarity} ${styles[scroll.rarity]}`}>{scroll.rarity}</span>
-                  <span className={styles.spellElement}>{scroll.spell.element}</span>
+          scrolls.map((scroll) => {
+            const quantity = (scroll as any).quantity || 1;
+            return (
+              <Card key={scroll.id} className={styles.scrollCard}>
+                <div className={styles.scrollHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 className={styles.scrollName} style={{ flex: 1, textAlign: 'left' }}>{scroll.spell.name}</h3>
+                  {quantity > 1 && (
+                    <span className={styles.quantity} style={{ marginLeft: 4 }}>x{quantity}</span>
+                  )}
                 </div>
-                <div className={styles.spellDescription}>{scroll.spell.description}</div>
-              </div>
-              <div className={styles.scrollActions}>
-                <button
-                  onClick={() => onUseScroll(scroll)}
-                  className={styles.useButton}
-                >
-                  Learn Spell
-                </button>
-                <button
-                  onClick={() => onEquipScroll(scroll as unknown as Equipment)}
-                  className={styles.useButton}
-                  disabled={!canEquipMore}
-                  title={robe ? (canEquipMore ? '' : 'No available robe slots') : 'Equip a robe to use spell scrolls'}
-                >
-                  Equip to Robes
-                </button>
-              </div>
-            </Card>
-          ))
+                <div className={styles.scrollImage}></div>
+                <div className={styles.spellInfo}>
+                  <div className={styles.spellName}>Spell Scroll</div>
+                  <div className={styles.spellDetails}>
+                    <span className={styles.spellType}>{scroll.spell.type}</span>
+                    <span className={`${styles.rarity} ${styles[scroll.rarity]}`}>{scroll.rarity}</span>
+                    <span className={styles.spellElement}>{scroll.spell.element}</span>
+                  </div>
+                  <div className={styles.spellDescription}>{scroll.spell.description}</div>
+                </div>
+                <div className={styles.scrollActions}>
+                  <button
+                    onClick={() => onUseScroll(scroll)}
+                    className={styles.useButton}
+                  >
+                    Learn Spell
+                  </button>
+                  <button
+                    onClick={() => {
+                      if ((quantity) > 1) {
+                        // Equip a single scroll (let state handle stack decrement)
+                        const singleScroll = { ...scroll, id: `${scroll.id}-eq-${Date.now()}`, quantity: 1 };
+                        onEquipScroll(singleScroll as unknown as Equipment);
+                      } else {
+                        onEquipScroll(scroll as unknown as Equipment);
+                      }
+                    }}
+                    className={styles.useButton}
+                    disabled={!canEquipMore}
+                    title={robe ? (canEquipMore ? '' : 'No available robe slots') : 'Equip a robe to use spell scrolls'}
+                  >
+                    Equip to Robes
+                  </button>
+                </div>
+              </Card>
+            );
+          })
         )}
       </div>
     </div>

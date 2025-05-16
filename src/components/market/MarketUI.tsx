@@ -13,6 +13,8 @@ import ErrorBoundary from '../error/ErrorBoundary';
 import styles from './MarketUI.module.css';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 import { Button } from '../ui/button';
+import { Card } from '../ui/card';
+import itemGridStyles from '../inventory/ItemGrid.module.css';
 
 // Main MarketUI component
 export const MarketUI: React.FC<{ onClose: (attackInfo?: any) => void }> = ({ onClose }) => {
@@ -144,11 +146,11 @@ export const MarketUI: React.FC<{ onClose: (attackInfo?: any) => void }> = ({ on
       if (!market) return;
 
       const lastRefreshed = new Date(market.lastRefreshed);
-      const refreshDays = market.inventoryRefreshDays || 1; // Default to 1 day if not specified
+      const refreshMinutes = market.inventoryRefreshMinutes || 72; // Default to 72 minutes if not specified
 
       // Calculate when the next refresh will happen
       const nextRefresh = new Date(lastRefreshed);
-      nextRefresh.setDate(lastRefreshed.getDate() + refreshDays);
+      nextRefresh.setMinutes(lastRefreshed.getMinutes() + refreshMinutes);
 
       // Calculate time remaining
       const now = new Date();
@@ -180,9 +182,10 @@ export const MarketUI: React.FC<{ onClose: (attackInfo?: any) => void }> = ({ on
       hasRefreshed = false;
 
       // Convert to hours, minutes, seconds
-      const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
-      const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+      const totalSeconds = Math.floor(timeRemaining / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
 
       // Format the time string
       setRestockTime(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
@@ -504,6 +507,150 @@ export const MarketUI: React.FC<{ onClose: (attackInfo?: any) => void }> = ({ on
     }
   };
 
+  // Shared MarketItemCard for all item types, matching ItemGrid
+  function MarketItemCard({ item, itemType, price, quantity, onAction, actionLabel }: {
+    item: any;
+    itemType: string;
+    price: number;
+    quantity: number;
+    onAction: () => void;
+    actionLabel: string;
+  }) {
+    // Icon logic (reuse from ItemGrid)
+    let icon = '';
+    if (itemType === 'ingredient') icon = '🌿';
+    else if (itemType === 'potion') icon = '🧪';
+    else if (itemType === 'equipment') {
+      switch (item.slot) {
+        case 'head': icon = '🧢'; break;
+        case 'body': icon = item.type === 'scroll' ? '📜' : '👕'; break;
+        case 'hand': icon = '🧤'; break;
+        case 'neck': icon = '📿'; break;
+        case 'finger': icon = '💍'; break;
+        case 'belt': icon = '🧶'; break;
+        default: icon = '🔹';
+      }
+    } else if (itemType === 'scroll') icon = '📜';
+
+    // Rarity class and badge (below image)
+    const rarityClass = item.rarity ? itemGridStyles[item.rarity] : '';
+
+    // Quantity badge
+    const quantityBadge = quantity > 1 ? (
+      <span className={itemGridStyles.quantity}>x{quantity}</span>
+    ) : null;
+
+    // Card structure matches ItemGrid
+    const isSpellScroll = itemType === 'scroll';
+    return (
+      <Card className={`${itemGridStyles.itemCard} ${isSpellScroll ? itemGridStyles.scrollCard : ''}`}> 
+        <div className={itemGridStyles.itemHeader}>
+          <h3 className={itemGridStyles.itemName}>{isSpellScroll && item.spell ? item.spell.name : item.name}</h3>
+          {quantityBadge}
+        </div>
+        <div className={itemGridStyles.itemImage}>
+          <div style={{ fontSize: '24px' }}>
+            {itemType === 'ingredient' && '🌿'}
+            {itemType === 'potion' && '🧪'}
+            {itemType === 'equipment' && (
+              item.slot === 'head' ? '🧢' :
+              item.slot === 'body' ? (item.type === 'scroll' ? '📜' : '👕') :
+              item.slot === 'hand' ? '🧤' :
+              item.slot === 'neck' ? '📿' :
+              item.slot === 'finger' ? '💍' :
+              item.slot === 'belt' ? '🧶' :
+              '🔹')
+            }
+            {isSpellScroll && '📜'}
+          </div>
+        </div>
+        <div className={itemGridStyles.itemDetails}>
+          {isSpellScroll && item.spell ? (
+            <>
+              <div className={itemGridStyles.spellType}>{item.spell.type}</div>
+              <div className={`${itemGridStyles.rarity} ${rarityClass}`}>{item.rarity}</div>
+              <div className={itemGridStyles.spellElement}>{item.spell.element}</div>
+            </>
+          ) : itemType === 'equipment' ? (
+            <>
+              <div className={itemGridStyles.slot}>{item.type === 'scroll' ? 'Robes' : item.slot}</div>
+              <div className={`${itemGridStyles.rarity} ${rarityClass}`}>{item.rarity}</div>
+              {item.type && <div className={itemGridStyles.type}>{item.type}</div>}
+            </>
+          ) : itemType === 'potion' ? (
+            <>
+              <div className={itemGridStyles.type}>{item.type}</div>
+              <div className={`${itemGridStyles.rarity} ${rarityClass}`}>{item.rarity}</div>
+              {quantity > 1 && <div className={itemGridStyles.quantity}>x{quantity}</div>}
+            </>
+          ) : itemType === 'ingredient' ? (
+            <>
+              <div className={itemGridStyles.category}>{item.category}</div>
+              <div className={`${itemGridStyles.rarity} ${rarityClass}`}>{item.rarity}</div>
+              {quantity > 1 && <div className={itemGridStyles.quantity}>x{quantity}</div>}
+            </>
+          ) : null}
+        </div>
+        <div className={itemGridStyles.bonuses}>
+          {itemType === 'potion' && item.effect ? (
+            <>
+              <div className={itemGridStyles.bonus}>
+                {item.type === 'health' && `❤️ +${item.effect.value} health`}
+                {item.type === 'mana' && `✨ +${item.effect.value} mana`}
+                {item.type === 'strength' && `⚔️ +${item.effect.value}% damage`}
+                {item.type === 'protection' && `🛡️ -${item.effect.value}% damage`}
+                {item.type === 'elemental' && `🔮 +${item.effect.value}% elem dmg`}
+                {item.type === 'luck' && `🎯 +${item.effect.value}% crit`}
+              </div>
+              {item.effect.duration && <div className={itemGridStyles.bonus}>Duration: {item.effect.duration} turns</div>}
+              <div className={itemGridStyles.bonus}>{item.description}</div>
+            </>
+          ) : itemType === 'equipment' && item.bonuses ? (
+            item.bonuses.map((bonus: any, idx: number) => (
+              <div key={idx} className={itemGridStyles.bonus}>
+                {bonus.stat === 'health' && '❤️'}
+                {bonus.stat === 'mana' && '✨'}
+                {bonus.stat === 'defense' && '🛡️'}
+                {bonus.stat === 'maxHealth' && '❤️'}
+                {bonus.stat === 'maxMana' && '✨'}
+                {bonus.stat === 'spellPower' && '🔮'}
+                {bonus.stat === 'manaRegen' && '♻️'}
+                {bonus.stat === 'manaCostReduction' && '💧'}
+                {bonus.stat === 'mysticPunchPower' && '👊'}
+                {bonus.stat === 'bleedEffect' && '🩸'}
+                {bonus.stat === 'extraCardDraw' && '🃏'}
+                {bonus.stat === 'potionSlots' && '🧪'}
+                {bonus.stat === 'potionEffectiveness' && '✨'}
+                {bonus.stat === 'elementalAffinity' && '🌟'}
+                {bonus.stat}: {bonus.value > 0 ? `+${bonus.value}` : bonus.value}
+                {bonus.element && ` (${bonus.element})`}
+              </div>
+            ))
+          ) : isSpellScroll && item.spell ? (
+            <>
+              <div className={itemGridStyles.spellName}>Spell Scroll</div>
+              <div className={itemGridStyles.spellDescription}>{item.spell.description}</div>
+            </>
+          ) : itemType === 'ingredient' ? (
+            <>
+              <div className={itemGridStyles.bonus}>{item.description}</div>
+              {Array.isArray(item.effects) && item.effects.length > 0 && item.effects.map((effect: string, idx: number) => (
+                <div key={idx} className={itemGridStyles.bonus}>{effect}</div>
+              ))}
+            </>
+          ) : null}
+        </div>
+        <div className={itemGridStyles.itemActions}>
+          <button className={itemGridStyles.equipButton} onClick={onAction}>{actionLabel}</button>
+        </div>
+        <div className={itemGridStyles.itemDetails}>
+          <div className={itemGridStyles.itemPrice}>Price: {price} gold</div>
+          <div className={itemGridStyles.itemQuantity} style={{ color: '#cccccc' }}>Available: {quantity}</div>
+        </div>
+      </Card>
+    );
+  }
+
   // Render market UI
   return (
     <ErrorBoundary fallback={<div className={styles.errorContainer}>Something went wrong in the market.</div>}>
@@ -621,57 +768,19 @@ export const MarketUI: React.FC<{ onClose: (attackInfo?: any) => void }> = ({ on
                 </button>
               </div>
 
-              <div className={styles.itemsGrid}>
+              <div className={itemGridStyles.itemGrid}>
                 {getDisplayItems().map((item: MarketItemType<any>, index: number) => {
-                  // Determine item name and description based on item type
-                  let itemName = item.item.name || 'Unknown Item';
-                  let itemDescription = '';
-                  let itemCardStyle = {};
-                  let itemNameStyle = {};
-                  let descriptionStyle = {};
-
-                  if (selectedTab === 'ingredients') {
-                    const ingredient = item.item as Ingredient;
-                    itemDescription = ingredient.description || 'No description available';
-                    itemCardStyle = { borderLeft: '4px solid #4caf50' };
-                    itemNameStyle = { color: '#4caf50' };
-                  } else if (selectedTab === 'potions') {
-                    const potion = item.item as Potion;
-                    itemDescription = potion.description || 'No description available';
-                    itemCardStyle = { borderLeft: '4px solid #2196f3' };
-                    itemNameStyle = { color: '#2196f3' };
-                  } else if (selectedTab === 'equipment') {
-                    const equipment = item.item as Equipment;
-                    itemDescription = equipment.description || 'No description available';
-                    itemCardStyle = { borderLeft: '4px solid #ff9800' };
-                    itemNameStyle = { color: '#ff9800' };
-                    descriptionStyle = { fontSize: '12px' };
-                  } else if (selectedTab === 'spellScrolls') {
-                    const scroll = item.item as SpellScroll;
-                    itemDescription = `Learn the ${scroll.spell.name} spell`;
-                    itemCardStyle = { borderLeft: '4px solid #9c27b0' };
-                    itemNameStyle = { color: '#9c27b0' };
-                  }
-
+                  let itemType = selectedTab === 'spellScrolls' ? 'scroll' : selectedTab;
                   return (
-                    <div
+                    <MarketItemCard
                       key={index}
-                      className={`${styles.itemCard}`}
-                      style={itemCardStyle}
-                    >
-                      <div className={styles.itemName} style={itemNameStyle}>{itemName}</div>
-                      <div className={styles.itemDescription} style={descriptionStyle}>{itemDescription}</div>
-                      <div className={styles.itemDetails}>
-                        <div className={styles.itemPrice}>Price: {item.currentPrice} gold</div>
-                        <div className={styles.itemQuantity} style={{color: '#cccccc'}}>Available: {item.quantity}</div>
-                      </div>
-                      <button
-                        className={styles.actionButton}
-                        onClick={() => mode === 'buy' ? handleBuyItem(item, index) : handleSellItem(item, index)}
-                      >
-                        {mode === 'buy' ? 'Buy' : 'Sell'}
-                      </button>
-                    </div>
+                      item={item.item}
+                      itemType={itemType}
+                      price={item.currentPrice}
+                      quantity={item.quantity}
+                      onAction={() => mode === 'buy' ? handleBuyItem(item, index) : handleSellItem(item, index)}
+                      actionLabel={mode === 'buy' ? 'Buy' : 'Sell'}
+                    />
                   );
                 })}
 

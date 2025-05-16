@@ -351,6 +351,16 @@ Generic cards (like save slots, inventory items, etc.) should follow these guide
 }
 ```
 
+### Save Slot Delete Button
+
+Each non-empty save slot card now features a delete button in the bottom right corner:
+
+- **Appearance**: Small, round button with a red gradient background and a white ❌ emoji.
+- **Location**: Absolutely positioned in the bottom right of the save slot card.
+- **Interaction**: Clicking the button prompts for confirmation and deletes only that save slot. The button is accessible (aria-label, focusable, keyboard accessible).
+- **Class**: `.save-slot__delete-btn` (see styles for details).
+- **Accessibility**: Button uses `aria-label` and is keyboard focusable for screen readers.
+
 ### Card Variations
 - Empty cards should use dashed borders
 - Filled cards should use solid borders with a subtle gradient background
@@ -481,6 +491,16 @@ The Battle Arena should maintain a consistent layout and styling:
   transition: background-color 0.3s ease;
 }
 ```
+
+### Consumable Item Cards (Potions & Spell Scrolls)
+
+- During battle, equipped potions and spell scrolls are accessible via two new buttons near the Mystic Punch and Skip Turn buttons: **Belt** (for potions) and **Robes** (for spell scrolls).
+- These buttons are only enabled if the player has at least one item equipped in the corresponding slot.
+- Pressing a button opens a modal overlay displaying the equipped items as cards.
+- Item cards use the same layout and style as spell cards in the hand and as item cards in the inventory/market (see `.itemCard`, `.scrollCard`, and `.spellCard` styles).
+- Each card has a **Use** button. When used, the item is consumed (removed from the slot and UI) and its effect is applied in battle.
+- The modal uses the same epic modal style as other modals (see `.modalOverlay` and `.modalContent`).
+- The rest of the battle arena remains unchanged.
 
 ## Wizard's Study
 

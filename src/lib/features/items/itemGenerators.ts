@@ -89,14 +89,18 @@ export const generateRandomIngredient = (level: number): Ingredient => {
   const rarity = calculateRarity(level);
   const name = randomFromArray(INGREDIENT_NAMES);
   const category = randomFromArray(INGREDIENT_CATEGORIES);
-  
+  // Generate effects based on category and rarity for more flavor
+  const effects = [`${category} effect +${Math.round(level * (rarity === 'legendary' ? 10 : rarity === 'epic' ? 7 : rarity === 'rare' ? 5 : rarity === 'uncommon' ? 3 : 1))}`];
   return {
     id: `ingredient-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     name,
     category,
     rarity,
     description: `A ${rarity} ${category} used in potion crafting`,
-    properties: [`Level ${level}`, `${category} type`]
+    properties: [`Level ${level}`, `${category} type`],
+    effects, // Always present
+    quantity: 1, // Always present
+    imagePath: '', // Always present
   };
 };
 
@@ -116,37 +120,14 @@ export const generateRandomPotion = (level: number): Potion => {
       value: potency,
       duration: type === 'protection' || type === 'strength' ? duration : undefined
     },
-    description: `A ${rarity} ${name.toLowerCase()} of level ${level}`
+    description: `A ${rarity} ${name.toLowerCase()} of level ${level}`,
+    imagePath: '', // Always present
+    quantity: 1, // Always present
   };
 };
 
-export const generateRandomEquipment = (level: number): Equipment => {
-  const rarity = calculateRarity(level);
-  const type = randomFromArray(EQUIPMENT_TYPES);
-  const element = randomFromArray(ELEMENTS);
-
-  const bonuses: StatBonus[] = [
-    { stat: 'health', value: Math.round(level * (Math.random() * 5 + 5)) },
-    { stat: 'mana', value: Math.round(level * (Math.random() * 4 + 3)) },
-    { stat: 'damage', value: Math.round(level * (Math.random() * 3 + 2)) },
-    { stat: 'defense', value: Math.round(level * (Math.random() * 3 + 2)) },
-    { stat: 'spellPower', value: Math.round(level * (Math.random() * 3 + 2)) },
-    { stat: 'elementalAffinity', value: Math.round(level * (Math.random() * 2 + 1)), element }
-  ];
-
-  return {
-    id: `equipment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    name: `${rarity.charAt(0).toUpperCase() + rarity.slice(1)} ${type} of ${element}`,
-    slot: 'hand',
-    type,
-    rarity,
-    bonuses,
-    description: `A ${rarity} ${type} imbued with ${element} energy`,
-    unlocked: true,
-    equipped: false,
-    requiredLevel: level
-  };
-};
+// Equipment generation is now handled exclusively by the procedural equipment generator in procedural/equipmentGenerator.ts
+// Do not add equipment generation here. Use generateProceduralEquipment or generateLootEquipment instead.
 
 export const generateRandomScroll = (level: number): SpellScroll => {
   const rarity = calculateRarity(level);

@@ -13,6 +13,16 @@ export interface Enemy {
   name: string;
   health: number;
   mana: number;
+  maxHealth: number;
+  maxMana: number;
+  baseMaxHealth?: number;
+  progressionMaxHealth?: number;
+  equipmentMaxHealth?: number;
+  totalMaxHealth?: number;
+  baseMaxMana?: number;
+  progressionMaxMana?: number;
+  equipmentMaxMana?: number;
+  totalMaxMana?: number;
   level: number;
   spells: Spell[];
   goldReward?: number;

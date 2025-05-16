@@ -19,69 +19,87 @@ export function processActiveEffects(
   const expiredEffects: ActiveEffect[] = [];
   const remainingEffects: ActiveEffect[] = [];
 
+  // Allowed ActiveEffect types
+  const allowedTypes = new Set([
+    'damage_over_time',
+    'healing_over_time',
+    'mana_regen',
+    'mana_drain',
+    'stun',
+    'silence',
+  ]);
+
   // Process each active effect
   activeEffects.forEach(activeEffect => {
-    const effect = activeEffect.effect;
+    // Defensive: skip undefined or malformed effects
+    if (!activeEffect || (!activeEffect.type && !activeEffect.effect)) return;
 
-    // Apply effect
-    switch (effect.type) {
-      case 'damage':
+    // Support both legacy (effect.type) and direct (activeEffect.type) effect types
+    let effectType = activeEffect.type as ActiveEffect['type'];
+    let effectValue = activeEffect.value;
+    let effectName = activeEffect.name;
+    let effectSource = activeEffect.source;
+    // If effect property exists, prefer its type/value
+    if (activeEffect.effect) {
+      effectType = activeEffect.effect.type as ActiveEffect['type'];
+      effectValue = activeEffect.effect.value;
+    }
+
+    // Only process allowed types
+    if (!allowedTypes.has(effectType)) return;
+
+    switch (effectType) {
+      case 'damage_over_time':
         // Apply damage over time
         newState[wizard] = {
           ...newState[wizard],
-          currentHealth: Math.max(0, newState[wizard].currentHealth - effect.value),
+          currentHealth: Math.max(0, newState[wizard].currentHealth - effectValue),
         };
-
-        // Add to combat log
         newState.log.push(createLogEntry({
           turn: newState.turn,
           round: newState.round,
-          actor: activeEffect.source,
+          actor: effectSource,
           action: 'damage_over_time',
-          details: `${effect.value} ${effect.element || ''} damage to ${isPlayer ? 'you' : 'enemy'} from ${activeEffect.name}!`,
-          damage: effect.value,
+          details: `${effectValue} damage to ${isPlayer ? 'you' : 'enemy'} from ${effectName}!`,
+          damage: effectValue,
         }));
-
-        // Check if this damage ended the combat
         newState = checkCombatStatus(newState);
         break;
-
-      case 'healing':
+      case 'healing_over_time':
         // Apply healing over time
         const maxHealth = newState[wizard].wizard.maxHealth;
         newState[wizard] = {
           ...newState[wizard],
-          currentHealth: Math.min(maxHealth, newState[wizard].currentHealth + effect.value),
+          currentHealth: Math.min(maxHealth, newState[wizard].currentHealth + effectValue),
         };
-
-        // Add to combat log
         newState.log.push(createLogEntry({
           turn: newState.turn,
           round: newState.round,
-          actor: activeEffect.source,
+          actor: effectSource,
           action: 'healing_over_time',
-          details: `${effect.value} healing to ${isPlayer ? 'you' : 'enemy'} from ${activeEffect.name}!`,
-          healing: effect.value,
+          details: `${effectValue} healing to ${isPlayer ? 'you' : 'enemy'} from ${effectName}!`,
+          healing: effectValue,
         }));
         break;
-
-      case 'manaRestore':
-        // Apply mana restoration over time
+      case 'mana_regen':
+        // Apply mana regeneration over time
         const maxMana = newState[wizard].wizard.maxMana;
         newState[wizard] = {
           ...newState[wizard],
-          currentMana: Math.min(maxMana, newState[wizard].currentMana + effect.value),
+          currentMana: Math.min(maxMana, newState[wizard].currentMana + effectValue),
         };
-
-        // Add to combat log
         newState.log.push(createLogEntry({
           turn: newState.turn,
           round: newState.round,
-          actor: activeEffect.source,
+          actor: effectSource,
           action: 'mana_restore_over_time',
-          details: `${effect.value} mana restored to ${isPlayer ? 'you' : 'enemy'} from ${activeEffect.name}!`,
-          mana: effect.value,
+          details: `${effectValue} mana restored to ${isPlayer ? 'you' : 'enemy'} from ${effectName}!`,
+          mana: effectValue,
         }));
+        break;
+      // Other allowed types (mana_drain, stun, silence) can be implemented as needed
+      default:
+        // Skip unknown or unsupported effect types
         break;
     }
 

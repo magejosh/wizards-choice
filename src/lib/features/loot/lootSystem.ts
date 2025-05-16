@@ -5,6 +5,7 @@ import { getRandomEquipment } from '../../equipment/equipmentData';
 import { generateProceduralEquipment, generateLootEquipment } from '../procedural/equipmentGenerator';
 import { generateRandomIngredient } from '../procedural/ingredientGenerator';
 import { generateRandomSpellScroll } from '../scrolls/scrollSystem';
+import { calculateWizardStats } from '../../wizard/wizardUtils';
 
 /**
  * Represents a loot drop from defeating an enemy
@@ -474,11 +475,14 @@ export function applyLoot(playerWizard: Wizard, loot: LootDrop): Wizard {
   console.log("Updated inventory:", updatedInventory);
   console.log("Updated ingredients:", updatedIngredients);
 
-  // Return updated wizard without adding experience (experience is already awarded via calculateExperienceGained)
-  return {
+  // Compose the updated wizard
+  const updatedWizard: Wizard = {
     ...playerWizard,
     spells: updatedSpells,
     inventory: updatedInventory,
     ingredients: updatedIngredients
   };
+
+  // Recalculate stats after loot is applied
+  return calculateWizardStats(updatedWizard);
 }

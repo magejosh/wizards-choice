@@ -21,141 +21,69 @@ Additional guidelines:
 
 ## Bug Fix & Improvement Tasks
 
-### Phase 1: Core Bug Fixes & Stability
+### Phase 1: Core Refactor & Spell Management Editor
 
-#### Task Group 1: Combat Phase Advancement Glitch
-- [x] Refactor Phase Management Logic
-  - [x] Review `src/lib/combat/phaseManager.ts`, focusing on the `advancePhase` function and phase transitions
-  - [x] Centralize phase state management definitively within phaseManager.ts and remove phase logic from BattleView.tsx useEffects
-  - [x] Ensure advancePhase transitions are atomic and handle all states correctly, especially discard -> end -> initiative
-  - [x] Implement robust state checks within advancePhase to prevent getting stuck and add detailed logging
-  - [x] Ensure processEnemyDiscard in cardManager.ts completes synchronously or its completion reliably triggers the next step
+#### Task Group 1: XML Spell Data Format & Documentation
+- [x] Decide and document the new XML spell data format in /docs, including all fields (name, type, element, tier, mana cost, description, effects, image, rarity, list membership)
+- [x] Specify XML schema and validation rules (unique spell names, valid effects/targets, list attribute for archetype/creature/any)
+- [x] Update documentation and process maps in /docs to reflect the new spell system and CMX workflow
 
-- [x] Verify State Updates
-  - [x] Add logging/debugging in BattleView.tsx and phaseManager.ts to trace state updates during phase transitions, while mindfully removing exceessive or redundant logging
-  - [x] Test edge cases (e.g., player/enemy skipping turns, empty hands/decks during discard)
-  - [x] Examine how phase changes are triggered and handled in the UI
-  - [x] Check for proper synchronization between UI state and combat state
+#### Task Group 2: Spell Data Migration & Validation
+- [ ] Write a migration script to export all current spells to the new XML format, ensuring each spell is a node with a list attribute (archetype, creature, or 'any')
+- [ ] Add validation to prevent duplicate spell names and invalid effects/targets
+- [ ] Ensure migration script checks for and appends a suffix on duplicate spell names
+- [ ] Ensure migration script does not delete current spell data and includes all spell lists in the XML data
+- [ ] Execute migration script and validate XML data against the new schema, IF failed, restart Task Group 2 UNTIL successful.
 
-- [x] Phase Tracking Review
-  - [x] Review `src/components/battle/PhaseTracker.tsx` and related components
-  - [x] Verify that phase tracking accurately reflects the current game state
-  - [x] Look for potential UI/state mismatches that could cause confusion
 
-#### Task Group 2: Save Slot System Malfunction
-- [x] Implement Unique Save Slot Identifiers
-  - [x] Review `src/lib/game-state/modules/saveModule.ts`, focusing on save slot management
-  - [x] Modify SaveSlot interface in game-types.ts to include a unique saveUuid (e.g., using uuid)
-  - [x] Update saveModule.ts (saveGame, loadGame, initializeNewGame, deleteSaveSlot) to use saveUuid for localStorage keys
-  - [x] Ensure currentSaveSlot stores the saveUuid, not just the array index
-  - [x] Update MainMenu.tsx to handle selection based on saveUuid
+#### Task Group 3: Game Refactor for XML Spell Loading
+- [ ] Refactor the game to load spells from the XML file at runtime, replacing hardcoded spell lists
+- [ ] Refactor archetype/creature logic to reference spells by name (unique, case-insensitive) instead of object or ID
+- [ ] Ensure all spell lists (default, archetype, creature) are populated from the XML data
 
-- [x] Refactor Save/Load Logic
-  - [x] Ensure loadGame correctly hydrates the entire game state, including correctly identifying the loaded slot
-  - [x] Verify that saveGame always saves the state associated with the currently active saveUuid
-  - [x] Check how save data is stored in localStorage
-  - [x] Look for potential conflicts or overwriting issues
-  - [x] Check for proper handling of empty vs. filled save slots
+#### Task Group 4: Card Management Editor (CMX) Implementation
+- [ ] Create a dev-only GUI at /cmx for spell management (visible only in dev server)
+- [ ] Allow viewing, editing, deleting, and adding spells, with all fields editable
+- [ ] Allow the dev user to select which list(s) a spell belongs to, or 'any' for default
+- [ ] Provide quick selection for mechanics/effects and value editing
+- [ ] Allow the dev user to enter the art file path/name (must exist in project folder)
+- [ ] Show changes live in the GUI, but require a dev server restart to load changes into the game
+- [ ] Add buttons to download the current spell list XML and import/upload a new XML file
+- [ ] Prompt the dev user to overwrite or rename if saving a spell with a duplicate name
+- [ ] Leave inline comments in the code for future batch editing and versioning extension points
 
-- [x] Fix Save Slot Data Isolation Issue
-  - [x] Restructure SaveSlot interface to include player and gameProgress data
-    - [x] Update game-types.ts to move player and gameProgress into the SaveSlot interface
-    - [x] Update GameState interface to remove top-level player and gameProgress properties
-  - [x] Update saveModule.ts functions to handle the new structure
-    - [x] Modify initializeNewGame to store player and gameProgress within the save slot
-    - [x] Update saveGame to save player and gameProgress data for the specific slot only
-    - [x] Revise loadGame to load player and gameProgress from the selected save slot
-  - [x] Update game state access patterns throughout the codebase
-    - [x] Create helper functions to get/set the current player and gameProgress data
-    - [x] Update all components that access player or gameProgress to use the new helpers
-  - [x] Implement data migration for existing saves
-    - [x] Create migration function to convert old save format to new structure
-    - [x] Update version number and add version check in onRehydrateStorage
-  - [x] Update wizardModule.ts to use the new update functions
-    - [x] Update updateWizard to use updateWizardInSaveSlot
-    - [x] Update addExperience to use updateWizardInSaveSlot and updateGameProgress
-    - [x] Update addGold and removeGold to use updateWizardInSaveSlot and updateGameProgress
-    - [x] Update addSpell to use updateWizardInSaveSlot and updateGameProgress
-    - [x] Update equipSpell and unequipSpell to use updateWizardInSaveSlot
-    - [x] Update equipItem and unequipItem to use updateWizardInSaveSlot
-  - [x] Update UI components to use the new accessor and modifier functions
-    - [x] Update WizardStudy component to use getWizard instead of directly accessing gameState.player
-    - [x] Update DeckBuilder component to use getWizard and updateWizard
-    - [x] Update progressModule to use updateGameProgress
-    - [x] Update PlayerProfileScreen, InventoryScreen, PotionCraftingScreen, and EquipmentScreen components
-    - [x] Update BattleView component to use getWizard and updateWizard
-    - [x] Update MarketUI component and marketModule to use getWizard and updateWizard
-  - [x] Fix updateGameState function to handle player and gameProgress updates properly
-  - [x] Fix updateWizard function calls to use proper function syntax
-    - [x] Update WizardStudy component to use proper function syntax
-    - [x] Update DeckBuilder component to use proper function syntax
-    - [x] Update BattleView component to use proper function syntax
-    - [x] Update marketModule to use proper function syntax
-    - [x] Update wizardModule to handle both function and object parameters
-  - [x] Fix direct access to top-level player and gameProgress data
-    - [x] Update wizardModule.ts functions to use getWizard() instead of directly accessing state.player
-    - [x] Update getPlayerGold, getPlayerScrolls, checkIfScrollSpellKnown, consumeScrollToLearnSpell, addGold, and removeGold functions
-    - [x] Fix import of getWizard in wizardModule.ts
-  - [x] Test save slot isolation
-    - [x] Verify that each save slot maintains its own player and progress data
-    - [x] Ensure switching between save slots correctly loads the appropriate data
+#### Task Group 5: Testing & Robustness
+- [ ] Add unit tests for spell loading, saving, and editing
+- [ ] Add validation tests for XML schema, duplicate names, and effect/target correctness
+- [ ] Ensure error handling and user feedback in the CMX GUI
 
-#### Task Group 3: Market Sell Function
-- [x] Refactor sellItem Logic
-  - [x] Review `src/lib/game-state/modules/marketModule.ts`, focusing on the `sellItem` function
-  - [x] Ensure sellItem correctly fetches the player's unequipped inventory items (excluding items in player.equipment)
-  - [x] Verify quantity checks and gold calculations are correct
 
-- [x] Update MarketUI.tsx Sell Mode
-  - [x] Review `src/components/market/MarketUI.tsx`, focusing on sell mode functionality
-  - [x] Implement the logic to display the correct player inventory items when mode is 'sell'
-  - [x] Ensure the UI passes the correct item details to the sellItem action
-  - [x] Examine how the UI switches between buy and sell modes
-
-- [x] Implement Market Gold Limits
-  - [x] Add a currentGold property to the MarketLocation type
-  - [x] Modify sellItem in marketModule.ts to check if market.currentGold >= totalValue
-  - [x] Modify buyItem to increase market.currentGold
-  - [x] Add logic to refreshMarketInventory to reset market.currentGold to a base value
-  - [x] Verify that gold limits reset when inventory refreshes as specified in the requirements
-
-#### Task Group 4: Market Attacks Not Triggering
-- [x] Verify Attack Trigger Points
-  - [x] Review `src/lib/features/market/marketAttacks.ts` and related functions
-  - [x] Ensure checkForMarketAttack (from marketModule.ts) is correctly called within MarketUI.tsx's handleClose function
-  - [x] If navigation involves changing currentLocation state, ensure the attack check happens before or is integrated into that process
-
-- [x] Review Attack Probability Logic
-  - [x] Debug shouldMarketAttackOccur in marketAttacks.ts to ensure probabilities are calculated correctly
-  - [x] Check how difficulty settings affect attack chances (Easy ~5%, Normal ~25%, Hard ~50% as per requirements)
-  - [x] Examine how market attacks are integrated with the game flow
-  - [x] Check for proper handling of attack results (win/lose/flee)
-
-#### Task Group 5: Equipment Slot Overwriting
-- [x] Modify Equipping Logic
-  - [x] Review `src/components/equipment/EquipmentScreen.tsx` and related components
-  - [x] In handleEquipItem (or the corresponding action in wizardModule.ts), check if the target slot is already occupied
-  - [x] If occupied, retrieve the currently equipped item and add it back to player.inventory
-  - [x] Then, place the new item into the player.equipment slot and remove it from player.inventory
-  - [x] Handle the edge case for the two 'finger' slots correctly
-  - [x] Verify that items are properly moved between inventory and equipment slots
+### Phase 2: Code Cleanup & Consistency
 
 #### Task Group 6: Potion Crafting System
 - [ ] Implement Core Crafting Logic
-  - [ ] Review `src/lib/features/potions/potionCrafting.ts` and related files
-  - [ ] Ensure craftPotion correctly consumes ingredients from player.ingredients (checking quantities)
-  - [ ] Ensure craftPotion correctly adds the resulting Potion to player.potions
-  - [ ] Fully implement experimentWithIngredients, ensuring ingredient consumption and recipe discovery updates
+  - [ ] Review `src/lib/features/potions/potionCrafting.ts` and related 
+  files
+  - [ ] Ensure craftPotion correctly consumes ingredients from player.
+  ingredients (checking quantities)
+  - [ ] Ensure craftPotion correctly adds the resulting Potion to player.
+  potions
+  - [ ] Fully implement experimentWithIngredients, ensuring ingredient 
+  consumption and recipe discovery updates
 
 - [ ] Connect UI to Logic
-  - [ ] Review `src/components/potions/PotionCraftingScreen.tsx` and related components
-  - [ ] Verify that clicking "Craft Potion" calls the correct state action (craftPotion from the store)
+  - [ ] Review `src/components/potions/PotionCraftingScreen.tsx` and 
+  related components
+  - [ ] Verify that clicking "Craft Potion" calls the correct state 
+  action (craftPotion from the store)
   - [ ] Verify that clicking "Experiment" calls experimentWithIngredients
-  - [ ] Ensure UI state (selected recipe, ingredients) is correctly passed to the logic functions
-  - [ ] Ensure the UI updates correctly after crafting/experimentation (ingredient counts, potion list, discovered recipes)
-  - [ ] Check for proper error handling and feedback during the crafting process
+  - [ ] Ensure UI state (selected recipe, ingredients) is correctly 
+  passed to the logic functions
+  - [ ] Ensure the UI updates correctly after crafting/experimentation 
+  (ingredient counts, potion list, discovered recipes)
+  - [ ] Check for proper error handling and feedback during the crafting 
+  process
 
-### Phase 2: Code Cleanup & Consistency
 
 #### Task Group 7: Consolidate Styling Approach
 - [ ] Choose a Primary Styling Method

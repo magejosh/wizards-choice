@@ -80,23 +80,23 @@ The authentication system provides user management with login, registration, and
 - **AXIOM 3**: Always validate user input on both client and server sides.
 - **AXIOM 4**: Check for browser API availability with `typeof window !== 'undefined'` for Next.js compatibility.
 
-## Game State Management
+## Game State Management (update)
 
-Game state is managed through a centralized store using Zustand, which provides:
-
-1. Persistent game state across sessions
-2. Multiple save slots per user
-3. Automatic saving at key game points
-4. Clean separation between UI and game logic
-
-### Best Practices
-- **AXIOM 5**: Game state should be immutable; create new state objects rather than mutating existing ones.
-- **AXIOM 6**: Separate UI state from game logic state for cleaner architecture.
-- **AXIOM 7**: Implement auto-save functionality at natural break points in gameplay.
+- Game state now tracks all four stat fields for each wizard:
+  - baseMaxHealth, progressionMaxHealth, equipmentMaxHealth, totalMaxHealth
+  - baseMaxMana, progressionMaxMana, equipmentMaxMana, totalMaxMana
+- Stat recalculation is triggered automatically after equipment or inventory changes, and after spending level-up points.
+- Only totalMaxHealth/totalMaxMana are used for display and combat logic.
 
 ## Spell System
 
 The spell system is designed to be extensible and balanced, with 10 tiers of spells (expandable to 120 spells).
+
+**Authoritative Spell Data Format:**
+- All spells are now defined in XML format as specified in [/docs/spell_data_format.md](./spell_data_format.md).
+- The XML schema covers all spell fields, effects, rarity, and list membership (archetype, creature, or 'any').
+- The spell data XML file is always located at `/public/data/spell_data.xml` in the project and loaded at runtime from `/data/spell_data.xml` (the URL path). There is only one file; the `/public` directory is served as the web root.
+- See the [Spell Data Workflow process map](./process_maps.md#spell-data-workflow) for the full lifecycle from creation to runtime loading.
 
 ### Key Features
 - Spell tiers with increasing power and complexity
@@ -362,9 +362,29 @@ The equipment system allows players to customize their wizard with:
 3. Amulets (providing special abilities)
 4. Rings (offering passive bonuses)
 
-### Best Practices
+### Stat Calculation and Progression Model
+
+Wizard stats are now calculated using a robust, modular structure:
+
+- **baseMaxHealth/baseMaxMana**: The true base stat, only changed by rare effects or admin tools.
+- **progressionMaxHealth/progressionMaxMana**: Permanent upgrades from level-ups, quests, or other progression sources. Increased by spending level-up points.
+- **equipmentMaxHealth/equipmentMaxMana**: The sum of all currently equipped item bonuses. Updated automatically when equipment is equipped or unequipped.
+- **totalMaxHealth/totalMaxMana**: The sum of all the above. This is the value used for display in the UI and for all combat calculations.
+
+**Stat Calculation Flow:**
+- When a wizard is created or loaded, all four stat fields are initialized.
+- When level-up points are spent, only progressionMaxHealth/progressionMaxMana are increased.
+- When equipment is equipped or unequipped, only equipmentMaxHealth/equipmentMaxMana are recalculated.
+- The totalMaxHealth/totalMaxMana is always recalculated as:
+  
+  `totalMaxHealth = baseMaxHealth + progressionMaxHealth + equipmentMaxHealth`
+  `totalMaxMana = baseMaxMana + progressionMaxMana + equipmentMaxMana`
+
+- Deprecated fields (maxHealth, maxMana) are set to totalMaxHealth/totalMaxMana for compatibility, but should not be mutated directly.
+
+### Best Practices (updated)
 - **AXIOM 14**: Design equipment bonuses to complement different play styles rather than having clear "best" items.
-- **AXIOM 15**: Implement equipment as composable modifiers to wizard stats for flexibility.
+- **AXIOM 15**: Implement equipment as composable modifiers to wizard stats for flexibility. All equipment bonuses are summed into equipmentMaxHealth/equipmentMaxMana.
 - **AXIOM 16**: Balance equipment bonuses against progression to maintain game challenge.
 
 - **All equipment (robes, belts, etc.) is procedurally generated using the equipment generator.**
@@ -727,90 +747,4 @@ The market attack system adds risk and reward to market visits, creating encount
 
 ### Data Structures
 
-```typescript
-interface SpellNode {
-  id: string;
-  spell: Spell;
-  position: { x: number; y: number };
-  connections: string[];
-  unlocked: boolean;
-  cost: number;
-  prerequisites: string[];
-}
-
-interface SpellTree {
-  nodes: SpellNode[];
-  centerNode: SpellNode;
-  maxPoints: number;
-  allocatedPoints: number;
-}
 ```
-
-### Key Features
-
-1. **Visual Layout**
-   - Centered wizard node
-   - Tiered spell organization
-   - Dynamic connection paths
-   - Visual state indicators
-
-2. **Interaction**
-   - Click to unlock nodes
-   - Hover for tooltips
-   - Zoom and pan navigation
-   - Reset functionality
-
-3. **State Management**
-   - Local storage persistence
-   - Point tracking
-   - Unlock state validation
-   - Prerequisite checking
-
-4. **Animations**
-   - Unlocking effects
-   - Connection highlighting
-   - State transitions
-
-### Integration Points
-
-1. **Spell System**
-   - Connected to spell data structures
-   - Integrated with spell learning mechanics
-   - Linked to spell scroll system
-
-2. **UI Components**
-   - Integrated with main game interface
-   - Connected to spell details panel
-   - Linked to point system display
-
-3. **State Management**
-   - Connected to game state store
-   - Integrated with save/load system
-   - Linked to progression tracking
-
-## TypeScript Configuration
-
-The project uses TypeScript with Next.js, configured for optimal development experience.
-
-### Key Features
-- Path aliases for cleaner imports (`@/` maps to `src/`)
-- Strict type checking for better code quality
-- Next.js-specific TypeScript configuration
-- Module resolution optimized for React development
-
-### Configuration Details
-```json
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
-  }
-}
-```
-
-### Best Practices
-- **AXIOM 44**: Use path aliases for consistent import paths
-- **AXIOM 45**: Maintain strict type checking for better code quality
-- **AXIOM 46**: Keep TypeScript configuration in sync with Next.js requirements

@@ -53,7 +53,35 @@ export function executeMysticPunch(
   const target = isPlayer ? 'enemyWizard' : 'playerWizard';
 
   // Calculate base damage based on spell tier
-  let baseDamage = 5 + (spellTier * 2);
+  let baseDamage = 2 + (spellTier * 3);
+
+  // Add mysticPunchPower from equipment (if any)
+  const mysticPunchPower = newState[caster].wizard.combatStats?.mysticPunchPower || 0;
+  baseDamage += mysticPunchPower;
+
+  // Apply Bleed Effect if present
+  const bleedEffect = newState[caster].wizard.combatStats?.bleedEffect || 0;
+  if (bleedEffect > 0) {
+    const bleedActiveEffect = {
+      name: 'Bleed',
+      type: 'damage_over_time' as const,
+      value: bleedEffect,
+      duration: 3,
+      remainingDuration: 3,
+      source: (isPlayer ? 'player' : 'enemy') as 'player' | 'enemy',
+    };
+    newState[target] = {
+      ...newState[target],
+      activeEffects: [...newState[target].activeEffects, bleedActiveEffect],
+    };
+    newState.log.push(createLogEntry({
+      turn: newState.turn,
+      round: newState.round,
+      actor: isPlayer ? 'player' : 'enemy',
+      action: 'effect_applied',
+      details: `Bleed applied to ${isPlayer ? 'enemy' : 'you'} for 3 turns!`,
+    }));
+  }
 
   // Apply difficulty modifier
   if (isPlayer) {
@@ -303,7 +331,7 @@ export function applySpellEffect(
       // Apply immediate damage
       newState[effectTarget] = {
         ...newState[effectTarget],
-        currentHealth: Math.max(0, newState[effectTarget].currentHealth - effect.value),
+        currentHealth: Math.max(0, newState[effectTarget].currentHealth - Math.round(effect.value)),
       };
 
       // Add to combat log
@@ -312,8 +340,8 @@ export function applySpellEffect(
         round: newState.round,
         actor: isPlayerCaster ? 'player' : 'enemy',
         action: 'damage',
-        details: `${effect.value} ${effect.element || ''} damage to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'}!`,
-        damage: effect.value
+        details: `${Math.round(effect.value)} ${effect.element || ''} damage to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'}!`,
+        damage: Math.round(effect.value)
       }));
 
       // Check if this damage ended the combat
@@ -325,7 +353,7 @@ export function applySpellEffect(
       const maxHealth = newState[effectTarget].wizard.maxHealth;
       newState[effectTarget] = {
         ...newState[effectTarget],
-        currentHealth: Math.min(maxHealth, newState[effectTarget].currentHealth + effect.value),
+        currentHealth: Math.min(maxHealth, newState[effectTarget].currentHealth + Math.round(effect.value)),
       };
 
       // Add to combat log
@@ -334,8 +362,8 @@ export function applySpellEffect(
         round: newState.round,
         actor: isPlayerCaster ? 'player' : 'enemy',
         action: 'healing',
-        details: `${effect.value} healing to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'}!`,
-        healing: effect.value
+        details: `${Math.round(effect.value)} healing to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'}!`,
+        healing: Math.round(effect.value)
       }));
       break;
 
@@ -344,7 +372,7 @@ export function applySpellEffect(
       const maxMana = newState[effectTarget].wizard.maxMana;
       newState[effectTarget] = {
         ...newState[effectTarget],
-        currentMana: Math.min(maxMana, newState[effectTarget].currentMana + effect.value),
+        currentMana: Math.min(maxMana, newState[effectTarget].currentMana + Math.round(effect.value)),
       };
 
       // Add to combat log
@@ -353,8 +381,8 @@ export function applySpellEffect(
         round: newState.round,
         actor: isPlayerCaster ? 'player' : 'enemy',
         action: 'mana_restore',
-        details: `${effect.value} mana restored to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'}!`,
-        mana: effect.value
+        details: `${Math.round(effect.value)} mana restored to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'}!`,
+        mana: Math.round(effect.value)
       }));
       break;
 

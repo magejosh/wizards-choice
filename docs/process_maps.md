@@ -101,6 +101,27 @@ flowchart TD
     DisplayRewards --> EndBattle[Return to Wizard's Study]
 ```
 
+## Battle Consumable Flow
+
+```mermaid
+flowchart TD
+    EnterBattle[Player enters battle] --> EquipCheck[Check equipped potions and scrolls]
+    EquipCheck --> BattleUI[Battle Arena UI]
+    BattleUI --> BeltBtn[Belt Button]
+    BattleUI --> RobesBtn[Robes Button]
+    BeltBtn --> |Player clicks| ShowPotions[Show Potions Modal]
+    RobesBtn --> |Player clicks| ShowScrolls[Show Scrolls Modal]
+    ShowPotions --> UsePotion[Player uses potion]
+    ShowScrolls --> UseScroll[Player uses scroll]
+    UsePotion --> ApplyPotionEffect[Apply potion effect]
+    UseScroll --> ApplyScrollEffect[Apply scroll effect]
+    ApplyPotionEffect --> RemovePotion[Remove potion from equipped]
+    ApplyScrollEffect --> RemoveScroll[Remove scroll from equipped]
+    RemovePotion --> UpdateUI[Update UI]
+    RemoveScroll --> UpdateUI
+    UpdateUI --> BattleContinues[Continue battle]
+```
+
 ## Equipment System
 
 ```mermaid
@@ -120,18 +141,15 @@ flowchart TD
     Fingers --> PassiveEffects[Passive Effects]
     Belt --> PotionStorage[Potion Storage]
     
-    StatBoosts --> ApplyStats[Apply to Wizard Stats]
-    SpellEnhancement --> ApplySpell[Apply to Spell Effects]
-    DefenseBoosts --> ApplyDefense[Apply to Defense]
-    SpecialAbilities --> ApplyAbilities[Apply Special Abilities]
-    PassiveEffects --> ApplyPassives[Apply Passive Effects]
+    StatBoosts --> EquipmentStats[Sum to equipmentMaxHealth/equipmentMaxMana]
+    SpellEnhancement --> EquipmentStats
+    DefenseBoosts --> EquipmentStats
+    SpecialAbilities --> EquipmentStats
+    PassiveEffects --> EquipmentStats
     PotionStorage --> UsePotions[Use in Combat]
     
-    ApplyStats --> CombatCalculation[Combat Calculations]
-    ApplySpell --> CombatCalculation
-    ApplyDefense --> CombatCalculation
-    ApplyAbilities --> CombatCalculation
-    ApplyPassives --> CombatCalculation
+    EquipmentStats --> TotalStats[totalMaxHealth/totalMaxMana]
+    TotalStats --> CombatCalculation[Combat Calculations]
     UsePotions --> CombatCalculation
 ```
 
@@ -455,6 +473,7 @@ flowchart TD
     RefreshMarket --> CallRefreshMarket[Call refreshMarket]
     CallRefreshMarket --> ScheduleRefreshData[Schedule Data Refresh]
     ScheduleRefreshData --> RefreshData
+    %% NOTE: Market refresh interval is now 72 minutes, not 72 hours or days.
     
     CloseMarket --> CheckForAttack[Check for Market Attack]
     CheckForAttack --> AttackFound{Attack Found?}
@@ -781,3 +800,94 @@ graph TD
       U8 --> U4
     end
 ```
+
+## Save Slot Deletion (Per-Slot)
+
+```mermaid
+flowchart TD
+    A[User sees Save Slots Modal] --> B{Clicks ❌ on a save slot}
+    B -->|No| A
+    B -->|Yes| C[Show confirmation dialog]
+    C -->|Cancel| A
+    C -->|Confirm| D[Call deleteSaveSlot for that slot]
+    D --> E[Slot is deleted, UI refreshes]
+    E --> A
+```
+
+## Stat Calculation and Progression
+
+```mermaid
+flowchart TD
+    Start[Wizard Created or Loaded]
+    Start --> BaseStats[baseMaxHealth/baseMaxMana]
+    Start --> ProgressionStats[progressionMaxHealth/progressionMaxMana]
+    Start --> EquipmentStats[equipmentMaxHealth/equipmentMaxMana]
+    
+    ProgressionStats <-- LevelUpPoints[Level-Up Points Spent]
+    EquipmentStats <-- EquipChange[Equipment Equipped/Unequipped]
+    
+    BaseStats --> TotalStats[totalMaxHealth/totalMaxMana]
+    ProgressionStats --> TotalStats
+    EquipmentStats --> TotalStats
+    
+    TotalStats --> UI[Display in UI/Combat]
+```
+
+- **baseMaxHealth/baseMaxMana**: Only changed by rare effects or admin tools
+- **progressionMaxHealth/progressionMaxMana**: Increased by level-up points and permanent upgrades
+- **equipmentMaxHealth/equipmentMaxMana**: Sum of all currently equipped item bonuses
+- **totalMaxHealth/totalMaxMana**: Used for display and combat; sum of all above
+
+### Equipment System (updated)
+
+```mermaid
+flowchart TD
+    Start[Equipment System] --> Slots[Equipment Slots]
+    Slots --> Head[Head: Wizard Hats]
+    Slots --> Hand[Hand: Wands/Staffs/Spellbooks]
+    Slots --> Body[Body: Robes]
+    Slots --> Neck[Neck: Amulets]
+    Slots --> Fingers[Fingers: Rings x2]
+    Slots --> Belt[Belt: Potions]
+    
+    Head --> StatBoosts[Stat Boosts]
+    Hand --> SpellEnhancement[Spell Enhancement]
+    Body --> DefenseBoosts[Defense Boosts]
+    Neck --> SpecialAbilities[Special Abilities]
+    Fingers --> PassiveEffects[Passive Effects]
+    Belt --> PotionStorage[Potion Storage]
+    
+    StatBoosts --> EquipmentStats[Sum to equipmentMaxHealth/equipmentMaxMana]
+    SpellEnhancement --> EquipmentStats
+    DefenseBoosts --> EquipmentStats
+    SpecialAbilities --> EquipmentStats
+    PassiveEffects --> EquipmentStats
+    PotionStorage --> UsePotions[Use in Combat]
+    
+    EquipmentStats --> TotalStats[totalMaxHealth/totalMaxMana]
+    TotalStats --> CombatCalculation[Combat Calculations]
+    UsePotions --> CombatCalculation
+```
+
+## Spell Data Workflow
+
+```mermaid
+flowchart TD
+    Start[Spell Creation/Editing] --> Validate[Validate XML Schema]
+    Validate --> |Valid| SaveXML[Save to /public/data/spell_data.xml]
+    Validate --> |Invalid| Error[Show Validation Error]
+    SaveXML --> AssignList[Assign List Membership]
+    AssignList --> |archetype| ArchetypeList[Add to Archetype Spell List]
+    AssignList --> |creature| CreatureList[Add to Creature Spell List]
+    AssignList --> |any| DefaultList[Add to Default Spell List]
+    ArchetypeList --> LoadGame[Load Spells at Runtime]
+    CreatureList --> LoadGame
+    DefaultList --> LoadGame
+    LoadGame --> GameUse[Spells Usable in Game]
+    Error --> Edit[Edit Spell Data]
+    Edit --> Validate
+```
+
+- The spell data XML file is always located at `/public/data/spell_data.xml` in the project.
+- At runtime, it is loaded from `/data/spell_data.xml` (the URL path).
+- There is only one file; the `/public` directory is served as the web root.

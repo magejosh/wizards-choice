@@ -230,3 +230,25 @@
     font-size: 10px;
   }
 }
+
+.unequippedScrollsHeader {
+  font-size: 1.1rem;
+  color: #b38dff;
+  margin: 0.5rem 0 0.25rem 0.5rem;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px #6a3de8, 0 0 2px #fff;
+}
+
+.equippedScrollsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .equippedScrollsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

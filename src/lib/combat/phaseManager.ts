@@ -381,6 +381,10 @@ function resolveQueuedEffects(state: CombatState): CombatState {
   // Get the effect queue
   const queue = [...newState.effectQueue];
 
+  if (queue.length === 0) {
+    console.warn('resolveQueuedEffects: Effect queue is empty. No actions to resolve.');
+  }
+
   // Sort the queue by timestamp (oldest first)
   const sortedQueue = queue.sort((a, b) => a.timestamp - b.timestamp);
 
@@ -396,11 +400,20 @@ function resolveQueuedEffects(state: CombatState): CombatState {
     // Process spell cast or mystic punch
     if (effect.spell) {
       // It's a spell cast
+      // Defensive: check if spell is in hand before resolving
+      const caster = effect.caster === 'player' ? 'playerWizard' : 'enemyWizard';
+      const spellInHand = newState[caster].hand.find(spell => spell.id === effect.spell.id);
+      if (!spellInHand) {
+        console.warn(`resolveQueuedEffects: Spell with id ${effect.spell.id} not found in hand for ${caster}. Skipping.`);
+        continue; // Skip this effect, do not penalize player
+      }
       newState = selectSpell(newState, effect.spell, effect.caster === 'player');
       newState = executeSpellCast(newState, effect.caster === 'player', true);
+      console.log(`resolveQueuedEffects: Successfully resolved spell ${effect.spell.name} for ${caster}.`);
     } else if (effect.spellTier !== undefined) {
       // It's a mystic punch
       newState = executeMysticPunch(newState, effect.spellTier, effect.caster === 'player', true);
+      console.log(`resolveQueuedEffects: Successfully resolved mystic punch for ${effect.caster}.`);
     }
   }
 

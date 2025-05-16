@@ -530,3 +530,6 @@
 
 ## 2025-03-25
 - Done: Task Group 5: Equipment Slot Overwriting. Implemented robust equip/unequip logic to prevent overwriting equipped items and ensure proper handling of finger slots. Updated docs and process maps accordingly. 
+
+## 2025-03-25
+- Done: Changed the market reset timer from 72 hours to 72 minutes. Updated all logic, types, mock data, and documentation to use minutes instead of days for the refresh interval. 

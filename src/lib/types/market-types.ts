@@ -14,7 +14,7 @@ export interface MarketLocation {
   unlockLevel: number;
   specialization?: 'ingredients' | 'potions' | 'equipment' | 'scrolls';
   reputationLevel: number;
-  inventoryRefreshDays: number;
+  inventoryRefreshMinutes: number;
   lastRefreshed: string;
   inventory: MarketInventory;
   priceMultiplier: number;

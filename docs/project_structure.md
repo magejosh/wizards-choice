@@ -162,6 +162,11 @@ https://github.com/magejosh/wizards-choice
 
 ## Spell System
 
+### Spell System
+- **All spell data is now defined in XML format as per [/docs/spell_data_format.md](./spell_data_format.md).**
+- The spell data XML file is always located at `/public/data/spell_data.xml` in the project and loaded at runtime from `/data/spell_data.xml` (the URL path). There is only one file; the `/public` directory is served as the web root.
+- See the [Spell Data Workflow process map](./process_maps.md#spell-data-workflow) for the full lifecycle.
+
 ```
 src/
 ├── components/

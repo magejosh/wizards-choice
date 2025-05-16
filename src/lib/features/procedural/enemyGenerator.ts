@@ -1,9 +1,8 @@
 // src/lib/features/procedural/enemyGenerator.ts
-import { Enemy, EnemyArchetype, Spell, Equipment, ElementType, EquipmentSlot, Wizard } from '../../types';
+import { Enemy, EnemyArchetype, Spell, Equipment, EquipmentSlot, Wizard } from '../../types';
 import { magicalCreatures } from './magicalCreatures';
 import { enemyArchetypes } from './enemyArchetypes';
 import { generateProceduralEquipment } from './equipmentGenerator';
-import { getRandomEquipment } from '../../equipment/equipmentData';
 import { generateSpell } from './spellGenerator';
 
 /**
@@ -14,7 +13,9 @@ import { generateSpell } from './spellGenerator';
  * @returns A procedurally generated enemy wizard
  */
 function generateEnemyWizard(playerLevel: number, difficulty: 'easy' | 'normal' | 'hard', theme?: string): Enemy {
-  const archetypeKey = Object.keys(enemyArchetypes)[Math.floor(Math.random() * Object.keys(enemyArchetypes).length)];
+  // Always use the key as the archetype property for robust mapping in the UI
+  const archetypeKeys = Object.keys(enemyArchetypes);
+  const archetypeKey = archetypeKeys[Math.floor(Math.random() * archetypeKeys.length)];
   const archetype = enemyArchetypes[archetypeKey];
   const level = Math.max(1, playerLevel + Math.floor(Math.random() * 3) - 1);
 
@@ -25,10 +26,11 @@ function generateEnemyWizard(playerLevel: number, difficulty: 'easy' | 'normal' 
     hard: 1.2
   }[difficulty];
 
-  const baseHealth = 100 * (1 + level * 0.1) * difficultyMultiplier;
-  const baseMana = 80 * (1 + level * 0.1) * difficultyMultiplier;
-  const health = Math.floor(baseHealth * archetype.baseStats.healthMultiplier);
-  const mana = Math.floor(baseMana * archetype.baseStats.manaMultiplier);
+  // Apply archetype multiplier only to the base, then scale by level and difficulty
+  const baseHealth = 100 * archetype.baseStats.healthMultiplier;
+  const baseMana = 80 * archetype.baseStats.manaMultiplier;
+  const health = Math.round(baseHealth * (1 + level * 0.1) * difficultyMultiplier);
+  const mana = Math.round(baseMana * (1 + level * 0.1) * difficultyMultiplier);
 
   // Generate spells based on archetype
   const spells: Spell[] = [
@@ -52,6 +54,16 @@ function generateEnemyWizard(playerLevel: number, difficulty: 'easy' | 'normal' 
     name: `${archetype.name} Wizard`,
     health,
     mana,
+    maxHealth: health,
+    maxMana: mana,
+    baseMaxHealth: health,
+    progressionMaxHealth: 0,
+    equipmentMaxHealth: 0,
+    totalMaxHealth: health,
+    baseMaxMana: mana,
+    progressionMaxMana: 0,
+    equipmentMaxMana: 0,
+    totalMaxMana: mana,
     level,
     spells,
     goldReward,
@@ -60,7 +72,7 @@ function generateEnemyWizard(playerLevel: number, difficulty: 'easy' | 'normal' 
     resistance: archetype.resistance || undefined,
     imagePath: `/images/enemies/${archetype.id}.jpg`,
     equipment,
-    archetype: archetype.id
+    archetype: archetypeKey // Always set to the key for robust UI mapping
   };
 }
 
@@ -98,23 +110,23 @@ function generateRandomWizardName(theme: string): string {
  */
 function addEquipment(wizard: Wizard, level: number, archetype: any): void {
   // Add wand with theme-appropriate bonuses
-  wizard.equipment.wand = getRandomEquipment(level);
+  wizard.equipment.wand = generateProceduralEquipment(level, 'hand');
   
   // Add robe with theme-appropriate bonuses
-  wizard.equipment.robe = getRandomEquipment(level);
+  wizard.equipment.robe = generateProceduralEquipment(level, 'body');
   
   // Add amulet if high enough level
   if (level >= 3) {
-    wizard.equipment.amulet = getRandomEquipment(level);
+    wizard.equipment.amulet = generateProceduralEquipment(level, 'neck');
   }
   
   // Add rings if high enough level
   if (level >= 5) {
-    wizard.equipment.ring1 = getRandomEquipment(level);
+    wizard.equipment.ring1 = generateProceduralEquipment(level, 'finger');
   }
   
   if (level >= 10) {
-    wizard.equipment.ring2 = getRandomEquipment(level);
+    wizard.equipment.ring2 = generateProceduralEquipment(level, 'finger');
   }
   
   // Add archetype-specific equipment bonuses
@@ -156,6 +168,16 @@ function generateMagicalCreature(playerLevel: number, difficulty: 'easy' | 'norm
     name: creature.name,
     health,
     mana,
+    maxHealth: health,
+    maxMana: mana,
+    baseMaxHealth: health,
+    progressionMaxHealth: 0,
+    equipmentMaxHealth: 0,
+    totalMaxHealth: health,
+    baseMaxMana: mana,
+    progressionMaxMana: 0,
+    equipmentMaxMana: 0,
+    totalMaxMana: mana,
     level,
     spells,
     goldReward,
@@ -176,6 +198,6 @@ export function generateEnemy(playerLevel: number, difficulty: 'easy' | 'normal'
   return isWizard ? generateEnemyWizard(playerLevel, difficulty, theme) : generateMagicalCreature(playerLevel, difficulty, theme);
 }
 
-function generateThematicSpells(elements: ElementType[], level: number): Spell[] {
+function generateThematicSpells(elements: string[], level: number): Spell[] {
   return elements.map(element => generateSpell(element, level));
 }

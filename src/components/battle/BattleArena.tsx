@@ -35,6 +35,11 @@ interface BattleArenaProps {
   canCastSpell: (spell: Spell) => boolean;
   canUseMysticPunch: boolean;
   currentPhase?: CombatPhase;
+  equippedPotions: import('../../lib/types/equipment-types').Potion[];
+  equippedSpellScrolls: import('../../lib/types/equipment-types').Equipment[];
+  onOpenBeltModal: () => void;
+  onOpenRobesModal: () => void;
+  enemyName?: string;
 }
 
 const BattleArena: React.FC<BattleArenaProps> = ({
@@ -60,7 +65,12 @@ const BattleArena: React.FC<BattleArenaProps> = ({
   onSpellCast,
   canCastSpell,
   canUseMysticPunch,
-  currentPhase
+  currentPhase,
+  equippedPotions,
+  equippedSpellScrolls,
+  onOpenBeltModal,
+  onOpenRobesModal,
+  enemyName
 }) => {
   // Track if we're on a mobile device
   const [isMobile, setIsMobile] = useState(false);
@@ -158,7 +168,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
           />
 
           <WizardStats
-            name="Enemy Wizard"
+            name={enemyName || "Enemy Wizard"}
             currentHealth={enemyHealth}
             maxHealth={enemyMaxHealth}
             currentMana={enemyMana}
@@ -218,6 +228,30 @@ const BattleArena: React.FC<BattleArenaProps> = ({
             >
               Skip Turn
             </button>
+            <button
+              className={styles.mysticPunchButton}
+              onClick={onOpenBeltModal}
+              disabled={!(equippedPotions && equippedPotions.length > 0)}
+              style={{
+                fontSize: window.innerWidth <= 380 ? '0.9rem' : '1rem',
+                padding: window.innerWidth <= 380 ? '0.4rem 0.6rem' : '0.5rem 1rem'
+              }}
+              title={equippedPotions && equippedPotions.length > 0 ? 'Use a potion' : 'No potions equipped'}
+            >
+              Belt
+            </button>
+            <button
+              className={styles.mysticPunchButton}
+              onClick={onOpenRobesModal}
+              disabled={!(equippedSpellScrolls && equippedSpellScrolls.length > 0)}
+              style={{
+                fontSize: window.innerWidth <= 380 ? '0.9rem' : '1rem',
+                padding: window.innerWidth <= 380 ? '0.4rem 0.6rem' : '0.5rem 1rem'
+              }}
+              title={equippedSpellScrolls && equippedSpellScrolls.length > 0 ? 'Use a scroll' : 'No scrolls equipped'}
+            >
+              Robes
+            </button>
           </div>
         </div>
 
@@ -274,7 +308,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
 
           <div className={`${styles.wizardInfo} ${styles.enemyInfo}`}>
             <WizardStats
-              name="Enemy Wizard"
+              name={enemyName || "Enemy Wizard"}
               currentHealth={enemyHealth}
               maxHealth={enemyMaxHealth}
               currentMana={enemyMana}
@@ -318,6 +352,30 @@ const BattleArena: React.FC<BattleArenaProps> = ({
               }}
             >
               Skip Turn
+            </button>
+            <button
+              className={styles.mysticPunchButton}
+              onClick={onOpenBeltModal}
+              disabled={!(equippedPotions && equippedPotions.length > 0)}
+              style={{
+                fontSize: window.innerWidth <= 380 ? '0.9rem' : '1rem',
+                padding: window.innerWidth <= 380 ? '0.4rem 0.6rem' : '0.5rem 1rem'
+              }}
+              title={equippedPotions && equippedPotions.length > 0 ? 'Use a potion' : 'No potions equipped'}
+            >
+              Belt
+            </button>
+            <button
+              className={styles.mysticPunchButton}
+              onClick={onOpenRobesModal}
+              disabled={!(equippedSpellScrolls && equippedSpellScrolls.length > 0)}
+              style={{
+                fontSize: window.innerWidth <= 380 ? '0.9rem' : '1rem',
+                padding: window.innerWidth <= 380 ? '0.4rem 0.6rem' : '0.5rem 1rem'
+              }}
+              title={equippedSpellScrolls && equippedSpellScrolls.length > 0 ? 'Use a scroll' : 'No scrolls equipped'}
+            >
+              Robes
             </button>
           </div>
         </div>

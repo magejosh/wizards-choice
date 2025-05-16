@@ -23,8 +23,11 @@ export function Ingredients({ ingredients, onUseIngredient }: IngredientsProps) 
         <Card key={ingredient.id} className={styles.ingredientCard}>
 
 
-          <div className={styles.ingredientHeader}>
-            <h3 className={styles.ingredientName}>{ingredient.name}</h3>
+          <div className={styles.ingredientHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 className={styles.ingredientName} style={{ flex: 1, textAlign: 'left' }}>{ingredient.name}</h3>
+            {ingredient.quantity && ingredient.quantity > 1 && (
+              <span className={styles.quantity} style={{ marginLeft: 4 }}>x{ingredient.quantity}</span>
+            )}
           </div>
 
           <div className={styles.ingredientImage}></div>
@@ -33,7 +36,6 @@ export function Ingredients({ ingredients, onUseIngredient }: IngredientsProps) 
             <div className={styles.ingredientDetails}>
               <span className={styles.category}>{ingredient.category}</span>
               <span className={`${styles.rarity} ${styles[ingredient.rarity]}`}>{ingredient.rarity}</span>
-              <span className={styles.quantity}>x{ingredient.quantity}</span>
             </div>
             <p className={styles.description}>{ingredient.description}</p>
             <div className={styles.effects}>

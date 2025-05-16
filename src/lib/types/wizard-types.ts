@@ -13,9 +13,11 @@ export interface Wizard {
   level: number;
   experience: number;
   experienceToNextLevel: number;
+  /** @deprecated Use totalMaxHealth instead. */
   health: number;
-  maxHealth: number;
+  /** @deprecated Use totalMaxMana instead. */
   mana: number;
+  maxHealth: number;
   maxMana: number;
   manaRegen: number;
   spells: Spell[];
@@ -44,5 +46,23 @@ export interface Wizard {
     extraCardDraw?: number;
     canDiscardAndDraw?: boolean;
     potionSlots?: number;
+    spellPower?: number;
   };
+  /**
+   * Stat structure for robust calculation:
+   * - baseMaxHealth/baseMaxMana: True base stat, only changed by rare effects or admin tools
+   * - progressionMaxHealth/progressionMaxMana: Permanent upgrades from level-ups, quests, etc.
+   * - equipmentMaxHealth/equipmentMaxMana: Sum of all currently equipped item bonuses
+   * - totalMaxHealth/totalMaxMana: Sum of all the above, used for display and combat
+   *
+   * maxHealth/maxMana are deprecated and will be removed after migration.
+   */
+  baseMaxHealth: number;
+  progressionMaxHealth: number;
+  equipmentMaxHealth: number;
+  totalMaxHealth: number;
+  baseMaxMana: number;
+  progressionMaxMana: number;
+  equipmentMaxMana: number;
+  totalMaxMana: number;
 }

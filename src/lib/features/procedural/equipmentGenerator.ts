@@ -94,29 +94,42 @@ export function generateProceduralEquipment(
 }
 
 /**
- * Choose a random equipment slot
- * @param playerLevel Player level (to determine if higher slots are available)
- * @returns Random equipment slot
+ * Utility: Choose a random slot with anti-duplication
  */
-function chooseRandomSlot(playerLevel: number): EquipmentSlot {
-  // Create a weighted array of available slots based on player level
-  const availableSlots: EquipmentSlot[] = ['hand', 'body']; // Always available
-  
-  // Add head for early levels
-  if (playerLevel >= 1) {
-    availableSlots.push('head');
-  }
-  
-  // Add more advanced slots at higher levels
+function chooseRandomSlotWithHistory(playerLevel: number, allowedSlots: EquipmentSlot[], slotHistory: EquipmentSlot[]): EquipmentSlot {
+  let slot: EquipmentSlot;
+  let attempts = 0;
+  do {
+    slot = allowedSlots[Math.floor(Math.random() * allowedSlots.length)];
+    attempts++;
+    // Prevent the same slot more than twice in a row
+    if (slotHistory.length >= 2 && slot === slotHistory[slotHistory.length - 1] && slot === slotHistory[slotHistory.length - 2]) {
+      continue;
+    }
+    break;
+  } while (attempts < 10);
+  return slot;
+}
+
+/**
+ * Refactored slot unlock order
+ */
+function getAvailableSlots(playerLevel: number): EquipmentSlot[] {
+  const availableSlots: EquipmentSlot[] = ['hand', 'body', 'belt']; // Belt now at level 1
   if (playerLevel >= 3) {
     availableSlots.push('neck');
   }
-  
   if (playerLevel >= 5) {
-    availableSlots.push('finger', 'belt');
+    availableSlots.push('head', 'finger'); // Head now unlocks at 5
   }
-  
-  // Choose a random slot from available slots
+  return availableSlots;
+}
+
+/**
+ * Update chooseRandomSlot to use new order
+ */
+function chooseRandomSlot(playerLevel: number): EquipmentSlot {
+  const availableSlots = getAvailableSlots(playerLevel);
   return availableSlots[Math.floor(Math.random() * availableSlots.length)];
 }
 
@@ -612,7 +625,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Vitality',
-    bonuses: [{ type: 'health', value: 15 }],
+    bonuses: [{ stat: 'maxHealth', value: 15 }],
     minLevel: 1,
     rarity: 'uncommon',
     descriptionTemplate: 'Increases maximum health.',
@@ -620,7 +633,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Fortitude',
-    bonuses: [{ type: 'health', value: 30 }],
+    bonuses: [{ stat: 'maxHealth', value: 30 }],
     minLevel: 5,
     rarity: 'rare',
     descriptionTemplate: 'Significantly increases maximum health.',
@@ -628,7 +641,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Titans',
-    bonuses: [{ type: 'health', value: 50 }],
+    bonuses: [{ stat: 'maxHealth', value: 50 }],
     minLevel: 10,
     rarity: 'epic',
     descriptionTemplate: 'Greatly increases maximum health.',
@@ -638,7 +651,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Focus',
-    bonuses: [{ type: 'manaBoost', value: 15 }],
+    bonuses: [{ stat: 'maxMana', value: 15 }],
     minLevel: 1,
     rarity: 'uncommon',
     descriptionTemplate: 'Increases maximum mana.',
@@ -646,7 +659,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Concentration',
-    bonuses: [{ type: 'manaBoost', value: 30 }],
+    bonuses: [{ stat: 'maxMana', value: 30 }],
     minLevel: 5,
     rarity: 'rare',
     descriptionTemplate: 'Significantly increases maximum mana.',
@@ -654,7 +667,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Brilliance',
-    bonuses: [{ type: 'manaBoost', value: 50 }],
+    bonuses: [{ stat: 'maxMana', value: 50 }],
     minLevel: 10,
     rarity: 'epic',
     descriptionTemplate: 'Greatly increases maximum mana.',
@@ -664,7 +677,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Restoration',
-    bonuses: [{ type: 'manaRegen', value: 2 }],
+    bonuses: [{ stat: 'manaRegen', value: 2 }],
     minLevel: 1,
     rarity: 'uncommon',
     descriptionTemplate: 'Enhances mana regeneration.',
@@ -672,7 +685,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Replenishment',
-    bonuses: [{ type: 'manaRegen', value: 4 }],
+    bonuses: [{ stat: 'manaRegen', value: 4 }],
     minLevel: 5,
     rarity: 'rare',
     descriptionTemplate: 'Significantly enhances mana regeneration.',
@@ -680,7 +693,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Renewal',
-    bonuses: [{ type: 'manaRegen', value: 7 }],
+    bonuses: [{ stat: 'manaRegen', value: 7 }],
     minLevel: 10,
     rarity: 'epic',
     descriptionTemplate: 'Greatly enhances mana regeneration.',
@@ -690,7 +703,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Protection',
-    bonuses: [{ type: 'damageReduction', value: 5 }],
+    bonuses: [{ stat: 'damageReduction', value: 5 }],
     minLevel: 1,
     rarity: 'uncommon',
     descriptionTemplate: 'Reduces damage taken.',
@@ -698,7 +711,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Warding',
-    bonuses: [{ type: 'damageReduction', value: 10 }],
+    bonuses: [{ stat: 'damageReduction', value: 10 }],
     minLevel: 5,
     rarity: 'rare',
     descriptionTemplate: 'Significantly reduces damage taken.',
@@ -706,7 +719,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Invulnerability',
-    bonuses: [{ type: 'damageReduction', value: 15 }],
+    bonuses: [{ stat: 'damageReduction', value: 15 }],
     minLevel: 10,
     rarity: 'epic',
     descriptionTemplate: 'Greatly reduces damage taken.',
@@ -716,7 +729,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Healing',
-    bonuses: [{ type: 'healthRegen', value: 2 }],
+    bonuses: [{ stat: 'healthRegen', value: 2 }],
     minLevel: 1,
     rarity: 'uncommon',
     descriptionTemplate: 'Regenerates health over time.',
@@ -724,7 +737,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Rejuvenation',
-    bonuses: [{ type: 'healthRegen', value: 4 }],
+    bonuses: [{ stat: 'healthRegen', value: 4 }],
     minLevel: 5,
     rarity: 'rare',
     descriptionTemplate: 'Significantly regenerates health over time.',
@@ -732,7 +745,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Immortality',
-    bonuses: [{ type: 'healthRegen', value: 7 }],
+    bonuses: [{ stat: 'healthRegen', value: 7 }],
     minLevel: 10,
     rarity: 'epic',
     descriptionTemplate: 'Greatly regenerates health over time.',
@@ -744,7 +757,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Recycling',
-    bonuses: [{ type: 'spellReuse', value: 1 }], // Chance to reuse a spell
+    bonuses: [{ stat: 'spellReuse', value: 1 }], // Chance to reuse a spell
     minLevel: 5,
     rarity: 'rare',
     descriptionTemplate: 'Occasionally allows casting a spell without consuming it.',
@@ -754,7 +767,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Potency',
-    bonuses: [{ type: 'criticalSpellcast', value: 10 }], // 10% chance
+    bonuses: [{ stat: 'criticalSpellcast', value: 10 }], // 10% chance
     minLevel: 8,
     rarity: 'rare',
     descriptionTemplate: 'Gives a chance for spells to have increased effect.',
@@ -762,7 +775,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Devastation',
-    bonuses: [{ type: 'criticalSpellcast', value: 20 }], // 20% chance
+    bonuses: [{ stat: 'criticalSpellcast', value: 20 }], // 20% chance
     minLevel: 15,
     rarity: 'epic',
     descriptionTemplate: 'Gives a significant chance for spells to have increased effect.',
@@ -772,7 +785,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Leeching',
-    bonuses: [{ type: 'spellVampirism', value: 5 }], // 5% life steal
+    bonuses: [{ stat: 'spellVampirism', value: 5 }], // 5% life steal
     minLevel: 10,
     rarity: 'rare',
     descriptionTemplate: 'Converts a portion of spell damage to health.',
@@ -780,7 +793,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Vampirism',
-    bonuses: [{ type: 'spellVampirism', value: 10 }], // 10% life steal
+    bonuses: [{ stat: 'spellVampirism', value: 10 }], // 10% life steal
     minLevel: 15,
     rarity: 'epic',
     descriptionTemplate: 'Converts a significant portion of spell damage to health.',
@@ -790,7 +803,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Shielding',
-    bonuses: [{ type: 'damageBarrier', value: 15 }], // Absorbs 15 damage
+    bonuses: [{ stat: 'damageBarrier', value: 15 }], // Absorbs 15 damage
     minLevel: 5,
     rarity: 'rare',
     descriptionTemplate: 'Creates a magical barrier that absorbs damage.',
@@ -798,7 +811,7 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
   {
     type: 'suffix',
     name: 'Aegis',
-    bonuses: [{ type: 'damageBarrier', value: 30 }], // Absorbs 30 damage
+    bonuses: [{ stat: 'damageBarrier', value: 30 }], // Absorbs 30 damage
     minLevel: 12,
     rarity: 'epic',
     descriptionTemplate: 'Creates a powerful magical barrier that absorbs significant damage.',
@@ -809,9 +822,9 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
     type: 'suffix',
     name: 'the Archmage',
     bonuses: [
-      { type: 'spellPower', value: 15 },
-      { type: 'manaBoost', value: 30 },
-      { type: 'manaRegen', value: 3 },
+      { stat: 'spellPower', value: 15 },
+      { stat: 'maxMana', value: 30 },
+      { stat: 'manaRegen', value: 3 },
     ],
     minLevel: 15,
     rarity: 'legendary',
@@ -821,9 +834,9 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
     type: 'suffix',
     name: 'the Guardian',
     bonuses: [
-      { type: 'health', value: 30 },
-      { type: 'damageReduction', value: 10 },
-      { type: 'damageBarrier', value: 20 },
+      { stat: 'maxHealth', value: 30 },
+      { stat: 'damageReduction', value: 10 },
+      { stat: 'damageBarrier', value: 20 },
     ],
     minLevel: 15,
     rarity: 'legendary',
@@ -833,9 +846,9 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
     type: 'suffix',
     name: 'the Phoenix',
     bonuses: [
-      { type: 'elementalAffinity', value: 25, element: 'fire' },
-      { type: 'healthRegen', value: 5 },
-      { type: 'spellVampirism', value: 8 },
+      { stat: 'elementalAffinity', value: 25, element: 'fire' },
+      { stat: 'healthRegen', value: 5 },
+      { stat: 'spellVampirism', value: 8 },
     ],
     minLevel: 15,
     rarity: 'legendary',
@@ -844,32 +857,30 @@ const EQUIPMENT_AFFIXES: EquipmentAffix[] = [
 ];
 
 /**
- * Generate multiple equipment pieces for loot drops
+ * Generate multiple equipment pieces with anti-duplication
  * @param playerLevel Current player level
  * @param count Number of equipment pieces to generate
  * @param minRarity Optional minimum rarity
  * @returns Array of generated equipment
  */
 export function generateLootEquipment(
-  playerLevel: number, 
-  count: number, 
+  playerLevel: number,
+  count: number,
   minRarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
 ): Equipment[] {
   const loot: Equipment[] = [];
-  
+  const slotHistory: EquipmentSlot[] = [];
+  const availableSlots = getAvailableSlots(playerLevel);
   for (let i = 0; i < count; i++) {
-    let equipment = generateProceduralEquipment(playerLevel);
-    
-    // If minRarity specified, ensure equipment meets that rarity
+    const slot = chooseRandomSlotWithHistory(playerLevel, availableSlots, slotHistory);
+    slotHistory.push(slot);
+    let equipment = generateProceduralEquipment(playerLevel, slot);
     if (minRarity && rarityValue(equipment.rarity) < rarityValue(minRarity)) {
-      // Try again with forced rarity
-      equipment = generateProceduralEquipment(playerLevel);
+      equipment = generateProceduralEquipment(playerLevel, slot);
       equipment.rarity = minRarity;
     }
-    
     loot.push(equipment);
   }
-  
   return loot;
 }
 

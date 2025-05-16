@@ -1,5 +1,6 @@
 // src/lib/equipment/equipmentData.ts
-import { Equipment, EquipmentBonus, ElementType } from '../types';
+import { Equipment } from '../types';
+import { ElementType } from '../types/element-types';
 
 /**
  * Generate a unique ID for equipment
@@ -110,11 +111,11 @@ export function getStarterEquipment(): {
 }
 
 /**
- * Get random equipment based on player level
- * @param level The player's level
- * @returns Random equipment appropriate for the level
+ * @deprecated Use generateProceduralEquipment or generateLootEquipment from procedural/equipmentGenerator.ts instead.
+ * This function should not be used for new equipment generation.
  */
 export function getRandomEquipment(level: number): Equipment {
+  throw new Error('getRandomEquipment is deprecated. Use generateProceduralEquipment or generateLootEquipment instead.');
   let possibleEquipment: Equipment[] = [];
   
   // Determine available rarities based on level
@@ -145,40 +146,33 @@ function createApprenticeWand(): Equipment {
   return {
     id: generateEquipmentId('Apprentice Wand'),
     name: 'Apprentice Wand',
-    slot: 'wand',
+    slot: 'hand',
     rarity: 'common',
     bonuses: [
-      {
-        type: 'manaCostReduction',
-        value: 5, // 5% reduction
-      },
-      {
-        type: 'manaRegen',
-        value: 1,
-      },
+      { stat: 'manaCostReduction', value: 5 },
+      { stat: 'manaRegen', value: 1 }
     ],
     description: 'A basic wand given to apprentice wizards. Provides minor mana cost reduction and regeneration.',
+    unlocked: false,
+    equipped: false,
+    requiredLevel: 1
   };
 }
 
-function createElementalFocusWand(element: ElementType): Equipment {
+function createElementalFocusWand(element: string): Equipment {
   return {
     id: generateEquipmentId(`${capitalizeFirstLetter(element)} Focus Wand`),
     name: `${capitalizeFirstLetter(element)} Focus Wand`,
-    slot: 'wand',
+    slot: 'hand',
     rarity: 'uncommon',
     bonuses: [
-      {
-        type: 'elementalAffinity',
-        value: 10, // 10% boost to element
-        element,
-      },
-      {
-        type: 'manaRegen',
-        value: 1,
-      },
+      { stat: 'elementalAffinity', value: 10, element: element as ElementType },
+      { stat: 'manaRegen', value: 1 }
     ],
     description: `A wand attuned to ${element} magic. Increases the power of ${element} spells and provides minor mana regeneration.`,
+    unlocked: false,
+    equipped: false,
+    requiredLevel: 1
   };
 }
 
@@ -186,19 +180,16 @@ function createManaConservationWand(): Equipment {
   return {
     id: generateEquipmentId('Mana Conservation Wand'),
     name: 'Mana Conservation Wand',
-    slot: 'wand',
+    slot: 'hand',
     rarity: 'rare',
     bonuses: [
-      {
-        type: 'manaCostReduction',
-        value: 10, // 10% reduction
-      },
-      {
-        type: 'manaRegen',
-        value: 2,
-      },
+      { stat: 'manaCostReduction', value: 10 },
+      { stat: 'manaRegen', value: 2 }
     ],
     description: 'A wand designed to conserve magical energy. Significantly reduces mana costs and improves regeneration.',
+    unlocked: false,
+    equipped: false,
+    requiredLevel: 1
   };
 }
 
@@ -206,19 +197,16 @@ function createSpellAmplifierWand(): Equipment {
   return {
     id: generateEquipmentId('Spell Amplifier Wand'),
     name: 'Spell Amplifier Wand',
-    slot: 'wand',
+    slot: 'hand',
     rarity: 'epic',
     bonuses: [
-      {
-        type: 'spellPower',
-        value: 15, // 15% increase
-      },
-      {
-        type: 'manaRegen',
-        value: 1,
-      },
+      { stat: 'spellPower', value: 15 },
+      { stat: 'manaRegen', value: 1 }
     ],
     description: 'A powerful wand that amplifies the effects of all spells. Provides a significant boost to spell power.',
+    unlocked: false,
+    equipped: false,
+    requiredLevel: 1
   };
 }
 
@@ -226,40 +214,39 @@ function createApprenticeRobe(): Equipment {
   return {
     id: generateEquipmentId('Apprentice Robe'),
     name: 'Apprentice Robe',
-    slot: 'robe',
+    slot: 'body',
     rarity: 'common',
     bonuses: [
-      {
-        type: 'health',
-        value: 10,
-      },
-      {
-        type: 'damageReduction',
-        value: 2, // 2% reduction
-      },
+      { stat: 'maxHealth', value: 10 },
+      { stat: 'defense', value: 2 }
     ],
     description: 'A basic robe given to apprentice wizards. Provides minor health and damage reduction.',
+    unlocked: false,
+    equipped: false,
+    requiredLevel: 1
   };
 }
 
-function createElementalWardRobe(element: ElementType): Equipment {
+function createElementalWardRobe(element: string): Equipment {
   return {
     id: generateEquipmentId(`${capitalizeFirstLetter(element)} Ward Robe`),
     name: `${capitalizeFirstLetter(element)} Ward Robe`,
-    slot: 'robe',
+    slot: 'body',
     rarity: 'uncommon',
     bonuses: [
       {
-        type: 'health',
+        stat: 'health',
         value: 15,
       },
       {
-        type: 'damageReduction',
+        stat: 'defense',
         value: 5, // 5% reduction
-        element,
+        element: element as ElementType,
       },
     ],
     description: `A robe warded against ${element} damage. Provides increased health and resistance to ${element} attacks.`,
+    unlocked: false,
+    equipped: false,
   };
 }
 
@@ -267,19 +254,21 @@ function createVitalityRobe(): Equipment {
   return {
     id: generateEquipmentId('Vitality Robe'),
     name: 'Vitality Robe',
-    slot: 'robe',
+    slot: 'body',
     rarity: 'rare',
     bonuses: [
       {
-        type: 'health',
+        stat: 'health',
         value: 30,
       },
       {
-        type: 'damageReduction',
+        stat: 'defense',
         value: 3, // 3% reduction
       },
     ],
     description: 'A robe imbued with vitality magic. Significantly increases maximum health and provides damage reduction.',
+    unlocked: false,
+    equipped: false,
   };
 }
 
@@ -287,19 +276,21 @@ function createRegenRobe(): Equipment {
   return {
     id: generateEquipmentId('Regeneration Robe'),
     name: 'Regeneration Robe',
-    slot: 'robe',
+    slot: 'body',
     rarity: 'epic',
     bonuses: [
       {
-        type: 'health',
+        stat: 'health',
         value: 20,
       },
       {
-        type: 'healthRegen',
+        stat: 'manaRegen',
         value: 5, // 5 health per round
       },
     ],
     description: 'A robe that continuously channels healing energy. Provides health regeneration each round.',
+    unlocked: false,
+    equipped: false,
   };
 }
 
@@ -307,36 +298,40 @@ function createApprenticeAmulet(): Equipment {
   return {
     id: generateEquipmentId('Apprentice Amulet'),
     name: 'Apprentice Amulet',
-    slot: 'amulet',
+    slot: 'neck',
     rarity: 'common',
     bonuses: [
       {
-        type: 'manaBoost',
+        stat: 'maxMana',
         value: 10,
       },
       {
-        type: 'spellPower',
+        stat: 'spellPower',
         value: 2, // 2% increase
       },
     ],
     description: 'A basic amulet given to apprentice wizards. Provides minor mana and spell power boosts.',
+    unlocked: false,
+    equipped: false,
   };
 }
 
-function createElementalAmulet(element: ElementType): Equipment {
+function createElementalAmulet(element: string): Equipment {
   return {
     id: generateEquipmentId(`${capitalizeFirstLetter(element)} Amulet`),
     name: `${capitalizeFirstLetter(element)} Amulet`,
-    slot: 'amulet',
+    slot: 'neck',
     rarity: 'uncommon',
     bonuses: [
       {
-        type: 'elementalAffinity',
+        stat: 'elementalAffinity',
         value: 15, // 15% boost to element
-        element,
+        element: element as ElementType,
       },
     ],
     description: `An amulet attuned to ${element} magic. Significantly increases the power of ${element} spells.`,
+    unlocked: false,
+    equipped: false,
   };
 }
 
@@ -344,15 +339,18 @@ function createSpellReuseAmulet(): Equipment {
   return {
     id: generateEquipmentId('Spell Reuse Amulet'),
     name: 'Spell Reuse Amulet',
-    slot: 'amulet',
+    slot: 'neck',
     rarity: 'rare',
+    // TODO: Retain spellReuse bonus for effects overhaul
     bonuses: [
       {
-        type: 'spellReuse',
+        stat: 'spellReuse',
         value: 1, // Once per 3 rounds
       },
     ],
     description: 'A mysterious amulet that occasionally allows spells to be cast without consuming a spell card. Can activate once every 3 rounds.',
+    unlocked: false,
+    equipped: false,
   };
 }
 
@@ -360,15 +358,18 @@ function createDamageBarrierAmulet(): Equipment {
   return {
     id: generateEquipmentId('Damage Barrier Amulet'),
     name: 'Damage Barrier Amulet',
-    slot: 'amulet',
+    slot: 'neck',
     rarity: 'epic',
+    // TODO: Retain damageBarrier bonus for effects overhaul
     bonuses: [
       {
-        type: 'damageBarrier',
+        stat: 'damageBarrier',
         value: 1, // Once per duel
       },
     ],
     description: 'A powerful amulet that can absorb a single damaging attack completely. Can only be used once per duel.',
+    unlocked: false,
+    equipped: false,
   };
 }
 
@@ -376,40 +377,44 @@ function createApprenticeRing(): Equipment {
   return {
     id: generateEquipmentId('Apprentice Ring'),
     name: 'Apprentice Ring',
-    slot: 'ring1', // Can be equipped in either ring slot
+    slot: 'finger',
     rarity: 'common',
     bonuses: [
       {
-        type: 'manaBoost',
+        stat: 'maxMana',
         value: 5,
       },
       {
-        type: 'spellPower',
+        stat: 'spellPower',
         value: 2, // 2% increase
       },
     ],
     description: 'A basic ring given to apprentice wizards. Provides minor mana and spell power boosts.',
+    unlocked: false,
+    equipped: false,
   };
 }
 
-function createElementalRing(element: ElementType): Equipment {
+function createElementalRing(element: string): Equipment {
   return {
     id: generateEquipmentId(`${capitalizeFirstLetter(element)} Ring`),
     name: `${capitalizeFirstLetter(element)} Ring`,
-    slot: 'ring1', // Can be equipped in either ring slot
+    slot: 'finger',
     rarity: 'uncommon',
     bonuses: [
       {
-        type: 'elementalAffinity',
+        stat: 'elementalAffinity',
         value: 10, // 10% boost to element
-        element,
+        element: element as ElementType,
       },
       {
-        type: 'manaBoost',
+        stat: 'maxMana',
         value: 5,
       },
     ],
     description: `A ring attuned to ${element} magic. Increases the power of ${element} spells and provides a small mana boost.`,
+    unlocked: false,
+    equipped: false,
   };
 }
 
@@ -417,15 +422,18 @@ function createCriticalSpellRing(): Equipment {
   return {
     id: generateEquipmentId('Critical Spell Ring'),
     name: 'Critical Spell Ring',
-    slot: 'ring1', // Can be equipped in either ring slot
+    slot: 'finger',
     rarity: 'rare',
+    // TODO: Retain criticalSpellcast bonus for effects overhaul
     bonuses: [
       {
-        type: 'criticalSpellcast',
+        stat: 'criticalSpellcast',
         value: 5, // 5% chance
       },
     ],
     description: 'A ring that enhances spell focus. Provides a chance for spells to have double effect.',
+    unlocked: false,
+    equipped: false,
   };
 }
 
@@ -433,15 +441,17 @@ function createManaBoostRing(): Equipment {
   return {
     id: generateEquipmentId('Mana Boost Ring'),
     name: 'Mana Boost Ring',
-    slot: 'ring1', // Can be equipped in either ring slot
+    slot: 'finger',
     rarity: 'rare',
     bonuses: [
       {
-        type: 'manaBoost',
+        stat: 'maxMana',
         value: 15,
       },
     ],
     description: 'A ring imbued with mana crystals. Significantly increases maximum mana.',
+    unlocked: false,
+    equipped: false,
   };
 }
 
@@ -449,15 +459,18 @@ function createSpellVampirismRing(): Equipment {
   return {
     id: generateEquipmentId('Spell Vampirism Ring'),
     name: 'Spell Vampirism Ring',
-    slot: 'ring1', // Can be equipped in either ring slot
+    slot: 'finger',
     rarity: 'epic',
+    // TODO: Retain spellVampirism bonus for effects overhaul
     bonuses: [
       {
-        type: 'spellVampirism',
+        stat: 'spellVampirism',
         value: 10, // 10% of damage
       },
     ],
     description: 'A dark ring that channels life force from damage dealt. Restores health equal to a percentage of damage dealt by spells.',
+    unlocked: false,
+    equipped: false,
   };
 }
 

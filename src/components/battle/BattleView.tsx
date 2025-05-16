@@ -11,7 +11,8 @@ import {
 import {
   selectSpell,
   executeMysticPunch,
-  executeSpellCast
+  executeSpellCast,
+  applySpellEffect
 } from '../../lib/combat/spellExecutor';
 import { initializeCombat } from '../../lib/combat/combatInitializer';
 import { discardCard, needsToDiscard } from '../../lib/combat/cardManager';
@@ -21,11 +22,15 @@ import { generateLoot, applyLoot, LootDrop } from '../../lib/features/loot/lootS
 import '@/app/battle/battle.css';
 import PhaseTracker from './PhaseTracker';
 import InitiativeRoll from './InitiativeRoll';
-import { addLogEntry } from '../../lib/combat/battleLogger';
 import { battleLogManager } from '../../lib/combat/battleLogManager';
 import { calculateExperienceGained } from '../../lib/combat/combatStatusManager';
 import { CombatPhase } from '../../lib/types/combat-types';
 import SpellCard from '../../components/ui/SpellCard';
+import { Card } from '@/components/ui/card';
+import potionStyles from '../inventory/Potions.module.css';
+import { addLogEntry } from '../../lib/combat/battleLogger';
+import { generateEnemy } from '../../lib/features/procedural/enemyGenerator';
+import { enemyArchetypes } from '../../lib/features/procedural/enemyArchetypes';
 
 // Maximum number of cards a player can have in hand before requiring discard
 const MAX_HAND_SIZE = 2;
@@ -164,38 +169,37 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       return;
     }
     console.log("Player wizard for battle:", playerWizard.name, "Level:", playerWizard.level);
+    const difficulty = gameState.settings.difficulty as 'easy' | 'normal' | 'hard';
+    const rawEnemy = generateEnemy(playerWizard.level, difficulty);
     const enemyWizard = {
-      id: 'enemy-1',
-      name: 'Enemy Wizard',
-      level: playerWizard.level,
+      ...rawEnemy,
       experience: 0,
       experienceToNextLevel: 100,
-      health: playerWizard.level * 20 + 80,
-      maxHealth: playerWizard.level * 20 + 80,
-      mana: playerWizard.level * 10 + 90,
-      maxMana: playerWizard.level * 10 + 90,
-      manaRegen: 5,
-      spells: [...playerWizard.spells],
-      equippedSpells: [...playerWizard.equippedSpells],
-      equipment: {},
+      manaRegen: 1,
+      spells: rawEnemy.spells,
+      equippedSpells: rawEnemy.spells,
+      equipment: rawEnemy.equipment || {},
       inventory: [],
       potions: [],
       equippedPotions: [],
+      equippedSpellScrolls: [],
       ingredients: [],
       discoveredRecipes: [],
       levelUpPoints: 0,
+      gold: 0,
+      skillPoints: 0,
       decks: [],
       activeDeckId: null,
-      combatStats: {
-        mysticPunchPower: 1,
-        bleedEffect: 0,
-        extraCardDraw: 0,
-        canDiscardAndDraw: false,
-        potionSlots: 0
-      }
+      combatStats: {},
+      baseMaxHealth: rawEnemy.baseMaxHealth ?? 0,
+      progressionMaxHealth: rawEnemy.progressionMaxHealth ?? 0,
+      equipmentMaxHealth: rawEnemy.equipmentMaxHealth ?? 0,
+      totalMaxHealth: rawEnemy.totalMaxHealth ?? 0,
+      baseMaxMana: rawEnemy.baseMaxMana ?? 0,
+      progressionMaxMana: rawEnemy.progressionMaxMana ?? 0,
+      equipmentMaxMana: rawEnemy.equipmentMaxMana ?? 0,
+      totalMaxMana: rawEnemy.totalMaxMana ?? 0,
     };
-
-    const difficulty = gameState.settings.difficulty as 'easy' | 'normal' | 'hard';
 
     // Initialize combat
     const initialCombatState = initializeCombat(
@@ -1194,6 +1198,230 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
   // Phase transitions are now handled by the PhaseManager
 
+  // Add state for Belt and Robes modals
+  const [showBeltModal, setShowBeltModal] = useState(false);
+  const [showRobesModal, setShowRobesModal] = useState(false);
+
+  const canUsePotion = () => {
+    if (!combatState) return false;
+    if (combatState.currentPhase === 'action') {
+      return !combatState.actionState.player.hasActed;
+    } else if (combatState.currentPhase === 'response') {
+      return !combatState.actionState.player.hasResponded;
+    }
+    return false;
+  };
+
+  const canUseScroll = (scroll) => {
+    if (!combatState || !scroll.spell) return false;
+    if (combatState.currentPhase === 'action') {
+      return !combatState.actionState.player.hasActed && scroll.spell.type !== 'reaction';
+    } else if (combatState.currentPhase === 'response') {
+      return !combatState.actionState.player.hasResponded && scroll.spell.type === 'reaction';
+    }
+    return false;
+  };
+
+  // Helper for post-action phase advancement and enemy action
+  const handlePostPlayerAction = (newState, phaseType) => {
+    if (phaseType === 'action') {
+      if (newState.actionState.player.hasActed && newState.actionState.enemy.hasActed) {
+        setTimeout(() => {
+          const nextPhaseState = advancePhase(newState);
+          setCombatState(nextPhaseState);
+          setIsAnimating(false);
+        }, 1000);
+      } else if (newState.actionState.player.hasActed && !newState.actionState.enemy.hasActed && newState.firstActor === 'player') {
+        setTimeout(() => {
+          processEnemyAction(newState);
+        }, 1000);
+      } else {
+        setTimeout(() => {
+          setIsAnimating(false);
+        }, 500);
+      }
+    } else if (phaseType === 'response') {
+      setTimeout(() => {
+        const nextPhaseState = advancePhase(newState);
+        setCombatState(nextPhaseState);
+        setIsAnimating(false);
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 500);
+    }
+  };
+
+  const handleUsePotion = (potion) => {
+    if (!combatState) return;
+    if (!canUsePotion()) return;
+    setIsAnimating(true);
+    let newState = {
+      ...combatState,
+      playerWizard: {
+        ...combatState.playerWizard,
+        equippedPotions: (combatState.playerWizard.equippedPotions || []).filter(p => p.id !== potion.id),
+        equippedSpellScrolls: combatState.playerWizard.equippedSpellScrolls ? [...combatState.playerWizard.equippedSpellScrolls] : [],
+      }
+    };
+    // Remove from persistent player data as well
+    updateWizard((prev) => ({
+      ...prev,
+      equippedPotions: (prev.equippedPotions || []).filter(p => p.id !== potion.id)
+    }));
+    // Apply effect
+    if (potion.effect) {
+      const effectElement = potion.effect.element || 'arcane';
+      if (potion.effect.duration && potion.effect.duration > 1) {
+        if (potion.type === 'health') {
+          newState.playerWizard.activeEffects = [
+            ...(newState.playerWizard.activeEffects || []),
+            {
+              id: `potion-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+              name: potion.name,
+              type: 'healing_over_time',
+              value: potion.effect.value,
+              duration: potion.effect.duration,
+              remainingDuration: potion.effect.duration,
+              source: 'player',
+              effect: {
+                type: 'healing',
+                value: potion.effect.value,
+                target: 'self',
+                element: effectElement,
+                duration: potion.effect.duration,
+              },
+            },
+          ];
+        } else if (potion.type === 'mana') {
+          newState.playerWizard.activeEffects = [
+            ...(newState.playerWizard.activeEffects || []),
+            {
+              id: `potion-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+              name: potion.name,
+              type: 'mana_regen',
+              value: potion.effect.value,
+              duration: potion.effect.duration,
+              remainingDuration: potion.effect.duration,
+              source: 'player',
+              effect: {
+                type: 'manaRestore',
+                value: potion.effect.value,
+                target: 'self',
+                element: effectElement,
+                duration: potion.effect.duration,
+              },
+            },
+          ];
+        }
+      } else {
+        if (potion.type === 'health') {
+          const maxHealth = newState.playerWizard.wizard.maxHealth;
+          newState.playerWizard.currentHealth = Math.min(maxHealth, newState.playerWizard.currentHealth + potion.effect.value);
+        } else if (potion.type === 'mana') {
+          const maxMana = newState.playerWizard.wizard.maxMana;
+          newState.playerWizard.currentMana = Math.min(maxMana, newState.playerWizard.currentMana + potion.effect.value);
+        }
+      }
+    }
+    // Log
+    newState.log = [
+      ...newState.log,
+      {
+        turn: newState.turn,
+        round: newState.round,
+        actor: 'player',
+        action: 'use_potion',
+        details: `You used ${potion.name}.`,
+        timestamp: Date.now(),
+      }
+    ];
+    // Mark action/response as used
+    if (combatState.currentPhase === 'action') {
+      newState.actionState = {
+        ...newState.actionState,
+        player: {
+          ...newState.actionState.player,
+          hasActed: true
+        }
+      };
+    } else if (combatState.currentPhase === 'response') {
+      newState.actionState = {
+        ...newState.actionState,
+        player: {
+          ...newState.actionState.player,
+          hasResponded: true
+        }
+      };
+    }
+    setCombatState(newState);
+    setShowBeltModal(false);
+    handlePostPlayerAction(newState, combatState.currentPhase);
+  };
+
+  const handleUseScroll = (scroll) => {
+    if (!combatState) return;
+    if (!canUseScroll(scroll)) return;
+    setIsAnimating(true);
+    let newState = {
+      ...combatState,
+      playerWizard: {
+        ...combatState.playerWizard,
+        equippedPotions: combatState.playerWizard.equippedPotions ? [...combatState.playerWizard.equippedPotions] : [],
+        equippedSpellScrolls: (combatState.playerWizard.equippedSpellScrolls || []).filter(s => s.id !== scroll.id),
+        currentMana: scroll.spell && scroll.spell.manaCost
+          ? Math.max(0, combatState.playerWizard.currentMana - scroll.spell.manaCost)
+          : combatState.playerWizard.currentMana,
+      }
+    };
+    // Remove from persistent player data as well
+    updateWizard((prev) => ({
+      ...prev,
+      equippedSpellScrolls: (prev.equippedSpellScrolls || []).filter(s => s.id !== scroll.id)
+    }));
+    if (scroll.spell) {
+      newState.playerWizard.equippedPotions = newState.playerWizard.equippedPotions || [];
+      newState.playerWizard.equippedSpellScrolls = newState.playerWizard.equippedSpellScrolls || [];
+      newState = queueAction(newState, {
+        caster: 'player',
+        spell: scroll.spell,
+        target: 'enemy'
+      }, false);
+    }
+    newState.log = [
+      ...newState.log,
+      {
+        turn: newState.turn,
+        round: newState.round,
+        actor: 'player',
+        action: 'use_scroll',
+        details: `You used spell scroll: ${scroll.spell?.name || scroll.name}.`,
+        timestamp: Date.now(),
+      }
+    ];
+    if (combatState.currentPhase === 'action') {
+      newState.actionState = {
+        ...newState.actionState,
+        player: {
+          ...newState.actionState.player,
+          hasActed: true
+        }
+      };
+    } else if (combatState.currentPhase === 'response') {
+      newState.actionState = {
+        ...newState.actionState,
+        player: {
+          ...newState.actionState.player,
+          hasResponded: true
+        }
+      };
+    }
+    setCombatState(newState);
+    setShowRobesModal(false);
+    handlePostPlayerAction(newState, combatState.currentPhase);
+  };
+
   if (!combatState) {
     return <div className="loading">Initializing battle...</div>;
   }
@@ -1256,6 +1484,11 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
               !isAnimating
             }
             currentPhase={combatState.currentPhase}
+            equippedPotions={combatState.playerWizard.equippedPotions || []}
+            equippedSpellScrolls={combatState.playerWizard.equippedSpellScrolls || []}
+            onOpenBeltModal={() => setShowBeltModal(true)}
+            onOpenRobesModal={() => setShowRobesModal(true)}
+            enemyName={enemyArchetypes[combatState.enemyWizard.wizard.archetype]?.name || 'Enemy Wizard'}
           />
 
           {/* Phase Tracker is now only in BattleArena component */}
@@ -1352,14 +1585,10 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
                       <SpellCard
                         spell={spell}
                         onClick={() => {
-                          console.log(`Selecting spell for Mystic Punch: ${spell.name}`);
-                          // Add a small delay to ensure the user sees the selection
                           const selectedCard = document.getElementById(`mystic-punch-spell-${spell.id}`);
                           if (selectedCard) {
                             selectedCard.classList.add('selected');
                           }
-
-                          // Slight delay to show the selection before closing the modal
                           setTimeout(() => {
                             handleMysticPunchSelect(spell);
                           }, 200);
@@ -1370,10 +1599,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
                 </div>
                 <button
                   className="modal-close-btn"
-                  onClick={() => {
-                    console.log("Closing Mystic Punch modal");
-                    setShowMysticPunchSelection(false);
-                  }}
+                  onClick={() => setShowMysticPunchSelection(false)}
                 >
                   Cancel
                 </button>
@@ -1412,6 +1638,113 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
               isEnemy={false}
             />
           )}
+
+          {/* Belt Modal */}
+          {showBeltModal && (
+            <div className="modal mystic-punch-modal">
+              <div className="modal-content">
+                <h2>Equipped Potions</h2>
+                <div className="spell-grid">
+                  {combatState.playerWizard.equippedPotions && combatState.playerWizard.equippedPotions.length > 0 ? (
+                    combatState.playerWizard.equippedPotions.map((potion) => (
+                      <Card key={potion.id} className={potionStyles.potionCard}>
+                        <div className={potionStyles.potionHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <h3 className={potionStyles.potionName} style={{ flex: 1, textAlign: 'left' }}>{potion.name}</h3>
+                          {potion.quantity && potion.quantity > 1 && (
+                            <span className={potionStyles.quantity} style={{ marginLeft: 4 }}>x{potion.quantity}</span>
+                          )}
+                        </div>
+                        <div className={potionStyles.potionImage}></div>
+                        <div className={potionStyles.potionInfo}>
+                          <div className={potionStyles.potionDetails}>
+                            <span className={potionStyles.type}>{potion.type}</span>
+                            <span className={`${potionStyles.rarity} ${potionStyles[potion.rarity]}`}>{potion.rarity}</span>
+                          </div>
+                          <p className={potionStyles.description}>{potion.description}</p>
+                          <div className={potionStyles.effects}>
+                            {potion.effect && (
+                              <span className={potionStyles.effect}>
+                                {potion.type === 'health' && `❤️ +${potion.effect.value} health`}
+                                {potion.type === 'mana' && `✨ +${potion.effect.value} mana`}
+                                {potion.type === 'strength' && `⚔️ +${potion.effect.value}% damage`}
+                                {potion.type === 'protection' && `🛡️ -${potion.effect.value}% damage`}
+                                {potion.type === 'elemental' && `🔮 +${potion.effect.value}% elem dmg`}
+                                {potion.type === 'luck' && `🎯 +${potion.effect.value}% crit`}
+                              </span>
+                            )}
+                          </div>
+                          {potion.effect && potion.effect.duration && (
+                            <div className={potionStyles.duration}>
+                              Duration: {potion.effect.duration} turns
+                            </div>
+                          )}
+                        </div>
+                        <div className={potionStyles.potionActions}>
+                          <button
+                            className={potionStyles.useButton}
+                            onClick={() => handleUsePotion(potion)}
+                          >
+                            Use
+                          </button>
+                        </div>
+                      </Card>
+                    ))
+                  ) : (
+                    <div className="noSpells">No potions equipped.</div>
+                  )}
+                </div>
+                <button
+                  className="modal-close-btn"
+                  onClick={() => setShowBeltModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Robes Modal */}
+          {showRobesModal && (
+            <div className="modal mystic-punch-modal">
+              <div className="modal-content">
+                <h2>Equipped Spell Scrolls</h2>
+                <div className="spell-grid">
+                  {combatState.playerWizard.equippedSpellScrolls && combatState.playerWizard.equippedSpellScrolls.length > 0 ? (
+                    combatState.playerWizard.equippedSpellScrolls.map((scroll) => (
+                      <div key={scroll.id} className="spell-card-wrapper">
+                        {scroll.spell ? (
+                          <SpellCard
+                            spell={scroll.spell}
+                            onClick={() => handleUseScroll(scroll)}
+                            disabled={!canUseScroll(scroll)}
+                          />
+                        ) : (
+                          <div className="spellCard" style={{ cursor: 'default' }}>
+                            <div className="spellCardHeader">
+                              <span className="spellName">{scroll.name}</span>
+                            </div>
+                            <div className="spellCardBody">
+                              <div className="spellElement">{scroll.type}</div>
+                              <div className="spellType">{scroll.rarity}</div>
+                            </div>
+                            <div className="spellCardDescription">{scroll.description}</div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="noSpells">No spell scrolls equipped.</div>
+                  )}
+                </div>
+                <button
+                  className="modal-close-btn"
+                  onClick={() => setShowRobesModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
@@ -1419,6 +1752,3 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 };
 
 export default BattleView;
-
-
-

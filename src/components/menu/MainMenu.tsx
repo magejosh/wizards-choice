@@ -20,7 +20,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
   onStartNewGame,
   onContinueGame
 }) => {
-  const { gameState, updateSettings, migrateSaveData, loadAllSaveSlots } = useGameStateStore();
+  const { gameState, updateSettings, migrateSaveData, loadAllSaveSlots, deleteSaveSlot } = useGameStateStore();
   const { settings, saveSlots } = gameState;
 
   // State for modals
@@ -163,6 +163,17 @@ const MainMenu: React.FC<MainMenuProps> = ({
     }
   };
 
+  // Handler for deleting a single save slot
+  const handleDeleteSaveSlot = (e: React.MouseEvent, slot: SaveSlot) => {
+    e.stopPropagation();
+    if (confirm(`Are you sure you want to delete save slot ${slot.id + 1} (${slot.playerName})? This action cannot be undone.`)) {
+      deleteSaveSlot(slot.saveUuid);
+      // Force a re-render by closing and reopening the modal
+      setShowSaveSlotModal(false);
+      setTimeout(() => setShowSaveSlotModal(true), 100);
+    }
+  };
+
   // Modal component for save slots
   const SaveSlotModal = () => (
     <div className="save-slot-modal">
@@ -181,6 +192,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
               key={slot.id}
               className={`magical-save-slot ${slot.isEmpty ? 'magical-save-slot--empty' : 'magical-save-slot--filled'}`}
               onClick={() => handleSaveSlotSelect(slot)}
+              style={{ position: 'relative' }}
             >
               <div className="magical-save-slot__slot-number">Slot {slot.id + 1}</div>
 
@@ -199,6 +211,17 @@ const MainMenu: React.FC<MainMenuProps> = ({
                       <span className="magical-save-slot__value">{new Date(slot.lastSaved).toLocaleDateString()}</span>
                     </div>
                   </div>
+                  {/* Delete button in bottom right */}
+                  <button
+                    className="save-slot__delete-btn"
+                    aria-label={`Delete save slot ${slot.id + 1}`}
+                    title="Delete Save Slot"
+                    onClick={e => handleDeleteSaveSlot(e, slot)}
+                    tabIndex={0}
+                    type="button"
+                  >
+                    ❌
+                  </button>
                 </>
               )}
             </div>
@@ -244,6 +267,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
               key={slot.id}
               className={`magical-save-slot ${slot.isEmpty ? 'magical-save-slot--empty' : 'magical-save-slot--filled'}`}
               onClick={() => handleSaveSlotSelect(slot)}
+              style={{ position: 'relative' }}
             >
               <div className="magical-save-slot__slot-number">Slot {slot.id + 1}</div>
 
@@ -259,6 +283,17 @@ const MainMenu: React.FC<MainMenuProps> = ({
                     </div>
                   </div>
                   <div className="magical-save-slot__warning">Will be overwritten!</div>
+                  {/* Delete button in bottom right */}
+                  <button
+                    className="save-slot__delete-btn"
+                    aria-label={`Delete save slot ${slot.id + 1}`}
+                    title="Delete Save Slot"
+                    onClick={e => handleDeleteSaveSlot(e, slot)}
+                    tabIndex={0}
+                    type="button"
+                  >
+                    ❌
+                  </button>
                 </>
               )}
             </div>

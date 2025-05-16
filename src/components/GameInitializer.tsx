@@ -1,6 +1,6 @@
 // src/components/GameInitializer.tsx
 import { useEffect } from 'react';
-import { useGameStateStore } from '../lib/game-state/gameStateStore';
+import { useGameStateStore, dedupeAndMergePotions, getWizard } from '../lib/game-state/gameStateStore';
 
 interface GameInitializerProps {
   onGameStart: (shouldStartGame: boolean) => void;
@@ -70,6 +70,32 @@ const GameInitializer: React.FC<GameInitializerProps> = ({ onGameStart }) => {
       console.log("GameInitializer found no special flags - taking no action");
     }
   }, [onGameStart]); // Removed gameState from dependencies to prevent infinite loops
+
+  // Repair potions and equippedPotions on every mount
+  useEffect(() => {
+    const player = getWizard();
+    if (player) {
+      const dedupedPotions = dedupeAndMergePotions(player.potions || []);
+      const dedupedEquipped = dedupeAndMergePotions(player.equippedPotions || []);
+      const arraysDiffer = (a, b) =>
+        a.length !== b.length ||
+        a.some((item, i) => item.id !== b[i]?.id || item.quantity !== b[i]?.quantity);
+      if (
+        arraysDiffer(dedupedPotions, player.potions || []) ||
+        arraysDiffer(dedupedEquipped, player.equippedPotions || [])
+      ) {
+        console.log('[Repair] (Initializer) Before dedupe - potions:', player.potions);
+        console.log('[Repair] (Initializer) Before dedupe - equippedPotions:', player.equippedPotions);
+        useGameStateStore.getState().updatePlayerPotions(dedupedPotions);
+        useGameStateStore.getState().updatePlayerEquippedPotions(dedupedEquipped);
+        setTimeout(() => {
+          const updated = getWizard();
+          console.log('[Repair] (Initializer) After dedupe - potions:', updated?.potions);
+          console.log('[Repair] (Initializer) After dedupe - equippedPotions:', updated?.equippedPotions);
+        }, 100);
+      }
+    }
+  }, []);
 
   return null; // This is a logic-only component
 };

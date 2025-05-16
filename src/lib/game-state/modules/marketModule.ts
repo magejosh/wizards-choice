@@ -8,6 +8,7 @@ import { Wizard } from '../../types/wizard-types';
 import { generateDefaultWizard } from '../../wizard/wizardUtils';
 import { refreshMarketInventory as importedRefreshMarketInventory } from '../../features/market/marketSystem';
 import { getWizard, updateWizard, updateGameProgress } from '../gameStateStore';
+import { generateProceduralEquipment } from '../../features/procedural/equipmentGenerator';
 
 // Define the slice of state this module manages
 export interface MarketState {
@@ -253,7 +254,6 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
           const {
             generateRandomIngredient,
             generateRandomPotion,
-            generateRandomEquipment,
             generateRandomScroll
           } = require('../../features/items/itemGenerators');
 
@@ -281,7 +281,7 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
 
             if (i < 2) {
               newInventory.equipment.push({
-                item: generateRandomEquipment(level),
+                item: generateProceduralEquipment(level, 'hand'),
                 quantity: Math.floor(Math.random() * 2) + 1,
                 currentPrice: 200,
                 supply: 'limited',

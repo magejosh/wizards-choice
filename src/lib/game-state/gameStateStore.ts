@@ -3,7 +3,9 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { GameState } from '../types/game-types';
+import { GameState, GameProgress, SaveSlot } from '../types/game-types';
+import { MarketData } from '../types/market-types';
+import { Wizard } from '../types/wizard-types';
 import { generateDefaultWizard } from '../wizard/wizardUtils';
 import { initializeMarkets, refreshMarketInventory } from '../features/market/marketSystem';
 
@@ -132,11 +134,13 @@ const getInitialState = (): { gameState: GameState } => {
       currentSaveSlot: saveSlots[0].saveUuid,  // Use the UUID of the first slot
       markets: validatedMarkets,
       marketData: {
+        gold: 0,
         transactions: [],
         reputationLevels: {},
         visitedMarkets: [],
         favoriteMarkets: []
       },
+      notifications: [],
       version: 3  // Increment version for the new save format with isolated save slots
     }
   };
@@ -311,20 +315,50 @@ export const useGameStateStore = create<GameStateStore>()(
           }
 
           // Ensure the top-level player and gameProgress are set from the current save slot
-          // for backward compatibility
           const currentSaveUuid = state.gameState.currentSaveSlot;
           const currentSlot = state.gameState.saveSlots.find(slot => slot.saveUuid === currentSaveUuid);
-
           if (currentSlot && (currentSlot.player || currentSlot.gameProgress)) {
-            // Update the state in the next tick
             setTimeout(() => {
+              // --- DEDUPE & MERGE POTIONS ---
+              let player = currentSlot.player || state.gameState.player;
+              let changed = false;
+              if (player) {
+                console.log('[Repair] Before dedupe - potions:', player.potions);
+                console.log('[Repair] Before dedupe - equippedPotions:', player.equippedPotions);
+                const dedupedPotions = dedupeAndMergePotions(player.potions || []);
+                const dedupedEquipped = dedupeAndMergePotions(player.equippedPotions || []);
+                // Compare by length and content (ids and quantities)
+                const arraysDiffer = (a, b) =>
+                  a.length !== b.length ||
+                  a.some((item, i) => item.id !== b[i]?.id || item.quantity !== b[i]?.quantity);
+                if (
+                  arraysDiffer(dedupedPotions, player.potions || []) ||
+                  arraysDiffer(dedupedEquipped, player.equippedPotions || [])
+                ) {
+                  changed = true;
+                  player = { ...player, potions: dedupedPotions, equippedPotions: dedupedEquipped };
+                  console.log('[Repair] After dedupe - potions:', dedupedPotions);
+                  console.log('[Repair] After dedupe - equippedPotions:', dedupedEquipped);
+                }
+              }
               useGameStateStore.setState({
                 gameState: {
                   ...state.gameState,
-                  player: currentSlot.player || state.gameState.player,
+                  player: player || state.gameState.player,
                   gameProgress: currentSlot.gameProgress || state.gameState.gameProgress
                 }
               });
+              if (changed) {
+                // Force save to localStorage for current save slot
+                try {
+                  const updatedState = useGameStateStore.getState().gameState;
+                  localStorage.setItem(`wizardsChoice_save_${currentSaveUuid}`, JSON.stringify(updatedState));
+                  console.log('[Repair] Forced save to localStorage after dedupe.');
+                } catch (e) {
+                  console.error('[Repair] Failed to save cleaned state to localStorage:', e);
+                }
+                console.log('[GameState] Deduplicated and merged potions on load (full content check).');
+              }
             }, 0);
           }
         } else {
@@ -538,3 +572,18 @@ export const getMarkets = () => {
   return markets;
 };
 export const getMarketData = () => useGameStateStore.getState().gameState.marketData;
+
+// Utility to deduplicate and merge potions by name/type/rarity
+export function dedupeAndMergePotions(potions) {
+  const map = new Map();
+  for (const potion of potions) {
+    const key = `${potion.name}|${potion.type}|${potion.rarity}`;
+    if (map.has(key)) {
+      const existing = map.get(key);
+      existing.quantity = (existing.quantity || 1) + (potion.quantity || 1);
+    } else {
+      map.set(key, { ...potion, quantity: potion.quantity || 1 });
+    }
+  }
+  return Array.from(map.values());
+}

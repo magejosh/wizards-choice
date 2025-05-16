@@ -80,6 +80,8 @@ export interface CombatWizard {
   hand: Spell[];
   drawPile: Spell[];
   discardPile: Spell[];
+  equippedPotions: import('./equipment-types').Potion[];
+  equippedSpellScrolls: import('./equipment-types').Equipment[];
 }
 
 /**

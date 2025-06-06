@@ -5,6 +5,70 @@ import { enemyArchetypes } from './enemyArchetypes';
 import { generateProceduralEquipment } from './equipmentGenerator';
 import { generateSpell } from './spellGenerator';
 
+function getLevelMultiplier(level: number): number {
+  const steps = [
+    { limit: 25, rate: 0.1 },
+    { limit: 100, rate: 0.07 },
+    { limit: 250, rate: 0.05 },
+    { limit: 500, rate: 0.03 },
+    { limit: 1000, rate: 0.02 },
+    { limit: 1500, rate: 0.015 },
+    { limit: 2500, rate: 0.01 },
+    { limit: 5000, rate: 0.005 },
+    { limit: 10000, rate: 0.003 }
+  ];
+
+  let multiplier = 1;
+  let remaining = level - 1;
+  let previous = 0;
+
+  for (const step of steps) {
+    if (remaining <= 0) break;
+    const stepLevels = Math.min(remaining, step.limit - previous);
+    multiplier += stepLevels * step.rate;
+    remaining -= stepLevels;
+    previous = step.limit;
+  }
+
+  if (remaining > 0) {
+    multiplier += remaining * 0.001;
+  }
+
+  return multiplier;
+}
+
+function getSpellScale(level: number): number {
+  const steps = [
+    { limit: 25, rate: 0.75 / 24 },
+    { limit: 100, rate: 0.02 },
+    { limit: 250, rate: 0.015 },
+    { limit: 500, rate: 0.01 },
+    { limit: 1000, rate: 0.008 },
+    { limit: 1500, rate: 0.006 },
+    { limit: 2500, rate: 0.004 },
+    { limit: 5000, rate: 0.002 },
+    { limit: 10000, rate: 0.001 }
+  ];
+
+  let ratio = 0.25;
+  let remaining = level - 1;
+  let previous = 0;
+
+  for (const step of steps) {
+    if (remaining <= 0) break;
+    const stepLevels = Math.min(remaining, step.limit - previous);
+    ratio += stepLevels * step.rate;
+    remaining -= stepLevels;
+    previous = step.limit;
+  }
+
+  if (remaining > 0) {
+    ratio += remaining * 0.0005;
+  }
+
+  return ratio;
+}
+
 /**
  * Generates a procedural enemy wizard based on player level and difficulty
  * @param playerLevel The player's current level
@@ -151,13 +215,30 @@ function generateMagicalCreature(playerLevel: number, difficulty: 'easy' | 'norm
     hard: 1.2
   }[difficulty];
 
-  const baseHealth = 100 * (1 + level * 0.1) * difficultyMultiplier;
-  const baseMana = 80 * (1 + level * 0.1) * difficultyMultiplier;
+  const levelMultiplier = getLevelMultiplier(level) * difficultyMultiplier;
+  const baseHealth = 100 * levelMultiplier;
+  const baseMana = 80 * levelMultiplier;
   const health = Math.floor(baseHealth * (creature.baseStats.health / 100));
   const mana = Math.floor(baseMana * (creature.baseStats.mana / 80));
 
   // Generate spells based on creature type
-  const spells: Spell[] = [...creature.thematicSpells];
+  // Scale creature spells based on level so early encounters aren't overwhelming
+  const scaleCreatureSpell = (spell: Spell): Spell => {
+    const ratio = getSpellScale(level);
+    const scaledEffects = spell.effects.map(effect => {
+      if (effect.type === 'damage' || effect.type === 'healing') {
+        return { ...effect, value: Math.round(effect.value * ratio) };
+      }
+      return effect;
+    });
+    return {
+      ...spell,
+      tier: Math.max(1, Math.ceil(level / 3)),
+      effects: scaledEffects
+    };
+  };
+
+  const spells: Spell[] = creature.thematicSpells.map(scaleCreatureSpell);
 
   // Calculate rewards based on difficulty and level
   const goldReward = Math.floor(150 * difficultyMultiplier * (1 + level * 0.1));

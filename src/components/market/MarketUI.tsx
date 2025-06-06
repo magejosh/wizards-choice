@@ -315,10 +315,12 @@ export const MarketUI: React.FC<{ onClose: (attackInfo?: any) => void }> = ({ on
         case 'equipment': {
           // Aggregate unequipped equipment by name
           const equipmentMap = new Map();
-          (player.inventory || [])
+            (player.inventory || [])
             .filter(item =>
               item.type !== 'scroll' &&
-              !(player.equipment || []).some(eq => eq.id === item.id)
+              !Object.values(player.equipment || {}).some(
+                eq => eq && eq.id === item.id
+              )
             )
             .forEach(item => {
               if (equipmentMap.has(item.name)) {

@@ -4,6 +4,7 @@ import { createLogEntry } from './battleLogManager';
 import { checkCombatStatus } from './combatStatusManager';
 import { discardCard } from './cardManager';
 import { advancePhase } from './phaseManager';
+import { calculateAndApplyDamage } from './damageCalculationUtils';
 
 /**
  * Select a spell for a wizard to cast
@@ -53,11 +54,7 @@ export function executeMysticPunch(
   const target = isPlayer ? 'enemyWizard' : 'playerWizard';
 
   // Calculate base damage based on spell tier
-  let baseDamage = 2 + (spellTier * 3);
-
-  // Add mysticPunchPower from equipment (if any)
-  const mysticPunchPower = newState[caster].wizard.combatStats?.mysticPunchPower || 0;
-  baseDamage += mysticPunchPower;
+  const baseDamage = 2 + (spellTier * 3);
 
   // Apply Bleed Effect if present
   const bleedEffect = newState[caster].wizard.combatStats?.bleedEffect || 0;
@@ -83,48 +80,15 @@ export function executeMysticPunch(
     }));
   }
 
-  // Apply difficulty modifier
-  if (isPlayer) {
-    switch (newState.difficulty) {
-      case 'easy':
-        baseDamage *= 1.2; // Player deals more damage on easy difficulty
-        break;
-      case 'hard':
-        baseDamage *= 0.8; // Player deals less damage on hard difficulty
-        break;
-    }
-  } else {
-    switch (newState.difficulty) {
-      case 'easy':
-        baseDamage *= 0.8; // Enemy deals less damage on easy difficulty
-        break;
-      case 'hard':
-        baseDamage *= 1.2; // Enemy deals more damage on hard difficulty
-        break;
-    }
-  }
-
-  // Round damage to nearest integer
-  const finalDamage = Math.round(baseDamage);
-
-  // Apply damage to target
-  newState[target] = {
-    ...newState[target],
-    currentHealth: Math.max(0, newState[target].currentHealth - finalDamage),
-  };
-
-  // Add to combat log
-  newState.log.push(createLogEntry({
-    turn: newState.turn,
-    round: newState.round,
-    actor: isPlayer ? 'player' : 'enemy',
-    action: 'mystic_punch',
-    details: `${isPlayer ? 'You' : 'Enemy'} used Mystic Punch for ${finalDamage} damage!`,
-    damage: finalDamage,
-  }));
-
-  // Check if this ended the combat using the combat status manager
-  newState = checkCombatStatus(newState);
+  // Use standardized damage calculation system
+  newState = calculateAndApplyDamage(newState, {
+    baseDamage,
+    damageType: 'mysticPunch',
+    element: 'physical',
+    caster,
+    target,
+    sourceDescription: 'Mystic Punch',
+  });
 
   // If combat has ended, return immediately
   if (newState.status !== 'active') {
@@ -322,30 +286,22 @@ export function applySpellEffect(
   isPlayerCaster: boolean
 ): CombatState {
   let newState = { ...state };
+  const caster = isPlayerCaster ? 'playerWizard' : 'enemyWizard';
   const effectTarget = effect.target === 'self'
     ? (isPlayerCaster ? 'playerWizard' : 'enemyWizard')
     : (isPlayerCaster ? 'enemyWizard' : 'playerWizard');
 
   switch (effect.type) {
     case 'damage':
-      // Apply immediate damage
-      newState[effectTarget] = {
-        ...newState[effectTarget],
-        currentHealth: Math.max(0, newState[effectTarget].currentHealth - Math.round(effect.value)),
-      };
-
-      // Add to combat log
-      newState.log.push(createLogEntry({
-        turn: newState.turn,
-        round: newState.round,
-        actor: isPlayerCaster ? 'player' : 'enemy',
-        action: 'damage',
-        details: `${Math.round(effect.value)} ${effect.element || ''} damage to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'}!`,
-        damage: Math.round(effect.value)
-      }));
-
-      // Check if this damage ended the combat
-      newState = checkCombatStatus(newState);
+      // Use standardized damage calculation system
+      newState = calculateAndApplyDamage(newState, {
+        baseDamage: effect.value,
+        damageType: 'spell',
+        element: effect.element || 'arcane',
+        caster,
+        target: effectTarget,
+        sourceDescription: `spell ${effect.element || ''} damage`,
+      });
       break;
 
     case 'healing':
@@ -386,102 +342,11 @@ export function applySpellEffect(
       }));
       break;
 
-    case 'damageOverTime':
-      // Apply damage over time effect
-      const dotEffect = {
-        id: `dot-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        name: effect.name || 'Damage Over Time',
-        source: isPlayerCaster ? 'player' : 'enemy',
-        remainingDuration: effect.duration || 1,
-        effect: {
-          type: 'damage',
-          value: effect.value,
-          element: effect.element,
-        },
-      };
-
-      // Add to active effects
-      newState[effectTarget] = {
-        ...newState[effectTarget],
-        activeEffects: [...newState[effectTarget].activeEffects, dotEffect],
-      };
-
-      // Add to combat log
-      newState.log.push(createLogEntry({
-        turn: newState.turn,
-        round: newState.round,
-        actor: isPlayerCaster ? 'player' : 'enemy',
-        action: 'effect_applied',
-        details: `${dotEffect.name} applied to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'} for ${effect.duration} turns!`,
-      }));
-      break;
-
-    case 'healingOverTime':
-      // Apply healing over time effect
-      const hotEffect = {
-        id: `hot-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        name: effect.name || 'Healing Over Time',
-        source: isPlayerCaster ? 'player' : 'enemy',
-        remainingDuration: effect.duration || 1,
-        effect: {
-          type: 'healing',
-          value: effect.value,
-        },
-      };
-
-      // Add to active effects
-      newState[effectTarget] = {
-        ...newState[effectTarget],
-        activeEffects: [...newState[effectTarget].activeEffects, hotEffect],
-      };
-
-      // Add to combat log
-      newState.log.push(createLogEntry({
-        turn: newState.turn,
-        round: newState.round,
-        actor: isPlayerCaster ? 'player' : 'enemy',
-        action: 'effect_applied',
-        details: `${hotEffect.name} applied to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'} for ${effect.duration} turns!`,
-      }));
-      break;
-
-    case 'manaRestoreOverTime':
-      // Apply mana restore over time effect
-      const motEffect = {
-        id: `mot-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        name: effect.name || 'Mana Restore Over Time',
-        source: isPlayerCaster ? 'player' : 'enemy',
-        remainingDuration: effect.duration || 1,
-        effect: {
-          type: 'manaRestore',
-          value: effect.value,
-        },
-      };
-
-      // Add to active effects
-      newState[effectTarget] = {
-        ...newState[effectTarget],
-        activeEffects: [...newState[effectTarget].activeEffects, motEffect],
-      };
-
-      // Add to combat log
-      newState.log.push(createLogEntry({
-        turn: newState.turn,
-        round: newState.round,
-        actor: isPlayerCaster ? 'player' : 'enemy',
-        action: 'effect_applied',
-        details: `${motEffect.name} applied to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'} for ${effect.duration} turns!`,
-      }));
-      break;
-
-    case 'statModifier':
-    case 'statusEffect':
-      // Handle special status effect for extra turn (Time Warp spell)
-      if (effect.type === 'statusEffect' && effect.value === 1 && effect.duration === 1) {
-        // This is the Time Warp extra turn effect
+    case 'statusEffect': {
+      // Handle Time Warp extra-turn effect first
+      if (effect.value === 1 && effect.duration === 1) {
         const actorName = isPlayerCaster ? 'player' : 'enemy';
 
-        // Add to combat log
         newState.log.push(createLogEntry({
           turn: newState.turn,
           round: newState.round,
@@ -490,12 +355,127 @@ export function applySpellEffect(
           details: `Time warped! ${actorName === 'player' ? 'You' : 'Enemy'} will get an extra turn!`
         }));
 
-        // Set a flag to grant an extra turn in the advanceTurn function
-        newState.extraTurn = {
-          for: actorName
+        newState.extraTurn = { for: actorName };
+        break;
+      }
+
+      let newActiveEffect: ActiveEffect | null = null;
+
+      if (effect.target === 'self' && effect.value > 0) {
+        // Healing over time on self
+        newActiveEffect = {
+          id: `hot-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          name: 'Healing Over Time',
+          source: isPlayerCaster ? 'player' : 'enemy',
+          remainingDuration: effect.duration || 1,
+          duration: effect.duration || 1,
+          type: 'healing_over_time',
+          value: effect.value,
+          effect
+        };
+      } else if (effect.target === 'enemy' && effect.value > 0) {
+        // Damage over time on enemy
+        newActiveEffect = {
+          id: `dot-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          name: 'Damage Over Time',
+          source: isPlayerCaster ? 'player' : 'enemy',
+          remainingDuration: effect.duration || 1,
+          duration: effect.duration || 1,
+          type: 'damage_over_time',
+          value: effect.value,
+          effect
         };
       }
+
+      if (newActiveEffect) {
+        newState[effectTarget] = {
+          ...newState[effectTarget],
+          activeEffects: [...newState[effectTarget].activeEffects, newActiveEffect],
+        };
+
+        newState.log.push(createLogEntry({
+          turn: newState.turn,
+          round: newState.round,
+          actor: isPlayerCaster ? 'player' : 'enemy',
+          action: 'effect_applied',
+          details: `${newActiveEffect.name} applied to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'} for ${effect.duration} turns!`,
+        }));
+      }
       break;
+    }
+
+    case 'statModifier': {
+      // Handle duration-based stat modifiers (buffs/debuffs)
+      if (effect.duration && effect.duration > 0) {
+        let effectType: ActiveEffect['type'];
+        let effectName: string;
+        
+        if (effect.value < 0) {
+          // Negative values are damage reduction/shields
+          effectType = 'damageReduction';
+          effectName = 'Damage Reduction';
+        } else {
+          // Positive values are buffs
+          effectType = 'buff';
+          effectName = 'Buff';
+        }
+
+        const activeEffect: ActiveEffect = {
+          id: `mod-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          name: effectName,
+          source: isPlayerCaster ? 'player' : 'enemy',
+          remainingDuration: effect.duration,
+          duration: effect.duration,
+          type: effectType,
+          value: effect.value,
+          effect,
+        };
+
+        newState[effectTarget] = {
+          ...newState[effectTarget],
+          activeEffects: [...newState[effectTarget].activeEffects, activeEffect],
+        };
+
+        newState.log.push(createLogEntry({
+          turn: newState.turn,
+          round: newState.round,
+          actor: isPlayerCaster ? 'player' : 'enemy',
+          action: 'effect_applied',
+          details: `${activeEffect.name} applied to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'} for ${effect.duration} turns!`,
+        }));
+      }
+      break;
+    }
+
+    case 'damageReduction': {
+      // Handle direct damageReduction effects (like Arcane Shield)
+      if (effect.duration && effect.duration > 0) {
+        const activeEffect: ActiveEffect = {
+          id: `dmgred-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          name: 'Damage Reduction',
+          source: isPlayerCaster ? 'player' : 'enemy',
+          remainingDuration: effect.duration,
+          duration: effect.duration,
+          type: 'damageReduction',
+          value: effect.value,
+          effect,
+        };
+
+        newState[effectTarget] = {
+          ...newState[effectTarget],
+          activeEffects: [...newState[effectTarget].activeEffects, activeEffect],
+        };
+
+        newState.log.push(createLogEntry({
+          turn: newState.turn,
+          round: newState.round,
+          actor: isPlayerCaster ? 'player' : 'enemy',
+          action: 'effect_applied',
+          details: `${activeEffect.name} applied to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'} for ${effect.duration} turns!`,
+        }));
+      }
+      break;
+    }
   }
 
   return newState;

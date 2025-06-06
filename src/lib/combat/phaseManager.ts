@@ -198,6 +198,11 @@ export function advancePhase(state: CombatState): CombatState {
         // Skip response phase if no actions were queued
         nextPhase = 'resolve';
 
+        // **CRITICAL FIX**: Even when skipping response, still resolve any effects
+        // that might be in the queue (defensive programming)
+        console.log(`Skipping response phase. Resolving ${newState.effectQueue.length} queued effects`);
+        newState = resolveQueuedEffects(newState);
+
         // Log phase change using the battle log manager
         createLogEntry({
           turn: newState.turn,
@@ -214,6 +219,11 @@ export function advancePhase(state: CombatState): CombatState {
 
     case 'response':
       nextPhase = 'resolve';
+
+      // **CRITICAL FIX**: Actually resolve queued effects before advancing
+      // This was the root cause of the spell execution bug
+      console.log(`Resolving ${newState.effectQueue.length} queued effects`);
+      newState = resolveQueuedEffects(newState);
 
       // Log phase change using the battle log manager
       createLogEntry({
@@ -402,7 +412,7 @@ function resolveQueuedEffects(state: CombatState): CombatState {
       // It's a spell cast
       // Defensive: check if spell is in hand before resolving
       const caster = effect.caster === 'player' ? 'playerWizard' : 'enemyWizard';
-      const spellInHand = newState[caster].hand.find(spell => spell.id === effect.spell.id);
+      const spellInHand = newState[caster].hand.find(spell => spell.id === effect.spell!.id);
       if (!spellInHand) {
         console.warn(`resolveQueuedEffects: Spell with id ${effect.spell.id} not found in hand for ${caster}. Skipping.`);
         continue; // Skip this effect, do not penalize player

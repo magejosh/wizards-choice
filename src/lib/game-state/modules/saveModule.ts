@@ -1,9 +1,9 @@
 // src/lib/game-state/modules/saveModule.ts
 // Game save/load management
 
-import { SaveSlot, GameState } from '../../types/game-types';
+import { SaveSlot, GameState, GameProgress } from '../../types/game-types';
 import { Wizard } from '../../types/wizard-types';
-import { generateDefaultWizard } from '../../wizard/wizardUtils';
+import { generateDefaultWizardAsync } from '../../wizard/wizardUtils';
 import { v4 as uuidv4 } from 'uuid';
 
 // Define the slice of state this module manages
@@ -29,12 +29,10 @@ export interface SaveActions {
 }
 
 // Helper to generate initial state
-const getInitialGameState = (playerName: string, saveSlotId: number): GameState => {
-  const defaultWizard = generateDefaultWizard(playerName);
-
+const getInitialGameState = async (playerName: string, saveSlotId: number): Promise<GameState> => {
+  const defaultWizard = await generateDefaultWizardAsync(playerName);
   // Generate a UUID for the active save slot
   const activeSlotUuid = uuidv4();
-
   // Create save slots with UUIDs
   const saveSlots = Array(3).fill(null).map((_, i) => {
     const isActiveSlot = i === saveSlotId;
@@ -47,7 +45,6 @@ const getInitialGameState = (playerName: string, saveSlotId: number): GameState 
       isEmpty: !isActiveSlot
     };
   });
-
   return {
     player: defaultWizard,
     gameProgress: {
@@ -104,6 +101,8 @@ const getInitialGameState = (playerName: string, saveSlotId: number): GameState 
         }
       }
     },
+    saveSlots,
+    currentSaveSlot: activeSlotUuid,
     settings: {
       difficulty: 'normal',
       soundEnabled: true,
@@ -111,18 +110,24 @@ const getInitialGameState = (playerName: string, saveSlotId: number): GameState 
       sfxVolume: 0.8,
       colorblindMode: false,
       uiScale: 1.0,
-      theme: 'default'
+      theme: 'default',
+      highContrastMode: false,
+      screenReaderMode: false,
+      textSize: 'medium',
+      showDamageNumbers: true,
+      showCombatLog: true,
+      showTutorialTips: true
     },
-    saveSlots: saveSlots,
-    currentSaveSlot: activeSlotUuid,  // Store the UUID instead of the index
     markets: [],
     marketData: {
+      gold: 0,
       transactions: [],
       reputationLevels: {},
       visitedMarkets: [],
       favoriteMarkets: []
     },
-    version: 2  // Set version to 2 for the new save format
+    notifications: [],
+    version: 3
   };
 };
 
@@ -457,36 +462,27 @@ export const createSaveModule = (set: Function, get: Function): SaveActions => (
     }
   },
 
-  initializeNewGame: (playerName, slotId) => {
+  initializeNewGame: async (playerName, slotId) => {
     console.log(`Initializing new game for ${playerName} in slot ${slotId}...`);
-
     // Get the current game state
     const currentGameState = get().gameState;
     const currentSaveSlots = [...currentGameState.saveSlots];
-
     // Generate a new UUID for this save slot
     const newSaveUuid = uuidv4();
-
     // First, clear any existing save data for this slot
     try {
-      // Clear both old and new format
       localStorage.removeItem(`wizardsChoice_saveSlot_${slotId}`);
-
-      // Find any existing save with this slot ID and remove it
       const existingSlot = currentSaveSlots.find(slot => slot.id === slotId);
       if (existingSlot && existingSlot.saveUuid) {
         localStorage.removeItem(`wizardsChoice_save_${existingSlot.saveUuid}`);
       }
-
       console.log(`Cleared existing save data in slot ${slotId}`);
     } catch (error) {
       console.error('Failed to clear existing save data:', error);
     }
-
     // Create a default wizard with the given name
-    const defaultWizard = generateDefaultWizard(playerName);
+    const defaultWizard = await generateDefaultWizardAsync(playerName);
     console.log(`Created default wizard: ${playerName}, Level ${defaultWizard.level}`);
-
     // Create default game progress
     const defaultGameProgress: GameProgress = {
       defeatedEnemies: [],

@@ -94,4 +94,10 @@ This document defines the XML format for all spell data in Wizard's Choice. All 
 ## File Location and Loading
 - The spell data XML file must be placed at `/public/data/spell_data.xml` in the project directory.
 - At runtime, the game loads the file from `/data/spell_data.xml` (the URL path).
-- There is only one file: the `/public` directory is served as the web root, so `/public/data/spell_data.xml` is accessible at `/data/spell_data.xml` in the browser. 
+- There is only one file: the `/public` directory is served as the web root, so `/public/data/spell_data.xml` is accessible at `/data/spell_data.xml` in the browser.
+
+## Cache Invalidation Requirement
+
+- After editing and saving spells (via the CMX or any tool), the in-memory spell cache must be cleared using the `clearSpellCache` function from `src/lib/spells/spellData.ts`.
+- This ensures that the game reloads the latest spell data from the XML file and displays all updates immediately.
+- The CMX now calls this automatically after a successful save. 

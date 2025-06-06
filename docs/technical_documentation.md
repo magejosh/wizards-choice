@@ -109,6 +109,11 @@ The spell system is designed to be extensible and balanced, with 10 tiers of spe
 - **AXIOM 9**: Design spells in sets with complementary effects to encourage strategic combinations.
 - **AXIOM 10**: Maintain clear documentation of spell effects and interactions for future expansion.
 
+### Spell Cache Invalidation
+- After editing and saving spells (via the CMX or any tool), the in-memory spell cache must be cleared using the `clearSpellCache` function from `src/lib/spells/spellData.ts`.
+- This ensures the game reloads the latest spell data from the XML file and displays all updates immediately.
+- The CMX now calls this automatically after a successful save.
+
 ## Spell Scroll System
 
 The spell scroll system provides an alternative method for players to acquire and use spells beyond the standard deck-building mechanics.

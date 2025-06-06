@@ -1,10 +1,40 @@
+import { getAllSpells } from './spellData';
 import { Spell } from '../types';
-import { generateSpellId } from './spellData';
 
 /**
  * Rarity levels for special spells
  */
 export type SpellRarity = 'uncommon' | 'rare' | 'legendary';
+
+/**
+ * Get all spells of a given rarity (uncommon, rare, legendary)
+ */
+export async function getSpecialSpellsByRarity(rarity: SpellRarity): Promise<Spell[]> {
+  const spells = await getAllSpells();
+  return spells.filter(spell => spell.rarity === rarity);
+}
+
+/**
+ * Get all special spells (uncommon, rare, legendary)
+ */
+export async function getAllSpecialSpells(): Promise<Spell[]> {
+  const spells = await getAllSpells();
+  return spells.filter(spell => ['uncommon', 'rare', 'legendary'].includes(spell.rarity));
+}
+
+/**
+ * Get all spells for a specific list type (archetype, creature, any)
+ */
+export async function getSpellsByList(listType: string): Promise<Spell[]> {
+  const spells = await getAllSpells();
+  // If the spell has a 'list' property as an array or string, check for match
+  return spells.filter(spell => {
+    if (Array.isArray((spell as any).list)) {
+      return (spell as any).list.includes(listType);
+    }
+    return (spell as any).list === listType;
+  });
+}
 
 /**
  * Interface extending Spell with rarity property
@@ -66,25 +96,13 @@ export function getLegendarySpells(): SpecialSpell[] {
   ];
 }
 
-/**
- * Get all special spells
- * @returns Array of all special spells
- */
-export function getAllSpecialSpells(): SpecialSpell[] {
-  return [
-    ...getUncommonSpells(),
-    ...getRareSpells(),
-    ...getLegendarySpells(),
-  ];
-}
-
 // Uncommon Spells
 
 function createEssenceTheftSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Essence Theft'),
+    id: 'spell_essence_theft',
     name: 'Essence Theft',
-    type: 'damage',
+    type: 'attack',
     element: 'arcane',
     tier: 3,
     manaCost: 40,
@@ -111,9 +129,9 @@ function createEssenceTheftSpell(): SpecialSpell {
 
 function createAstralChainSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Astral Chain'),
+    id: 'spell_astral_chain',
     name: 'Astral Chain',
-    type: 'damage',
+    type: 'attack',
     element: 'arcane',
     tier: 4,
     manaCost: 45,
@@ -142,9 +160,9 @@ function createAstralChainSpell(): SpecialSpell {
 
 function createMagneticPulseSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Magnetic Pulse'),
+    id: 'spell_magnetic_pulse',
     name: 'Magnetic Pulse',
-    type: 'damage',
+    type: 'attack',
     element: 'air',
     tier: 2,
     manaCost: 30,
@@ -166,9 +184,9 @@ function createMagneticPulseSpell(): SpecialSpell {
 
 function createResonanceStrikeSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Resonance Strike'),
+    id: 'spell_resonance_strike',
     name: 'Resonance Strike',
-    type: 'damage',
+    type: 'attack',
     element: 'air',
     tier: 5,
     manaCost: 50,
@@ -190,7 +208,7 @@ function createResonanceStrikeSpell(): SpecialSpell {
 
 function createHoneyedWordsSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Honeyed Words'),
+    id: 'spell_honeyed_words',
     name: 'Honeyed Words',
     type: 'buff',
     element: 'arcane',
@@ -214,7 +232,7 @@ function createHoneyedWordsSpell(): SpecialSpell {
 
 function createLifebloodRitualSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Lifeblood Ritual'),
+    id: 'spell_lifeblood_ritual',
     name: 'Lifeblood Ritual',
     type: 'healing',
     element: 'earth',
@@ -243,7 +261,7 @@ function createLifebloodRitualSpell(): SpecialSpell {
 
 function createElementalHarmonySpell(): SpecialSpell {
   return {
-    id: generateSpellId('Elemental Harmony'),
+    id: 'spell_elemental_harmony',
     name: 'Elemental Harmony',
     type: 'buff',
     element: 'arcane',
@@ -267,9 +285,9 @@ function createElementalHarmonySpell(): SpecialSpell {
 
 function createRiftShatterSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Rift Shatter'),
+    id: 'spell_rift_shatter',
     name: 'Rift Shatter',
-    type: 'damage',
+    type: 'attack',
     element: 'arcane',
     tier: 5,
     manaCost: 60,
@@ -291,7 +309,7 @@ function createRiftShatterSpell(): SpecialSpell {
 
 function createChronoSkipSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Chrono Skip'),
+    id: 'spell_chrono_skip',
     name: 'Chrono Skip',
     type: 'buff',
     element: 'arcane',
@@ -315,7 +333,7 @@ function createChronoSkipSpell(): SpecialSpell {
 
 function createMirrorImageSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Mirror Image'),
+    id: 'spell_mirror_image',
     name: 'Mirror Image',
     type: 'buff',
     element: 'arcane',
@@ -341,9 +359,9 @@ function createMirrorImageSpell(): SpecialSpell {
 
 function createEternalWinterSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Eternal Winter'),
+    id: 'spell_eternal_winter',
     name: 'Eternal Winter',
-    type: 'damage',
+    type: 'attack',
     element: 'water',
     tier: 6,
     manaCost: 70,
@@ -378,9 +396,9 @@ function createEternalWinterSpell(): SpecialSpell {
 
 function createVoidRiftSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Void Rift'),
+    id: 'spell_void_rift',
     name: 'Void Rift',
-    type: 'damage',
+    type: 'attack',
     element: 'arcane',
     tier: 7,
     manaCost: 100,
@@ -402,9 +420,9 @@ function createVoidRiftSpell(): SpecialSpell {
 
 function createSoulshatterSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Soulshatter'),
+    id: 'spell_soulshatter',
     name: 'Soulshatter',
-    type: 'damage',
+    type: 'attack',
     element: 'arcane',
     tier: 6,
     manaCost: 80,
@@ -432,9 +450,9 @@ function createSoulshatterSpell(): SpecialSpell {
 
 function createDragonflameSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Dragonflame'),
+    id: 'spell_dragonflame',
     name: 'Dragonflame',
-    type: 'damage',
+    type: 'attack',
     element: 'fire',
     tier: 6,
     manaCost: 75,
@@ -463,7 +481,7 @@ function createDragonflameSpell(): SpecialSpell {
 
 function createCelestialBlessSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Celestial Blessing'),
+    id: 'spell_celestial_blessing',
     name: 'Celestial Blessing',
     type: 'healing',
     element: 'arcane',
@@ -500,9 +518,9 @@ function createCelestialBlessSpell(): SpecialSpell {
 
 function createAbsoluteSilenceSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Absolute Silence'),
+    id: 'spell_absolute_silence',
     name: 'Absolute Silence',
-    type: 'damage',
+    type: 'attack',
     element: 'arcane',
     tier: 6,
     manaCost: 70,
@@ -530,9 +548,9 @@ function createAbsoluteSilenceSpell(): SpecialSpell {
 
 function createPlasmaStormSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Plasma Storm'),
+    id: 'spell_plasma_storm',
     name: 'Plasma Storm',
-    type: 'damage',
+    type: 'attack',
     element: 'fire',
     tier: 7,
     manaCost: 95,
@@ -561,7 +579,7 @@ function createPlasmaStormSpell(): SpecialSpell {
 
 function createRunicBindingSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Runic Binding'),
+    id: 'spell_runic_binding',
     name: 'Runic Binding',
     type: 'buff',
     element: 'earth',
@@ -591,7 +609,7 @@ function createRunicBindingSpell(): SpecialSpell {
 
 function createEldritchBarrierSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Eldritch Barrier'),
+    id: 'spell_eldritch_barrier',
     name: 'Eldritch Barrier',
     type: 'buff',
     element: 'arcane',
@@ -616,9 +634,9 @@ function createEldritchBarrierSpell(): SpecialSpell {
 
 function createInsanityWhisperSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Insanity Whisper'),
+    id: 'spell_insanity_whisper',
     name: 'Insanity Whisper',
-    type: 'damage',
+    type: 'attack',
     element: 'arcane',
     tier: 7,
     manaCost: 90,
@@ -649,9 +667,9 @@ function createInsanityWhisperSpell(): SpecialSpell {
 
 function createWorldEndingFlameSpell(): SpecialSpell {
   return {
-    id: generateSpellId('World-Ending Flame'),
+    id: 'spell_world_ending_flame',
     name: 'World-Ending Flame',
-    type: 'damage',
+    type: 'attack',
     element: 'fire',
     tier: 9,
     manaCost: 150,
@@ -680,9 +698,9 @@ function createWorldEndingFlameSpell(): SpecialSpell {
 
 function createGazeOfTheVoidSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Gaze of the Void'),
+    id: 'spell_gaze_of_the_void',
     name: 'Gaze of the Void',
-    type: 'damage',
+    type: 'attack',
     element: 'arcane',
     tier: 9,
     manaCost: 180,
@@ -711,9 +729,9 @@ function createGazeOfTheVoidSpell(): SpecialSpell {
 
 function createSingularityNexusSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Singularity Nexus'),
+    id: 'spell_singularity_nexus',
     name: 'Singularity Nexus',
-    type: 'damage',
+    type: 'attack',
     element: 'arcane',
     tier: 10,
     manaCost: 220,
@@ -748,7 +766,7 @@ function createSingularityNexusSpell(): SpecialSpell {
 
 function createAscendantApotheosisSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Ascendant Apotheosis'),
+    id: 'spell_ascendant_apotheosis',
     name: 'Ascendant Apotheosis',
     type: 'buff',
     element: 'arcane',
@@ -798,9 +816,9 @@ function createAscendantApotheosisSpell(): SpecialSpell {
 
 function createDivineJudgmentSpell(): SpecialSpell {
   return {
-    id: generateSpellId('Divine Judgment'),
+    id: 'spell_divine_judgment',
     name: 'Divine Judgment',
-    type: 'damage',
+    type: 'attack',
     element: 'arcane',
     tier: 10,
     manaCost: 250,

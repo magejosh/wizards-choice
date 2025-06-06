@@ -29,17 +29,17 @@ Additional guidelines:
 - [x] Update documentation and process maps in /docs to reflect the new spell system and CMX workflow
 
 #### Task Group 2: Spell Data Migration & Validation
-- [ ] Write a migration script to export all current spells to the new XML format, ensuring each spell is a node with a list attribute (archetype, creature, or 'any')
-- [ ] Add validation to prevent duplicate spell names and invalid effects/targets
-- [ ] Ensure migration script checks for and appends a suffix on duplicate spell names
-- [ ] Ensure migration script does not delete current spell data and includes all spell lists in the XML data
-- [ ] Execute migration script and validate XML data against the new schema, IF failed, restart Task Group 2 UNTIL successful.
+- [x] Write a migration script to export all current spells to the new XML format, ensuring each spell is a node with a list attribute (archetype, creature, or 'any')
+- [x] Add validation to prevent duplicate spell names and invalid effects/targets
+- [x] Ensure migration script checks for and appends a suffix on duplicate spell names
+- [x] Ensure migration script does not delete current spell data and includes all spell lists in the XML data
+- [x] Execute migration script and validate XML data against the new schema, IF failed, restart Task Group 2 UNTIL successful.
 
 
 #### Task Group 3: Game Refactor for XML Spell Loading
-- [ ] Refactor the game to load spells from the XML file at runtime, replacing hardcoded spell lists
-- [ ] Refactor archetype/creature logic to reference spells by name (unique, case-insensitive) instead of object or ID
-- [ ] Ensure all spell lists (default, archetype, creature) are populated from the XML data
+- [x] Refactor the game to load spells from the XML file at runtime, replacing hardcoded spell lists
+- [x] Refactor archetype/creature logic to reference spells by name (unique, case-insensitive) instead of object or ID
+- [x] Ensure all spell lists (default, archetype, creature) are populated from the XML data
 
 #### Task Group 4: Card Management Editor (CMX) Implementation
 - [ ] Create a dev-only GUI at /cmx for spell management (visible only in dev server)

@@ -21,6 +21,8 @@ export interface Spell {
   description: string;
   effects: SpellEffect[];
   imagePath: string;
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  list?: string | string[];
 }
 
 /**
@@ -29,7 +31,7 @@ export interface Spell {
 export interface SpellEffect {
   type: 'damage' | 'healing' | 'buff' | 'debuff' | 'control' | 'summon' | 'utility' | 'timeRewind' | 
         'delay' | 'confusion' | 'damageBonus' | 'defense' | 'spellEcho' | 
-        'manaRestore' | 'statModifier' | 'statusEffect';
+        'manaRestore' | 'statModifier' | 'statusEffect' | 'damageReduction';
   value: number;
   target: 'self' | 'enemy';
   element: ElementType;
@@ -42,7 +44,7 @@ export interface SpellEffect {
 export interface ActiveEffect {
   id?: string;
   name: string;
-  type: 'damage_over_time' | 'healing_over_time' | 'mana_drain' | 'mana_regen' | 'stun' | 'silence';
+  type: 'damage_over_time' | 'healing_over_time' | 'mana_drain' | 'mana_regen' | 'stun' | 'silence' | 'damageReduction' | 'buff';
   value: number;
   duration: number; // In turns
   remainingDuration: number; // Remaining turns for the effect

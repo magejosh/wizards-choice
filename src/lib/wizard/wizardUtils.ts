@@ -1,19 +1,30 @@
 // src/lib/wizard/wizardUtils.ts
 import { Wizard, Equipment } from '../types';
-import { getDefaultSpells } from '../spells/spellData';
+import { getAllSpells } from '../spells/spellData';
+
+function isSpell(spell: unknown): spell is import('../types').Spell {
+  return !!spell;
+}
 
 /**
- * Generates a default wizard with starting stats
+ * Generates a default wizard with starting stats (ASYNC)
  * @param name The name of the wizard
  * @returns A new wizard object with default stats
  */
-export function generateDefaultWizard(name: string): Wizard {
-  // Get default spells for the wizard
-  const defaultSpells = getDefaultSpells();
-
-  // Select the first 3 spells for the equipped spells
-  const equippedSpells = defaultSpells.slice(0, 3);
-
+export async function generateDefaultWizardAsync(name: string): Promise<Wizard> {
+  // Get all spells from XML
+  const allSpells = await getAllSpells();
+  // Always select the three intended starter spells by name
+  const starterNames = ["Firebolt", "Arcane Shield", "Minor Healing"];
+  const starterSpells = starterNames.map(n => allSpells.find(s => s.name === n)).filter(isSpell);
+  if (starterSpells.length !== 3) throw new Error("One or more starter spells missing from XML");
+  // Add two more random tier 1 spells (excluding the three core)
+  const tier1Spells = allSpells.filter(s => s.tier === 1 && !starterNames.includes(s.name));
+  const shuffled = tier1Spells.sort(() => Math.random() - 0.5);
+  const extraSpells = shuffled.slice(0, 2);
+  const defaultSpells: import('../types').Spell[] = [...starterSpells, ...extraSpells];
+  // Equipped spells are always the three core starter spells
+  const equippedSpells: import('../types').Spell[] = starterSpells;
   // Create a default deck
   const defaultDeckId = `deck_default_${Date.now()}`;
   const defaultDeck = {
@@ -23,7 +34,6 @@ export function generateDefaultWizard(name: string): Wizard {
     dateCreated: new Date().toISOString(),
     lastModified: new Date().toISOString()
   };
-
   return {
     id: `wizard_${Date.now()}`,
     name: name || 'Unnamed Wizard',

@@ -40,6 +40,9 @@ interface BattleArenaProps {
   onOpenBeltModal: () => void;
   onOpenRobesModal: () => void;
   enemyName?: string;
+  playerName?: string;
+  playerLevel?: number;
+  enemyLevel?: number;
 }
 
 const BattleArena: React.FC<BattleArenaProps> = ({
@@ -70,7 +73,10 @@ const BattleArena: React.FC<BattleArenaProps> = ({
   equippedSpellScrolls,
   onOpenBeltModal,
   onOpenRobesModal,
-  enemyName
+  enemyName,
+  playerName,
+  playerLevel,
+  enemyLevel
 }) => {
   // Track if we're on a mobile device
   const [isMobile, setIsMobile] = useState(false);
@@ -150,7 +156,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
           </div>
 
           <WizardStats
-            name="Your Wizard"
+            name={playerName || "Your Wizard"}
             currentHealth={playerHealth}
             maxHealth={playerMaxHealth}
             currentMana={playerMana}
@@ -276,7 +282,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
         <div className={styles.mainBattleArea}>
           <div className={styles.wizardInfo}>
             <WizardStats
-              name="Your Wizard"
+              name={playerName || "Your Wizard"}
               currentHealth={playerHealth}
               maxHealth={playerMaxHealth}
               currentMana={playerMana}

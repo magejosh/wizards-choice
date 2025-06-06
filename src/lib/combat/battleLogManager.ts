@@ -70,7 +70,7 @@ class BattleLogManager {
 
     // Check for potential duplicates
     if (this.isDuplicate(logEntry)) {
-      console.log(`[Battle Log] Prevented duplicate entry: ${entry.actor} ${entry.action}: ${entry.details}`);
+      // console.log(`[Battle Log] Prevented duplicate entry: ${entry.actor} ${entry.action}: ${entry.details}`);
       return logEntry; // Return the entry but don't add it to the log
     }
 
@@ -84,7 +84,7 @@ class BattleLogManager {
     this.lastEntryTimestamp = timestamp;
 
     // Log to console for debugging
-    console.log(`[Battle Log] Added: ${entry.actor} ${entry.action}: ${entry.details} (timestamp: ${timestamp}, sequence: ${sequence})`);
+    // console.log(`[Battle Log] Added: ${entry.actor} ${entry.action}: ${entry.details} (timestamp: ${timestamp}, sequence: ${sequence})`);
 
     return logEntry;
   }

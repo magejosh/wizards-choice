@@ -1,6 +1,35 @@
 # CHANGELOG
 
 ## 2025-04-05
+- **Done: Fixed Loot System Gold Application Bug**
+  - **Root Cause Fixed**: The `applyLoot` function was missing gold handling, causing loot errors when players tried to collect rewards after winning battles
+  - **Gold Integration**: Added proper gold application to the `applyLoot` function in `lootSystem.ts`
+  - **Error Resolution**: Fixed the "An error occurred while looting" message that appeared when players clicked the "Loot Enemy" button
+  - **Logging Added**: Enhanced loot application with detailed console logging for debugging
+  - **Benefits**: 
+    - ✅ Loot system now properly awards gold to players after battle victories
+    - ✅ No more error messages when looting defeated enemies
+    - ✅ All loot types (spells, equipment, ingredients, scrolls, gold) now work correctly
+    - ✅ Consistent reward system across all battle encounters
+
+## 2025-04-05
+- **Done: Standardized Combat Damage System and Fixed Damage Reduction**
+  - **Root Cause Fixed**: Multiple inconsistent damage calculation systems causing damage reduction to not work for mystic punch
+  - **New Standardized System**: Created `damageCalculationUtils.ts` with single source of truth for all damage calculations
+  - **Fixed Mystic Punch**: Now properly applies damage reduction, spell power bonuses, and difficulty modifiers
+  - **Fixed combatModule.ts Bug**: Corrected backwards damage reduction calculation (was adding instead of subtracting)
+  - **Unified All Damage Sources**: Spells, mystic punch, and DoT effects now use same standardized calculation
+  - **Created Game Mechanics Standard**: Comprehensive documentation defining consistent combat mechanics (`docs/game_mechanics_standard.md`)
+  - **Resolved Build Issues**: Fixed syntax errors in combatModule.ts that were preventing compilation
+  - **Deprecated Legacy Code**: Marked old inconsistent combat functions as deprecated in favor of standardized system
+  - **Benefits**: 
+    - ✅ Damage reduction now works for ALL damage sources
+    - ✅ Consistent behavior across entire combat system  
+    - ✅ Easy to add new mechanics without breaking existing ones
+    - ✅ Clear, documented game mechanics like a proper card game
+    - ✅ Build compiles successfully again
+
+## 2025-04-05
 - Refactoring Combat Logic Flow Continued
   - Fixing visual and backend logic errors
   - Ensuring proper state management and UI updates
@@ -533,3 +562,18 @@
 
 ## 2025-03-25
 - Done: Changed the market reset timer from 72 hours to 72 minutes. Updated all logic, types, mock data, and documentation to use minutes instead of days for the refresh interval. 
+
+## 2025-04-05
+- **Done: Fixed Critical Spell Execution Bug in Combat System**
+  - **Root Cause Fixed**: Spells were being queued during action phase but never executed during resolve phase
+  - **Missing Spell Resolution**: Added `resolveQueuedEffects` calls in `advancePhase` function when transitioning to resolve phase
+  - **Two Path Fix**: Fixed both direct action→resolve transition and response→resolve transition
+  - **Defensive Programming**: Added spell resolution for both code paths to ensure effects always get processed
+  - **Spell Queue Processing**: All queued spells and mystic punches now properly execute with mana costs, damage, and card removal
+  - **Benefits**: 
+    - ✅ Player spells now properly execute during resolve phase
+    - ✅ Mana costs are properly deducted when spells are cast
+    - ✅ Spell cards are properly removed from hand after casting
+    - ✅ All spell effects (damage, healing, buffs, debuffs) now work correctly
+    - ✅ No more "lost turns" where players queue spells but nothing happens
+    - ✅ Consistent behavior - every queued action now executes as expected

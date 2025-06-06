@@ -876,7 +876,8 @@ flowchart TD
     Start[Spell Creation/Editing] --> Validate[Validate XML Schema]
     Validate --> |Valid| SaveXML[Save to /public/data/spell_data.xml]
     Validate --> |Invalid| Error[Show Validation Error]
-    SaveXML --> AssignList[Assign List Membership]
+    SaveXML --> ClearCache[Clear Spell Cache]
+    ClearCache --> AssignList[Assign List Membership]
     AssignList --> |archetype| ArchetypeList[Add to Archetype Spell List]
     AssignList --> |creature| CreatureList[Add to Creature Spell List]
     AssignList --> |any| DefaultList[Add to Default Spell List]
@@ -887,6 +888,8 @@ flowchart TD
     Error --> Edit[Edit Spell Data]
     Edit --> Validate
 ```
+
+- After saving spell data, the spell cache must be cleared using `clearSpellCache` to ensure the game reloads the latest XML.
 
 - The spell data XML file is always located at `/public/data/spell_data.xml` in the project.
 - At runtime, it is loaded from `/data/spell_data.xml` (the URL path).

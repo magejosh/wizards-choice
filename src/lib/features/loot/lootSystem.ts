@@ -16,6 +16,7 @@ export interface LootDrop {
   ingredients: Ingredient[];
   scrolls: SpellScroll[];
   experience: number;
+  gold?: number;
 }
 
 /**
@@ -26,14 +27,14 @@ export interface LootDrop {
  * @param difficulty The game difficulty
  * @returns Loot drop containing spells, equipment, ingredients, and experience
  */
-export function generateLoot(
+export async function generateLoot(
   playerWizard: Wizard,
   enemyWizard: Wizard,
   isWizardEnemy: boolean = true,
   difficulty: 'easy' | 'normal' | 'hard' = 'normal'
-): LootDrop {
+): Promise<LootDrop> {
   // Generate spell loot
-  const spells = generateSpellLoot(playerWizard, enemyWizard, isWizardEnemy, difficulty);
+  const spells = await generateSpellLoot(playerWizard, enemyWizard, isWizardEnemy, difficulty);
 
   // Generate equipment loot
   const equipment = generateEquipmentLoot(playerWizard, enemyWizard, isWizardEnemy, difficulty);
@@ -46,13 +47,15 @@ export function generateLoot(
 
   // Set experience to 0 since we're using calculateExperienceGained in combatStatusManager.ts instead
   const experience = 0;
+  const goldAmount = calculateGoldReward(enemyWizard.level, isWizardEnemy, difficulty);
 
   return {
     spells,
     equipment,
     ingredients,
     scrolls,
-    experience
+    experience,
+    gold: goldAmount,
   };
 }
 
@@ -93,6 +96,33 @@ function calculateExperienceReward(
 }
 
 /**
+ * Calculate gold reward for defeating an enemy
+ * @param enemyLevel The level of the defeated enemy
+ * @param isWizardEnemy Whether the enemy was a wizard (true) or a magical creature (false)
+ * @param difficulty The game difficulty
+ * @returns Gold points rewarded
+ */
+function calculateGoldReward(
+  enemyLevel: number,
+  isWizardEnemy: boolean,
+  difficulty: 'easy' | 'normal' | 'hard'
+): number {
+  let baseGold = enemyLevel * 5; // Base gold
+  if (isWizardEnemy) {
+    baseGold *= 1.2;
+  }
+  switch (difficulty) {
+    case 'easy':
+      baseGold *= 1.2;
+      break;
+    case 'hard':
+      baseGold *= 0.8;
+      break;
+  }
+  return Math.floor(baseGold);
+}
+
+/**
  * Generates spell loot after defeating an enemy
  * @param playerWizard The player's wizard
  * @param enemyWizard The defeated enemy wizard
@@ -100,12 +130,12 @@ function calculateExperienceReward(
  * @param difficulty The game difficulty
  * @returns Array of spell loot
  */
-function generateSpellLoot(
+async function generateSpellLoot(
   playerWizard: Wizard,
   enemyWizard: Wizard,
   isWizardEnemy: boolean,
   difficulty: 'easy' | 'normal' | 'hard'
-): Spell[] {
+): Promise<Spell[]> {
   const lootSpells: Spell[] = [];
 
   // Determine number of spells to drop
@@ -160,7 +190,7 @@ function generateSpellLoot(
     // Get spells from appropriate tiers
     let availableSpells: Spell[] = [];
     for (let tier = 1; tier <= maxTier; tier++) {
-      availableSpells = [...availableSpells, ...getSpellsByTier(tier)];
+      availableSpells = [...availableSpells, ...(await getSpellsByTier(tier))];
     }
 
     // Filter out spells the player already has
@@ -472,6 +502,15 @@ export function applyLoot(playerWizard: Wizard, loot: LootDrop): Wizard {
     }
   }
 
+  // Add gold to wizard's total (if any)
+  const currentGold = playerWizard.gold || 0;
+  const lootGold = loot.gold || 0;
+  const updatedGold = currentGold + lootGold;
+
+  if (lootGold > 0) {
+    console.log(`Adding ${lootGold} gold to player (current: ${currentGold}, new total: ${updatedGold})`);
+  }
+
   console.log("Updated inventory:", updatedInventory);
   console.log("Updated ingredients:", updatedIngredients);
 
@@ -480,7 +519,8 @@ export function applyLoot(playerWizard: Wizard, loot: LootDrop): Wizard {
     ...playerWizard,
     spells: updatedSpells,
     inventory: updatedInventory,
-    ingredients: updatedIngredients
+    ingredients: updatedIngredients,
+    gold: updatedGold
   };
 
   // Recalculate stats after loot is applied

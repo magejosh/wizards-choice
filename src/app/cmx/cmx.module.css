@@ -1,0 +1,141 @@
+.cmxContainer {
+  background: linear-gradient(135deg, #2d1b4e 0%, #1a1a2e 100%);
+  color: #fff;
+  font-family: 'Raleway', sans-serif;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(106, 61, 232, 0.2);
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 1200px;
+}
+
+.cmxTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 2.2rem;
+  text-align: center;
+  color: #b38dff;
+  text-shadow: 0 0 10px rgba(179, 141, 255, 0.7), 0 0 20px rgba(179, 141, 255, 0.5);
+  margin-bottom: 1.5rem;
+  letter-spacing: 2px;
+}
+
+.cmxTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(58, 42, 94, 0.5);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.cmxTable th, .cmxTable td {
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #3a3a5c;
+  text-align: left;
+}
+
+.cmxTable th {
+  background: #2d1b4e;
+  color: #b38dff;
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+}
+
+.cmxTable th:nth-child(1), .cmxTable td:nth-child(1) { min-width: 120px; }
+.cmxTable th:nth-child(2), .cmxTable td:nth-child(2) { min-width: 120px; }
+.cmxTable th:nth-child(7), .cmxTable td:nth-child(7) { min-width: 60px; }
+.cmxTable th:nth-child(8), .cmxTable td:nth-child(8) { min-width: 100px; }
+.cmxTable th:nth-child(9), .cmxTable td:nth-child(9) { min-width: 90px; }
+
+.cmxTable tr:last-child td {
+  border-bottom: none;
+}
+
+.cmxButton {
+  background: linear-gradient(to bottom, #6a3de8, #5a2dd8);
+  color: white;
+  box-shadow: 0 5px 15px rgba(106, 61, 232, 0.3);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  border: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  margin-right: 8px;
+}
+.cmxButton:hover {
+  background: linear-gradient(to bottom, #7a4df8, #6a3de8);
+  box-shadow: 0 5px 15px rgba(106, 61, 232, 0.5), 0 0 10px rgba(106, 61, 232, 0.3);
+  transform: translateY(-2px);
+}
+
+.cmxButtonSecondary {
+  background: transparent;
+  color: #b38dff;
+  border: 1px solid #5a3a8e;
+}
+.cmxButtonSecondary:hover {
+  background: rgba(90, 58, 142, 0.2);
+  border-color: #8a5dff;
+  box-shadow: 0 0 10px rgba(138, 79, 255, 0.3);
+}
+
+.cmxInput, .cmxSelect, .cmxTextarea {
+  background: #2d1b4e;
+  color: #fff;
+  border: 1px solid #5a3a8e;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  margin-bottom: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Raleway', sans-serif;
+}
+.cmxInput:focus, .cmxSelect:focus, .cmxTextarea:focus {
+  outline: none;
+  border-color: #b38dff;
+  box-shadow: 0 0 8px #b38dff;
+}
+
+.cmxPromptOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cmxPromptBox {
+  background: linear-gradient(135deg, #2d1b4e 0%, #1a1a2e 100%);
+  border: 2px solid #8a4fff;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(138, 79, 255, 0.3);
+  padding: 2rem 2.5rem;
+  color: #fff;
+  min-width: 340px;
+  max-width: 90vw;
+  text-align: center;
+}
+.cmxPromptBox input {
+  margin: 0 8px;
+}
+.cmxDivider {
+  height: 2px;
+  background: linear-gradient(to right, transparent, #8a4fff, transparent);
+  margin: 1rem 0;
+  position: relative;
+}
+.cmxDivider::before {
+  content: '✧';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #8a4fff;
+  background-color: #2d1b4e;
+  padding: 0 10px;
+  font-size: 1rem;
+} 

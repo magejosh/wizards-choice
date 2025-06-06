@@ -193,8 +193,11 @@ function generateMagicalCreature(playerLevel: number, difficulty: 'easy' | 'norm
  * Generate a random enemy (either wizard or magical creature)
  */
 export function generateEnemy(playerLevel: number, difficulty: 'easy' | 'normal' | 'hard', theme?: string): Enemy {
-  // 70% chance for wizard, 30% chance for magical creature
-  const isWizard = Math.random() < 0.7;
+  // The chance of a magical creature starts at 30% and increases by 0.1 percentage points per level, capping at 50%
+  const baseCreatureChance = 0.3;
+  const maxCreatureChance = 0.5;
+  const creatureChance = Math.min(baseCreatureChance + 0.001 * (playerLevel - 1), maxCreatureChance);
+  const isWizard = Math.random() >= creatureChance;
   return isWizard ? generateEnemyWizard(playerLevel, difficulty, theme) : generateMagicalCreature(playerLevel, difficulty, theme);
 }
 

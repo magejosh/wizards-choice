@@ -5,6 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment, Stars, Text, OrbitControls } from '@react-three/drei';
 import SpellEffect3D from './effects/SpellEffect3D';
 import WizardModel from './WizardModel';
+import HexGrid from './HexGrid';
 import { Spell, ActiveEffect } from '../../lib/types/spell-types';
 import { CombatState, CombatLogEntry, CombatWizard } from '../../lib/types/combat-types';
 
@@ -190,12 +191,18 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
       {/* Battle platform */}
       <mesh position={[0, -0.5, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={1}>
         <circleGeometry args={[5, 32]} />
-        <meshStandardMaterial 
+        <meshStandardMaterial
           color={theme.colors.platform}
           metalness={0.7}
           roughness={0.2}
         />
       </mesh>
+
+      {/* Hexagonal battlefield overlay */}
+      {/* Slightly above the platform to avoid z-fighting */}
+      <group position={[0, -0.49, 0]}>
+        <HexGrid gridRadius={3} radius={1} height={0.2} />
+      </group>
       
       {/* Player wizard */}
       <WizardModel 

@@ -54,7 +54,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
     }),
     getThematicSpells: (level: number): Spell[] => {
       const spells: Spell[] = [];
-      const baseValue = 5 + level * 2;
+      const baseValue = 5 + level * 1.5;
       
       // Death Bolt
       spells.push({

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import RuneSequenceMinigame, { RuneGrade } from '../minigames/RuneSequenceMinigame';
 import { useGameStateStore, getWizard } from '../../lib/game-state/gameStateStore';
 import { PotionRecipe, Ingredient } from '../../lib/types';
 import { getCraftableRecipes, getDiscoveredRecipes } from '../../lib/features/potions/potionCrafting';
@@ -22,6 +23,8 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
   const [discoveredRecipes, setDiscoveredRecipes] = useState<PotionRecipe[]>([]);
   const [resultMessage, setResultMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [showMinigame, setShowMinigame] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'craft' | 'experiment' | null>(null);
 
   // Load recipes on component mount
   useEffect(() => {
@@ -91,8 +94,8 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
     );
   };
 
-  // Handle crafting a potion from a recipe
-  const handleCraftPotion = () => {
+  // Perform the craft action
+  const performCraftPotion = () => {
     if (!selectedRecipe) return;
 
     const result = craftPotion(selectedRecipe.id);
@@ -101,12 +104,19 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
 
     if (result.success) {
       // Update the craftable recipes list since we used ingredients
-      setCraftableRecipes(getCraftableRecipes(gameState.player));
+      setCraftableRecipes(getCraftableRecipes(getWizard()!));
     }
   };
 
-  // Handle experimenting with ingredients
-  const handleExperiment = () => {
+  // Handle crafting a potion (opens minigame first)
+  const handleCraftPotion = () => {
+    if (!selectedRecipe) return;
+    setPendingAction('craft');
+    setShowMinigame(true);
+  };
+
+  // Perform the experiment action
+  const performExperiment = () => {
     if (selectedIngredients.length < 2) {
       setResultMessage('You need at least 2 ingredients to experiment.');
       setIsSuccess(false);
@@ -120,9 +130,18 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
 
     // Update recipes and ingredients lists
     if (result.success) {
-      setCraftableRecipes(getCraftableRecipes(gameState.player));
-      setDiscoveredRecipes(getDiscoveredRecipes(gameState.player));
+      const updatedPlayer = getWizard();
+      if (updatedPlayer) {
+        setCraftableRecipes(getCraftableRecipes(updatedPlayer));
+        setDiscoveredRecipes(getDiscoveredRecipes(updatedPlayer));
+      }
     }
+  };
+
+  // Handle experimenting with ingredients (opens minigame)
+  const handleExperiment = () => {
+    setPendingAction('experiment');
+    setShowMinigame(true);
   };
 
   // Render recipe list for brewing
@@ -281,6 +300,28 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
           <div className={`${styles.potionCraftingResult} ${isSuccess ? styles.potionCraftingResultSuccess : styles.potionCraftingResultFailure}`}>
             {resultMessage}
           </div>
+        )}
+
+        {showMinigame && (
+          <RuneSequenceMinigame
+            sequenceLength={3}
+            onComplete={(grade: RuneGrade) => {
+              setShowMinigame(false);
+              if (pendingAction === 'craft') {
+                performCraftPotion();
+              } else if (pendingAction === 'experiment') {
+                performExperiment();
+              }
+              setPendingAction(null);
+              setResultMessage(prev =>
+                prev ? `${prev} (Rune ${grade})` : `Rune ${grade}`
+              );
+            }}
+            onCancel={() => {
+              setShowMinigame(false);
+              setPendingAction(null);
+            }}
+          />
         )}
       </div>
     </div>

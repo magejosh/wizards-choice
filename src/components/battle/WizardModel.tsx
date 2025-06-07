@@ -292,9 +292,9 @@ const WizardModel: React.FC<WizardModelProps> = ({
         <ambientLight intensity={0.8} />
         <primitive
           object={scene}
-          scale={[0.2, 0.2, 0.2]}
-          position={[0, -0.2, 0]}
-          rotation={[0, -Math.PI / 2, 0]}
+          scale={[1.17, 1.17, 1.17]}
+          position={[0, -0.25, 0]}
+          rotation={[0, Math.PI / 2, 0]}
         />
         <group position={[0, 2, 0]}>
           <mesh position={[0, 0, 0]}>

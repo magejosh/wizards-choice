@@ -358,6 +358,18 @@ The battle system provides an immersive 3D experience using Three.js via React T
 - **AXIOM 45**: Use consistent color themes and visual language across all spell effects.
 - **AXIOM 46**: Design visual effects to communicate gameplay information (damage type, effect strength).
 
+## Hex Grid System
+
+The battle arena uses a hexagonal grid as the basis for future tactical movement mechanics. The grid is generated in `HexGrid.tsx` and all entity positions are aligned to hex centers using utilities from `src/lib/utils/hexUtils.ts`.
+
+### Key Points
+1. Hex tiles use axial coordinates `(q, r)` with pointy-top orientation.
+2. `axialToWorld()` converts a tile coordinate to a Three.js world position.
+3. `snapToHexCenter()` snaps any world position to the nearest hex center for consistent placement.
+4. Player and enemy wizards start at `(-2, 0)` and `(2, 0)` respectively, leaving three empty tiles between them.
+
+This grid forms the foundation for a tactical movement system planned for future updates. All movement and range calculations will operate on these axial coordinates.
+
 ## Equipment System
 
 The equipment system allows players to customize their wizard with:

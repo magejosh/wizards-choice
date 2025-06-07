@@ -6,6 +6,7 @@ import { Environment, Stars, Text, OrbitControls } from '@react-three/drei';
 import SpellEffect3D from './effects/SpellEffect3D';
 import WizardModel from './WizardModel';
 import HexGrid, { TILE_COLORS } from './HexGrid';
+import { axialToWorld } from '@/lib/utils/hexUtils';
 import { Spell, ActiveEffect } from '../../lib/types/spell-types';
 import { CombatState, CombatLogEntry, CombatWizard } from '../../lib/types/combat-types';
 
@@ -213,16 +214,16 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
       </group>
       
       {/* Player wizard */}
-      <WizardModel 
-        position={[-2.5, 0, 0]} 
+      <WizardModel
+        position={axialToWorld({ q: -2, r: 0 })}
         color={theme.colors.primary.main}
         health={playerHealth / playerMaxHealth}
         isActive={combatState ? (combatState.isPlayerTurn && combatState.status === 'active') : true}
       />
       
       {/* Enemy wizard */}
-      <WizardModel 
-        position={[2.5, 0, 0]} 
+      <WizardModel
+        position={axialToWorld({ q: 2, r: 0 })}
         color={theme.colors.secondary.main}
         isEnemy={true}
         health={enemyHealth / enemyMaxHealth}

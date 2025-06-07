@@ -5,7 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment, Stars, Text, OrbitControls } from '@react-three/drei';
 import SpellEffect3D from './effects/SpellEffect3D';
 import WizardModel from './WizardModel';
-import HexGrid, { TILE_COLORS } from './HexGrid';
+import HexGrid from './HexGrid';
 import { Spell, ActiveEffect } from '../../lib/types/spell-types';
 import { CombatState, CombatLogEntry, CombatWizard } from '../../lib/types/combat-types';
 

@@ -23,12 +23,12 @@ export default function BattlePage() {
     
     // Check if we're coming from wizard's study (valid entry point)
     // The location should be 'duel' - this is set by the WizardStudy component when starting a duel
-    const { currentLocation } = gameState.gameProgress;
+    const currentLocation = gameState?.gameProgress?.currentLocation;
     
     console.log('Battle page initialization, current location:', currentLocation);
-    
+
     // Accept either 'duel' or 'wizardStudy' as valid entry points to prevent navigation issues
-    if (currentLocation !== 'duel' && currentLocation !== 'wizardStudy' && !isNavigatingAwayRef.current) {
+    if (!currentLocation || (currentLocation !== 'duel' && currentLocation !== 'wizardStudy') && !isNavigatingAwayRef.current) {
       console.log('Invalid navigation to battle page - redirecting to home');
       isNavigatingAwayRef.current = true;
       router.push('/');

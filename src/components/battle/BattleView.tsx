@@ -1394,6 +1394,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
             playerName={playerDisplayName}
             playerLevel={playerLevel}
             enemyLevel={enemyLevel}
+            combatState={combatState}
           />
 
           {/* Phase Tracker is now only in BattleArena component */}

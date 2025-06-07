@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment, Stars, Text, OrbitControls } from '@react-three/drei';
 import SpellEffect3D from './effects/SpellEffect3D';
@@ -214,23 +214,27 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
       </group>
       
       {/* Player wizard */}
-      <WizardModel
-        position={axialToWorld({ q: -2, r: 0 })}
-        color={theme.colors.primary.main}
-        health={playerHealth / playerMaxHealth}
-        isActive={combatState ? (combatState.isPlayerTurn && combatState.status === 'active') : true}
-      />
+      <Suspense fallback={null}>
+        <WizardModel
+          position={axialToWorld({ q: -2, r: 0 })}
+          color={theme.colors.primary.main}
+          health={playerHealth / playerMaxHealth}
+          isActive={combatState ? (combatState.isPlayerTurn && combatState.status === 'active') : true}
+        />
+      </Suspense>
       
       {/* Enemy wizard */}
-      <WizardModel
-        position={axialToWorld({ q: 2, r: 0 })}
-        color={theme.colors.secondary.main}
-        isEnemy={true}
-        health={enemyHealth / enemyMaxHealth}
-        isActive={combatState ? (!combatState.isPlayerTurn && combatState.status === 'active') : false}
-        enemyVariant={Math.round(Math.random()) as 0 | 1}
-        modelPath={combatState?.enemyWizard.wizard.modelPath}
-      />
+      <Suspense fallback={null}>
+        <WizardModel
+          position={axialToWorld({ q: 2, r: 0 })}
+          color={theme.colors.secondary.main}
+          isEnemy={true}
+          health={enemyHealth / enemyMaxHealth}
+          isActive={combatState ? (!combatState.isPlayerTurn && combatState.status === 'active') : false}
+          enemyVariant={Math.round(Math.random()) as 0 | 1}
+          modelPath={combatState?.enemyWizard.wizard.modelPath}
+        />
+      </Suspense>
       
       {/* Render active spell effects - adjusted for tighter view */}
       {activeEffects.map((effect, index) => (
@@ -307,7 +311,9 @@ const BattleScene: React.FC<BattleSceneProps> = (props) => {
       camera={{ position: cameraPosition, fov: fov }}
       style={{ width: '100%', height: '100%' }}
     >
-      <BattleSceneContent {...props} isMobile={isMobile} />
+      <Suspense fallback={null}>
+        <BattleSceneContent {...props} isMobile={isMobile} />
+      </Suspense>
     </Canvas>
   );
 };

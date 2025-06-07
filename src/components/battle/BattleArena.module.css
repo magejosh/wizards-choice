@@ -885,3 +885,14 @@
   50% { transform: translateY(-10px); }
   100% { transform: translateY(0); }
 }
+
+.wizard-level {
+  font-family: 'Cinzel', serif !important;
+  color: #b38dff !important;
+  text-shadow: 0 0 8px #9370DB, 0 0 16px #b38dff99 !important;
+  font-size: 1.1em;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  margin-left: 2px;
+  margin-right: 2px;
+}

@@ -54,7 +54,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
     }),
     getThematicSpells: (level: number): Spell[] => {
       const spells: Spell[] = [];
-      const baseValue = 15 + level * 2;
+      const baseValue = 5 + level * 1.5;
       
       // Death Bolt
       spells.push({
@@ -147,7 +147,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
     }),
     getThematicSpells: (level: number): Spell[] => {
       const spells: Spell[] = [];
-      const baseValue = 15 + level * 2;
+      const baseValue = 5 + level * 1.5;
       
       // Time Stop
       spells.push({
@@ -230,7 +230,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
     }),
     getThematicSpells: (level: number): Spell[] => {
       const spells: Spell[] = [];
-      const baseValue = 15 + level * 2;
+      const baseValue = 5 + level * 1.5;
       
       // Blade Storm
       spells.push({
@@ -319,7 +319,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
     }),
     getThematicSpells: (level: number): Spell[] => {
       const spells: Spell[] = [];
-      const baseValue = 15 + level * 2;
+      const baseValue = 5 + level * 1.5;
       
       // Confusion
       spells.push({
@@ -401,7 +401,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
     }),
     getThematicSpells: (level: number): Spell[] => {
       const spells: Spell[] = [];
-      const baseValue = 15 + level * 2;
+      const baseValue = 5 + level * 1.5;
       
       // Acid Splash
       spells.push({

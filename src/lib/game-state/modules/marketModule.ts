@@ -5,7 +5,7 @@ import { MarketLocation, MarketData, MarketTransaction, MarketItem, MarketInvent
 import { Equipment, Ingredient, Potion } from '../../types/equipment-types';
 import { SpellScroll, Spell } from '../../types/spell-types';
 import { Wizard } from '../../types/wizard-types';
-import { generateDefaultWizard } from '../../wizard/wizardUtils';
+import { generateDefaultWizardAsync } from '../../wizard/wizardUtils';
 import { refreshMarketInventory as importedRefreshMarketInventory } from '../../features/market/marketSystem';
 import { getWizard, updateWizard, updateGameProgress } from '../gameStateStore';
 import { generateProceduralEquipment } from '../../features/procedural/equipmentGenerator';
@@ -33,7 +33,7 @@ export interface MarketActions {
   updateMarketPrices: (marketId: string) => void;
   buyItem: (marketId: string, itemType: 'ingredient' | 'potion' | 'equipment' | 'scroll', itemId: string, quantity: number) => { success: boolean; message: string };
   sellItem: (marketId: string, itemType: 'ingredient' | 'potion' | 'equipment' | 'scroll', itemId: string, quantity: number) => { success: boolean; message: string };
-  checkForMarketAttack: (marketId: string) => { attacked: boolean; attacker: Wizard | null };
+  checkForMarketAttack: (marketId: string) => Promise<{ attacked: boolean; attacker: Wizard | null }>;
   handleMarketAttackResult: (result: 'win' | 'lose' | 'flee') => void;
 }
 
@@ -119,14 +119,41 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
     // Update the game progress data
     updateGameProgress(gameProgress => {
       if (!gameProgress) return gameProgress;
-
-      // Create a new playerStats object with updated gold earned
+      const ps = gameProgress.playerStats;
+      if (!ps) return gameProgress;
       const updatedPlayerStats = {
-        ...gameProgress.playerStats,
-        goldEarned: (gameProgress.playerStats?.goldEarned || 0) + amount
+        ...ps,
+        goldEarned: (ps.goldEarned !== undefined ? ps.goldEarned : 0) + amount,
+        battlesTotal: ps.battlesTotal !== undefined ? ps.battlesTotal : 0,
+        battlesWon: ps.battlesWon !== undefined ? ps.battlesWon : 0,
+        battlesLost: ps.battlesLost !== undefined ? ps.battlesLost : 0,
+        damageDealt: ps.damageDealt !== undefined ? ps.damageDealt : 0,
+        damageReceived: ps.damageReceived !== undefined ? ps.damageReceived : 0,
+        healingDone: ps.healingDone !== undefined ? ps.healingDone : 0,
+        criticalHitsLanded: ps.criticalHitsLanded !== undefined ? ps.criticalHitsLanded : 0,
+        criticalHitsReceived: ps.criticalHitsReceived !== undefined ? ps.criticalHitsReceived : 0,
+        spellsCast: ps.spellsCast || { total: 0, byType: {}, byElement: {} },
+        mysticPunchesUsed: ps.mysticPunchesUsed !== undefined ? ps.mysticPunchesUsed : 0,
+        totalTurns: ps.totalTurns !== undefined ? ps.totalTurns : 0,
+        longestBattle: ps.longestBattle !== undefined ? ps.longestBattle : 0,
+        shortestVictory: ps.shortestVictory !== undefined ? ps.shortestVictory : 0,
+        flawlessVictories: ps.flawlessVictories !== undefined ? ps.flawlessVictories : 0,
+        totalExperienceGained: ps.totalExperienceGained !== undefined ? ps.totalExperienceGained : 0,
+        goldSpent: ps.goldSpent !== undefined ? ps.goldSpent : 0,
+        levelsGained: ps.levelsGained !== undefined ? ps.levelsGained : 0,
+        skillPointsSpent: ps.skillPointsSpent !== undefined ? ps.skillPointsSpent : 0,
+        spellsAcquired: ps.spellsAcquired !== undefined ? ps.spellsAcquired : 0,
+        equipmentCollected: ps.equipmentCollected !== undefined ? ps.equipmentCollected : 0,
+        potionsCrafted: ps.potionsCrafted !== undefined ? ps.potionsCrafted : 0,
+        ingredientsGathered: ps.ingredientsGathered !== undefined ? ps.ingredientsGathered : 0,
+        recipesDiscovered: ps.recipesDiscovered !== undefined ? ps.recipesDiscovered : 0,
+        scrollsUsed: ps.scrollsUsed !== undefined ? ps.scrollsUsed : 0,
+        damagePerMana: ps.damagePerMana !== undefined ? ps.damagePerMana : 0,
+        averageTurnsPerVictory: ps.averageTurnsPerVictory !== undefined ? ps.averageTurnsPerVictory : 0,
+        goldPerBattle: ps.goldPerBattle !== undefined ? ps.goldPerBattle : 0,
+        experiencePerBattle: ps.experiencePerBattle !== undefined ? ps.experiencePerBattle : 0,
+        elementalDamage: ps.elementalDamage || { fire: 0, water: 0, earth: 0, air: 0, arcane: 0, nature: 0, shadow: 0, light: 0 }
       };
-
-      // Return the updated game progress
       return {
         ...gameProgress,
         playerStats: updatedPlayerStats
@@ -155,14 +182,40 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
     // Update the game progress data
     updateGameProgress(gameProgress => {
       if (!gameProgress) return gameProgress;
-
-      // Create a new playerStats object with updated gold spent
+      const ps = gameProgress.playerStats;
+      if (!ps) return gameProgress;
       const updatedPlayerStats = {
-        ...gameProgress.playerStats,
-        goldSpent: (gameProgress.playerStats?.goldSpent || 0) + amount
+        ...ps,
+        goldSpent: (ps.goldSpent !== undefined ? ps.goldSpent : 0) + amount,
+        battlesTotal: ps.battlesTotal !== undefined ? ps.battlesTotal : 0,
+        battlesWon: ps.battlesWon !== undefined ? ps.battlesWon : 0,
+        battlesLost: ps.battlesLost !== undefined ? ps.battlesLost : 0,
+        damageDealt: ps.damageDealt !== undefined ? ps.damageDealt : 0,
+        damageReceived: ps.damageReceived !== undefined ? ps.damageReceived : 0,
+        healingDone: ps.healingDone !== undefined ? ps.healingDone : 0,
+        criticalHitsLanded: ps.criticalHitsLanded !== undefined ? ps.criticalHitsLanded : 0,
+        criticalHitsReceived: ps.criticalHitsReceived !== undefined ? ps.criticalHitsReceived : 0,
+        spellsCast: ps.spellsCast || { total: 0, byType: {}, byElement: {} },
+        mysticPunchesUsed: ps.mysticPunchesUsed !== undefined ? ps.mysticPunchesUsed : 0,
+        totalTurns: ps.totalTurns !== undefined ? ps.totalTurns : 0,
+        longestBattle: ps.longestBattle !== undefined ? ps.longestBattle : 0,
+        shortestVictory: ps.shortestVictory !== undefined ? ps.shortestVictory : 0,
+        flawlessVictories: ps.flawlessVictories !== undefined ? ps.flawlessVictories : 0,
+        totalExperienceGained: ps.totalExperienceGained !== undefined ? ps.totalExperienceGained : 0,
+        levelsGained: ps.levelsGained !== undefined ? ps.levelsGained : 0,
+        skillPointsSpent: ps.skillPointsSpent !== undefined ? ps.skillPointsSpent : 0,
+        spellsAcquired: ps.spellsAcquired !== undefined ? ps.spellsAcquired : 0,
+        equipmentCollected: ps.equipmentCollected !== undefined ? ps.equipmentCollected : 0,
+        potionsCrafted: ps.potionsCrafted !== undefined ? ps.potionsCrafted : 0,
+        ingredientsGathered: ps.ingredientsGathered !== undefined ? ps.ingredientsGathered : 0,
+        recipesDiscovered: ps.recipesDiscovered !== undefined ? ps.recipesDiscovered : 0,
+        scrollsUsed: ps.scrollsUsed !== undefined ? ps.scrollsUsed : 0,
+        damagePerMana: ps.damagePerMana !== undefined ? ps.damagePerMana : 0,
+        averageTurnsPerVictory: ps.averageTurnsPerVictory !== undefined ? ps.averageTurnsPerVictory : 0,
+        goldPerBattle: ps.goldPerBattle !== undefined ? ps.goldPerBattle : 0,
+        experiencePerBattle: ps.experiencePerBattle !== undefined ? ps.experiencePerBattle : 0,
+        elementalDamage: ps.elementalDamage || { fire: 0, water: 0, earth: 0, air: 0, arcane: 0, nature: 0, shadow: 0, light: 0 }
       };
-
-      // Return the updated game progress
       return {
         ...gameProgress,
         playerStats: updatedPlayerStats
@@ -1003,12 +1056,11 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
     };
   },
 
-  checkForMarketAttack: (marketId) => {
+  checkForMarketAttack: async (marketId) => {
     const market = get().getMarketById(marketId);
     if (!market) {
       return { attacked: false, attacker: null };
     }
-
     // Set attack chance based on difficulty
     let attackChance = 0.05; // default to 5%
     const difficulty = get().gameState.settings.difficulty;
@@ -1019,7 +1071,6 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
     } else if (difficulty === 'hard') {
       attackChance = 0.5; // 50%
     }
-
     // Roll for attack
     const roll = Math.random();
     if (roll <= attackChance) {
@@ -1028,20 +1079,15 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
       if (!player) {
         return { attacked: false, attacker: null };
       }
-
       // Generate an attacker based on player level
       const playerLevel = player.level;
       const attackerLevel = Math.max(1, Math.floor(playerLevel * 0.8));
-
       // Generate a bandit/thief wizard with appropriate level
-      const attackerWizard = generateDefaultWizard('Market Bandit');
-
+      const attackerWizard = await generateDefaultWizardAsync('Market Bandit');
       // Manually set the attacker's level
       attackerWizard.level = attackerLevel;
-
       return { attacked: true, attacker: attackerWizard };
     }
-
     return { attacked: false, attacker: null };
   },
 
@@ -1056,12 +1102,41 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
         // Update player stats
         updateGameProgress(gameProgress => {
           if (!gameProgress) return gameProgress;
-
+          const ps = gameProgress.playerStats;
+          if (!ps) return gameProgress;
           const updatedPlayerStats = {
-            ...gameProgress.playerStats,
-            marketAttacksWon: (gameProgress.playerStats?.marketAttacksWon || 0) + 1
+            ...ps,
+            goldEarned: (ps.goldEarned !== undefined ? ps.goldEarned : 0) + goldReward,
+            battlesTotal: ps.battlesTotal !== undefined ? ps.battlesTotal : 0,
+            battlesWon: ps.battlesWon !== undefined ? ps.battlesWon : 0,
+            battlesLost: ps.battlesLost !== undefined ? ps.battlesLost : 0,
+            damageDealt: ps.damageDealt !== undefined ? ps.damageDealt : 0,
+            damageReceived: ps.damageReceived !== undefined ? ps.damageReceived : 0,
+            healingDone: ps.healingDone !== undefined ? ps.healingDone : 0,
+            criticalHitsLanded: ps.criticalHitsLanded !== undefined ? ps.criticalHitsLanded : 0,
+            criticalHitsReceived: ps.criticalHitsReceived !== undefined ? ps.criticalHitsReceived : 0,
+            spellsCast: ps.spellsCast || { total: 0, byType: {}, byElement: {} },
+            mysticPunchesUsed: ps.mysticPunchesUsed !== undefined ? ps.mysticPunchesUsed : 0,
+            totalTurns: ps.totalTurns !== undefined ? ps.totalTurns : 0,
+            longestBattle: ps.longestBattle !== undefined ? ps.longestBattle : 0,
+            shortestVictory: ps.shortestVictory !== undefined ? ps.shortestVictory : 0,
+            flawlessVictories: ps.flawlessVictories !== undefined ? ps.flawlessVictories : 0,
+            totalExperienceGained: ps.totalExperienceGained !== undefined ? ps.totalExperienceGained : 0,
+            goldSpent: ps.goldSpent !== undefined ? ps.goldSpent : 0,
+            levelsGained: ps.levelsGained !== undefined ? ps.levelsGained : 0,
+            skillPointsSpent: ps.skillPointsSpent !== undefined ? ps.skillPointsSpent : 0,
+            spellsAcquired: ps.spellsAcquired !== undefined ? ps.spellsAcquired : 0,
+            equipmentCollected: ps.equipmentCollected !== undefined ? ps.equipmentCollected : 0,
+            potionsCrafted: ps.potionsCrafted !== undefined ? ps.potionsCrafted : 0,
+            ingredientsGathered: ps.ingredientsGathered !== undefined ? ps.ingredientsGathered : 0,
+            recipesDiscovered: ps.recipesDiscovered !== undefined ? ps.recipesDiscovered : 0,
+            scrollsUsed: ps.scrollsUsed !== undefined ? ps.scrollsUsed : 0,
+            damagePerMana: ps.damagePerMana !== undefined ? ps.damagePerMana : 0,
+            averageTurnsPerVictory: ps.averageTurnsPerVictory !== undefined ? ps.averageTurnsPerVictory : 0,
+            goldPerBattle: ps.goldPerBattle !== undefined ? ps.goldPerBattle : 0,
+            experiencePerBattle: ps.experiencePerBattle !== undefined ? ps.experiencePerBattle : 0,
+            elementalDamage: ps.elementalDamage || { fire: 0, water: 0, earth: 0, air: 0, arcane: 0, nature: 0, shadow: 0, light: 0 }
           };
-
           return {
             ...gameProgress,
             playerStats: updatedPlayerStats
@@ -1077,12 +1152,41 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
         // Update player stats
         updateGameProgress(gameProgress => {
           if (!gameProgress) return gameProgress;
-
+          const ps = gameProgress.playerStats;
+          if (!ps) return gameProgress;
           const updatedPlayerStats = {
-            ...gameProgress.playerStats,
-            marketAttacksLost: (gameProgress.playerStats?.marketAttacksLost || 0) + 1
+            ...ps,
+            goldEarned: (ps.goldEarned !== undefined ? ps.goldEarned : 0) - goldLoss,
+            goldSpent: (ps.goldSpent !== undefined ? ps.goldSpent : 0) + goldLoss,
+            battlesTotal: ps.battlesTotal !== undefined ? ps.battlesTotal : 0,
+            battlesWon: ps.battlesWon !== undefined ? ps.battlesWon : 0,
+            battlesLost: ps.battlesLost !== undefined ? ps.battlesLost : 0,
+            damageDealt: ps.damageDealt !== undefined ? ps.damageDealt : 0,
+            damageReceived: ps.damageReceived !== undefined ? ps.damageReceived : 0,
+            healingDone: ps.healingDone !== undefined ? ps.healingDone : 0,
+            criticalHitsLanded: ps.criticalHitsLanded !== undefined ? ps.criticalHitsLanded : 0,
+            criticalHitsReceived: ps.criticalHitsReceived !== undefined ? ps.criticalHitsReceived : 0,
+            spellsCast: ps.spellsCast || { total: 0, byType: {}, byElement: {} },
+            mysticPunchesUsed: ps.mysticPunchesUsed !== undefined ? ps.mysticPunchesUsed : 0,
+            totalTurns: ps.totalTurns !== undefined ? ps.totalTurns : 0,
+            longestBattle: ps.longestBattle !== undefined ? ps.longestBattle : 0,
+            shortestVictory: ps.shortestVictory !== undefined ? ps.shortestVictory : 0,
+            flawlessVictories: ps.flawlessVictories !== undefined ? ps.flawlessVictories : 0,
+            totalExperienceGained: ps.totalExperienceGained !== undefined ? ps.totalExperienceGained : 0,
+            levelsGained: ps.levelsGained !== undefined ? ps.levelsGained : 0,
+            skillPointsSpent: ps.skillPointsSpent !== undefined ? ps.skillPointsSpent : 0,
+            spellsAcquired: ps.spellsAcquired !== undefined ? ps.spellsAcquired : 0,
+            equipmentCollected: ps.equipmentCollected !== undefined ? ps.equipmentCollected : 0,
+            potionsCrafted: ps.potionsCrafted !== undefined ? ps.potionsCrafted : 0,
+            ingredientsGathered: ps.ingredientsGathered !== undefined ? ps.ingredientsGathered : 0,
+            recipesDiscovered: ps.recipesDiscovered !== undefined ? ps.recipesDiscovered : 0,
+            scrollsUsed: ps.scrollsUsed !== undefined ? ps.scrollsUsed : 0,
+            damagePerMana: ps.damagePerMana !== undefined ? ps.damagePerMana : 0,
+            averageTurnsPerVictory: ps.averageTurnsPerVictory !== undefined ? ps.averageTurnsPerVictory : 0,
+            goldPerBattle: ps.goldPerBattle !== undefined ? ps.goldPerBattle : 0,
+            experiencePerBattle: ps.experiencePerBattle !== undefined ? ps.experiencePerBattle : 0,
+            elementalDamage: ps.elementalDamage || { fire: 0, water: 0, earth: 0, air: 0, arcane: 0, nature: 0, shadow: 0, light: 0 }
           };
-
           return {
             ...gameProgress,
             playerStats: updatedPlayerStats
@@ -1098,12 +1202,41 @@ export const createMarketModule = (set: Function, get: Function): MarketActions 
         // Update player stats
         updateGameProgress(gameProgress => {
           if (!gameProgress) return gameProgress;
-
+          const ps = gameProgress.playerStats;
+          if (!ps) return gameProgress;
           const updatedPlayerStats = {
-            ...gameProgress.playerStats,
-            marketAttacksFled: (gameProgress.playerStats?.marketAttacksFled || 0) + 1
+            ...ps,
+            goldEarned: (ps.goldEarned !== undefined ? ps.goldEarned : 0) - fleeGoldLoss,
+            goldSpent: (ps.goldSpent !== undefined ? ps.goldSpent : 0) + fleeGoldLoss,
+            battlesTotal: ps.battlesTotal !== undefined ? ps.battlesTotal : 0,
+            battlesWon: ps.battlesWon !== undefined ? ps.battlesWon : 0,
+            battlesLost: ps.battlesLost !== undefined ? ps.battlesLost : 0,
+            damageDealt: ps.damageDealt !== undefined ? ps.damageDealt : 0,
+            damageReceived: ps.damageReceived !== undefined ? ps.damageReceived : 0,
+            healingDone: ps.healingDone !== undefined ? ps.healingDone : 0,
+            criticalHitsLanded: ps.criticalHitsLanded !== undefined ? ps.criticalHitsLanded : 0,
+            criticalHitsReceived: ps.criticalHitsReceived !== undefined ? ps.criticalHitsReceived : 0,
+            spellsCast: ps.spellsCast || { total: 0, byType: {}, byElement: {} },
+            mysticPunchesUsed: ps.mysticPunchesUsed !== undefined ? ps.mysticPunchesUsed : 0,
+            totalTurns: ps.totalTurns !== undefined ? ps.totalTurns : 0,
+            longestBattle: ps.longestBattle !== undefined ? ps.longestBattle : 0,
+            shortestVictory: ps.shortestVictory !== undefined ? ps.shortestVictory : 0,
+            flawlessVictories: ps.flawlessVictories !== undefined ? ps.flawlessVictories : 0,
+            totalExperienceGained: ps.totalExperienceGained !== undefined ? ps.totalExperienceGained : 0,
+            levelsGained: ps.levelsGained !== undefined ? ps.levelsGained : 0,
+            skillPointsSpent: ps.skillPointsSpent !== undefined ? ps.skillPointsSpent : 0,
+            spellsAcquired: ps.spellsAcquired !== undefined ? ps.spellsAcquired : 0,
+            equipmentCollected: ps.equipmentCollected !== undefined ? ps.equipmentCollected : 0,
+            potionsCrafted: ps.potionsCrafted !== undefined ? ps.potionsCrafted : 0,
+            ingredientsGathered: ps.ingredientsGathered !== undefined ? ps.ingredientsGathered : 0,
+            recipesDiscovered: ps.recipesDiscovered !== undefined ? ps.recipesDiscovered : 0,
+            scrollsUsed: ps.scrollsUsed !== undefined ? ps.scrollsUsed : 0,
+            damagePerMana: ps.damagePerMana !== undefined ? ps.damagePerMana : 0,
+            averageTurnsPerVictory: ps.averageTurnsPerVictory !== undefined ? ps.averageTurnsPerVictory : 0,
+            goldPerBattle: ps.goldPerBattle !== undefined ? ps.goldPerBattle : 0,
+            experiencePerBattle: ps.experiencePerBattle !== undefined ? ps.experiencePerBattle : 0,
+            elementalDamage: ps.elementalDamage || { fire: 0, water: 0, earth: 0, air: 0, arcane: 0, nature: 0, shadow: 0, light: 0 }
           };
-
           return {
             ...gameProgress,
             playerStats: updatedPlayerStats

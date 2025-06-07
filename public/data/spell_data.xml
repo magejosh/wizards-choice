@@ -1,0 +1,1052 @@
+<spells>
+  <spell id="spell_firebolt_mar51ero" name="Firebolt" type="damage" element="fire" tier="1" manaCost="25" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Launches a bolt of fire at your enemy, dealing direct damage.</description>
+    <effects>
+      <effect type="damage" value="20" target="enemy" element="fire"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_arcane_shield_mar51ero" name="Arcane Shield" type="buff" element="arcane" tier="1" manaCost="30" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Creates a magical shield that reduces incoming damage for 5 turns.</description>
+    <effects>
+      <effect type="damageReduction" value="-5" target="self" element="arcane" duration="5"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_minor_healing_mar51ero" name="Minor Healing" type="healing" element="water" tier="1" manaCost="25" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Heals some of your health.</description>
+    <effects>
+      <effect type="healing" value="15" target="self" element="water"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_frost_ray_mar51ero" name="Frost Ray" type="damage" element="water" tier="1" manaCost="25" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Shoots a beam of frost that deals damage and may slow the enemy.</description>
+    <effects>
+      <effect type="damage" value="17" target="enemy" element="water"/>
+      <effect type="debuff" value="-2" target="enemy" element="water" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_arcane_blast_mar51ero" name="Arcane Blast" type="damage" element="arcane" tier="1" manaCost="30" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Releases a burst of pure arcane energy.</description>
+    <effects>
+      <effect type="damage" value="25" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_nature&apos;s_touch_mar51ero" name="Nature&apos;s Touch" type="healing" element="earth" tier="1" manaCost="30" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Channels the power of nature to restore health over time.</description>
+    <effects>
+      <effect type="healing" value="10" target="self" element="earth"/>
+      <effect type="statusEffect" value="5" target="self" element="earth" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_shadow_strike_mar51ero" name="Shadow Strike" type="damage" element="arcane" tier="1" manaCost="20" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>A quick strike from the shadows that deals moderate damage.</description>
+    <effects>
+      <effect type="damage" value="15" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_lightning_jolt_mar51ero" name="Lightning Jolt" type="damage" element="air" tier="1" manaCost="20" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>A quick bolt of lightning that deals damage.</description>
+    <effects>
+      <effect type="damage" value="18" target="enemy" element="air"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_earth_tremor_mar51erp" name="Earth Tremor" type="damage" element="earth" tier="1" manaCost="35" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Creates a small earthquake that damages the enemy.</description>
+    <effects>
+      <effect type="damage" value="22" target="enemy" element="earth"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_mystic_insight_mar51erp" name="Mystic Insight" type="buff" element="arcane" tier="1" manaCost="20" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Grants mystical insight, increasing spell power for a short time.</description>
+    <effects>
+      <effect type="statModifier" value="5" target="self" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_fireball_mar51erp" name="Fireball" type="damage" element="fire" tier="2" manaCost="40" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Hurls a ball of fire that explodes on impact, dealing area damage.</description>
+    <effects>
+      <effect type="damage" value="35" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="5" target="enemy" element="fire" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_ice_barrier_mar51erp" name="Ice Barrier" type="buff" element="water" tier="2" manaCost="35" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Creates a barrier of ice that reduces damage and may freeze attackers.</description>
+    <effects>
+      <effect type="statModifier" value="-10" target="self" element="water" duration="3"/>
+      <effect type="statusEffect" value="5" target="self" element="water" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_rejuvenation_mar51erp" name="Rejuvenation" type="healing" element="earth" tier="2" manaCost="45" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>A powerful healing spell that restores health and provides healing over time.</description>
+    <effects>
+      <effect type="healing" value="25" target="self" element="earth"/>
+      <effect type="statusEffect" value="8" target="self" element="earth" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_arcane_armory_mar51erp" name="Arcane Armory" type="buff" element="arcane" tier="2" manaCost="40" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Surrounds the caster with arcane weapons that boost attack power and defense.</description>
+    <effects>
+      <effect type="statModifier" value="8" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="-5" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_wind_blast_mar51erp" name="Wind Blast" type="damage" element="air" tier="2" manaCost="35" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Summons a powerful gust of wind that damages and pushes back the enemy.</description>
+    <effects>
+      <effect type="damage" value="30" target="enemy" element="air"/>
+      <effect type="statModifier" value="-3" target="enemy" element="air" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_venom_spray_mar51erp" name="Venom Spray" type="dot" element="earth" tier="2" manaCost="38" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Sprays toxic venom that poisons the enemy, dealing damage over time.</description>
+    <effects>
+      <effect type="damage" value="15" target="enemy" element="earth"/>
+      <effect type="statusEffect" value="10" target="enemy" element="earth" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_thunderclasp_mar51erp" name="Thunderclasp" type="damage" element="air" tier="2" manaCost="42" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Calls down a thunderous boom that deals heavy damage and may stun the enemy.</description>
+    <effects>
+      <effect type="damage" value="40" target="enemy" element="air"/>
+      <effect type="statusEffect" value="-1" target="enemy" element="air" duration="1"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_earth_shield_mar51erp" name="Earth Shield" type="buff" element="earth" tier="2" manaCost="40" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Creates a shield of stone and earth that significantly reduces incoming damage.</description>
+    <effects>
+      <effect type="statModifier" value="-15" target="self" element="earth" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_lifedrain_mar51erp" name="Lifedrain" type="damage" element="arcane" tier="2" manaCost="45" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Drains life force from the enemy, healing the caster by half the damage dealt.</description>
+    <effects>
+      <effect type="damage" value="30" target="enemy" element="arcane"/>
+      <effect type="healing" value="15" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_mana_steal_mar51erp" name="Mana Steal" type="damage" element="arcane" tier="2" manaCost="35" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Drains magical energy from the enemy, restoring mana to the caster.</description>
+    <effects>
+      <effect type="damage" value="25" target="enemy" element="arcane"/>
+      <effect type="manaRestore" value="15" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_inferno_mar51erp" name="Inferno" type="damage" element="fire" tier="3" manaCost="60" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Engulfs the area in flames, causing massive fire damage and lingering burns.</description>
+    <effects>
+      <effect type="damage" value="50" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="10" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_frost_nova_mar51erp" name="Frost Nova" type="damage" element="water" tier="3" manaCost="55" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Releases a freezing wave that damages enemies and significantly reduces their action speed.</description>
+    <effects>
+      <effect type="damage" value="40" target="enemy" element="water"/>
+      <effect type="statModifier" value="-5" target="enemy" element="water" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_nature&apos;s_blessing_mar51erp" name="Nature&apos;s Blessing" type="healing" element="earth" tier="3" manaCost="65" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Channels the full power of nature to provide substantial healing and restoration over time.</description>
+    <effects>
+      <effect type="healing" value="45" target="self" element="earth"/>
+      <effect type="statusEffect" value="12" target="self" element="earth" duration="3"/>
+      <effect type="manaRestore" value="10" target="self" element="earth"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_arcane_surge_mar51erp" name="Arcane Surge" type="damage" element="arcane" tier="3" manaCost="60" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Channels pure arcane energy into a devastating blast that ignores magical defenses.</description>
+    <effects>
+      <effect type="damage" value="60" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_hurricane_mar51erp" name="Hurricane" type="damage" element="air" tier="3" manaCost="58" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Summons a violent storm that deals damage over multiple turns and reduces enemy effectiveness.</description>
+    <effects>
+      <effect type="damage" value="35" target="enemy" element="air"/>
+      <effect type="statusEffect" value="15" target="enemy" element="air" duration="4"/>
+      <effect type="statModifier" value="-3" target="enemy" element="air" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_earthquake_mar51erp" name="Earthquake" type="damage" element="earth" tier="3" manaCost="55" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Triggers a massive earthquake that deals substantial damage and destabilizes the enemy.</description>
+    <effects>
+      <effect type="damage" value="55" target="enemy" element="earth"/>
+      <effect type="statModifier" value="-4" target="enemy" element="earth" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_shadow_form_mar51erp" name="Shadow Form" type="buff" element="arcane" tier="3" manaCost="50" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Transforms the caster into living shadow, increasing evasion and spell power.</description>
+    <effects>
+      <effect type="statModifier" value="-20" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="12" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_chain_lightning_mar51erp" name="Chain Lightning" type="damage" element="air" tier="3" manaCost="55" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Unleashes a bolt of lightning that repeatedly strikes the enemy.</description>
+    <effects>
+      <effect type="damage" value="20" target="enemy" element="air"/>
+      <effect type="damage" value="20" target="enemy" element="air"/>
+      <effect type="damage" value="20" target="enemy" element="air"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_vitality_transfer_mar51erp" name="Vitality Transfer" type="healing" element="arcane" tier="3" manaCost="50" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Converts mana into health, providing substantial immediate healing.</description>
+    <effects>
+      <effect type="healing" value="70" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_mana_flux_mar51erp" name="Mana Flux" type="buff" element="arcane" tier="3" manaCost="45" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Creates a surge of magical energy that temporarily reduces spell costs and increases regeneration.</description>
+    <effects>
+      <effect type="statModifier" value="15" target="self" element="arcane" duration="4"/>
+      <effect type="manaRestore" value="25" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_meteor_strike_mar51erp" name="Meteor Strike" type="damage" element="fire" tier="4" manaCost="75" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Calls down a devastating meteor that deals massive damage and leaves the area burning.</description>
+    <effects>
+      <effect type="damage" value="70" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="15" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_blizzard_mar51erp" name="Blizzard" type="damage" element="water" tier="4" manaCost="70" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Summons a violent blizzard that deals severe cold damage and freezes enemies.</description>
+    <effects>
+      <effect type="damage" value="50" target="enemy" element="water"/>
+      <effect type="statusEffect" value="10" target="enemy" element="water" duration="3"/>
+      <effect type="statModifier" value="-8" target="enemy" element="water" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_arcane_explosion_mar51erp" name="Arcane Explosion" type="damage" element="arcane" tier="4" manaCost="85" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Releases an explosive burst of arcane energy that deals massive damage to all enemies.</description>
+    <effects>
+      <effect type="damage" value="90" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_gale_force_mar51erp" name="Gale Force" type="damage" element="air" tier="4" manaCost="70" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Summons a devastating windstorm that deals damage and severely reduces enemy capabilities.</description>
+    <effects>
+      <effect type="damage" value="60" target="enemy" element="air"/>
+      <effect type="statModifier" value="-10" target="enemy" element="air" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_earth&apos;s_embrace_mar51erp" name="Earth&apos;s Embrace" type="buff" element="earth" tier="4" manaCost="65" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Envelops the caster in living stone, providing near-immunity to damage for a short time.</description>
+    <effects>
+      <effect type="statModifier" value="-30" target="self" element="earth" duration="2"/>
+      <effect type="healing" value="30" target="self" element="earth"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_void_rift_mar51erp" name="Void Rift" type="damage" element="arcane" tier="4" manaCost="80" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Opens a rift to the void, dealing extreme damage that bypasses defenses.</description>
+    <effects>
+      <effect type="damage" value="80" target="enemy" element="arcane"/>
+      <effect type="statModifier" value="10" target="enemy" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_raging_thunderstorm_mar51erp" name="Raging Thunderstorm" type="damage" element="air" tier="4" manaCost="75" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Summons a violent thunderstorm that strikes multiple times with increasing intensity.</description>
+    <effects>
+      <effect type="damage" value="30" target="enemy" element="air"/>
+      <effect type="damage" value="35" target="enemy" element="air"/>
+      <effect type="damage" value="40" target="enemy" element="air"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_nature&apos;s_wrath_mar51erp" name="Nature&apos;s Wrath" type="damage" element="earth" tier="4" manaCost="75" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Unleashes nature&apos;s fury in a devastating attack that also heals the caster.</description>
+    <effects>
+      <effect type="damage" value="65" target="enemy" element="earth"/>
+      <effect type="healing" value="30" target="self" element="earth"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_mana_rejuvenation_mar51erp" name="Mana Rejuvenation" type="buff" element="arcane" tier="4" manaCost="60" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Rapidly restores mana and enhances mana regeneration for several turns.</description>
+    <effects>
+      <effect type="manaRestore" value="50" target="self" element="arcane"/>
+      <effect type="statModifier" value="20" target="self" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_phoenix_flame_mar51erp" name="Phoenix Flame" type="healing" element="fire" tier="4" manaCost="80" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Envelops the caster in regenerative flames that provide substantial healing and damage resistance.</description>
+    <effects>
+      <effect type="healing" value="60" target="self" element="fire"/>
+      <effect type="statModifier" value="-15" target="self" element="fire" duration="3"/>
+      <effect type="statusEffect" value="10" target="self" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_solar_flare_mar51erp" name="Solar Flare" type="damage" element="fire" tier="5" manaCost="100" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Channels the power of the sun to create a devastating flare that causes catastrophic damage.</description>
+    <effects>
+      <effect type="damage" value="100" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="20" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_absolute_zero_mar51erp" name="Absolute Zero" type="damage" element="water" tier="5" manaCost="95" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Reduces the temperature to absolute zero, causing extreme damage and completely freezing the enemy.</description>
+    <effects>
+      <effect type="damage" value="80" target="enemy" element="water"/>
+      <effect type="statusEffect" value="15" target="enemy" element="water" duration="3"/>
+      <effect type="statModifier" value="-15" target="enemy" element="water" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_world_shatter_mar51erp" name="World Shatter" type="damage" element="earth" tier="5" manaCost="100" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Creates a localized earthquake of such magnitude that it threatens to shatter the world itself.</description>
+    <effects>
+      <effect type="damage" value="120" target="enemy" element="earth"/>
+      <effect type="statusEffect" value="10" target="enemy" element="earth" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_tempest_mar51erp" name="Tempest" type="damage" element="air" tier="5" manaCost="90" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Conjures a catastrophic tempest of wind, lightning, and rain that devastates everything in its path.</description>
+    <effects>
+      <effect type="damage" value="70" target="enemy" element="air"/>
+      <effect type="damage" value="40" target="enemy" element="air"/>
+      <effect type="statusEffect" value="15" target="enemy" element="air" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_arcane_singularity_mar51erp" name="Arcane Singularity" type="damage" element="arcane" tier="5" manaCost="120" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Creates an arcane singularity that warps reality and devastates anything in its vicinity.</description>
+    <effects>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_divine_restoration_mar51erp" name="Divine Restoration" type="healing" element="water" tier="5" manaCost="90" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Channels divine energy to completely restore health and remove all negative effects.</description>
+    <effects>
+      <effect type="healing" value="100" target="self" element="water"/>
+      <effect type="statusEffect" value="15" target="self" element="water" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_void_consumption_mar51erp" name="Void Consumption" type="damage" element="arcane" tier="5" manaCost="110" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Opens a rift to the void that consumes a portion of the enemy&apos;s essence, dealing damage and healing the caster.</description>
+    <effects>
+      <effect type="damage" value="90" target="enemy" element="arcane"/>
+      <effect type="healing" value="45" target="self" element="arcane"/>
+      <effect type="manaRestore" value="35" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_elemental_fusion_mar51erp" name="Elemental Fusion" type="buff" element="arcane" tier="5" manaCost="85" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Fuses elemental energies to dramatically enhance spellcasting power and provide protection.</description>
+    <effects>
+      <effect type="statModifier" value="25" target="self" element="arcane" duration="4"/>
+      <effect type="statModifier" value="-20" target="self" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_time_warp_mar51erp" name="Time Warp" type="buff" element="arcane" tier="5" manaCost="100" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Warps the flow of time, allowing the caster to act twice in a single turn.</description>
+    <effects>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="1"/>
+      <effect type="manaRestore" value="30" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_essence_of_life_mar51erq" name="Essence of Life" type="healing" element="earth" tier="5" manaCost="95" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Channels the pure essence of life, providing massive healing and ongoing regeneration.</description>
+    <effects>
+      <effect type="healing" value="80" target="self" element="earth"/>
+      <effect type="statusEffect" value="20" target="self" element="earth" duration="5"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_apocalypse_mar51erq" name="Apocalypse" type="damage" element="fire" tier="6" manaCost="150" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Summons the apocalypse, inflicting catastrophic fire damage and leaving the target in agony.</description>
+    <effects>
+      <effect type="damage" value="140" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="30" target="enemy" element="fire" duration="4"/>
+      <effect type="statModifier" value="10" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_tsunami_mar51erq" name="Tsunami" type="damage" element="water" tier="6" manaCost="140" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Summons a massive tsunami that crashes down on enemies, causing devastating damage and lingering effects.</description>
+    <effects>
+      <effect type="damage" value="120" target="enemy" element="water"/>
+      <effect type="statusEffect" value="15" target="enemy" element="water" duration="4"/>
+      <effect type="statModifier" value="-20" target="enemy" element="water" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_colossal_eruption_mar51erq" name="Colossal Eruption" type="damage" element="earth" tier="6" manaCost="150" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Triggers a massive volcanic eruption beneath the enemy, causing extreme damage and lingering volcanic effects.</description>
+    <effects>
+      <effect type="damage" value="150" target="enemy" element="earth"/>
+      <effect type="statusEffect" value="20" target="enemy" element="fire" duration="3"/>
+      <effect type="statModifier" value="-10" target="enemy" element="earth" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_supercell_storm_mar51erq" name="Supercell Storm" type="damage" element="air" tier="6" manaCost="145" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Summons a massive supercell thunderstorm with multiple devastating effects.</description>
+    <effects>
+      <effect type="damage" value="60" target="enemy" element="air"/>
+      <effect type="damage" value="60" target="enemy" element="air"/>
+      <effect type="statusEffect" value="25" target="enemy" element="air" duration="4"/>
+      <effect type="statModifier" value="-15" target="enemy" element="air" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_reality_warp_mar51erq" name="Reality Warp" type="damage" element="arcane" tier="6" manaCost="160" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Tears apart the fabric of reality around the target, causing catastrophic arcane damage and disrupting their magic.</description>
+    <effects>
+      <effect type="damage" value="180" target="enemy" element="arcane"/>
+      <effect type="statModifier" value="25" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_mind_control_mar51erq" name="Mind Control" type="debuff" element="arcane" tier="6" manaCost="140" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Takes control of the enemy&apos;s mind, forcing them to damage themselves with their own power.</description>
+    <effects>
+      <effect type="damage" value="80" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="40" target="enemy" element="arcane" duration="2"/>
+      <effect type="statModifier" value="20" target="enemy" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_phoenix_resurrection_mar51erq" name="Phoenix Resurrection" type="healing" element="fire" tier="6" manaCost="150" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Channels the power of the mythical phoenix to restore the caster to full power and provide powerful regeneration.</description>
+    <effects>
+      <effect type="healing" value="200" target="self" element="fire"/>
+      <effect type="statusEffect" value="30" target="self" element="fire" duration="4"/>
+      <effect type="statModifier" value="20" target="self" element="fire" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_time_reverse_mar51erq" name="Time Reverse" type="healing" element="arcane" tier="6" manaCost="140" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Reverses time around the caster, undoing recent damage and restoring mana and health to a previous state.</description>
+    <effects>
+      <effect type="healing" value="150" target="self" element="arcane"/>
+      <effect type="manaRestore" value="100" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_cosmic_shield_mar51erq" name="Cosmic Shield" type="buff" element="arcane" tier="6" manaCost="130" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Surrounds the caster with the power of the cosmos, providing near invulnerability and reflecting damage back at attackers.</description>
+    <effects>
+      <effect type="statModifier" value="-50" target="self" element="arcane" duration="3"/>
+      <effect type="statusEffect" value="30" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_planar_binding_mar51erq" name="Planar Binding" type="damage" element="arcane" tier="6" manaCost="155" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Binds the enemy to another plane of existence, causing immense damage and absorbing their power.</description>
+    <effects>
+      <effect type="damage" value="120" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="20" target="enemy" element="arcane" duration="3"/>
+      <effect type="manaRestore" value="60" target="self" element="arcane"/>
+      <effect type="healing" value="40" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_supernova_mar51erq" name="Supernova" type="damage" element="fire" tier="7" manaCost="200" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Creates a supernova explosion that devastates everything in its path with stellar fire.</description>
+    <effects>
+      <effect type="damage" value="200" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="40" target="enemy" element="fire" duration="4"/>
+      <effect type="statModifier" value="30" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_abyssal_maw_mar51erq" name="Abyssal Maw" type="damage" element="water" tier="7" manaCost="190" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Opens a giant maw to the deepest abyssal trenches, crushing the enemy with immense pressure and cold.</description>
+    <effects>
+      <effect type="damage" value="180" target="enemy" element="water"/>
+      <effect type="statusEffect" value="30" target="enemy" element="water" duration="3"/>
+      <effect type="statModifier" value="25" target="enemy" element="water" duration="4"/>
+      <effect type="statModifier" value="-25" target="enemy" element="water" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_world_tree_mar51erq" name="World Tree" type="healing" element="earth" tier="7" manaCost="180" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Manifests the World Tree, the source of all life, providing extraordinary healing and life force.</description>
+    <effects>
+      <effect type="healing" value="250" target="self" element="earth"/>
+      <effect type="statusEffect" value="40" target="self" element="earth" duration="5"/>
+      <effect type="manaRestore" value="50" target="self" element="earth"/>
+      <effect type="statModifier" value="-30" target="self" element="earth" duration="5"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_hurricane_apocalypse_mar51erq" name="Hurricane Apocalypse" type="damage" element="air" tier="7" manaCost="195" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Summons a world-ending hurricane that tears everything apart with wind, lightning, and devastation.</description>
+    <effects>
+      <effect type="damage" value="100" target="enemy" element="air"/>
+      <effect type="damage" value="100" target="enemy" element="air"/>
+      <effect type="statusEffect" value="40" target="enemy" element="air" duration="5"/>
+      <effect type="statModifier" value="30" target="enemy" element="air" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_astral_projection_mar51erq" name="Astral Projection" type="buff" element="arcane" tier="7" manaCost="170" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Projects the caster&apos;s consciousness into the astral plane, making them nearly invulnerable and enhancing their magical abilities.</description>
+    <effects>
+      <effect type="statModifier" value="-70" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="40" target="self" element="arcane" duration="3"/>
+      <effect type="manaRestore" value="60" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_elemental_convergence_mar51erq" name="Elemental Convergence" type="damage" element="arcane" tier="7" manaCost="210" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Converges all elemental forces into a single devastating attack that overwhelms any defense.</description>
+    <effects>
+      <effect type="damage" value="80" target="enemy" element="fire"/>
+      <effect type="damage" value="80" target="enemy" element="water"/>
+      <effect type="damage" value="80" target="enemy" element="earth"/>
+      <effect type="damage" value="80" target="enemy" element="air"/>
+      <effect type="statModifier" value="40" target="enemy" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_lifeforce_manipulation_mar51erq" name="Lifeforce Manipulation" type="healing" element="arcane" tier="7" manaCost="185" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Manipulates the very essence of life, transferring life force from the enemy to the caster.</description>
+    <effects>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+      <effect type="healing" value="150" target="self" element="arcane"/>
+      <effect type="statusEffect" value="30" target="enemy" element="arcane" duration="3"/>
+      <effect type="statusEffect" value="30" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_glacial_age_mar51erq" name="Glacial Age" type="damage" element="water" tier="7" manaCost="190" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Brings forth a miniature ice age, freezing everything and causing catastrophic cold damage.</description>
+    <effects>
+      <effect type="damage" value="170" target="enemy" element="water"/>
+      <effect type="statusEffect" value="35" target="enemy" element="water" duration="4"/>
+      <effect type="statModifier" value="-40" target="enemy" element="water" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_celestial_judgment_mar51erq" name="Celestial Judgment" type="damage" element="arcane" tier="7" manaCost="220" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Calls down judgment from celestial beings, devastating the enemy with divine power.</description>
+    <effects>
+      <effect type="damage" value="250" target="enemy" element="arcane"/>
+      <effect type="statModifier" value="50" target="enemy" element="arcane" duration="1"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_phase_shift_mar51err" name="Phase Shift" type="buff" element="arcane" tier="7" manaCost="180" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Shifts the caster out of phase with normal reality, granting them extraordinary powers.</description>
+    <effects>
+      <effect type="statModifier" value="-80" target="self" element="arcane" duration="2"/>
+      <effect type="statModifier" value="50" target="self" element="arcane" duration="3"/>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="1"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_extinction_event_mar51err" name="Extinction Event" type="damage" element="fire" tier="8" manaCost="300" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Recreates the cataclysmic event that caused mass extinction, annihilating everything in its path.</description>
+    <effects>
+      <effect type="damage" value="300" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="50" target="enemy" element="fire" duration="5"/>
+      <effect type="statModifier" value="50" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_galactic_rift_mar51err" name="Galactic Rift" type="damage" element="arcane" tier="8" manaCost="320" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Tears open a rift to the void between galaxies, subjecting the enemy to the unimaginable forces found there.</description>
+    <effects>
+      <effect type="damage" value="350" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="40" target="enemy" element="arcane" duration="3"/>
+      <effect type="statModifier" value="40" target="enemy" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_dimensional_collapse_mar51err" name="Dimensional Collapse" type="damage" element="arcane" tier="8" manaCost="330" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Collapses a small dimension onto the enemy, subjecting them to the catastrophic energy release.</description>
+    <effects>
+      <effect type="damage" value="400" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_omni-elemental_fury_mar51err" name="Omni-Elemental Fury" type="damage" element="arcane" tier="8" manaCost="310" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Unleashes the fury of all elemental planes simultaneously in a devastating assault.</description>
+    <effects>
+      <effect type="damage" value="100" target="enemy" element="fire"/>
+      <effect type="damage" value="100" target="enemy" element="water"/>
+      <effect type="damage" value="100" target="enemy" element="earth"/>
+      <effect type="damage" value="100" target="enemy" element="air"/>
+      <effect type="statusEffect" value="60" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_time_stop_mar51err" name="Time Stop" type="buff" element="arcane" tier="8" manaCost="300" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Completely stops time for everyone except the caster, allowing multiple actions without opposition.</description>
+    <effects>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="3"/>
+      <effect type="manaRestore" value="100" target="self" element="arcane"/>
+      <effect type="statModifier" value="60" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_cosmic_rebirth_mar51err" name="Cosmic Rebirth" type="healing" element="arcane" tier="8" manaCost="280" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Causes the caster to be reborn in the fires of cosmic creation, fully restoring them and granting immense power.</description>
+    <effects>
+      <effect type="healing" value="500" target="self" element="arcane"/>
+      <effect type="manaRestore" value="200" target="self" element="arcane"/>
+      <effect type="statModifier" value="-70" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="70" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_primeval_force_mar51err" name="Primeval Force" type="damage" element="earth" tier="8" manaCost="290" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Channels the primeval forces of creation that shaped the world, devastating the enemy with unimaginable power.</description>
+    <effects>
+      <effect type="damage" value="280" target="enemy" element="earth"/>
+      <effect type="statusEffect" value="70" target="enemy" element="earth" duration="4"/>
+      <effect type="statModifier" value="60" target="enemy" element="earth" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_divine_intervention_mar51err" name="Divine Intervention" type="healing" element="arcane" tier="8" manaCost="270" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Calls upon divine powers to intervene, completely restoring the caster and smiting their enemies.</description>
+    <effects>
+      <effect type="healing" value="400" target="self" element="arcane"/>
+      <effect type="damage" value="200" target="enemy" element="arcane"/>
+      <effect type="manaRestore" value="150" target="self" element="arcane"/>
+      <effect type="statusEffect" value="50" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_reality_breach_mar51err" name="Reality Breach" type="damage" element="arcane" tier="8" manaCost="340" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Creates a catastrophic breach in the fabric of reality, unleashing chaotic energies that devastate everything.</description>
+    <effects>
+      <effect type="damage" value="300" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="80" target="enemy" element="arcane" duration="3"/>
+      <effect type="statModifier" value="70" target="enemy" element="arcane" duration="2"/>
+      <effect type="damage" value="50" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_titanic_manifestation_mar51err" name="Titanic Manifestation" type="buff" element="earth" tier="8" manaCost="310" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Manifests a titanic elemental being of immense power that fights alongside the caster.</description>
+    <effects>
+      <effect type="statModifier" value="-90" target="self" element="earth" duration="4"/>
+      <effect type="statModifier" value="80" target="self" element="earth" duration="4"/>
+      <effect type="statusEffect" value="60" target="enemy" element="earth" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_universal_cataclysm_mar51err" name="Universal Cataclysm" type="damage" element="fire" tier="9" manaCost="450" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Triggers a cataclysm on a universal scale, channeling the raw destructive power of cosmic apocalypse.</description>
+    <effects>
+      <effect type="damage" value="500" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="100" target="enemy" element="fire" duration="3"/>
+      <effect type="statModifier" value="80" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_eternal_oblivion_mar51err" name="Eternal Oblivion" type="damage" element="arcane" tier="9" manaCost="470" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Consigns the enemy to eternal oblivion, a place beyond space and time where existence itself is erased.</description>
+    <effects>
+      <effect type="damage" value="550" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="80" target="enemy" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_multiversal_nexus_mar51err" name="Multiversal Nexus" type="damage" element="arcane" tier="9" manaCost="500" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Creates a nexus of infinite realities, subjecting the enemy to the simultaneous destructive forces of countless universes.</description>
+    <effects>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="120" target="enemy" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_ascension_mar51err" name="Ascension" type="buff" element="arcane" tier="9" manaCost="450" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Causes the caster to temporarily ascend to a higher plane of existence, gaining godlike powers.</description>
+    <effects>
+      <effect type="statModifier" value="-100" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="100" target="self" element="arcane" duration="3"/>
+      <effect type="healing" value="300" target="self" element="arcane"/>
+      <effect type="manaRestore" value="300" target="self" element="arcane"/>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_primordial_genesis_mar51ers" name="Primordial Genesis" type="healing" element="earth" tier="9" manaCost="420" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Taps into the primordial forces of creation that birthed the world, completely restoring and empowering the caster.</description>
+    <effects>
+      <effect type="healing" value="600" target="self" element="earth"/>
+      <effect type="manaRestore" value="400" target="self" element="earth"/>
+      <effect type="statusEffect" value="80" target="self" element="earth" duration="5"/>
+      <effect type="statModifier" value="-80" target="self" element="earth" duration="5"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_cosmic_reset_mar51ers" name="Cosmic Reset" type="healing" element="arcane" tier="9" manaCost="480" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Resets the caster&apos;s existence to a perfect state while devastating the enemy&apos;s.</description>
+    <effects>
+      <effect type="healing" value="999" target="self" element="arcane"/>
+      <effect type="manaRestore" value="999" target="self" element="arcane"/>
+      <effect type="damage" value="400" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_transcendent_form_mar51ers" name="Transcendent Form" type="buff" element="arcane" tier="9" manaCost="430" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Transforms the caster into a being of pure energy, transcending the limitations of physical form.</description>
+    <effects>
+      <effect type="statModifier" value="-120" target="self" element="arcane" duration="4"/>
+      <effect type="statModifier" value="120" target="self" element="arcane" duration="4"/>
+      <effect type="statusEffect" value="100" target="enemy" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_omega_blast_mar51ers" name="Omega Blast" type="damage" element="arcane" tier="9" manaCost="490" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Channels the power of the omega force, the ultimate destructive power in the multiverse.</description>
+    <effects>
+      <effect type="damage" value="650" target="enemy" element="arcane"/>
+      <effect type="damage" value="100" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_celestial_maelstrom_mar51ers" name="Celestial Maelstrom" type="damage" element="air" tier="9" manaCost="460" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Summons a maelstrom of celestial proportions, channeling the destructive power of colliding galaxies.</description>
+    <effects>
+      <effect type="damage" value="200" target="enemy" element="air"/>
+      <effect type="damage" value="200" target="enemy" element="air"/>
+      <effect type="damage" value="200" target="enemy" element="air"/>
+      <effect type="statusEffect" value="150" target="enemy" element="air" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_chrono_disruption_mar51ers" name="Chrono Disruption" type="damage" element="arcane" tier="9" manaCost="470" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Disrupts the enemy&apos;s timeline, causing them to experience their demise from infinite different timelines simultaneously.</description>
+    <effects>
+      <effect type="damage" value="300" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="200" target="enemy" element="arcane" duration="3"/>
+      <effect type="statModifier" value="150" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_total_obliteration_mar51ers" name="Total Obliteration" type="damage" element="arcane" tier="10" manaCost="800" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>The ultimate destructive spell that completely obliterates the target from existence across all possible timelines and realities.</description>
+    <effects>
+      <effect type="damage" value="1000" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_creation-extinction_cycle_mar51ers" name="Creation-Extinction Cycle" type="damage" element="arcane" tier="10" manaCost="850" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Subjects the enemy to the full cycle of universal creation and extinction, billions of years of cosmic birth and death compressed into moments.</description>
+    <effects>
+      <effect type="damage" value="300" target="enemy" element="fire"/>
+      <effect type="damage" value="300" target="enemy" element="earth"/>
+      <effect type="damage" value="300" target="enemy" element="water"/>
+      <effect type="damage" value="300" target="enemy" element="air"/>
+      <effect type="statusEffect" value="300" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_ultimate_reality_mar51ers" name="Ultimate Reality" type="damage" element="arcane" tier="10" manaCost="900" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Confronts the enemy with the ultimate reality that lies beyond all illusion, a truth so terrible it shatters mind, body, and soul.</description>
+    <effects>
+      <effect type="damage" value="800" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="400" target="enemy" element="arcane" duration="3"/>
+      <effect type="statModifier" value="200" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_godhead_manifestation_mar51ers" name="Godhead Manifestation" type="buff" element="arcane" tier="10" manaCost="750" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>The caster temporarily manifests as a divine being of unlimited power, transcending all limitations of mortal existence.</description>
+    <effects>
+      <effect type="healing" value="999" target="self" element="arcane"/>
+      <effect type="manaRestore" value="999" target="self" element="arcane"/>
+      <effect type="statModifier" value="-200" target="self" element="arcane" duration="5"/>
+      <effect type="statModifier" value="200" target="self" element="arcane" duration="5"/>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_infinity_mar51ers" name="Infinity" type="damage" element="arcane" tier="10" manaCost="1000" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Channels the concept of infinity itself, subjecting the enemy to endless iterations of destruction across infinite dimensions.</description>
+    <effects>
+      <effect type="damage" value="500" target="enemy" element="arcane"/>
+      <effect type="damage" value="500" target="enemy" element="arcane"/>
+      <effect type="damage" value="500" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="500" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_primordial_one_mar51ers" name="Primordial One" type="healing" element="arcane" tier="10" manaCost="800" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Returns the caster to the primordial state of the One that existed before creation, gaining the power that birthed all reality.</description>
+    <effects>
+      <effect type="healing" value="999" target="self" element="arcane"/>
+      <effect type="manaRestore" value="999" target="self" element="arcane"/>
+      <effect type="statModifier" value="-500" target="self" element="arcane" duration="3"/>
+      <effect type="damage" value="500" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_omnipotence_mar51ers" name="Omnipotence" type="buff" element="arcane" tier="10" manaCost="950" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Grants the caster temporary omnipotence, the state of unlimited power and ability to do anything.</description>
+    <effects>
+      <effect type="statModifier" value="-999" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="999" target="self" element="arcane" duration="3"/>
+      <effect type="statusEffect" value="500" target="enemy" element="arcane" duration="3"/>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="5"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_heat_death_mar51ers" name="Heat Death" type="damage" element="fire" tier="10" manaCost="880" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Subjects the enemy to the heat death of the universe, the ultimate entropic end where all energy is exhausted.</description>
+    <effects>
+      <effect type="damage" value="600" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="400" target="enemy" element="fire" duration="5"/>
+      <effect type="statModifier" value="300" target="enemy" element="fire" duration="5"/>
+      <effect type="manaRestore" value="-300" target="enemy" element="fire"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_big_bang_mar51ers" name="Big Bang" type="damage" element="fire" tier="10" manaCost="920" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Recreates the Big Bang, the primordial explosion that birthed the universe, focusing all its energy on the enemy.</description>
+    <effects>
+      <effect type="damage" value="1500" target="enemy" element="fire"/>
+      <effect type="damage" value="300" target="self" element="fire"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_singularity_mar51ers" name="Singularity" type="damage" element="arcane" tier="10" manaCost="999" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description>Creates a true singularity, a point of infinite density and zero volume, that consumes the enemy completely.</description>
+    <effects>
+      <effect type="damage" value="2000" target="enemy" element="arcane"/>
+      <effect type="damage" value="500" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_essence_theft_mar51ers" name="Essence Theft" type="damage" element="arcane" tier="3" manaCost="40" rarity="uncommon" imagePath="/images/spells/special/essence-theft.jpg">
+    <description>Steals the essence of the enemy, healing the caster for a portion of the damage dealt.</description>
+    <effects>
+      <effect type="damage" value="40" target="enemy" element="arcane"/>
+      <effect type="healing" value="25" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_astral_chain_mar51ers" name="Astral Chain" type="damage" element="arcane" tier="4" manaCost="45" rarity="uncommon" imagePath="/images/spells/special/astral-chain.jpg">
+    <description>Binds the enemy with chains of astral energy, dealing damage and preventing them from using certain abilities.</description>
+    <effects>
+      <effect type="damage" value="35" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="15" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_magnetic_pulse_mar51ers" name="Magnetic Pulse" type="damage" element="air" tier="2" manaCost="30" rarity="uncommon" imagePath="/images/spells/special/magnetic-pulse.jpg">
+    <description>Releases a concentrated magnetic pulse that damages enemies wearing metal armor more severely.</description>
+    <effects>
+      <effect type="damage" value="45" target="enemy" element="air"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_resonance_strike_mar51ers" name="Resonance Strike" type="damage" element="air" tier="5" manaCost="50" rarity="uncommon" imagePath="/images/spells/special/resonance-strike.jpg">
+    <description>Strikes the enemy with a precisely tuned resonant frequency, bypassing shields and barriers.</description>
+    <effects>
+      <effect type="damage" value="60" target="enemy" element="air"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_honeyed_words_mar51ert" name="Honeyed Words" type="buff" element="arcane" tier="1" manaCost="15" rarity="uncommon" imagePath="/images/spells/special/honeyed-words.jpg">
+    <description>A subtle enchantment that makes your words more persuasive, potentially avoiding combat entirely.</description>
+    <effects>
+      <effect type="statModifier" value="30" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_lifeblood_ritual_mar51ert" name="Lifeblood Ritual" type="healing" element="earth" tier="4" manaCost="35" rarity="uncommon" imagePath="/images/spells/special/lifeblood-ritual.jpg">
+    <description>A forbidden healing ritual that draws upon your own lifeforce to heal grievous wounds instantly.</description>
+    <effects>
+      <effect type="healing" value="100" target="self" element="earth"/>
+      <effect type="damage" value="30" target="self" element="earth"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_elemental_harmony_mar51ert" name="Elemental Harmony" type="buff" element="arcane" tier="3" manaCost="45" rarity="uncommon" imagePath="/images/spells/special/elemental-harmony.jpg">
+    <description>Harmonizes with the elements around you, granting resistance to all elemental damage for a short time.</description>
+    <effects>
+      <effect type="statModifier" value="-20" target="self" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_rift_shatter_mar51ert" name="Rift Shatter" type="damage" element="arcane" tier="5" manaCost="60" rarity="uncommon" imagePath="/images/spells/special/rift-shatter.jpg">
+    <description>Shatters the fabric between dimensions, causing chaotic arcane energy to flood the area and damage all enemies.</description>
+    <effects>
+      <effect type="damage" value="70" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_chrono_skip_mar51ert" name="Chrono Skip" type="buff" element="arcane" tier="4" manaCost="70" rarity="uncommon" imagePath="/images/spells/special/chrono-skip.jpg">
+    <description>Skips forward in time momentarily, allowing you to avoid an incoming attack with certainty.</description>
+    <effects>
+      <effect type="statModifier" value="-100" target="self" element="arcane" duration="1"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_mirror_image_mar51ert" name="Mirror Image" type="buff" element="arcane" tier="3" manaCost="40" rarity="uncommon" imagePath="/images/spells/special/mirror-image.jpg">
+    <description>Creates illusory duplicates of yourself that confuse enemies and absorb attacks.</description>
+    <effects>
+      <effect type="statModifier" value="-40" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_eternal_winter_mar51ert" name="Eternal Winter" type="damage" element="water" tier="6" manaCost="70" rarity="rare" imagePath="/images/spells/special/eternal-winter.jpg">
+    <description>Summons a fragment of eternal winter from the far north, freezing enemies solid and dealing severe cold damage over time.</description>
+    <effects>
+      <effect type="damage" value="60" target="enemy" element="water"/>
+      <effect type="statusEffect" value="30" target="enemy" element="water" duration="5"/>
+      <effect type="statModifier" value="40" target="enemy" element="water" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_soulshatter_mar51ert" name="Soulshatter" type="damage" element="arcane" tier="6" manaCost="80" rarity="rare" imagePath="/images/spells/special/soulshatter.jpg">
+    <description>Attacks the very soul of the enemy, dealing damage proportional to their remaining health and weakening them severely.</description>
+    <effects>
+      <effect type="damage" value="100" target="enemy" element="arcane"/>
+      <effect type="statModifier" value="50" target="enemy" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_dragonflame_mar51ert" name="Dragonflame" type="damage" element="fire" tier="6" manaCost="75" rarity="rare" imagePath="/images/spells/special/dragonflame.jpg">
+    <description>Channels the ancient fire of dragons, burning through all defenses and continuing to burn for several turns.</description>
+    <effects>
+      <effect type="damage" value="85" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="30" target="enemy" element="fire" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_celestial_blessing_mar51ert" name="Celestial Blessing" type="healing" element="arcane" tier="7" manaCost="85" rarity="rare" imagePath="/images/spells/special/celestial-blessing.jpg">
+    <description>Calls upon celestial forces to bless the caster, providing healing, protection, and enhanced magical abilities.</description>
+    <effects>
+      <effect type="healing" value="100" target="self" element="arcane"/>
+      <effect type="statModifier" value="-30" target="self" element="arcane" duration="5"/>
+      <effect type="statModifier" value="40" target="self" element="arcane" duration="5"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_absolute_silence_mar51ert" name="Absolute Silence" type="damage" element="arcane" tier="6" manaCost="70" rarity="rare" imagePath="/images/spells/special/absolute-silence.jpg">
+    <description>Envelops the enemy in a field of absolute silence where no magic can function, preventing them from casting spells.</description>
+    <effects>
+      <effect type="damage" value="50" target="enemy" element="arcane"/>
+      <effect type="statModifier" value="100" target="enemy" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_plasma_storm_mar51ert" name="Plasma Storm" type="damage" element="fire" tier="7" manaCost="95" rarity="rare" imagePath="/images/spells/special/plasma-storm.jpg">
+    <description>Creates a swirling vortex of superheated plasma that deals massive damage to enemies caught within it.</description>
+    <effects>
+      <effect type="damage" value="120" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="40" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_runic_binding_mar51ert" name="Runic Binding" type="buff" element="earth" tier="6" manaCost="60" rarity="rare" imagePath="/images/spells/special/runic-binding.jpg">
+    <description>Inscribes ancient protective runes on the caster, granting exceptional defense against all forms of damage.</description>
+    <effects>
+      <effect type="statModifier" value="-60" target="self" element="earth" duration="6"/>
+      <effect type="healing" value="20" target="self" element="earth"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_eldritch_barrier_mar51ert" name="Eldritch Barrier" type="buff" element="arcane" tier="7" manaCost="80" rarity="rare" imagePath="/images/spells/special/eldritch-barrier.jpg">
+    <description>Creates a protective barrier of eldritch energy that absorbs damage and reflects a portion back to attackers.</description>
+    <effects>
+      <effect type="statModifier" value="-70" target="self" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_insanity_whisper_mar51ert" name="Insanity Whisper" type="damage" element="arcane" tier="7" manaCost="90" rarity="rare" imagePath="/images/spells/special/insanity-whisper.jpg">
+    <description>Whispers secrets of cosmic horror directly into the enemy&apos;s mind, causing them to attack themselves or allies in madness.</description>
+    <effects>
+      <effect type="damage" value="70" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="60" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_world-ending_flame_mar51ert" name="World-Ending Flame" type="damage" element="fire" tier="9" manaCost="150" rarity="legendary" imagePath="/images/spells/special/world-ending-flame.jpg">
+    <description>Summons the primordial flame that will one day consume the world, dealing catastrophic damage to all enemies.</description>
+    <effects>
+      <effect type="damage" value="300" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="100" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_gaze_of_the_void_mar51ert" name="Gaze of the Void" type="damage" element="arcane" tier="9" manaCost="180" rarity="legendary" imagePath="/images/spells/special/gaze-of-the-void.jpg">
+    <description>Channels the incomprehensible power of the Void itself, potentially erasing enemies from existence.</description>
+    <effects>
+      <effect type="damage" value="250" target="enemy" element="arcane"/>
+      <effect type="statModifier" value="200" target="enemy" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_singularity_nexus_mar51ert" name="Singularity Nexus" type="damage" element="arcane" tier="10" manaCost="220" rarity="legendary" imagePath="/images/spells/special/singularity-nexus.jpg">
+    <description>Creates a nexus of singularities that bend spacetime itself, dealing massive damage to all enemies and distorting reality.</description>
+    <effects>
+      <effect type="damage" value="400" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="150" target="enemy" element="arcane" duration="3"/>
+      <effect type="damage" value="100" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_ascendant_apotheosis_mar51ert" name="Ascendant Apotheosis" type="buff" element="arcane" tier="10" manaCost="200" rarity="legendary" imagePath="/images/spells/special/ascendant-apotheosis.jpg">
+    <description>Temporarily ascends the caster to a higher plane of existence, granting godlike power for a brief moment.</description>
+    <effects>
+      <effect type="statModifier" value="-200" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="200" target="self" element="arcane" duration="3"/>
+      <effect type="manaRestore" value="500" target="self" element="arcane"/>
+      <effect type="healing" value="500" target="self" element="arcane"/>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_divine_judgment_mar51ert" name="Divine Judgment" type="damage" element="arcane" tier="10" manaCost="250" rarity="legendary" imagePath="/images/spells/special/divine-judgment.jpg">
+    <description>Calls down divine judgment upon enemies, dealing damage proportional to their misdeeds and evil within them.</description>
+    <effects>
+      <effect type="damage" value="500" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+</spells>

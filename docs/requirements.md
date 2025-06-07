@@ -6,7 +6,7 @@
 ## Technical Requirements
 
 ### Engine & Framework
-- PhaserJS for 2D visualization and responsive visuals
+- Three.js with React Three Fiber for 3D visualization and interactive graphics
 - Next.js as the application framework (with future multiplayer considerations)
 - Browser-based implementation for cross-platform accessibility
 

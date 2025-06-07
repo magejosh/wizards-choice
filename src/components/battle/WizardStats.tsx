@@ -107,12 +107,61 @@ const WizardStats: React.FC<WizardStatsProps> = ({
     }
   };
 
+  // Helper to split and style the level in the name
+  function renderNameWithLevel(name: string) {
+    // Player: 'Name (Lv. X)'
+    const playerMatch = name.match(/^(.*) \(Lv\. (\d+)\)$/);
+    if (playerMatch) {
+      return <>
+        <span>{playerMatch[1]}</span>{' '}
+        <span className="wizard-level">(Lv. {playerMatch[2]})</span>
+      </>;
+    }
+    // Enemy: 'Lv. X Name'
+    const enemyMatch = name.match(/^Lv\. (\d+) (.*)$/);
+    if (enemyMatch) {
+      return <>
+        <span className="wizard-level">Lv. {enemyMatch[1]}</span>{' '}
+        <span>{enemyMatch[2]}</span>
+      </>;
+    }
+    // Fallback
+    return name;
+  }
+
+  // Helper to get a user-friendly effect label
+  function getEffectLabel(effect: ActiveEffect): string {
+    if (effect.name && effect.name !== 'Damage Over Time' && effect.name !== 'Healing Over Time' && effect.name !== 'Mana Restore Over Time' && effect.name !== 'Damage Reduction') {
+      return effect.name;
+    }
+    switch (effect.type) {
+      case 'damage_over_time':
+        return `Damage Over Time (${effect.value < 0 ? '' : '+'}${effect.value})`;
+      case 'healing_over_time':
+        return `Healing Over Time (${effect.value < 0 ? '' : '+'}${effect.value})`;
+      case 'mana_regen':
+        return `Mana Regen (${effect.value < 0 ? '' : '+'}${effect.value})`;
+      case 'damageReduction':
+        return `Damage Reduction (${effect.value})`;
+      case 'buff':
+        return `Buff (+${effect.value})`;
+      case 'mana_drain':
+        return `Mana Drain (${effect.value})`;
+      case 'stun':
+        return 'Stunned';
+      case 'silence':
+        return 'Silenced';
+      default:
+        return effect.name || effect.type;
+    }
+  }
+
   return (
     <div 
       style={style || (isMobile ? mobileStyles.container : undefined)} 
       className={isMobile ? '' : isPlayer ? styles.playerSection : styles.enemySection}
     >
-      <h2 style={isMobile ? mobileStyles.title : undefined}>{name}</h2>
+      <h2 style={isMobile ? mobileStyles.title : undefined}>{renderNameWithLevel(name)}</h2>
       
       <div className={styles.statsBar}>
         <div className={styles.statGroup}>
@@ -148,7 +197,7 @@ const WizardStats: React.FC<WizardStatsProps> = ({
           <div className={styles.effectsList}>
             {activeEffects.map((effect, index) => (
               <div key={index} className={styles.effectItem}>
-                <span className={styles.effectName}>{effect.name}</span>
+                <span className={styles.effectName}>{getEffectLabel(effect)}</span>
                 <span className={styles.effectDuration}>{effect.remainingDuration} turns</span>
               </div>
             ))}

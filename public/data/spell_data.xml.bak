@@ -1,0 +1,1058 @@
+<spells>
+  <spell id="spell_firebolt_mar53sje" name="Firebolt" type="damage" element="fire" tier="1" manaCost="25" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="20" target="enemy" element="fire"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_arcane_shield_mar53sje" name="Arcane Shield" type="buff" element="arcane" tier="1" manaCost="30" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text="Creates a magical shield that reduces incoming damage for 5 turns."/>
+    <effects>
+      <effect type="damageReduction" value="-5" target="self" element="arcane" duration="5"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_minor_healing_mar53sje" name="Minor Healing" type="healing" element="water" tier="1" manaCost="25" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="15" target="self" element="water"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_frost_ray_mar53sje" name="Frost Ray" type="damage" element="water" tier="1" manaCost="25" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="17" target="enemy" element="water"/>
+      <effect type="statModifier" value="-2" target="enemy" element="water" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_arcane_blast_mar53sje" name="Arcane Blast" type="damage" element="arcane" tier="1" manaCost="30" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="25" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_nature&apos;s_touch_mar53sje" name="Nature&apos;s Touch" type="healing" element="earth" tier="1" manaCost="30" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="10" target="self" element="earth"/>
+      <effect type="statusEffect" value="5" target="self" element="earth" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_shadow_strike_mar53sje" name="Shadow Strike" type="damage" element="arcane" tier="1" manaCost="20" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="15" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_lightning_jolt_mar53sje" name="Lightning Jolt" type="damage" element="air" tier="1" manaCost="20" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="18" target="enemy" element="air"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_earth_tremor_mar53sje" name="Earth Tremor" type="damage" element="earth" tier="1" manaCost="35" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="22" target="enemy" element="earth"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_mystic_insight_mar53sje" name="Mystic Insight" type="buff" element="arcane" tier="1" manaCost="20" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="5" target="self" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_fireball_mar53sje" name="Fireball" type="damage" element="fire" tier="2" manaCost="40" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="35" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="5" target="enemy" element="fire" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_ice_barrier_mar53sje" name="Ice Barrier" type="buff" element="water" tier="2" manaCost="35" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-10" target="self" element="water" duration="3"/>
+      <effect type="statusEffect" value="5" target="self" element="water" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_rejuvenation_mar53sje" name="Rejuvenation" type="healing" element="earth" tier="2" manaCost="45" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="25" target="self" element="earth"/>
+      <effect type="statusEffect" value="8" target="self" element="earth" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_arcane_armory_mar53sje" name="Arcane Armory" type="buff" element="arcane" tier="2" manaCost="40" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="8" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="-5" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_wind_blast_mar53sje" name="Wind Blast" type="damage" element="air" tier="2" manaCost="35" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="30" target="enemy" element="air"/>
+      <effect type="statModifier" value="-3" target="enemy" element="air" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_venom_spray_mar53sje" name="Venom Spray" type="dot" element="earth" tier="2" manaCost="38" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="15" target="enemy" element="earth"/>
+      <effect type="statusEffect" value="10" target="enemy" element="earth" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_thunderclasp_mar53sje" name="Thunderclasp" type="damage" element="air" tier="2" manaCost="42" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="40" target="enemy" element="air"/>
+      <effect type="statusEffect" value="-1" target="enemy" element="air" duration="1"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_earth_shield_mar53sje" name="Earth Shield" type="buff" element="earth" tier="2" manaCost="40" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-15" target="self" element="earth" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_lifedrain_mar53sje" name="Lifedrain" type="damage" element="arcane" tier="2" manaCost="45" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="30" target="enemy" element="arcane"/>
+      <effect type="healing" value="15" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_mana_steal_mar53sje" name="Mana Steal" type="damage" element="arcane" tier="2" manaCost="35" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="25" target="enemy" element="arcane"/>
+      <effect type="manaRestore" value="15" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_inferno_mar53sje" name="Inferno" type="damage" element="fire" tier="3" manaCost="60" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="50" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="10" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_frost_nova_mar53sje" name="Frost Nova" type="damage" element="water" tier="3" manaCost="55" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="40" target="enemy" element="water"/>
+      <effect type="statModifier" value="-5" target="enemy" element="water" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_nature&apos;s_blessing_mar53sje" name="Nature&apos;s Blessing" type="healing" element="earth" tier="3" manaCost="65" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="45" target="self" element="earth"/>
+      <effect type="statusEffect" value="12" target="self" element="earth" duration="3"/>
+      <effect type="manaRestore" value="10" target="self" element="earth"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_arcane_surge_mar53sje" name="Arcane Surge" type="damage" element="arcane" tier="3" manaCost="60" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="60" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_hurricane_mar53sje" name="Hurricane" type="damage" element="air" tier="3" manaCost="58" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="35" target="enemy" element="air"/>
+      <effect type="statusEffect" value="15" target="enemy" element="air" duration="4"/>
+      <effect type="statModifier" value="-3" target="enemy" element="air" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_earthquake_mar53sje" name="Earthquake" type="damage" element="earth" tier="3" manaCost="55" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="55" target="enemy" element="earth"/>
+      <effect type="statModifier" value="-4" target="enemy" element="earth" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_shadow_form_mar53sjf" name="Shadow Form" type="buff" element="arcane" tier="3" manaCost="50" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-20" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="12" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_chain_lightning_mar53sjf" name="Chain Lightning" type="damage" element="air" tier="3" manaCost="55" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="20" target="enemy" element="air"/>
+      <effect type="damage" value="20" target="enemy" element="air"/>
+      <effect type="damage" value="20" target="enemy" element="air"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_vitality_transfer_mar53sjf" name="Vitality Transfer" type="healing" element="arcane" tier="3" manaCost="50" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="70" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_mana_flux_mar53sjf" name="Mana Flux" type="buff" element="arcane" tier="3" manaCost="45" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="15" target="self" element="arcane" duration="4"/>
+      <effect type="manaRestore" value="25" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_meteor_strike_mar53sjf" name="Meteor Strike" type="damage" element="fire" tier="4" manaCost="75" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="70" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="15" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_blizzard_mar53sjf" name="Blizzard" type="damage" element="water" tier="4" manaCost="70" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="50" target="enemy" element="water"/>
+      <effect type="statusEffect" value="10" target="enemy" element="water" duration="3"/>
+      <effect type="statModifier" value="-8" target="enemy" element="water" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_arcane_explosion_mar53sjf" name="Arcane Explosion" type="damage" element="arcane" tier="4" manaCost="85" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="90" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_gale_force_mar53sjf" name="Gale Force" type="damage" element="air" tier="4" manaCost="70" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="60" target="enemy" element="air"/>
+      <effect type="statModifier" value="-10" target="enemy" element="air" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_earth&apos;s_embrace_mar53sjf" name="Earth&apos;s Embrace" type="buff" element="earth" tier="4" manaCost="65" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-30" target="self" element="earth" duration="2"/>
+      <effect type="healing" value="30" target="self" element="earth"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_void_rift_mar53sjf" name="Void Rift Prime" type="damage" element="arcane" tier="7" manaCost="100" rarity="rare" imagePath="/images/spells/special/void-rift.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_raging_thunderstorm_mar53sjf" name="Raging Thunderstorm" type="damage" element="air" tier="4" manaCost="75" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="30" target="enemy" element="air"/>
+      <effect type="damage" value="35" target="enemy" element="air"/>
+      <effect type="damage" value="40" target="enemy" element="air"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_nature&apos;s_wrath_mar53sjf" name="Nature&apos;s Wrath" type="damage" element="earth" tier="4" manaCost="75" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="65" target="enemy" element="earth"/>
+      <effect type="healing" value="30" target="self" element="earth"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_mana_rejuvenation_mar53sjf" name="Mana Rejuvenation" type="buff" element="arcane" tier="4" manaCost="60" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="manaRestore" value="50" target="self" element="arcane"/>
+      <effect type="statModifier" value="20" target="self" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_phoenix_flame_mar53sjf" name="Phoenix Flame" type="healing" element="fire" tier="4" manaCost="80" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="60" target="self" element="fire"/>
+      <effect type="statModifier" value="-15" target="self" element="fire" duration="3"/>
+      <effect type="statusEffect" value="10" target="self" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_solar_flare_mar53sjf" name="Solar Flare" type="damage" element="fire" tier="5" manaCost="100" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="100" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="20" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_absolute_zero_mar53sjf" name="Absolute Zero" type="damage" element="water" tier="5" manaCost="95" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="80" target="enemy" element="water"/>
+      <effect type="statusEffect" value="15" target="enemy" element="water" duration="3"/>
+      <effect type="statModifier" value="-15" target="enemy" element="water" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_world_shatter_mar53sjf" name="World Shatter" type="damage" element="earth" tier="5" manaCost="100" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="120" target="enemy" element="earth"/>
+      <effect type="statusEffect" value="10" target="enemy" element="earth" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_tempest_mar53sjf" name="Tempest" type="damage" element="air" tier="5" manaCost="90" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="70" target="enemy" element="air"/>
+      <effect type="damage" value="40" target="enemy" element="air"/>
+      <effect type="statusEffect" value="15" target="enemy" element="air" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_arcane_singularity_mar53sjf" name="Arcane Singularity" type="damage" element="arcane" tier="5" manaCost="120" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_divine_restoration_mar53sjf" name="Divine Restoration" type="healing" element="water" tier="5" manaCost="90" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="100" target="self" element="water"/>
+      <effect type="statusEffect" value="15" target="self" element="water" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_void_consumption_mar53sjf" name="Void Consumption" type="damage" element="arcane" tier="5" manaCost="110" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="90" target="enemy" element="arcane"/>
+      <effect type="healing" value="45" target="self" element="arcane"/>
+      <effect type="manaRestore" value="35" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_elemental_fusion_mar53sjf" name="Elemental Fusion" type="buff" element="arcane" tier="5" manaCost="85" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="25" target="self" element="arcane" duration="4"/>
+      <effect type="statModifier" value="-20" target="self" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_time_warp_mar53sjf" name="Time Warp" type="buff" element="arcane" tier="5" manaCost="100" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="1"/>
+      <effect type="manaRestore" value="30" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_essence_of_life_mar53sjf" name="Essence of Life" type="healing" element="earth" tier="5" manaCost="95" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="80" target="self" element="earth"/>
+      <effect type="statusEffect" value="20" target="self" element="earth" duration="5"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_apocalypse_mar53sjf" name="Apocalypse" type="damage" element="fire" tier="6" manaCost="150" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="140" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="30" target="enemy" element="fire" duration="4"/>
+      <effect type="statModifier" value="10" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_tsunami_mar53sjf" name="Tsunami" type="damage" element="water" tier="6" manaCost="140" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="120" target="enemy" element="water"/>
+      <effect type="statusEffect" value="15" target="enemy" element="water" duration="4"/>
+      <effect type="statModifier" value="-20" target="enemy" element="water" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_colossal_eruption_mar53sjf" name="Colossal Eruption" type="damage" element="earth" tier="6" manaCost="150" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="150" target="enemy" element="earth"/>
+      <effect type="statusEffect" value="20" target="enemy" element="fire" duration="3"/>
+      <effect type="statModifier" value="-10" target="enemy" element="earth" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_supercell_storm_mar53sjf" name="Supercell Storm" type="damage" element="air" tier="6" manaCost="145" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="60" target="enemy" element="air"/>
+      <effect type="damage" value="60" target="enemy" element="air"/>
+      <effect type="statusEffect" value="25" target="enemy" element="air" duration="4"/>
+      <effect type="statModifier" value="-15" target="enemy" element="air" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_reality_warp_mar53sjf" name="Reality Warp" type="damage" element="arcane" tier="6" manaCost="160" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="180" target="enemy" element="arcane"/>
+      <effect type="statModifier" value="25" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_mind_control_mar53sjf" name="Mind Control" type="debuff" element="arcane" tier="6" manaCost="140" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="80" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="40" target="enemy" element="arcane" duration="2"/>
+      <effect type="statModifier" value="20" target="enemy" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_phoenix_resurrection_mar53sjf" name="Phoenix Resurrection" type="healing" element="fire" tier="6" manaCost="150" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="200" target="self" element="fire"/>
+      <effect type="statusEffect" value="30" target="self" element="fire" duration="4"/>
+      <effect type="statModifier" value="20" target="self" element="fire" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_time_reverse_mar53sjf" name="Time Reverse" type="healing" element="arcane" tier="6" manaCost="140" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="150" target="self" element="arcane"/>
+      <effect type="manaRestore" value="100" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_cosmic_shield_mar53sjf" name="Cosmic Shield" type="buff" element="arcane" tier="6" manaCost="130" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-50" target="self" element="arcane" duration="3"/>
+      <effect type="statusEffect" value="30" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_planar_binding_mar53sjf" name="Planar Binding" type="damage" element="arcane" tier="6" manaCost="155" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="120" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="20" target="enemy" element="arcane" duration="3"/>
+      <effect type="manaRestore" value="60" target="self" element="arcane"/>
+      <effect type="healing" value="40" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_supernova_mar53sjf" name="Supernova" type="damage" element="fire" tier="7" manaCost="200" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="200" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="40" target="enemy" element="fire" duration="4"/>
+      <effect type="statModifier" value="30" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_abyssal_maw_mar53sjf" name="Abyssal Maw" type="damage" element="water" tier="7" manaCost="190" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="180" target="enemy" element="water"/>
+      <effect type="statusEffect" value="30" target="enemy" element="water" duration="3"/>
+      <effect type="statModifier" value="25" target="enemy" element="water" duration="4"/>
+      <effect type="statModifier" value="-25" target="enemy" element="water" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_world_tree_mar53sjg" name="World Tree" type="healing" element="earth" tier="7" manaCost="180" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="250" target="self" element="earth"/>
+      <effect type="statusEffect" value="40" target="self" element="earth" duration="5"/>
+      <effect type="manaRestore" value="50" target="self" element="earth"/>
+      <effect type="statModifier" value="-30" target="self" element="earth" duration="5"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_hurricane_apocalypse_mar53sjg" name="Hurricane Apocalypse" type="damage" element="air" tier="7" manaCost="195" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="100" target="enemy" element="air"/>
+      <effect type="damage" value="100" target="enemy" element="air"/>
+      <effect type="statusEffect" value="40" target="enemy" element="air" duration="5"/>
+      <effect type="statModifier" value="30" target="enemy" element="air" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_astral_projection_mar53sjg" name="Astral Projection" type="buff" element="arcane" tier="7" manaCost="170" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-70" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="40" target="self" element="arcane" duration="3"/>
+      <effect type="manaRestore" value="60" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_elemental_convergence_mar53sjg" name="Elemental Convergence" type="damage" element="arcane" tier="7" manaCost="210" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="80" target="enemy" element="fire"/>
+      <effect type="damage" value="80" target="enemy" element="water"/>
+      <effect type="damage" value="80" target="enemy" element="earth"/>
+      <effect type="damage" value="80" target="enemy" element="air"/>
+      <effect type="statModifier" value="40" target="enemy" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_lifeforce_manipulation_mar53sjg" name="Lifeforce Manipulation" type="healing" element="arcane" tier="7" manaCost="185" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+      <effect type="healing" value="150" target="self" element="arcane"/>
+      <effect type="statusEffect" value="30" target="enemy" element="arcane" duration="3"/>
+      <effect type="statusEffect" value="30" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_glacial_age_mar53sjg" name="Glacial Age" type="damage" element="water" tier="7" manaCost="190" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="170" target="enemy" element="water"/>
+      <effect type="statusEffect" value="35" target="enemy" element="water" duration="4"/>
+      <effect type="statModifier" value="-40" target="enemy" element="water" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_celestial_judgment_mar53sjg" name="Celestial Judgment" type="damage" element="arcane" tier="7" manaCost="220" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="250" target="enemy" element="arcane"/>
+      <effect type="statModifier" value="50" target="enemy" element="arcane" duration="1"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_phase_shift_mar53sjg" name="Phase Shift" type="buff" element="arcane" tier="7" manaCost="180" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-80" target="self" element="arcane" duration="2"/>
+      <effect type="statModifier" value="50" target="self" element="arcane" duration="3"/>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="1"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_extinction_event_mar53sjg" name="Extinction Event" type="damage" element="fire" tier="8" manaCost="300" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="300" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="50" target="enemy" element="fire" duration="5"/>
+      <effect type="statModifier" value="50" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_galactic_rift_mar53sjg" name="Galactic Rift" type="damage" element="arcane" tier="8" manaCost="320" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="350" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="40" target="enemy" element="arcane" duration="3"/>
+      <effect type="statModifier" value="40" target="enemy" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_dimensional_collapse_mar53sjg" name="Dimensional Collapse" type="damage" element="arcane" tier="8" manaCost="330" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="400" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_omni-elemental_fury_mar53sjg" name="Omni-Elemental Fury" type="damage" element="arcane" tier="8" manaCost="310" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="100" target="enemy" element="fire"/>
+      <effect type="damage" value="100" target="enemy" element="water"/>
+      <effect type="damage" value="100" target="enemy" element="earth"/>
+      <effect type="damage" value="100" target="enemy" element="air"/>
+      <effect type="statusEffect" value="60" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_time_stop_mar53sjg" name="Time Stop" type="buff" element="arcane" tier="8" manaCost="300" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="3"/>
+      <effect type="manaRestore" value="100" target="self" element="arcane"/>
+      <effect type="statModifier" value="60" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_cosmic_rebirth_mar53sjg" name="Cosmic Rebirth" type="healing" element="arcane" tier="8" manaCost="280" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="500" target="self" element="arcane"/>
+      <effect type="manaRestore" value="200" target="self" element="arcane"/>
+      <effect type="statModifier" value="-70" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="70" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_primeval_force_mar53sjg" name="Primeval Force" type="damage" element="earth" tier="8" manaCost="290" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="280" target="enemy" element="earth"/>
+      <effect type="statusEffect" value="70" target="enemy" element="earth" duration="4"/>
+      <effect type="statModifier" value="60" target="enemy" element="earth" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_divine_intervention_mar53sjg" name="Divine Intervention" type="healing" element="arcane" tier="8" manaCost="270" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="400" target="self" element="arcane"/>
+      <effect type="damage" value="200" target="enemy" element="arcane"/>
+      <effect type="manaRestore" value="150" target="self" element="arcane"/>
+      <effect type="statusEffect" value="50" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_reality_breach_mar53sjg" name="Reality Breach" type="damage" element="arcane" tier="8" manaCost="340" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="300" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="80" target="enemy" element="arcane" duration="3"/>
+      <effect type="statModifier" value="70" target="enemy" element="arcane" duration="2"/>
+      <effect type="damage" value="50" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_titanic_manifestation_mar53sjg" name="Titanic Manifestation" type="buff" element="earth" tier="8" manaCost="310" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-90" target="self" element="earth" duration="4"/>
+      <effect type="statModifier" value="80" target="self" element="earth" duration="4"/>
+      <effect type="statusEffect" value="60" target="enemy" element="earth" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_universal_cataclysm_mar53sjg" name="Universal Cataclysm" type="damage" element="fire" tier="9" manaCost="450" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="500" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="100" target="enemy" element="fire" duration="3"/>
+      <effect type="statModifier" value="80" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_eternal_oblivion_mar53sjg" name="Eternal Oblivion" type="damage" element="arcane" tier="9" manaCost="470" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="550" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="80" target="enemy" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_multiversal_nexus_mar53sjg" name="Multiversal Nexus" type="damage" element="arcane" tier="9" manaCost="500" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+      <effect type="damage" value="150" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="120" target="enemy" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_ascension_mar53sjg" name="Ascension" type="buff" element="arcane" tier="9" manaCost="450" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-100" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="100" target="self" element="arcane" duration="3"/>
+      <effect type="healing" value="300" target="self" element="arcane"/>
+      <effect type="manaRestore" value="300" target="self" element="arcane"/>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_primordial_genesis_mar53sjg" name="Primordial Genesis" type="healing" element="earth" tier="9" manaCost="420" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="600" target="self" element="earth"/>
+      <effect type="manaRestore" value="400" target="self" element="earth"/>
+      <effect type="statusEffect" value="80" target="self" element="earth" duration="5"/>
+      <effect type="statModifier" value="-80" target="self" element="earth" duration="5"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_cosmic_reset_mar53sjh" name="Cosmic Reset" type="healing" element="arcane" tier="9" manaCost="480" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="999" target="self" element="arcane"/>
+      <effect type="manaRestore" value="999" target="self" element="arcane"/>
+      <effect type="damage" value="400" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_transcendent_form_mar53sjh" name="Transcendent Form" type="buff" element="arcane" tier="9" manaCost="430" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-120" target="self" element="arcane" duration="4"/>
+      <effect type="statModifier" value="120" target="self" element="arcane" duration="4"/>
+      <effect type="statusEffect" value="100" target="enemy" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_omega_blast_mar53sjh" name="Omega Blast" type="damage" element="arcane" tier="9" manaCost="490" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="650" target="enemy" element="arcane"/>
+      <effect type="damage" value="100" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_celestial_maelstrom_mar53sjh" name="Celestial Maelstrom" type="damage" element="air" tier="9" manaCost="460" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="200" target="enemy" element="air"/>
+      <effect type="damage" value="200" target="enemy" element="air"/>
+      <effect type="damage" value="200" target="enemy" element="air"/>
+      <effect type="statusEffect" value="150" target="enemy" element="air" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_chrono_disruption_mar53sjh" name="Chrono Disruption" type="damage" element="arcane" tier="9" manaCost="470" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="300" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="200" target="enemy" element="arcane" duration="3"/>
+      <effect type="statModifier" value="150" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_total_obliteration_mar53sjh" name="Total Obliteration" type="damage" element="arcane" tier="10" manaCost="800" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="1000" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_creation-extinction_cycle_mar53sjh" name="Creation-Extinction Cycle" type="damage" element="arcane" tier="10" manaCost="850" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="300" target="enemy" element="fire"/>
+      <effect type="damage" value="300" target="enemy" element="earth"/>
+      <effect type="damage" value="300" target="enemy" element="water"/>
+      <effect type="damage" value="300" target="enemy" element="air"/>
+      <effect type="statusEffect" value="300" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_ultimate_reality_mar53sjh" name="Ultimate Reality" type="damage" element="arcane" tier="10" manaCost="900" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="800" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="400" target="enemy" element="arcane" duration="3"/>
+      <effect type="statModifier" value="200" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_godhead_manifestation_mar53sjh" name="Godhead Manifestation" type="buff" element="arcane" tier="10" manaCost="750" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="999" target="self" element="arcane"/>
+      <effect type="manaRestore" value="999" target="self" element="arcane"/>
+      <effect type="statModifier" value="-200" target="self" element="arcane" duration="5"/>
+      <effect type="statModifier" value="200" target="self" element="arcane" duration="5"/>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_infinity_mar53sjh" name="Infinity" type="damage" element="arcane" tier="10" manaCost="1000" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="500" target="enemy" element="arcane"/>
+      <effect type="damage" value="500" target="enemy" element="arcane"/>
+      <effect type="damage" value="500" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="500" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_primordial_one_mar53sjh" name="Primordial One" type="healing" element="arcane" tier="10" manaCost="800" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="999" target="self" element="arcane"/>
+      <effect type="manaRestore" value="999" target="self" element="arcane"/>
+      <effect type="statModifier" value="-500" target="self" element="arcane" duration="3"/>
+      <effect type="damage" value="500" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_omnipotence_mar53sjh" name="Omnipotence" type="buff" element="arcane" tier="10" manaCost="950" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-999" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="999" target="self" element="arcane" duration="3"/>
+      <effect type="statusEffect" value="500" target="enemy" element="arcane" duration="3"/>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="5"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_heat_death_mar53sjh" name="Heat Death" type="damage" element="fire" tier="10" manaCost="880" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="600" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="400" target="enemy" element="fire" duration="5"/>
+      <effect type="statModifier" value="300" target="enemy" element="fire" duration="5"/>
+      <effect type="manaRestore" value="-300" target="enemy" element="fire"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_big_bang_mar53sjh" name="Big Bang" type="damage" element="fire" tier="10" manaCost="920" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="1500" target="enemy" element="fire"/>
+      <effect type="damage" value="300" target="self" element="fire"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_singularity_mar53sjh" name="Singularity" type="damage" element="arcane" tier="10" manaCost="999" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="2000" target="enemy" element="arcane"/>
+      <effect type="damage" value="500" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_essence_theft_mar53sjh" name="Essence Theft" type="damage" element="arcane" tier="3" manaCost="40" rarity="uncommon" imagePath="/images/spells/special/essence-theft.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="40" target="enemy" element="arcane"/>
+      <effect type="healing" value="25" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_astral_chain_mar53sjh" name="Astral Chain" type="damage" element="arcane" tier="4" manaCost="45" rarity="uncommon" imagePath="/images/spells/special/astral-chain.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="35" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="15" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_magnetic_pulse_mar53sjh" name="Magnetic Pulse" type="damage" element="air" tier="2" manaCost="30" rarity="uncommon" imagePath="/images/spells/special/magnetic-pulse.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="45" target="enemy" element="air"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_resonance_strike_mar53sjh" name="Resonance Strike" type="damage" element="air" tier="5" manaCost="50" rarity="uncommon" imagePath="/images/spells/special/resonance-strike.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="60" target="enemy" element="air"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_honeyed_words_mar53sjh" name="Honeyed Words" type="buff" element="arcane" tier="1" manaCost="15" rarity="uncommon" imagePath="/images/spells/special/honeyed-words.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="30" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_lifeblood_ritual_mar53sjh" name="Lifeblood Ritual" type="healing" element="earth" tier="4" manaCost="35" rarity="uncommon" imagePath="/images/spells/special/lifeblood-ritual.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="100" target="self" element="earth"/>
+      <effect type="damage" value="30" target="self" element="earth"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_elemental_harmony_mar53sjh" name="Elemental Harmony" type="buff" element="arcane" tier="3" manaCost="45" rarity="uncommon" imagePath="/images/spells/special/elemental-harmony.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-20" target="self" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_rift_shatter_mar53sjh" name="Rift Shatter" type="damage" element="arcane" tier="5" manaCost="60" rarity="uncommon" imagePath="/images/spells/special/rift-shatter.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="70" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_chrono_skip_mar53sjh" name="Chrono Skip" type="buff" element="arcane" tier="4" manaCost="70" rarity="uncommon" imagePath="/images/spells/special/chrono-skip.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-100" target="self" element="arcane" duration="1"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_mirror_image_mar53sjh" name="Mirror Image" type="buff" element="arcane" tier="3" manaCost="40" rarity="uncommon" imagePath="/images/spells/special/mirror-image.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-40" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_eternal_winter_mar53sjh" name="Eternal Winter" type="damage" element="water" tier="6" manaCost="70" rarity="rare" imagePath="/images/spells/special/eternal-winter.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="60" target="enemy" element="water"/>
+      <effect type="statusEffect" value="30" target="enemy" element="water" duration="5"/>
+      <effect type="statModifier" value="40" target="enemy" element="water" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_void_rift_mar53sjh" name="Void Rift Minor" type="damage" element="arcane" tier="4" manaCost="42" rarity="rare" imagePath="/images/spells/special/void-rift.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="50" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_soulshatter_mar53sjh" name="Soulshatter" type="damage" element="arcane" tier="6" manaCost="80" rarity="rare" imagePath="/images/spells/special/soulshatter.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="100" target="enemy" element="arcane"/>
+      <effect type="statModifier" value="50" target="enemy" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_dragonflame_mar53sjh" name="Dragonflame" type="damage" element="fire" tier="6" manaCost="75" rarity="rare" imagePath="/images/spells/special/dragonflame.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="85" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="30" target="enemy" element="fire" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_celestial_blessing_mar53sji" name="Celestial Blessing" type="healing" element="arcane" tier="7" manaCost="85" rarity="rare" imagePath="/images/spells/special/celestial-blessing.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="healing" value="100" target="self" element="arcane"/>
+      <effect type="statModifier" value="-30" target="self" element="arcane" duration="5"/>
+      <effect type="statModifier" value="40" target="self" element="arcane" duration="5"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_absolute_silence_mar53sji" name="Absolute Silence" type="damage" element="arcane" tier="6" manaCost="70" rarity="rare" imagePath="/images/spells/special/absolute-silence.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="50" target="enemy" element="arcane"/>
+      <effect type="statModifier" value="100" target="enemy" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_plasma_storm_mar53sji" name="Plasma Storm" type="damage" element="fire" tier="7" manaCost="95" rarity="rare" imagePath="/images/spells/special/plasma-storm.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="120" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="40" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_runic_binding_mar53sji" name="Runic Binding" type="buff" element="earth" tier="6" manaCost="60" rarity="rare" imagePath="/images/spells/special/runic-binding.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-60" target="self" element="earth" duration="6"/>
+      <effect type="healing" value="20" target="self" element="earth"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_eldritch_barrier_mar53sji" name="Eldritch Barrier" type="buff" element="arcane" tier="7" manaCost="80" rarity="rare" imagePath="/images/spells/special/eldritch-barrier.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-70" target="self" element="arcane" duration="4"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_insanity_whisper_mar53sji" name="Insanity Whisper" type="damage" element="arcane" tier="7" manaCost="90" rarity="rare" imagePath="/images/spells/special/insanity-whisper.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="70" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="60" target="enemy" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_world-ending_flame_mar53sji" name="World-Ending Flame" type="damage" element="fire" tier="9" manaCost="150" rarity="legendary" imagePath="/images/spells/special/world-ending-flame.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="300" target="enemy" element="fire"/>
+      <effect type="statusEffect" value="100" target="enemy" element="fire" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_gaze_of_the_void_mar53sji" name="Gaze of the Void" type="damage" element="arcane" tier="9" manaCost="180" rarity="legendary" imagePath="/images/spells/special/gaze-of-the-void.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="250" target="enemy" element="arcane"/>
+      <effect type="statModifier" value="200" target="enemy" element="arcane" duration="2"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_singularity_nexus_mar53sji" name="Singularity Nexus" type="damage" element="arcane" tier="10" manaCost="220" rarity="legendary" imagePath="/images/spells/special/singularity-nexus.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="400" target="enemy" element="arcane"/>
+      <effect type="statusEffect" value="150" target="enemy" element="arcane" duration="3"/>
+      <effect type="damage" value="100" target="self" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_ascendant_apotheosis_mar53sji" name="Ascendant Apotheosis" type="buff" element="arcane" tier="10" manaCost="200" rarity="legendary" imagePath="/images/spells/special/ascendant-apotheosis.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="statModifier" value="-200" target="self" element="arcane" duration="3"/>
+      <effect type="statModifier" value="200" target="self" element="arcane" duration="3"/>
+      <effect type="manaRestore" value="500" target="self" element="arcane"/>
+      <effect type="healing" value="500" target="self" element="arcane"/>
+      <effect type="statusEffect" value="1" target="self" element="arcane" duration="3"/>
+    </effects>
+    <list>any</list>
+  </spell>
+  <spell id="spell_divine_judgment_mar53sji" name="Divine Judgment" type="damage" element="arcane" tier="10" manaCost="250" rarity="legendary" imagePath="/images/spells/special/divine-judgment.jpg">
+    <description #text=""/>
+    <effects>
+      <effect type="damage" value="500" target="enemy" element="arcane"/>
+    </effects>
+    <list>any</list>
+  </spell>
+</spells>

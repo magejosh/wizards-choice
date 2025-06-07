@@ -1,0 +1,3541 @@
+[
+    {
+      "id": "spell_firebolt_mar51ero",
+      "name": "Firebolt",
+      "type": "damage",
+      "element": "fire",
+      "tier": 1,
+      "manaCost": 25,
+      "description": "Launches a bolt of fire at your enemy, dealing direct damage.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 20,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_arcane_shield_mar51ero",
+      "name": "Arcane Shield",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 1,
+      "manaCost": 30,
+      "description": "Creates a magical shield that reduces incoming damage for 3 turns.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -5,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_minor_healing_mar51ero",
+      "name": "Minor Healing",
+      "type": "healing",
+      "element": "water",
+      "tier": 1,
+      "manaCost": 25,
+      "description": "Heals some of your health.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 15,
+          "target": "self",
+          "element": "water"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_frost_ray_mar51ero",
+      "name": "Frost Ray",
+      "type": "damage",
+      "element": "water",
+      "tier": 1,
+      "manaCost": 25,
+      "description": "Shoots a beam of frost that deals damage and may slow the enemy.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 15,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statModifier",
+          "value": -2,
+          "duration": 2,
+          "target": "enemy",
+          "element": "water"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_arcane_blast_mar51ero",
+      "name": "Arcane Blast",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 1,
+      "manaCost": 30,
+      "description": "Releases a burst of pure arcane energy.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 25,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_nature's_touch_mar51ero",
+      "name": "Nature's Touch",
+      "type": "healing",
+      "element": "earth",
+      "tier": 1,
+      "manaCost": 30,
+      "description": "Channels the power of nature to restore health over time.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 10,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "statusEffect",
+          "value": 5,
+          "duration": 3,
+          "target": "self",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_shadow_strike_mar51ero",
+      "name": "Shadow Strike",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 1,
+      "manaCost": 20,
+      "description": "A quick strike from the shadows that deals moderate damage.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 15,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_lightning_jolt_mar51ero",
+      "name": "Lightning Jolt",
+      "type": "damage",
+      "element": "air",
+      "tier": 1,
+      "manaCost": 20,
+      "description": "A quick bolt of lightning that deals damage.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 18,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_earth_tremor_mar51erp",
+      "name": "Earth Tremor",
+      "type": "damage",
+      "element": "earth",
+      "tier": 1,
+      "manaCost": 35,
+      "description": "Creates a small earthquake that damages the enemy.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 22,
+          "target": "enemy",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_mystic_insight_mar51erp",
+      "name": "Mystic Insight",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 1,
+      "manaCost": 20,
+      "description": "Grants mystical insight, increasing spell power for a short time.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": 5,
+          "duration": 2,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_fireball_mar51erp",
+      "name": "Fireball",
+      "type": "damage",
+      "element": "fire",
+      "tier": 2,
+      "manaCost": 40,
+      "description": "Hurls a ball of fire that explodes on impact, dealing area damage.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 35,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 5,
+          "duration": 2,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_ice_barrier_mar51erp",
+      "name": "Ice Barrier",
+      "type": "buff",
+      "element": "water",
+      "tier": 2,
+      "manaCost": 35,
+      "description": "Creates a barrier of ice that reduces damage and may freeze attackers.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -10,
+          "duration": 3,
+          "target": "self",
+          "element": "water"
+        },
+        {
+          "type": "statusEffect",
+          "value": 5,
+          "duration": 3,
+          "target": "self",
+          "element": "water"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_rejuvenation_mar51erp",
+      "name": "Rejuvenation",
+      "type": "healing",
+      "element": "earth",
+      "tier": 2,
+      "manaCost": 45,
+      "description": "A powerful healing spell that restores health and provides healing over time.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 25,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "statusEffect",
+          "value": 8,
+          "duration": 3,
+          "target": "self",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_arcane_armory_mar51erp",
+      "name": "Arcane Armory",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 2,
+      "manaCost": 40,
+      "description": "Surrounds the caster with arcane weapons that boost attack power and defense.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": 8,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": -5,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_wind_blast_mar51erp",
+      "name": "Wind Blast",
+      "type": "damage",
+      "element": "air",
+      "tier": 2,
+      "manaCost": 35,
+      "description": "Summons a powerful gust of wind that damages and pushes back the enemy.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 30,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statModifier",
+          "value": -3,
+          "duration": 2,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_venom_spray_mar51erp",
+      "name": "Venom Spray",
+      "type": "dot",
+      "element": "earth",
+      "tier": 2,
+      "manaCost": 38,
+      "description": "Sprays toxic venom that poisons the enemy, dealing damage over time.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 15,
+          "target": "enemy",
+          "element": "earth"
+        },
+        {
+          "type": "statusEffect",
+          "value": 10,
+          "duration": 3,
+          "target": "enemy",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_thunderclasp_mar51erp",
+      "name": "Thunderclasp",
+      "type": "damage",
+      "element": "air",
+      "tier": 2,
+      "manaCost": 42,
+      "description": "Calls down a thunderous boom that deals heavy damage and may stun the enemy.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 40,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statusEffect",
+          "value": -1,
+          "duration": 1,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_earth_shield_mar51erp",
+      "name": "Earth Shield",
+      "type": "buff",
+      "element": "earth",
+      "tier": 2,
+      "manaCost": 40,
+      "description": "Creates a shield of stone and earth that significantly reduces incoming damage.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -15,
+          "duration": 2,
+          "target": "self",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_lifedrain_mar51erp",
+      "name": "Lifedrain",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 2,
+      "manaCost": 45,
+      "description": "Drains life force from the enemy, healing the caster by half the damage dealt.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 30,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "healing",
+          "value": 15,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_mana_steal_mar51erp",
+      "name": "Mana Steal",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 2,
+      "manaCost": 35,
+      "description": "Drains magical energy from the enemy, restoring mana to the caster.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 25,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 15,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_inferno_mar51erp",
+      "name": "Inferno",
+      "type": "damage",
+      "element": "fire",
+      "tier": 3,
+      "manaCost": 60,
+      "description": "Engulfs the area in flames, causing massive fire damage and lingering burns.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 50,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 10,
+          "duration": 3,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_frost_nova_mar51erp",
+      "name": "Frost Nova",
+      "type": "damage",
+      "element": "water",
+      "tier": 3,
+      "manaCost": 55,
+      "description": "Releases a freezing wave that damages enemies and significantly reduces their action speed.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 40,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statModifier",
+          "value": -5,
+          "duration": 3,
+          "target": "enemy",
+          "element": "water"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_nature's_blessing_mar51erp",
+      "name": "Nature's Blessing",
+      "type": "healing",
+      "element": "earth",
+      "tier": 3,
+      "manaCost": 65,
+      "description": "Channels the full power of nature to provide substantial healing and restoration over time.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 45,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "statusEffect",
+          "value": 12,
+          "duration": 3,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "manaRestore",
+          "value": 10,
+          "target": "self",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_arcane_surge_mar51erp",
+      "name": "Arcane Surge",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 3,
+      "manaCost": 60,
+      "description": "Channels pure arcane energy into a devastating blast that ignores magical defenses.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 60,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_hurricane_mar51erp",
+      "name": "Hurricane",
+      "type": "damage",
+      "element": "air",
+      "tier": 3,
+      "manaCost": 58,
+      "description": "Summons a violent storm that deals damage over multiple turns and reduces enemy effectiveness.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 35,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statusEffect",
+          "value": 15,
+          "duration": 4,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statModifier",
+          "value": -3,
+          "duration": 4,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_earthquake_mar51erp",
+      "name": "Earthquake",
+      "type": "damage",
+      "element": "earth",
+      "tier": 3,
+      "manaCost": 55,
+      "description": "Triggers a massive earthquake that deals substantial damage and destabilizes the enemy.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 55,
+          "target": "enemy",
+          "element": "earth"
+        },
+        {
+          "type": "statModifier",
+          "value": -4,
+          "duration": 2,
+          "target": "enemy",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_shadow_form_mar51erp",
+      "name": "Shadow Form",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 3,
+      "manaCost": 50,
+      "description": "Transforms the caster into living shadow, increasing evasion and spell power.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -20,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 12,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_chain_lightning_mar51erp",
+      "name": "Chain Lightning",
+      "type": "damage",
+      "element": "air",
+      "tier": 3,
+      "manaCost": 55,
+      "description": "Unleashes a bolt of lightning that repeatedly strikes the enemy.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 20,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "damage",
+          "value": 20,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "damage",
+          "value": 20,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_vitality_transfer_mar51erp",
+      "name": "Vitality Transfer",
+      "type": "healing",
+      "element": "arcane",
+      "tier": 3,
+      "manaCost": 50,
+      "description": "Converts mana into health, providing substantial immediate healing.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 70,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_mana_flux_mar51erp",
+      "name": "Mana Flux",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 3,
+      "manaCost": 45,
+      "description": "Creates a surge of magical energy that temporarily reduces spell costs and increases regeneration.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": 15,
+          "duration": 4,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 25,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_meteor_strike_mar51erp",
+      "name": "Meteor Strike",
+      "type": "damage",
+      "element": "fire",
+      "tier": 4,
+      "manaCost": 75,
+      "description": "Calls down a devastating meteor that deals massive damage and leaves the area burning.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 70,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 15,
+          "duration": 3,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_blizzard_mar51erp",
+      "name": "Blizzard",
+      "type": "damage",
+      "element": "water",
+      "tier": 4,
+      "manaCost": 70,
+      "description": "Summons a violent blizzard that deals severe cold damage and freezes enemies.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 50,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statusEffect",
+          "value": 10,
+          "duration": 3,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statModifier",
+          "value": -8,
+          "duration": 2,
+          "target": "enemy",
+          "element": "water"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_arcane_explosion_mar51erp",
+      "name": "Arcane Explosion",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 4,
+      "manaCost": 85,
+      "description": "Releases an explosive burst of arcane energy that deals massive damage to all enemies.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 90,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_gale_force_mar51erp",
+      "name": "Gale Force",
+      "type": "damage",
+      "element": "air",
+      "tier": 4,
+      "manaCost": 70,
+      "description": "Summons a devastating windstorm that deals damage and severely reduces enemy capabilities.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 60,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statModifier",
+          "value": -10,
+          "duration": 3,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_earth's_embrace_mar51erp",
+      "name": "Earth's Embrace",
+      "type": "buff",
+      "element": "earth",
+      "tier": 4,
+      "manaCost": 65,
+      "description": "Envelops the caster in living stone, providing near-immunity to damage for a short time.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -30,
+          "duration": 2,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "healing",
+          "value": 30,
+          "target": "self",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_void_rift_mar51erp",
+      "name": "Void Rift",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 4,
+      "manaCost": 80,
+      "description": "Opens a rift to the void, dealing extreme damage that bypasses defenses.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 80,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 10,
+          "duration": 2,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_raging_thunderstorm_mar51erp",
+      "name": "Raging Thunderstorm",
+      "type": "damage",
+      "element": "air",
+      "tier": 4,
+      "manaCost": 75,
+      "description": "Summons a violent thunderstorm that strikes multiple times with increasing intensity.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 30,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "damage",
+          "value": 35,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "damage",
+          "value": 40,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_nature's_wrath_mar51erp",
+      "name": "Nature's Wrath",
+      "type": "damage",
+      "element": "earth",
+      "tier": 4,
+      "manaCost": 75,
+      "description": "Unleashes nature's fury in a devastating attack that also heals the caster.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 65,
+          "target": "enemy",
+          "element": "earth"
+        },
+        {
+          "type": "healing",
+          "value": 30,
+          "target": "self",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_mana_rejuvenation_mar51erp",
+      "name": "Mana Rejuvenation",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 4,
+      "manaCost": 60,
+      "description": "Rapidly restores mana and enhances mana regeneration for several turns.",
+      "effects": [
+        {
+          "type": "manaRestore",
+          "value": 50,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 20,
+          "duration": 4,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_phoenix_flame_mar51erp",
+      "name": "Phoenix Flame",
+      "type": "healing",
+      "element": "fire",
+      "tier": 4,
+      "manaCost": 80,
+      "description": "Envelops the caster in regenerative flames that provide substantial healing and damage resistance.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 60,
+          "target": "self",
+          "element": "fire"
+        },
+        {
+          "type": "statModifier",
+          "value": -15,
+          "duration": 3,
+          "target": "self",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 10,
+          "duration": 3,
+          "target": "self",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_solar_flare_mar51erp",
+      "name": "Solar Flare",
+      "type": "damage",
+      "element": "fire",
+      "tier": 5,
+      "manaCost": 100,
+      "description": "Channels the power of the sun to create a devastating flare that causes catastrophic damage.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 100,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 20,
+          "duration": 3,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_absolute_zero_mar51erp",
+      "name": "Absolute Zero",
+      "type": "damage",
+      "element": "water",
+      "tier": 5,
+      "manaCost": 95,
+      "description": "Reduces the temperature to absolute zero, causing extreme damage and completely freezing the enemy.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 80,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statusEffect",
+          "value": 15,
+          "duration": 3,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statModifier",
+          "value": -15,
+          "duration": 2,
+          "target": "enemy",
+          "element": "water"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_world_shatter_mar51erp",
+      "name": "World Shatter",
+      "type": "damage",
+      "element": "earth",
+      "tier": 5,
+      "manaCost": 100,
+      "description": "Creates a localized earthquake of such magnitude that it threatens to shatter the world itself.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 120,
+          "target": "enemy",
+          "element": "earth"
+        },
+        {
+          "type": "statusEffect",
+          "value": 10,
+          "duration": 2,
+          "target": "enemy",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_tempest_mar51erp",
+      "name": "Tempest",
+      "type": "damage",
+      "element": "air",
+      "tier": 5,
+      "manaCost": 90,
+      "description": "Conjures a catastrophic tempest of wind, lightning, and rain that devastates everything in its path.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 70,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "damage",
+          "value": 40,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statusEffect",
+          "value": 15,
+          "duration": 3,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_arcane_singularity_mar51erp",
+      "name": "Arcane Singularity",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 5,
+      "manaCost": 120,
+      "description": "Creates an arcane singularity that warps reality and devastates anything in its vicinity.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 150,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_divine_restoration_mar51erp",
+      "name": "Divine Restoration",
+      "type": "healing",
+      "element": "water",
+      "tier": 5,
+      "manaCost": 90,
+      "description": "Channels divine energy to completely restore health and remove all negative effects.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 100,
+          "target": "self",
+          "element": "water"
+        },
+        {
+          "type": "statusEffect",
+          "value": 15,
+          "duration": 3,
+          "target": "self",
+          "element": "water"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_void_consumption_mar51erp",
+      "name": "Void Consumption",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 5,
+      "manaCost": 110,
+      "description": "Opens a rift to the void that consumes a portion of the enemy's essence, dealing damage and healing the caster.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 90,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "healing",
+          "value": 45,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 35,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_elemental_fusion_mar51erp",
+      "name": "Elemental Fusion",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 5,
+      "manaCost": 85,
+      "description": "Fuses elemental energies to dramatically enhance spellcasting power and provide protection.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": 25,
+          "duration": 4,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": -20,
+          "duration": 4,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_time_warp_mar51erp",
+      "name": "Time Warp",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 5,
+      "manaCost": 100,
+      "description": "Warps the flow of time, allowing the caster to act twice in a single turn.",
+      "effects": [
+        {
+          "type": "statusEffect",
+          "value": 1,
+          "duration": 1,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 30,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_essence_of_life_mar51erq",
+      "name": "Essence of Life",
+      "type": "healing",
+      "element": "earth",
+      "tier": 5,
+      "manaCost": 95,
+      "description": "Channels the pure essence of life, providing massive healing and ongoing regeneration.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 80,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "statusEffect",
+          "value": 20,
+          "duration": 5,
+          "target": "self",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_apocalypse_mar51erq",
+      "name": "Apocalypse",
+      "type": "damage",
+      "element": "fire",
+      "tier": 6,
+      "manaCost": 150,
+      "description": "Summons the apocalypse, inflicting catastrophic fire damage and leaving the target in agony.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 140,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 30,
+          "duration": 4,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statModifier",
+          "value": 10,
+          "duration": 3,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_tsunami_mar51erq",
+      "name": "Tsunami",
+      "type": "damage",
+      "element": "water",
+      "tier": 6,
+      "manaCost": 140,
+      "description": "Summons a massive tsunami that crashes down on enemies, causing devastating damage and lingering effects.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 120,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statusEffect",
+          "value": 15,
+          "duration": 4,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statModifier",
+          "value": -20,
+          "duration": 3,
+          "target": "enemy",
+          "element": "water"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_colossal_eruption_mar51erq",
+      "name": "Colossal Eruption",
+      "type": "damage",
+      "element": "earth",
+      "tier": 6,
+      "manaCost": 150,
+      "description": "Triggers a massive volcanic eruption beneath the enemy, causing extreme damage and lingering volcanic effects.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 150,
+          "target": "enemy",
+          "element": "earth"
+        },
+        {
+          "type": "statusEffect",
+          "value": 20,
+          "duration": 3,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statModifier",
+          "value": -10,
+          "duration": 3,
+          "target": "enemy",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_supercell_storm_mar51erq",
+      "name": "Supercell Storm",
+      "type": "damage",
+      "element": "air",
+      "tier": 6,
+      "manaCost": 145,
+      "description": "Summons a massive supercell thunderstorm with multiple devastating effects.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 60,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "damage",
+          "value": 60,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statusEffect",
+          "value": 25,
+          "duration": 4,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statModifier",
+          "value": -15,
+          "duration": 3,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_reality_warp_mar51erq",
+      "name": "Reality Warp",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 6,
+      "manaCost": 160,
+      "description": "Tears apart the fabric of reality around the target, causing catastrophic arcane damage and disrupting their magic.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 180,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 25,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_mind_control_mar51erq",
+      "name": "Mind Control",
+      "type": "debuff",
+      "element": "arcane",
+      "tier": 6,
+      "manaCost": 140,
+      "description": "Takes control of the enemy's mind, forcing them to damage themselves with their own power.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 80,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 40,
+          "duration": 2,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 20,
+          "duration": 2,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_phoenix_resurrection_mar51erq",
+      "name": "Phoenix Resurrection",
+      "type": "healing",
+      "element": "fire",
+      "tier": 6,
+      "manaCost": 150,
+      "description": "Channels the power of the mythical phoenix to restore the caster to full power and provide powerful regeneration.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 200,
+          "target": "self",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 30,
+          "duration": 4,
+          "target": "self",
+          "element": "fire"
+        },
+        {
+          "type": "statModifier",
+          "value": 20,
+          "duration": 4,
+          "target": "self",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_time_reverse_mar51erq",
+      "name": "Time Reverse",
+      "type": "healing",
+      "element": "arcane",
+      "tier": 6,
+      "manaCost": 140,
+      "description": "Reverses time around the caster, undoing recent damage and restoring mana and health to a previous state.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 150,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 100,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_cosmic_shield_mar51erq",
+      "name": "Cosmic Shield",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 6,
+      "manaCost": 130,
+      "description": "Surrounds the caster with the power of the cosmos, providing near invulnerability and reflecting damage back at attackers.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -50,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 30,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_planar_binding_mar51erq",
+      "name": "Planar Binding",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 6,
+      "manaCost": 155,
+      "description": "Binds the enemy to another plane of existence, causing immense damage and absorbing their power.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 120,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 20,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 60,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "healing",
+          "value": 40,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_supernova_mar51erq",
+      "name": "Supernova",
+      "type": "damage",
+      "element": "fire",
+      "tier": 7,
+      "manaCost": 200,
+      "description": "Creates a supernova explosion that devastates everything in its path with stellar fire.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 200,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 40,
+          "duration": 4,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statModifier",
+          "value": 30,
+          "duration": 3,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_abyssal_maw_mar51erq",
+      "name": "Abyssal Maw",
+      "type": "damage",
+      "element": "water",
+      "tier": 7,
+      "manaCost": 190,
+      "description": "Opens a giant maw to the deepest abyssal trenches, crushing the enemy with immense pressure and cold.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 180,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statusEffect",
+          "value": 30,
+          "duration": 3,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statModifier",
+          "value": 25,
+          "duration": 4,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statModifier",
+          "value": -25,
+          "duration": 4,
+          "target": "enemy",
+          "element": "water"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_world_tree_mar51erq",
+      "name": "World Tree",
+      "type": "healing",
+      "element": "earth",
+      "tier": 7,
+      "manaCost": 180,
+      "description": "Manifests the World Tree, the source of all life, providing extraordinary healing and life force.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 250,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "statusEffect",
+          "value": 40,
+          "duration": 5,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "manaRestore",
+          "value": 50,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "statModifier",
+          "value": -30,
+          "duration": 5,
+          "target": "self",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_hurricane_apocalypse_mar51erq",
+      "name": "Hurricane Apocalypse",
+      "type": "damage",
+      "element": "air",
+      "tier": 7,
+      "manaCost": 195,
+      "description": "Summons a world-ending hurricane that tears everything apart with wind, lightning, and devastation.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 100,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "damage",
+          "value": 100,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statusEffect",
+          "value": 40,
+          "duration": 5,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statModifier",
+          "value": 30,
+          "duration": 3,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_astral_projection_mar51erq",
+      "name": "Astral Projection",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 7,
+      "manaCost": 170,
+      "description": "Projects the caster's consciousness into the astral plane, making them nearly invulnerable and enhancing their magical abilities.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -70,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 40,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 60,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_elemental_convergence_mar51erq",
+      "name": "Elemental Convergence",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 7,
+      "manaCost": 210,
+      "description": "Converges all elemental forces into a single devastating attack that overwhelms any defense.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 80,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "damage",
+          "value": 80,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "damage",
+          "value": 80,
+          "target": "enemy",
+          "element": "earth"
+        },
+        {
+          "type": "damage",
+          "value": 80,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statModifier",
+          "value": 40,
+          "duration": 2,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_lifeforce_manipulation_mar51erq",
+      "name": "Lifeforce Manipulation",
+      "type": "healing",
+      "element": "arcane",
+      "tier": 7,
+      "manaCost": 185,
+      "description": "Manipulates the very essence of life, transferring life force from the enemy to the caster.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 150,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "healing",
+          "value": 150,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 30,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 30,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_glacial_age_mar51erq",
+      "name": "Glacial Age",
+      "type": "damage",
+      "element": "water",
+      "tier": 7,
+      "manaCost": 190,
+      "description": "Brings forth a miniature ice age, freezing everything and causing catastrophic cold damage.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 170,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statusEffect",
+          "value": 35,
+          "duration": 4,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statModifier",
+          "value": -40,
+          "duration": 2,
+          "target": "enemy",
+          "element": "water"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_celestial_judgment_mar51erq",
+      "name": "Celestial Judgment",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 7,
+      "manaCost": 220,
+      "description": "Calls down judgment from celestial beings, devastating the enemy with divine power.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 250,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 50,
+          "duration": 1,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_phase_shift_mar51err",
+      "name": "Phase Shift",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 7,
+      "manaCost": 180,
+      "description": "Shifts the caster out of phase with normal reality, granting them extraordinary powers.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -80,
+          "duration": 2,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 50,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 1,
+          "duration": 1,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_extinction_event_mar51err",
+      "name": "Extinction Event",
+      "type": "damage",
+      "element": "fire",
+      "tier": 8,
+      "manaCost": 300,
+      "description": "Recreates the cataclysmic event that caused mass extinction, annihilating everything in its path.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 300,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 50,
+          "duration": 5,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statModifier",
+          "value": 50,
+          "duration": 3,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_galactic_rift_mar51err",
+      "name": "Galactic Rift",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 8,
+      "manaCost": 320,
+      "description": "Tears open a rift to the void between galaxies, subjecting the enemy to the unimaginable forces found there.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 350,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 40,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 40,
+          "duration": 4,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_dimensional_collapse_mar51err",
+      "name": "Dimensional Collapse",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 8,
+      "manaCost": 330,
+      "description": "Collapses a small dimension onto the enemy, subjecting them to the catastrophic energy release.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 400,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_omni-elemental_fury_mar51err",
+      "name": "Omni-Elemental Fury",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 8,
+      "manaCost": 310,
+      "description": "Unleashes the fury of all elemental planes simultaneously in a devastating assault.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 100,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "damage",
+          "value": 100,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "damage",
+          "value": 100,
+          "target": "enemy",
+          "element": "earth"
+        },
+        {
+          "type": "damage",
+          "value": 100,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statusEffect",
+          "value": 60,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_time_stop_mar51err",
+      "name": "Time Stop",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 8,
+      "manaCost": 300,
+      "description": "Completely stops time for everyone except the caster, allowing multiple actions without opposition.",
+      "effects": [
+        {
+          "type": "statusEffect",
+          "value": 1,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 100,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 60,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_cosmic_rebirth_mar51err",
+      "name": "Cosmic Rebirth",
+      "type": "healing",
+      "element": "arcane",
+      "tier": 8,
+      "manaCost": 280,
+      "description": "Causes the caster to be reborn in the fires of cosmic creation, fully restoring them and granting immense power.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 500,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 200,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": -70,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 70,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_primeval_force_mar51err",
+      "name": "Primeval Force",
+      "type": "damage",
+      "element": "earth",
+      "tier": 8,
+      "manaCost": 290,
+      "description": "Channels the primeval forces of creation that shaped the world, devastating the enemy with unimaginable power.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 280,
+          "target": "enemy",
+          "element": "earth"
+        },
+        {
+          "type": "statusEffect",
+          "value": 70,
+          "duration": 4,
+          "target": "enemy",
+          "element": "earth"
+        },
+        {
+          "type": "statModifier",
+          "value": 60,
+          "duration": 3,
+          "target": "enemy",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_divine_intervention_mar51err",
+      "name": "Divine Intervention",
+      "type": "healing",
+      "element": "arcane",
+      "tier": 8,
+      "manaCost": 270,
+      "description": "Calls upon divine powers to intervene, completely restoring the caster and smiting their enemies.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 400,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "damage",
+          "value": 200,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 150,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 50,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_reality_breach_mar51err",
+      "name": "Reality Breach",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 8,
+      "manaCost": 340,
+      "description": "Creates a catastrophic breach in the fabric of reality, unleashing chaotic energies that devastate everything.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 300,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 80,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 70,
+          "duration": 2,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "damage",
+          "value": 50,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_titanic_manifestation_mar51err",
+      "name": "Titanic Manifestation",
+      "type": "buff",
+      "element": "earth",
+      "tier": 8,
+      "manaCost": 310,
+      "description": "Manifests a titanic elemental being of immense power that fights alongside the caster.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -90,
+          "duration": 4,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "statModifier",
+          "value": 80,
+          "duration": 4,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "statusEffect",
+          "value": 60,
+          "duration": 4,
+          "target": "enemy",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_universal_cataclysm_mar51err",
+      "name": "Universal Cataclysm",
+      "type": "damage",
+      "element": "fire",
+      "tier": 9,
+      "manaCost": 450,
+      "description": "Triggers a cataclysm on a universal scale, channeling the raw destructive power of cosmic apocalypse.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 500,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 100,
+          "duration": 3,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statModifier",
+          "value": 80,
+          "duration": 3,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_eternal_oblivion_mar51err",
+      "name": "Eternal Oblivion",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 9,
+      "manaCost": 470,
+      "description": "Consigns the enemy to eternal oblivion, a place beyond space and time where existence itself is erased.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 550,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 80,
+          "duration": 4,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_multiversal_nexus_mar51err",
+      "name": "Multiversal Nexus",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 9,
+      "manaCost": 500,
+      "description": "Creates a nexus of infinite realities, subjecting the enemy to the simultaneous destructive forces of countless universes.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 150,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "damage",
+          "value": 150,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "damage",
+          "value": 150,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "damage",
+          "value": 150,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 120,
+          "duration": 2,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_ascension_mar51err",
+      "name": "Ascension",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 9,
+      "manaCost": 450,
+      "description": "Causes the caster to temporarily ascend to a higher plane of existence, gaining godlike powers.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -100,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 100,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "healing",
+          "value": 300,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 300,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 1,
+          "duration": 2,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_primordial_genesis_mar51ers",
+      "name": "Primordial Genesis",
+      "type": "healing",
+      "element": "earth",
+      "tier": 9,
+      "manaCost": 420,
+      "description": "Taps into the primordial forces of creation that birthed the world, completely restoring and empowering the caster.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 600,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "manaRestore",
+          "value": 400,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "statusEffect",
+          "value": 80,
+          "duration": 5,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "statModifier",
+          "value": -80,
+          "duration": 5,
+          "target": "self",
+          "element": "earth"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_cosmic_reset_mar51ers",
+      "name": "Cosmic Reset",
+      "type": "healing",
+      "element": "arcane",
+      "tier": 9,
+      "manaCost": 480,
+      "description": "Resets the caster's existence to a perfect state while devastating the enemy's.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 999,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 999,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "damage",
+          "value": 400,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_transcendent_form_mar51ers",
+      "name": "Transcendent Form",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 9,
+      "manaCost": 430,
+      "description": "Transforms the caster into a being of pure energy, transcending the limitations of physical form.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -120,
+          "duration": 4,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 120,
+          "duration": 4,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 100,
+          "duration": 4,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_omega_blast_mar51ers",
+      "name": "Omega Blast",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 9,
+      "manaCost": 490,
+      "description": "Channels the power of the omega force, the ultimate destructive power in the multiverse.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 650,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "damage",
+          "value": 100,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_celestial_maelstrom_mar51ers",
+      "name": "Celestial Maelstrom",
+      "type": "damage",
+      "element": "air",
+      "tier": 9,
+      "manaCost": 460,
+      "description": "Summons a maelstrom of celestial proportions, channeling the destructive power of colliding galaxies.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 200,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "damage",
+          "value": 200,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "damage",
+          "value": 200,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statusEffect",
+          "value": 150,
+          "duration": 3,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_chrono_disruption_mar51ers",
+      "name": "Chrono Disruption",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 9,
+      "manaCost": 470,
+      "description": "Disrupts the enemy's timeline, causing them to experience their demise from infinite different timelines simultaneously.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 300,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 200,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 150,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_total_obliteration_mar51ers",
+      "name": "Total Obliteration",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 10,
+      "manaCost": 800,
+      "description": "The ultimate destructive spell that completely obliterates the target from existence across all possible timelines and realities.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 1000,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_creation-extinction_cycle_mar51ers",
+      "name": "Creation-Extinction Cycle",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 10,
+      "manaCost": 850,
+      "description": "Subjects the enemy to the full cycle of universal creation and extinction, billions of years of cosmic birth and death compressed into moments.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 300,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "damage",
+          "value": 300,
+          "target": "enemy",
+          "element": "earth"
+        },
+        {
+          "type": "damage",
+          "value": 300,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "damage",
+          "value": 300,
+          "target": "enemy",
+          "element": "air"
+        },
+        {
+          "type": "statusEffect",
+          "value": 300,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_ultimate_reality_mar51ers",
+      "name": "Ultimate Reality",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 10,
+      "manaCost": 900,
+      "description": "Confronts the enemy with the ultimate reality that lies beyond all illusion, a truth so terrible it shatters mind, body, and soul.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 800,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 400,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 200,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_godhead_manifestation_mar51ers",
+      "name": "Godhead Manifestation",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 10,
+      "manaCost": 750,
+      "description": "The caster temporarily manifests as a divine being of unlimited power, transcending all limitations of mortal existence.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 999,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 999,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": -200,
+          "duration": 5,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 200,
+          "duration": 5,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 1,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_infinity_mar51ers",
+      "name": "Infinity",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 10,
+      "manaCost": 1000,
+      "description": "Channels the concept of infinity itself, subjecting the enemy to endless iterations of destruction across infinite dimensions.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 500,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "damage",
+          "value": 500,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "damage",
+          "value": 500,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 500,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_primordial_one_mar51ers",
+      "name": "Primordial One",
+      "type": "healing",
+      "element": "arcane",
+      "tier": 10,
+      "manaCost": 800,
+      "description": "Returns the caster to the primordial state of the One that existed before creation, gaining the power that birthed all reality.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 999,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 999,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": -500,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "damage",
+          "value": 500,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_omnipotence_mar51ers",
+      "name": "Omnipotence",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 10,
+      "manaCost": 950,
+      "description": "Grants the caster temporary omnipotence, the state of unlimited power and ability to do anything.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -999,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 999,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 500,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 1,
+          "duration": 5,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_heat_death_mar51ers",
+      "name": "Heat Death",
+      "type": "damage",
+      "element": "fire",
+      "tier": 10,
+      "manaCost": 880,
+      "description": "Subjects the enemy to the heat death of the universe, the ultimate entropic end where all energy is exhausted.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 600,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 400,
+          "duration": 5,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statModifier",
+          "value": 300,
+          "duration": 5,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "manaRestore",
+          "value": -300,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_big_bang_mar51ers",
+      "name": "Big Bang",
+      "type": "damage",
+      "element": "fire",
+      "tier": 10,
+      "manaCost": 920,
+      "description": "Recreates the Big Bang, the primordial explosion that birthed the universe, focusing all its energy on the enemy.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 1500,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "damage",
+          "value": 300,
+          "target": "self",
+          "element": "fire"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_singularity_mar51ers",
+      "name": "Singularity",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 10,
+      "manaCost": 999,
+      "description": "Creates a true singularity, a point of infinite density and zero volume, that consumes the enemy completely.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 2000,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "damage",
+          "value": 500,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "imagePath": "/images/spells/default-placeholder.jpg"
+    },
+    {
+      "id": "spell_essence_theft_mar51ers",
+      "name": "Essence Theft",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 3,
+      "manaCost": 40,
+      "description": "Steals the essence of the enemy, healing the caster for a portion of the damage dealt.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 40,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "healing",
+          "value": 25,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "uncommon",
+      "howToObtain": "Defeat a Mana Vampire in the Whispering Caverns",
+      "imagePath": "/images/spells/special/essence-theft.jpg"
+    },
+    {
+      "id": "spell_astral_chain_mar51ers",
+      "name": "Astral Chain",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 4,
+      "manaCost": 45,
+      "description": "Binds the enemy with chains of astral energy, dealing damage and preventing them from using certain abilities.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 35,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 15,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "uncommon",
+      "howToObtain": "Complete the \"Astral Binding\" side quest in the Mystic Academy",
+      "imagePath": "/images/spells/special/astral-chain.jpg"
+    },
+    {
+      "id": "spell_magnetic_pulse_mar51ers",
+      "name": "Magnetic Pulse",
+      "type": "damage",
+      "element": "air",
+      "tier": 2,
+      "manaCost": 30,
+      "description": "Releases a concentrated magnetic pulse that damages enemies wearing metal armor more severely.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 45,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "rarity": "uncommon",
+      "howToObtain": "Found in ancient technology in the Rusted Ruins",
+      "imagePath": "/images/spells/special/magnetic-pulse.jpg"
+    },
+    {
+      "id": "spell_resonance_strike_mar51ers",
+      "name": "Resonance Strike",
+      "type": "damage",
+      "element": "air",
+      "tier": 5,
+      "manaCost": 50,
+      "description": "Strikes the enemy with a precisely tuned resonant frequency, bypassing shields and barriers.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 60,
+          "target": "enemy",
+          "element": "air"
+        }
+      ],
+      "rarity": "uncommon",
+      "howToObtain": "Reward from the Resonant Crystal collection quest",
+      "imagePath": "/images/spells/special/resonance-strike.jpg"
+    },
+    {
+      "id": "spell_honeyed_words_mar51ert",
+      "name": "Honeyed Words",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 1,
+      "manaCost": 15,
+      "description": "A subtle enchantment that makes your words more persuasive, potentially avoiding combat entirely.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": 30,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "uncommon",
+      "howToObtain": "Learned from the Silvertongue Bard in Verdant City",
+      "imagePath": "/images/spells/special/honeyed-words.jpg"
+    },
+    {
+      "id": "spell_lifeblood_ritual_mar51ert",
+      "name": "Lifeblood Ritual",
+      "type": "healing",
+      "element": "earth",
+      "tier": 4,
+      "manaCost": 35,
+      "description": "A forbidden healing ritual that draws upon your own lifeforce to heal grievous wounds instantly.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 100,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "damage",
+          "value": 30,
+          "target": "self",
+          "element": "earth"
+        }
+      ],
+      "rarity": "uncommon",
+      "howToObtain": "Found in the Forbidden Grimoire in the Ancient Library",
+      "imagePath": "/images/spells/special/lifeblood-ritual.jpg"
+    },
+    {
+      "id": "spell_elemental_harmony_mar51ert",
+      "name": "Elemental Harmony",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 3,
+      "manaCost": 45,
+      "description": "Harmonizes with the elements around you, granting resistance to all elemental damage for a short time.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -20,
+          "duration": 4,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "uncommon",
+      "howToObtain": "Reward for completing the Elemental Trials",
+      "imagePath": "/images/spells/special/elemental-harmony.jpg"
+    },
+    {
+      "id": "spell_rift_shatter_mar51ert",
+      "name": "Rift Shatter",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 5,
+      "manaCost": 60,
+      "description": "Shatters the fabric between dimensions, causing chaotic arcane energy to flood the area and damage all enemies.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 70,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "uncommon",
+      "howToObtain": "Dropped by the Dimensional Ripper boss",
+      "imagePath": "/images/spells/special/rift-shatter.jpg"
+    },
+    {
+      "id": "spell_chrono_skip_mar51ert",
+      "name": "Chrono Skip",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 4,
+      "manaCost": 70,
+      "description": "Skips forward in time momentarily, allowing you to avoid an incoming attack with certainty.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -100,
+          "duration": 1,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "uncommon",
+      "howToObtain": "Found in the Clockwork Tower",
+      "imagePath": "/images/spells/special/chrono-skip.jpg"
+    },
+    {
+      "id": "spell_mirror_image_mar51ert",
+      "name": "Mirror Image",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 3,
+      "manaCost": 40,
+      "description": "Creates illusory duplicates of yourself that confuse enemies and absorb attacks.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -40,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "uncommon",
+      "howToObtain": "Learned from the Master Illusionist in the Hall of Mirrors",
+      "imagePath": "/images/spells/special/mirror-image.jpg"
+    },
+    {
+      "id": "spell_eternal_winter_mar51ert",
+      "name": "Eternal Winter",
+      "type": "damage",
+      "element": "water",
+      "tier": 6,
+      "manaCost": 70,
+      "description": "Summons a fragment of eternal winter from the far north, freezing enemies solid and dealing severe cold damage over time.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 60,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statusEffect",
+          "value": 30,
+          "duration": 5,
+          "target": "enemy",
+          "element": "water"
+        },
+        {
+          "type": "statModifier",
+          "value": 40,
+          "duration": 3,
+          "target": "enemy",
+          "element": "water"
+        }
+      ],
+      "rarity": "rare",
+      "howToObtain": "Defeat the Frost Giant King in the Glacial Peaks",
+      "imagePath": "/images/spells/special/eternal-winter.jpg"
+    },
+    {
+      "id": "spell_void_rift_mar51ert",
+      "name": "Void Rift",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 7,
+      "manaCost": 100,
+      "description": "Opens a rift to the Void, a place of nothingness that consumes matter and energy alike. Can sometimes banish enemies entirely.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 150,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "rare",
+      "howToObtain": "Complete the \"Beyond the Veil\" quest line",
+      "imagePath": "/images/spells/special/void-rift.jpg"
+    },
+    {
+      "id": "spell_soulshatter_mar51ert",
+      "name": "Soulshatter",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 6,
+      "manaCost": 80,
+      "description": "Attacks the very soul of the enemy, dealing damage proportional to their remaining health and weakening them severely.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 100,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 50,
+          "duration": 4,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "rare",
+      "howToObtain": "Defeat the Soulsplitter Demon in the Abyssal Depths",
+      "imagePath": "/images/spells/special/soulshatter.jpg"
+    },
+    {
+      "id": "spell_dragonflame_mar51ert",
+      "name": "Dragonflame",
+      "type": "damage",
+      "element": "fire",
+      "tier": 6,
+      "manaCost": 75,
+      "description": "Channels the ancient fire of dragons, burning through all defenses and continuing to burn for several turns.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 85,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 30,
+          "duration": 4,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "rarity": "rare",
+      "howToObtain": "Defeat an Ancient Dragon or complete the Dragon's Pact quest",
+      "imagePath": "/images/spells/special/dragonflame.jpg"
+    },
+    {
+      "id": "spell_celestial_blessing_mar51ert",
+      "name": "Celestial Blessing",
+      "type": "healing",
+      "element": "arcane",
+      "tier": 7,
+      "manaCost": 85,
+      "description": "Calls upon celestial forces to bless the caster, providing healing, protection, and enhanced magical abilities.",
+      "effects": [
+        {
+          "type": "healing",
+          "value": 100,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": -30,
+          "duration": 5,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 40,
+          "duration": 5,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "rare",
+      "howToObtain": "Complete the Celestial Temple trials",
+      "imagePath": "/images/spells/special/celestial-blessing.jpg"
+    },
+    {
+      "id": "spell_absolute_silence_mar51ert",
+      "name": "Absolute Silence",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 6,
+      "manaCost": 70,
+      "description": "Envelops the enemy in a field of absolute silence where no magic can function, preventing them from casting spells.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 50,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 100,
+          "duration": 2,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "rare",
+      "howToObtain": "Reward from the Mage Hunter faction",
+      "imagePath": "/images/spells/special/absolute-silence.jpg"
+    },
+    {
+      "id": "spell_plasma_storm_mar51ert",
+      "name": "Plasma Storm",
+      "type": "damage",
+      "element": "fire",
+      "tier": 7,
+      "manaCost": 95,
+      "description": "Creates a swirling vortex of superheated plasma that deals massive damage to enemies caught within it.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 120,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 40,
+          "duration": 3,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "rarity": "rare",
+      "howToObtain": "Defeat the Star Forger in the Celestial Forge",
+      "imagePath": "/images/spells/special/plasma-storm.jpg"
+    },
+    {
+      "id": "spell_runic_binding_mar51ert",
+      "name": "Runic Binding",
+      "type": "buff",
+      "element": "earth",
+      "tier": 6,
+      "manaCost": 60,
+      "description": "Inscribes ancient protective runes on the caster, granting exceptional defense against all forms of damage.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -60,
+          "duration": 6,
+          "target": "self",
+          "element": "earth"
+        },
+        {
+          "type": "healing",
+          "value": 20,
+          "target": "self",
+          "element": "earth"
+        }
+      ],
+      "rarity": "rare",
+      "howToObtain": "Complete the Rune Master's trials in the Runic Chambers",
+      "imagePath": "/images/spells/special/runic-binding.jpg"
+    },
+    {
+      "id": "spell_eldritch_barrier_mar51ert",
+      "name": "Eldritch Barrier",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 7,
+      "manaCost": 80,
+      "description": "Creates a protective barrier of eldritch energy that absorbs damage and reflects a portion back to attackers.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -70,
+          "duration": 4,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "rare",
+      "howToObtain": "Found in the Tome of Eldritch Wonders in the Forbidden Library",
+      "imagePath": "/images/spells/special/eldritch-barrier.jpg"
+    },
+    {
+      "id": "spell_insanity_whisper_mar51ert",
+      "name": "Insanity Whisper",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 7,
+      "manaCost": 90,
+      "description": "Whispers secrets of cosmic horror directly into the enemy's mind, causing them to attack themselves or allies in madness.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 70,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 60,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "rare",
+      "howToObtain": "Defeat the Mind Flayer Elder in the Darkest Depths",
+      "imagePath": "/images/spells/special/insanity-whisper.jpg"
+    },
+    {
+      "id": "spell_world-ending_flame_mar51ert",
+      "name": "World-Ending Flame",
+      "type": "damage",
+      "element": "fire",
+      "tier": 9,
+      "manaCost": 150,
+      "description": "Summons the primordial flame that will one day consume the world, dealing catastrophic damage to all enemies.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 300,
+          "target": "enemy",
+          "element": "fire"
+        },
+        {
+          "type": "statusEffect",
+          "value": 100,
+          "duration": 3,
+          "target": "enemy",
+          "element": "fire"
+        }
+      ],
+      "rarity": "legendary",
+      "howToObtain": "Defeat the Apocalypse Dragon, an optional superboss",
+      "imagePath": "/images/spells/special/world-ending-flame.jpg"
+    },
+    {
+      "id": "spell_gaze_of_the_void_mar51ert",
+      "name": "Gaze of the Void",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 9,
+      "manaCost": 180,
+      "description": "Channels the incomprehensible power of the Void itself, potentially erasing enemies from existence.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 250,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 200,
+          "duration": 2,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "legendary",
+      "howToObtain": "Complete the secret \"Void Walker\" quest line",
+      "imagePath": "/images/spells/special/gaze-of-the-void.jpg"
+    },
+    {
+      "id": "spell_singularity_nexus_mar51ert",
+      "name": "Singularity Nexus",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 10,
+      "manaCost": 220,
+      "description": "Creates a nexus of singularities that bend spacetime itself, dealing massive damage to all enemies and distorting reality.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 400,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 150,
+          "duration": 3,
+          "target": "enemy",
+          "element": "arcane"
+        },
+        {
+          "type": "damage",
+          "value": 100,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "legendary",
+      "howToObtain": "Combine three fragments of the Cosmic Keystone found in hidden locations",
+      "imagePath": "/images/spells/special/singularity-nexus.jpg"
+    },
+    {
+      "id": "spell_ascendant_apotheosis_mar51ert",
+      "name": "Ascendant Apotheosis",
+      "type": "buff",
+      "element": "arcane",
+      "tier": 10,
+      "manaCost": 200,
+      "description": "Temporarily ascends the caster to a higher plane of existence, granting godlike power for a brief moment.",
+      "effects": [
+        {
+          "type": "statModifier",
+          "value": -200,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statModifier",
+          "value": 200,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "manaRestore",
+          "value": 500,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "healing",
+          "value": 500,
+          "target": "self",
+          "element": "arcane"
+        },
+        {
+          "type": "statusEffect",
+          "value": 1,
+          "duration": 3,
+          "target": "self",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "legendary",
+      "howToObtain": "Complete the hidden \"Path to Transcendence\" quest line",
+      "imagePath": "/images/spells/special/ascendant-apotheosis.jpg"
+    },
+    {
+      "id": "spell_divine_judgment_mar51ert",
+      "name": "Divine Judgment",
+      "type": "damage",
+      "element": "arcane",
+      "tier": 10,
+      "manaCost": 250,
+      "description": "Calls down divine judgment upon enemies, dealing damage proportional to their misdeeds and evil within them.",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 500,
+          "target": "enemy",
+          "element": "arcane"
+        }
+      ],
+      "rarity": "legendary",
+      "howToObtain": "Earn the favor of the God of Justice by completing all righteous quests",
+      "imagePath": "/images/spells/special/divine-judgment.jpg"
+    }
+  ]
+  

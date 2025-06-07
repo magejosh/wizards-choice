@@ -6,7 +6,7 @@ import { persist } from 'zustand/middleware';
 import { GameState, GameProgress, SaveSlot } from '../types/game-types';
 import { MarketData } from '../types/market-types';
 import { Wizard } from '../types/wizard-types';
-import { generateDefaultWizard } from '../wizard/wizardUtils';
+import { generateDefaultWizardAsync } from '../wizard/wizardUtils';
 import { initializeMarkets, refreshMarketInventory } from '../features/market/marketSystem';
 
 // Import all modules
@@ -21,8 +21,8 @@ import { createSaveModule, SaveActions } from './modules/saveModule';
 import { v4 as uuidv4 } from 'uuid';
 
 // Get initial state with placeholder data
-const getInitialState = (): { gameState: GameState } => {
-  const defaultWizard = generateDefaultWizard('');
+const getInitialState = async (): Promise<{ gameState: GameState }> => {
+  const defaultWizard = await generateDefaultWizardAsync('');
   const defaultMarkets = initializeMarkets();
 
   // Defensive: Validate and recover market inventory structure

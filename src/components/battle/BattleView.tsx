@@ -60,10 +60,10 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
   // Custom setter that ensures entries are always sorted by timestamp (newest first)
   const setBattleLog = (entries: CombatLogEntry[]) => {
     // Debug log to help diagnose ordering issues
-    console.log('setBattleLog called with', entries.length, 'entries');
+    // console.log('setBattleLog called with', entries.length, 'entries');
     if (entries.length > 0) {
-      console.log('First entry before sorting:', entries[0].details);
-      console.log('Last entry before sorting:', entries[entries.length - 1].details);
+      // console.log('First entry before sorting:', entries[0].details);
+      // console.log('Last entry before sorting:', entries[entries.length - 1].details);
     }
 
     // Sort entries by timestamp (newest first)
@@ -71,8 +71,8 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
     // Debug log after sorting
     if (sortedEntries.length > 0) {
-      console.log('First entry after sorting (newest):', sortedEntries[0].details);
-      console.log('Last entry after sorting (oldest):', sortedEntries[sortedEntries.length - 1].details);
+      // console.log('First entry after sorting (newest):', sortedEntries[0].details);
+      // console.log('Last entry after sorting (oldest):', sortedEntries[sortedEntries.length - 1].details);
     }
 
     // Update state with sorted entries
@@ -114,12 +114,12 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     if (!combatState) return;
 
     // Log the phase change for debugging
-    console.log(`BattleView detected phase change to: ${combatState.currentPhase} in round ${combatState.round}`);
+    // console.log(`BattleView detected phase change to: ${combatState.currentPhase} in round ${combatState.round}`);
 
     // Safety check: If we're in initiative phase but the initiative roll UI isn't showing,
     // make sure it gets shown
     if (combatState.currentPhase === 'initiative' && !showInitiativeRoll) {
-      console.log('Safety check: In initiative phase but initiative roll UI not showing - fixing');
+      // console.log('Safety check: In initiative phase but initiative roll UI not showing - fixing');
       setShowInitiativeRoll(true);
     }
 
@@ -138,7 +138,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
       // Only update if the order has changed
       if (orderChanged) {
-        console.log('Battle log order changed - re-sorting');
+        // console.log('Battle log order changed - re-sorting');
         setLogEntries(sortedEntries);
       }
     }
@@ -149,13 +149,13 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     if (isInitialized) return;
 
     // Check if we're coming from wizard's study (valid entry point)
-    const { currentLocation } = gameState.gameProgress;
+    const { currentLocation } = gameState.gameProgress || {};
 
-    console.log('Battle page initialization, current location:', currentLocation);
+    // console.log('Battle page initialization, current location:', currentLocation);
 
     // Accept either 'duel' or 'wizardStudy' as valid entry points to prevent navigation issues
     if (currentLocation !== 'duel' && currentLocation !== 'wizardStudy') {
-      console.log('Invalid navigation to battle - aborting');
+      // console.log('Invalid navigation to battle - aborting');
       return;
     }
 
@@ -165,10 +165,10 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     // Generate enemy wizard
     const playerWizard = getWizard();
     if (!playerWizard) {
-      console.error('Player wizard not found');
+      // console.error('Player wizard not found');
       return;
     }
-    console.log("Player wizard for battle:", playerWizard.name, "Level:", playerWizard.level);
+    // console.log("Player wizard for battle:", playerWizard.name, "Level:", playerWizard.level);
     const difficulty = gameState.settings.difficulty as 'easy' | 'normal' | 'hard';
     const rawEnemy = generateEnemy(playerWizard.level, difficulty);
     const enemyWizard = {
@@ -257,7 +257,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
     // Important: Show the initiative roll UI as soon as we initialize combat
     if (initialCombatState.currentPhase === 'initiative') {
-      console.log('Starting with initiative phase - showing dice roller UI');
+      // console.log('Starting with initiative phase - showing dice roller UI');
       // We don't set initiativeRolls with pre-generated values anymore
       // Let the InitiativeRoll component generate random values
       setShowInitiativeRoll(true);
@@ -297,7 +297,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       animationTimeoutRef.current = null;
     }
 
-    console.log("COMBAT END: Processing battle end, status =", combatState.status);
+    // console.log("COMBAT END: Processing battle end, status =", combatState.status);
 
     // Process victory or defeat - shared logic
     try {
@@ -305,7 +305,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         // Use the centralized experience calculation function
         const experience = calculateExperienceGained(combatState);
 
-        console.log('Adding experience:', experience);
+        // console.log('Adding experience:', experience);
 
         // Store the experience gained for display in the victory modal
         setExperienceGained(experience);
@@ -345,182 +345,74 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
       // Save game state but don't change location yet
       // Location will be changed when user clicks Continue button
-      console.log("COMBAT END: Saving game state");
+      // console.log("COMBAT END: Saving game state");
       saveGame();
 
       // Note: We don't navigate here - let the user click the continue button
       // Location will be set by onReturnToWizardStudy function
     } catch (error) {
-      console.error("Error processing battle end:", error);
+      // console.error("Error processing battle end:", error);
     }
   }, [combatState?.status, addExperience, saveGame]);
 
   // Handle enemy looting
-  const handleLootEnemy = () => {
-    if (!combatState || hasLootedEnemy) return;
+  const handleLootEnemy = async () => {
+    if (!combatState || !combatState.enemyWizard || hasLootedEnemy) return;
 
     try {
-      console.log("Looting enemy wizard");
+     // console.log("Looting enemy wizard");
 
       const difficulty = combatState.difficulty;
-      const playerWizard = gameState.player;
-      const enemyWizard = combatState.enemyWizard.wizard;
-
-      // Determine success chance based on difficulty experienceMultiplier
-      let successChance = 0;
-      // Use the same multiplier values as in calculateExperienceGained
-      const experienceMultiplier =
-        difficulty === 'easy' ? 10 :
-        difficulty === 'normal' ? 1 :
-        difficulty === 'hard' ? 0.1 : 1;
-
-      // 10 times the experienceMultiplier as percentage
-      successChance = experienceMultiplier * 10;
-
-      // For debugging, temporarily make success more likely
-      console.log(`Loot success chance: ${successChance}%`);
-      const roll = Math.random() * 100;
-      const isLootingSuccessful = roll <= successChance;
-      console.log(`Loot roll: ${roll}, Success: ${isLootingSuccessful}`);
-
-      if (isLootingSuccessful) {
-        // Generate loot using the lootSystem
-        let lootDrop = generateLoot(
-          playerWizard,
-          enemyWizard,
-          true, // isWizardEnemy
-          difficulty
-        );
-
-        console.log("Generated loot:", lootDrop);
-
-        // Convert any spells to scrolls instead of directly adding them to the spell library
-        const scrollsFromSpells = lootDrop.spells.map(spell => ({
-          id: `scroll_${spell.id}_${Date.now()}`,
-          name: `Scroll: ${spell.name}`,
-          description: `A magical scroll containing the spell: ${spell.name}`,
-          type: 'scroll' as const,
-          rarity: spell.tier <= 2 ? 'common' as const :
-                 spell.tier <= 4 ? 'uncommon' as const :
-                 spell.tier <= 6 ? 'rare' as const :
-                 'epic' as const,
-          spell: spell,
-          imagePath: spell.imagePath
-        }));
-
-        // Remove spells from loot and add them as scrolls
-        lootDrop = {
-          ...lootDrop,
-          spells: [],
-          scrolls: [...lootDrop.scrolls, ...scrollsFromSpells]
-        };
-
-        // Calculate gold based on enemy level and difficulty
-        const goldAmount = Math.floor((Math.random() * 30 + 20) * enemyWizard.level * experienceMultiplier);
-
-        // Get the current player
-        const currentPlayer = getWizard();
-        if (!currentPlayer) {
-          console.error('Player not found when applying loot');
-          return;
-        }
-
-        // Apply the loot to the player
-        console.log("Player before applying loot:", currentPlayer);
-        const updatedWizard = applyLoot(currentPlayer, lootDrop);
-        console.log("Player after applying loot:", updatedWizard);
-
-        // Add gold to the updated wizard
-        const currentGold = currentPlayer.gold || 0;
-        updatedWizard.gold = currentGold + goldAmount;
-
-        // Update the player in the game state using updateWizard
-        // This will update both the save slot and top-level player data
-        updateWizard(() => updatedWizard);
-        console.log("Added gold to player:", goldAmount);
-
-        // Force a save immediately
-        setTimeout(() => {
-          saveGame();
-          console.log("Game saved after loot applied");
-
-          // Double-check that state was updated correctly
-          const currentState = useGameStateStore.getState().gameState;
-          console.log("Current player state after save:", currentState.player);
-          console.log("Current player gold after save:", currentState.player.gold);
-        }, 100);
-
-        // Generate loot notification message
-        let lootMessage = "You looted: ";
-        if (scrollsFromSpells.length > 0) {
-          lootMessage += `${scrollsFromSpells.length} spell scroll${scrollsFromSpells.length !== 1 ? 's' : ''} (${scrollsFromSpells.map(s => s.name.replace('Scroll: ', '')).join(', ')}), `;
-        }
-        if (lootDrop.equipment.length > 0) {
-          lootMessage += `${lootDrop.equipment.length} equipment item${lootDrop.equipment.length !== 1 ? 's' : ''}, `;
-        }
-        if (lootDrop.ingredients.length > 0) {
-          lootMessage += `${lootDrop.ingredients.length} ingredient${lootDrop.ingredients.length !== 1 ? 's' : ''}, `;
-        }
-        if (lootDrop.scrolls.length - scrollsFromSpells.length > 0) {
-          const originalScrollCount = lootDrop.scrolls.length - scrollsFromSpells.length;
-          lootMessage += `${originalScrollCount} additional scroll${originalScrollCount !== 1 ? 's' : ''}, `;
-        }
-        lootMessage += `and ${goldAmount} gold!`;
-
-        // Show loot notification
-        setLootNotification({
-          show: true,
-          message: lootMessage
-        });
-
-        // Add loot message to battle log using the manager
-        battleLogManager.addEntry({
-          turn: combatState.turn,
-          round: combatState.round,
-          actor: 'player',
-          action: 'loot',
-          details: lootMessage
-        });
-
-        // Update the battle log state with the latest entries
-        setBattleLog(battleLogManager.getEntries());
-      } else {
-        // Looting failed
-        setLootNotification({
-          show: true,
-          message: "You didn't find anything valuable on the enemy."
-        });
-
-        // Add failure message to battle log using the manager
-        battleLogManager.addEntry({
-          turn: combatState.turn,
-          round: combatState.round,
-          actor: 'player',
-          action: 'loot',
-          details: "Failed to find anything valuable."
-        });
-
-        // Update the battle log state with the latest entries
-        setBattleLog(battleLogManager.getEntries());
+      const player = getWizard();
+      if (!player) {
+       // console.error("Player not found for looting");
+        return;
       }
 
-      // Mark enemy as looted
-      setHasLootedEnemy(true);
+      const lootDrop = await generateLoot(player, combatState.enemyWizard.wizard, true, difficulty);
 
-      // Hide notification after 5 seconds
-      setTimeout(() => {
-        setLootNotification({show: false, message: ''});
-      }, 5000);
+     // console.log("Generated loot:", lootDrop);
 
+      // Apply loot to player
+      if (player) {
+        const updatedWizard = applyLoot(player, lootDrop);
+        updateWizard(() => updatedWizard);
+
+        let lootMessage = "You found: ";
+        const foundItems: string[] = [];
+        if (lootDrop.gold && lootDrop.gold > 0) foundItems.push(`${lootDrop.gold} gold`);
+        if (lootDrop.spells.length > 0) foundItems.push(...lootDrop.spells.map(s => s.name));
+        if (lootDrop.equipment.length > 0) foundItems.push(...lootDrop.equipment.map(e => e.name));
+        if (lootDrop.ingredients.length > 0) foundItems.push(...lootDrop.ingredients.map(i => i.name));
+        if (lootDrop.scrolls.length > 0) foundItems.push(...lootDrop.scrolls.map(s => s.name));
+
+        if (foundItems.length > 0) {
+          lootMessage += foundItems.join(', ') + '.';
+        } else {
+          lootMessage = "You found nothing of interest.";
+        }
+        
+        setLootNotification({
+          show: true,
+          message: lootMessage,
+        });
+
+        // Mark as looted to prevent multiple loot attempts
+        setHasLootedEnemy(true); 
+        // Force a save immediately after looting
+        setTimeout(() => {
+          saveGame();
+         // console.log("Game saved after loot applied");
+        }, 100);
+      } else {
+       // console.error('Player not found when applying loot');
+      }
     } catch (error) {
-      console.error("Error looting enemy:", error);
+     // console.error("Error looting enemy:", error);
       setLootNotification({
         show: true,
-        message: "Error occurred while looting."
+        message: "An error occurred while looting.",
       });
-      setTimeout(() => {
-        setLootNotification({show: false, message: ''});
-      }, 5000);
     }
   };
 
@@ -530,33 +422,33 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
     // Only allow spell casting during the action or response phases
     if (combatState.currentPhase !== 'action' && combatState.currentPhase !== 'response') {
-      console.log(`Cannot cast spell in ${combatState.currentPhase} phase - must be in action or response phase`);
+      // console.log(`Cannot cast spell in ${combatState.currentPhase} phase - must be in action or response phase`);
       return;
     }
 
     // In response phase, only allow reaction type spells
     if (combatState.currentPhase === 'response' && spell.type !== 'reaction') {
-      console.log('Only reaction spells can be cast during the response phase');
+      // console.log('Only reaction spells can be cast during the response phase');
       return;
     }
 
     // Don't allow casting if player has already acted in the current phase
     if ((combatState.currentPhase === 'action' && combatState.actionState.player.hasActed) ||
         (combatState.currentPhase === 'response' && combatState.actionState.player.hasResponded)) {
-      console.log(`Player has already taken an action in this ${combatState.currentPhase} phase`);
+      // console.log(`Player has already taken an action in this ${combatState.currentPhase} phase`);
       return;
     }
 
     // Validate mana cost
     if (spell.manaCost > combatState.playerWizard.currentMana) {
-      console.log('Not enough mana to cast this spell');
+      // console.log('Not enough mana to cast this spell');
       return;
     }
 
     setIsAnimating(true);
 
     try {
-      console.log(`Player queuing spell: ${spell.name} in ${combatState.currentPhase} phase`);
+      // console.log(`Player queuing spell: ${spell.name} in ${combatState.currentPhase} phase`);
 
       // Make sure the spell has required properties
       const validatedSpell: Spell = {
@@ -631,7 +523,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         }, 500);
           }
     } catch (error) {
-      console.error("Error in spell selection:", error);
+      // console.error("Error in spell selection:", error);
       setIsAnimating(false);
     }
   };
@@ -639,12 +531,12 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
   // Handle mystic punch selection
   const handleMysticPunchSelect = (spell: Spell) => {
     if (!combatState || isAnimating) {
-      console.log("Cannot execute Mystic Punch - combatState missing or animation in progress");
+      // console.log("Cannot execute Mystic Punch - combatState missing or animation in progress");
       setShowMysticPunchSelection(false);
       return;
     }
 
-    console.log(`DEBUG: Selected spell for Mystic Punch: ${spell.name} (ID: ${spell.id})`);
+    // console.log(`DEBUG: Selected spell for Mystic Punch: ${spell.name} (ID: ${spell.id})`);
 
     // First close the selection modal to prevent duplicate processing
     setShowMysticPunchSelection(false);
@@ -716,7 +608,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         }, 500);
           }
     } catch (error) {
-      console.error("Error executing mystic punch:", error);
+      // console.error("Error executing mystic punch:", error);
       setIsAnimating(false);
       setShowMysticPunchSelection(false);
     }
@@ -724,29 +616,29 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
   // Handle skip turn with phase-based system
   const handleSkipTurn = () => {
-    console.log("Skip turn button clicked");
+    // console.log("Skip turn button clicked");
     if (!combatState) {
-      console.log("Cannot skip turn - combat state is null");
+      // console.log("Cannot skip turn - combat state is null");
       return;
     }
 
     if (isAnimating) {
-      console.log("Cannot skip turn - animation in progress");
+      // console.log("Cannot skip turn - animation in progress");
       return;
     }
 
-    console.log(`Current phase: ${combatState.currentPhase}, Player has acted: ${combatState.actionState.player.hasActed}`);
+    // console.log(`Current phase: ${combatState.currentPhase}, Player has acted: ${combatState.actionState.player.hasActed}`);
 
     // Only allow skipping during action or response phases
     if (combatState.currentPhase !== 'action' && combatState.currentPhase !== 'response') {
-      console.log(`Cannot skip turn in ${combatState.currentPhase} phase`);
+      // console.log(`Cannot skip turn in ${combatState.currentPhase} phase`);
       return;
     }
 
     // Check if player has already acted in the current phase
     if ((combatState.currentPhase === 'action' && combatState.actionState.player.hasActed) ||
         (combatState.currentPhase === 'response' && combatState.actionState.player.hasResponded)) {
-      console.log(`Player has already taken an action in this ${combatState.currentPhase} phase`);
+      // console.log(`Player has already taken an action in this ${combatState.currentPhase} phase`);
       return;
     }
 
@@ -754,7 +646,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
     try {
       // Log the action
-      console.log(`Skipping turn in ${combatState.currentPhase} phase`);
+      // console.log(`Skipping turn in ${combatState.currentPhase} phase`);
 
       // Skip the player's turn - this will update the action state
       const newState = skipTurn(combatState, true);
@@ -812,7 +704,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         }, 500);
       }
     } catch (error) {
-      console.error("Error skipping turn:", error);
+      // console.error("Error skipping turn:", error);
       setIsAnimating(false);
     }
   };
@@ -824,65 +716,55 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     if (!combatState) return;
 
     try {
-      console.log('DEBUG: Discarding spell:', spell.name);
-      console.log('DEBUG: Hand size before discard:', combatState.playerWizard.hand.length);
+      // console.log('DEBUG: Discarding spell:', spell.name);
+      // console.log('DEBUG: Hand size before discard:', combatState.playerWizard.hand.length);
 
       // Execute the discard using the card manager
       const updatedState = discardCard(combatState, spell.id, true);
 
-      console.log('DEBUG: Hand size after discard:', updatedState.playerWizard.hand.length);
+      // console.log('DEBUG: Hand size after discard:', updatedState.playerWizard.hand.length);
 
       // Use the cardManager function to check if player still needs to discard
       const { needsDiscard, cardsToDiscard } = needsToDiscard(updatedState, true, MAX_HAND_SIZE);
 
       if (needsDiscard) {
-        console.log(`DEBUG: Still need to discard ${cardsToDiscard} more cards`);
+        // console.log(`DEBUG: Still need to discard ${cardsToDiscard} more cards`);
         setNumCardsToDiscard(cardsToDiscard);
         // Update state but keep discard modal open
         setCombatState(updatedState);
       } else {
         // All required discards complete - player has MAX_HAND_SIZE or fewer cards
-        console.log(`DEBUG: Discard complete, hand size is now ≤ ${MAX_HAND_SIZE}`);
+        // console.log(`DEBUG: Discard complete, hand size is now ≤ ${MAX_HAND_SIZE}`);
 
         // First close the discard modal
         setShowDiscardSelection(false);
         setNumCardsToDiscard(0);
 
-        // Verify that enemy has also completed discarding
+        // Check if enemy also needs to discard or if we can advance
+        // This logic might need refinement based on game rules for enemy discard
         if (updatedState.enemyWizard.hand.length <= MAX_HAND_SIZE) {
           // Both player and enemy have completed discarding, advance to next phase
-          console.log('DEBUG: Both player and enemy discard complete, advancing to end phase');
+          // console.log('DEBUG: Both player and enemy discard complete, advancing to end phase');
 
           // Make sure we're still in the discard phase before advancing
           if (updatedState.currentPhase === 'discard') {
-            // Add a slight delay to ensure UI updates
-            setTimeout(() => {
-              const finalState = advancePhase(updatedState);
-              // Update the combat state with the new phase
-              setCombatState(finalState);
-            }, 500);
-          } else {
-            // Just update the state without advancing the phase
-            setCombatState(updatedState);
+            const finalState = advancePhase(updatedState);
+            setCombatState(finalState);
           }
         } else {
-          console.log('DEBUG: Player discard complete, but enemy still needs to discard');
+          // console.log('DEBUG: Player discard complete, but enemy still needs to discard');
           // Process enemy discard first
-          const stateAfterEnemyDiscard = processEnemyDiscard(updatedState, MAX_HAND_SIZE);
-
-          // Then advance to the end phase
-          if (stateAfterEnemyDiscard.currentPhase === 'discard') {
-            setTimeout(() => {
-              const finalState = advancePhase(stateAfterEnemyDiscard);
-              setCombatState(finalState);
-            }, 500);
-          } else {
-            setCombatState(stateAfterEnemyDiscard);
-          }
+          // const stateAfterEnemyDiscard = processEnemyDiscard(updatedState, MAX_HAND_SIZE);
+          // setCombatState(stateAfterEnemyDiscard);
+          // // After enemy discard, check if we can advance
+          // if (stateAfterEnemyDiscard.currentPhase === 'discard') {
+          //   const finalStateAfterEnemy = advancePhase(stateAfterEnemyDiscard);
+          //   setCombatState(finalStateAfterEnemy);
+          // }
         }
       }
     } catch (error) {
-      console.error("Error in discard selection:", error);
+      // console.error("Error in discard selection:", error);
       // In case of error, make sure discard modal is closed
       setShowDiscardSelection(false);
       setNumCardsToDiscard(0);
@@ -894,12 +776,12 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     if (combatState && combatState.status === 'active') {
       const checkTimeout = setTimeout(() => {
         if (isAnimating) {
-          console.log("Animation safety timeout: Animation stuck for too long, forcing it to end");
+          // console.log("Animation safety timeout: Animation stuck for too long, forcing it to end");
           setIsAnimating(false);
 
           // Also reset the turn if we detected a stuck state
           if (!combatState.isPlayerTurn) {
-            console.log("Animation safety: Forced turn reset to player");
+            // console.log("Animation safety: Forced turn reset to player");
             setCombatState({
               ...combatState,
               isPlayerTurn: true
@@ -915,7 +797,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
   // Create a wrapped version of onReturnToWizardStudy to ensure game is saved before returning
   const handleReturnToWizardStudy = () => {
     try {
-      console.log("BattleView: Return to wizard study clicked");
+      // console.log("BattleView: Return to wizard study clicked");
 
       // Add transition class immediately to prevent UI flashing
       if (typeof document !== 'undefined') {
@@ -966,7 +848,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
       // Force an immediate state refresh
       const currentState = useGameStateStore.getState().gameState;
-      console.log("Current game state before returning:", currentState);
+      // console.log("Current game state before returning:", currentState);
 
       // Ensure we set the location properly using the setCurrentLocation function
       // This will update both the save slot and top-level gameProgress data
@@ -974,23 +856,23 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
       // Save game immediately
       saveGame();
-      console.log("Saving game before returning to wizard's study");
+      // console.log("Saving game before returning to wizard's study");
 
       // Set localStorage flags for home page detection
       if (typeof window !== 'undefined') {
         localStorage.setItem('forceWizardStudy', 'true');
         localStorage.setItem('comingFromBattleVictory', 'true');
-        console.log("Set localStorage flags for battle victory navigation");
+        // console.log("Set localStorage flags for battle victory navigation");
 
         // Use a more reliable direct navigation approach
         setTimeout(() => {
           // Replace (not push) to home with the force parameter
-          console.log("Executing direct navigation to wizard study");
+          // console.log("Executing direct navigation to wizard study");
           window.location.replace('/?forceBattleReturn=true&timestamp=' + Date.now());
         }, 300);
       }
     } catch (error) {
-      console.error("Error saving game before returning to wizard's study:", error);
+      // console.error("Error saving game before returning to wizard's study:", error);
       // Remove transition class if there was an error
       if (typeof document !== 'undefined') {
         document.body.classList.remove('page-transitioning');
@@ -1072,12 +954,13 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       updatedState.log = battleLogManager.getEntries();
 
       // Debug log to help diagnose ordering issues
-      console.log('After initiative roll:');
-      battleLogManager.debugLog();
+      // console.log('After initiative roll:');
+      // printFullBattleLogDebug(); // Now safe to call as combatState is initialized
 
       // Now advance from initiative to draw phase
       const nextPhaseState = advancePhase(updatedState);
-      console.log('Advanced from initiative to draw phase after roll completion');
+      // console.log('Advanced from initiative to draw phase after roll completion');
+      setShowInitiativeRoll(false); // Hide dice roller after advancing
 
       return nextPhaseState;
     });
@@ -1101,7 +984,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         const sortedSpells = [...availableSpells].sort((a, b) => b.manaCost - a.manaCost);
         const chosenSpell = sortedSpells[0];
 
-        console.log(`Enemy queuing spell: ${chosenSpell.name}`);
+        // console.log(`Enemy queuing spell: ${chosenSpell.name}`);
 
         // Queue the spell action for the resolution phase
         const queuedState = queueAction(state, {
@@ -1129,7 +1012,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         queuedState.log = latestEntries;
 
         // Debug log to help diagnose ordering issues
-        console.log('Enemy action - updated battle log with', latestEntries.length, 'entries');
+        // console.log('Enemy action - updated battle log with', latestEntries.length, 'entries');
 
         // Update the state to reflect the enemy's action
         setCombatState(queuedState);
@@ -1149,7 +1032,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         }
       } else {
         // Enemy skips turn if no spells can be cast
-        console.log('Enemy skipping turn (no castable spells)');
+        // console.log('Enemy skipping turn (no castable spells)');
         const skipState = skipTurn(state, false);
 
         // Add to battle log using the manager
@@ -1171,7 +1054,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         skipState.log = latestEntries;
 
         // Debug log to help diagnose ordering issues
-        console.log('Enemy skip turn - updated battle log with', latestEntries.length, 'entries');
+        // console.log('Enemy skip turn - updated battle log with', latestEntries.length, 'entries');
 
         // Update the state to reflect the enemy's skipped turn
         setCombatState(skipState);
@@ -1191,7 +1074,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         }
       }
     } catch (error) {
-      console.error("Error in enemy action:", error);
+      // console.error("Error in enemy action:", error);
       setIsAnimating(false);
     }
   };
@@ -1428,6 +1311,24 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
   // Game status is directly passed from combatState.status
 
+  // Get the player's save slot name (from current save slot) or fallback to wizard's name
+  const currentSaveSlot = gameState.saveSlots.find(slot => slot.saveUuid === gameState.currentSaveSlot);
+  const playerName = currentSaveSlot?.playerName || combatState.playerWizard.wizard.name || 'Your Wizard';
+
+  // Get the enemy's archetype display name, fallback to enemy wizard's name
+  const enemyWizardObj = combatState.enemyWizard.wizard as any;
+  const enemyArchetypeKey = (typeof enemyWizardObj === 'object' && 'archetype' in enemyWizardObj) ? enemyWizardObj.archetype : undefined;
+  const enemyName = (enemyArchetypeKey && enemyArchetypes[enemyArchetypeKey]?.name)
+    ? enemyArchetypes[enemyArchetypeKey].name
+    : combatState.enemyWizard.wizard.name || 'Enemy Wizard';
+
+  const playerLevel = combatState.playerWizard.wizard.level;
+  const enemyLevel = combatState.enemyWizard.wizard.level;
+
+  // Format names with level as required
+  const playerDisplayName = `${playerName} (Lv. ${playerLevel})`;
+  const enemyDisplayName = `Lv. ${enemyLevel} ${enemyName}`;
+
   return (
     <div className="battle-view">
       {combatState && (
@@ -1447,13 +1348,13 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
             battleLog={battleLog}
             isPlayerTurn={combatState.isPlayerTurn}
             onMysticPunch={() => {
-              console.log("Mystic Punch button clicked");
+              // console.log("Mystic Punch button clicked");
               // Show selection modal only during action phase and if player hasn't acted
               if (combatState.currentPhase !== 'action' || combatState.actionState.player.hasActed || isAnimating) {
-                console.log("Cannot use Mystic Punch - wrong phase, already acted, or animation in progress");
+                // console.log("Cannot use Mystic Punch - wrong phase, already acted, or animation in progress");
                 return;
               }
-              console.log("Opening Mystic Punch selection modal");
+              // console.log("Opening Mystic Punch selection modal");
               setShowMysticPunchSelection(true);
             }}
             onSpellCast={handleSpellSelect}
@@ -1488,7 +1389,10 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
             equippedSpellScrolls={combatState.playerWizard.equippedSpellScrolls || []}
             onOpenBeltModal={() => setShowBeltModal(true)}
             onOpenRobesModal={() => setShowRobesModal(true)}
-            enemyName={enemyArchetypes[combatState.enemyWizard.wizard.archetype]?.name || 'Enemy Wizard'}
+            enemyName={enemyDisplayName}
+            playerName={playerDisplayName}
+            playerLevel={playerLevel}
+            enemyLevel={enemyLevel}
           />
 
           {/* Phase Tracker is now only in BattleArena component */}

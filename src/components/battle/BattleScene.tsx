@@ -5,6 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment, Stars, Text, OrbitControls } from '@react-three/drei';
 import SpellEffect3D from './effects/SpellEffect3D';
 import WizardModel from './WizardModel';
+import HexGrid, { TILE_COLORS } from './HexGrid';
 import { Spell, ActiveEffect } from '../../lib/types/spell-types';
 import { CombatState, CombatLogEntry, CombatWizard } from '../../lib/types/combat-types';
 
@@ -85,6 +86,14 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
       }
     }
   };
+
+  const textureMap = {
+    grass: '/tiles/grass.png',
+    stone: '/tiles/stone.png',
+    brick: '/tiles/brick.png',
+    dirt: '/tiles/dirt.png',
+    water: '/tiles/water.png'
+  } as const;
   
   // Process combat log to create visual effects
   useEffect(() => {
@@ -190,12 +199,18 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
       {/* Battle platform */}
       <mesh position={[0, -0.5, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={1}>
         <circleGeometry args={[5, 32]} />
-        <meshStandardMaterial 
+        <meshStandardMaterial
           color={theme.colors.platform}
           metalness={0.7}
           roughness={0.2}
         />
       </mesh>
+
+      {/* Hexagonal battlefield overlay */}
+      {/* Slightly above the platform to avoid z-fighting */}
+      <group position={[0, -0.49, 0]}>
+        <HexGrid gridRadius={3} radius={1} height={0.2} textureMap={textureMap} />
+      </group>
       
       {/* Player wizard */}
       <WizardModel 
@@ -212,6 +227,7 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
         isEnemy={true}
         health={enemyHealth / enemyMaxHealth}
         isActive={combatState ? (!combatState.isPlayerTurn && combatState.status === 'active') : false}
+        enemyVariant={Math.round(Math.random()) as 0 | 1}
       />
       
       {/* Render active spell effects - adjusted for tighter view */}

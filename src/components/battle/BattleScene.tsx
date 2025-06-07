@@ -229,6 +229,7 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
         health={enemyHealth / enemyMaxHealth}
         isActive={combatState ? (!combatState.isPlayerTurn && combatState.status === 'active') : false}
         enemyVariant={Math.round(Math.random()) as 0 | 1}
+        modelPath={combatState?.enemyWizard.wizard.modelPath}
       />
       
       {/* Render active spell effects - adjusted for tighter view */}

@@ -11,6 +11,8 @@ export interface Wizard {
   id: string;
   name: string;
   level: number;
+  /** Optional path to a 3D model for rendering this wizard */
+  modelPath?: string;
   experience: number;
   experienceToNextLevel: number;
   /** @deprecated Use totalMaxHealth instead. */

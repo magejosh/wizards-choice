@@ -3,6 +3,8 @@ import { Spell, ElementType, SpellType } from '../../types';
 export interface MagicalCreature {
   name: string;
   type: 'dragon' | 'horror' | 'guardian' | 'elemental' | 'leviathan';
+  /** Optional path to a 3D model for this creature */
+  modelPath?: string;
   description: string;
   baseStats: {
     health: number;
@@ -40,6 +42,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
   ancientDragon: {
     name: 'Ancient Dragon',
     type: 'dragon',
+    modelPath: '/assets/PyreSorcerer.fbx',
     description: 'A massive dragon that has lived for centuries, wielding the power of fire and commanding the skies.',
     baseStats: {
       health: 150,
@@ -119,6 +122,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
   eldritchHorror: {
     name: 'Eldritch Horror',
     type: 'horror',
+    modelPath: '/assets/HorrorNurse.fbx',
     description: 'An incomprehensible being from beyond the void, warping reality with its mere presence.',
     baseStats: {
       health: 140,
@@ -198,6 +202,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
   natureGuardian: {
     name: 'Nature Guardian',
     type: 'guardian',
+    modelPath: '/assets/Witch.fbx',
     description: 'A massive being of living wood and stone, protecting the natural world with its immense power.',
     baseStats: {
       health: 170,
@@ -276,6 +281,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
   stormElemental: {
     name: 'Storm Elemental',
     type: 'elemental',
+    modelPath: '/assets/Scarecrow.fbx',
     description: 'A being of pure lightning and wind, moving with incredible speed and striking with thunderous force.',
     baseStats: {
       health: 130,
@@ -354,6 +360,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
   abyssalLeviathan: {
     name: 'Abyssal Leviathan',
     type: 'leviathan',
+    modelPath: '/assets/Devil.fbx',
     description: 'A massive creature from the depths of the ocean, wielding the power of water and darkness.',
     baseStats: {
       health: 160,

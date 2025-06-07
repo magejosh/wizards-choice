@@ -173,6 +173,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     const rawEnemy = generateEnemy(playerWizard.level, difficulty);
     const enemyWizard = {
       ...rawEnemy,
+      modelPath: rawEnemy.modelPath,
       experience: 0,
       experienceToNextLevel: 100,
       manaRegen: 1,

@@ -14,6 +14,8 @@ export interface EnemyArchetype {
     manaMultiplier: number;
     manaRegenMultiplier: number;
   };
+  /** Optional path to a 3D model for this archetype */
+  modelPath?: string;
   getSpecialSpell: (level: number) => Spell;
   getThematicSpells: (level: number) => Spell[];
 }
@@ -33,6 +35,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
       manaMultiplier: 1.3,
       manaRegenMultiplier: 1.1
     },
+    modelPath: '/assets/Skull.fbx',
     getSpecialSpell: (level: number): Spell => ({
       id: `spell_summon_undead_${Date.now()}`,
       name: 'Summon Undead Minion',
@@ -126,6 +129,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
       manaMultiplier: 1.5,
       manaRegenMultiplier: 1.3
     },
+    modelPath: '/assets/Wizzir.fbx',
     getSpecialSpell: (level: number): Spell => ({
       id: `spell_time_rewind_${Date.now()}`,
       name: 'Time Rewind',
@@ -209,6 +213,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
       manaMultiplier: 0.8,
       manaRegenMultiplier: 1.0
     },
+    modelPath: '/assets/Bloody.fbx',
     getSpecialSpell: (level: number): Spell => ({
       id: `spell_weapon_enhancement_${Date.now()}`,
       name: 'Weapon Enhancement',
@@ -298,6 +303,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
       manaMultiplier: 1.2,
       manaRegenMultiplier: 1.1
     },
+    modelPath: '/assets/David.fbx',
     getSpecialSpell: (level: number): Spell => ({
       id: `spell_mirror_image_${Date.now()}`,
       name: 'Mirror Image',
@@ -380,6 +386,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
       manaMultiplier: 1.1,
       manaRegenMultiplier: 1.2
     },
+    modelPath: '/assets/Pipe.fbx',
     getSpecialSpell: (level: number): Spell => ({
       id: `spell_potion_throw_${Date.now()}`,
       name: 'Potion Throw',

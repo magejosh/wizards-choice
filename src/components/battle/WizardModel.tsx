@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text, useGLTF } from '@react-three/drei';
+import { Text, useGLTF, useFBX } from '@react-three/drei';
 import { Mesh, Vector3 } from 'three';
 
 interface WizardModelProps {
@@ -12,6 +12,7 @@ interface WizardModelProps {
   isActive?: boolean;
   isEnemy?: boolean;
   enemyVariant?: 0 | 1; // 0: original, 1: alternate
+  modelPath?: string;
 }
 
 const PLAYER_WIZARD_GLB_PATH = '/assets/player-wizard-01.glb';
@@ -215,7 +216,8 @@ const WizardModel: React.FC<WizardModelProps> = ({
   health,
   isActive = false,
   isEnemy = false,
-  enemyVariant = 0
+  enemyVariant = 0,
+  modelPath
 }) => {
   // Player: use GLB model
   if (!isEnemy) {
@@ -268,7 +270,51 @@ const WizardModel: React.FC<WizardModelProps> = ({
       </group>
     );
   }
-  // Enemy: use primitive model, select variant
+  // Enemy: use custom model if provided, otherwise primitive model
+  if (modelPath) {
+    // Load FBX model
+    const { scene } = useFBX(modelPath);
+    const getHealthColor = () => {
+      if (health > 0.6) return '#44ff44';
+      if (health > 0.3) return '#ffff00';
+      return '#ff4444';
+    };
+    return (
+      <group position={position}>
+        <primitive
+          object={scene}
+          scale={[0.02, 0.02, 0.02]}
+          rotation={[0, Math.PI, 0]}
+        />
+        <group position={[0, 2, 0]}>
+          <mesh position={[0, 0, 0]}>
+            <boxGeometry args={[1.2, 0.15, 0.05]} />
+            <meshStandardMaterial color="#222222" roughness={0.5} />
+          </mesh>
+          <mesh position={[0, 0, 0.03]} scale={[health, 1, 1]}>
+            <boxGeometry args={[1.2, 0.15, 0.05]} />
+            <meshStandardMaterial
+              color={getHealthColor()}
+              emissive={getHealthColor()}
+              emissiveIntensity={0.5}
+              roughness={0.3}
+            />
+          </mesh>
+          <Text
+            position={[0, 0, 0.1]}
+            fontSize={0.1}
+            color="#ffffff"
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.01}
+            outlineColor="#000000"
+          >
+            {Math.floor(health * 100)}%
+          </Text>
+        </group>
+      </group>
+    );
+  }
   return (
     <PrimitiveWizardModel
       position={position}

@@ -260,25 +260,11 @@ const WizardModel: React.FC<WizardModelProps> = ({
   const isValidModelPath = typeof modelPath === 'string' && modelPath.trim().length > 0;
   let scene: any = null;
   if (isValidModelPath) {
-    try {
-      if (modelPath!.toLowerCase().endsWith('.vrm')) {
-        const gltf = useLoader(VRMLoader, modelPath!);
-        scene = gltf.scene;
-      } else {
-        scene = useFBX(modelPath!);
-      }
-      // Traverse and fix materials if needed
-      scene.traverse((child: any) => {
-        if (child.isMesh) {
-          child.material = new THREE.MeshStandardMaterial({
-            color: '#888888',
-            side: THREE.DoubleSide
-          });
-          child.material.needsUpdate = true;
-        }
-      });
-    } catch {
-      scene = null;
+    if (modelPath!.toLowerCase().endsWith('.vrm')) {
+      const gltf = useLoader(VRMLoader, modelPath!);
+      scene = gltf.scene;
+    } else {
+      scene = useFBX(modelPath!);
     }
   }
   if (scene) {

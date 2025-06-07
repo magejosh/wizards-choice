@@ -135,6 +135,7 @@ function generateEnemyWizard(playerLevel: number, difficulty: 'easy' | 'normal' 
     weakness: archetype.weakness || undefined,
     resistance: archetype.resistance || undefined,
     imagePath: `/images/enemies/${archetype.id}.jpg`,
+    modelPath: archetype.modelPath,
     equipment,
     archetype: archetypeKey // Always set to the key for robust UI mapping
   };
@@ -266,6 +267,7 @@ function generateMagicalCreature(playerLevel: number, difficulty: 'easy' | 'norm
     weakness: creature.weaknesses[Math.floor(Math.random() * creature.weaknesses.length)],
     resistance: creature.resistances[Math.floor(Math.random() * creature.resistances.length)],
     imagePath: `/images/creatures/${creature.type}.jpg`,
+    modelPath: creature.modelPath,
     archetype: creature.type
   };
 }

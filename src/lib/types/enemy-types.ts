@@ -30,6 +30,8 @@ export interface Enemy {
   weakness?: ElementType;
   resistance?: ElementType;
   imagePath?: string;
+  /** Optional path to a 3D model for this enemy */
+  modelPath?: string;
   equipment?: Record<string, Equipment | undefined>;
   archetype?: string;
 }

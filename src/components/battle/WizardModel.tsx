@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text, useGLTF, useFBX } from '@react-three/drei';
 import { Mesh, Vector3 } from 'three';
+import * as THREE from 'three';
 
 interface WizardModelProps {
   position: [number, number, number];
@@ -222,39 +223,23 @@ const WizardModel: React.FC<WizardModelProps> = ({
   // Player: use GLB model
   if (!isEnemy) {
     const { scene } = useGLTF(PLAYER_WIZARD_GLB_PATH);
-    // Health bar color logic
     const getHealthColor = () => {
-      if (health > 0.6) return '#44ff44'; // Green
-      if (health > 0.3) return '#ffff00'; // Yellow
-      return '#ff4444'; // Red
+      if (health > 0.6) return '#44ff44';
+      if (health > 0.3) return '#ffff00';
+      return '#ff4444';
     };
     return (
       <group position={position}>
         <primitive object={scene} scale={[1.81, 1.81, 1.81]} position={[0, 0.7, 0]} rotation={[0, Math.PI/3, 0]} />
-        {/* Health bar and effects (reuse from primitive model) */}
         <group position={[0, 2, 0]}>
-          {/* Health bar background */}
           <mesh position={[0, 0, 0]}>
             <boxGeometry args={[1.2, 0.15, 0.05]} />
-            <meshStandardMaterial 
-              color="#222222" 
-              roughness={0.5}
-            />
+            <meshStandardMaterial color="#222222" roughness={0.5} />
           </mesh>
-          {/* Health bar fill */}
-          <mesh 
-            position={[0, 0, 0.03]}
-            scale={[health, 1, 1]}
-          >
+          <mesh position={[0, 0, 0.03]} scale={[health, 1, 1]}>
             <boxGeometry args={[1.2, 0.15, 0.05]} />
-            <meshStandardMaterial 
-              color={getHealthColor()} 
-              emissive={getHealthColor()}
-              emissiveIntensity={0.5}
-              roughness={0.3}
-            />
+            <meshStandardMaterial color={getHealthColor()} emissive={getHealthColor()} emissiveIntensity={0.5} roughness={0.3} />
           </mesh>
-          {/* Health percentage text */}
           <Text
             position={[0, 0, 0.1]}
             fontSize={0.1}
@@ -271,9 +256,26 @@ const WizardModel: React.FC<WizardModelProps> = ({
     );
   }
   // Enemy: use custom model if provided, otherwise primitive model
-  if (modelPath) {
-    // Load FBX model
-    const { scene } = useFBX(modelPath);
+  const isValidModelPath = typeof modelPath === 'string' && modelPath.trim().length > 0;
+  let scene: any = null;
+  if (isValidModelPath) {
+    try {
+      scene = useFBX(modelPath!);
+      // Traverse and fix materials if needed
+      scene.traverse((child: any) => {
+        if (child.isMesh) {
+          child.material = new THREE.MeshStandardMaterial({
+            color: '#888888',
+            side: THREE.DoubleSide
+          });
+          child.material.needsUpdate = true;
+        }
+      });
+    } catch {
+      scene = null;
+    }
+  }
+  if (scene) {
     const getHealthColor = () => {
       if (health > 0.6) return '#44ff44';
       if (health > 0.3) return '#ffff00';
@@ -281,10 +283,12 @@ const WizardModel: React.FC<WizardModelProps> = ({
     };
     return (
       <group position={position}>
+        <ambientLight intensity={0.8} />
         <primitive
           object={scene}
-          scale={[0.02, 0.02, 0.02]}
-          rotation={[0, Math.PI, 0]}
+          scale={[0.2, 0.2, 0.2]}
+          position={[0, -0.2, 0]}
+          rotation={[0, -Math.PI / 2, 0]}
         />
         <group position={[0, 2, 0]}>
           <mesh position={[0, 0, 0]}>
@@ -293,12 +297,7 @@ const WizardModel: React.FC<WizardModelProps> = ({
           </mesh>
           <mesh position={[0, 0, 0.03]} scale={[health, 1, 1]}>
             <boxGeometry args={[1.2, 0.15, 0.05]} />
-            <meshStandardMaterial
-              color={getHealthColor()}
-              emissive={getHealthColor()}
-              emissiveIntensity={0.5}
-              roughness={0.3}
-            />
+            <meshStandardMaterial color={getHealthColor()} emissive={getHealthColor()} emissiveIntensity={0.5} roughness={0.3} />
           </mesh>
           <Text
             position={[0, 0, 0.1]}

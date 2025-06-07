@@ -12,10 +12,8 @@ class MemoryStorage implements Storage {
   private store: Record<string, string> = {};
   length = 0;
   clear() {
- codex/add-save-slot-isolation-tests
     this.store = {};
     this.length = 0;
- main
   }
   getItem(key: string) {
     return Object.prototype.hasOwnProperty.call(this.store, key) ? this.store[key] : null;

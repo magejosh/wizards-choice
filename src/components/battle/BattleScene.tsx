@@ -5,7 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment, Stars, Text, OrbitControls } from '@react-three/drei';
 import SpellEffect3D from './effects/SpellEffect3D';
 import WizardModel from './WizardModel';
-import HexGrid from './HexGrid';
+import HexGrid, { TILE_COLORS } from './HexGrid';
 import { Spell, ActiveEffect } from '../../lib/types/spell-types';
 import { CombatState, CombatLogEntry, CombatWizard } from '../../lib/types/combat-types';
 
@@ -86,6 +86,14 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
       }
     }
   };
+
+  const textureMap = {
+    grass: '/tiles/grass.png',
+    stone: '/tiles/stone.png',
+    brick: '/tiles/brick.png',
+    dirt: '/tiles/dirt.png',
+    water: '/tiles/water.png'
+  } as const;
   
   // Process combat log to create visual effects
   useEffect(() => {
@@ -201,7 +209,7 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
       {/* Hexagonal battlefield overlay */}
       {/* Slightly above the platform to avoid z-fighting */}
       <group position={[0, -0.49, 0]}>
-        <HexGrid gridRadius={3} radius={1} height={0.2} />
+        <HexGrid gridRadius={3} radius={1} height={0.2} textureMap={textureMap} />
       </group>
       
       {/* Player wizard */}

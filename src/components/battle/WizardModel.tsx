@@ -260,11 +260,31 @@ const WizardModel: React.FC<WizardModelProps> = ({
   const isValidModelPath = typeof modelPath === 'string' && modelPath.trim().length > 0;
   let scene: any = null;
   if (isValidModelPath) {
-    if (modelPath!.toLowerCase().endsWith('.vrm')) {
-      const gltf = useLoader(VRMLoader, modelPath!);
-      scene = gltf.scene;
-    } else {
-      scene = useFBX(modelPath!);
+    try {
+      if (modelPath!.toLowerCase().endsWith('.vrm')) {
+        const gltf = useLoader(VRMLoader, modelPath!);
+        scene = gltf.scene;
+        // Simple idle animation for VRM models (if no animations are present)
+        const [idleTime, setIdleTime] = useState(0);
+        useFrame((_, delta) => {
+          setIdleTime(t => t + delta);
+          if (scene) {
+            // Bob the whole model up and down
+            scene.position.y = Math.sin(idleTime * 2) * 0.05;
+            // Try to swing arms if humanoid bones are present
+            const leftArm = scene.getObjectByName('LeftUpperArm') || scene.getObjectByName('mixamorig:LeftArm');
+            const rightArm = scene.getObjectByName('RightUpperArm') || scene.getObjectByName('mixamorig:RightArm');
+            if (leftArm && rightArm) {
+              leftArm.rotation.z = Math.sin(idleTime * 2) * 0.1 - 0.2;
+              rightArm.rotation.z = -Math.sin(idleTime * 2) * 0.1 + 0.2;
+            }
+          }
+        });
+      } else {
+        scene = useFBX(modelPath!);
+      }
+    } catch {
+      scene = null;
     }
   }
   if (scene) {

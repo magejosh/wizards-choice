@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
+import { TextureLoader, Texture } from 'three';
 import { useLoader } from '@react-three/fiber';
-import { TextureLoader } from 'three';
+ main
 import { Edges } from '@react-three/drei';
 
 type Vec3 = [number, number, number];
@@ -30,9 +31,39 @@ interface HexTileProps {
   textureMap?: Partial<Record<TileType, string>>;
 }
 
+const useOptionalTexture = (url?: string) => {
+  const [texture, setTexture] = useState<Texture | null>(null);
+
+  useEffect(() => {
+    if (!url) {
+      setTexture(null);
+      return;
+    }
+    let active = true;
+    const loader = new TextureLoader();
+    loader.load(
+      url,
+      tex => {
+        if (active) setTexture(tex);
+      },
+      undefined,
+      err => {
+        console.warn(`Could not load ${url}:`, err);
+        if (active) setTexture(null);
+      }
+    );
+    return () => {
+      active = false;
+    };
+  }, [url]);
+
+  return texture;
+};
+
 const HexTile: React.FC<HexTileProps> = ({ position, radius, height, type, textureMap }) => {
   const texturePath = textureMap?.[type];
-  const texture = texturePath ? useLoader(TextureLoader, texturePath) : undefined;
+  const texture = useOptionalTexture(texturePath);
+ main
 
   // CylinderGeometry groups: 0 - side, 1 - top, 2 - bottom
   const materials = useMemo(() => {

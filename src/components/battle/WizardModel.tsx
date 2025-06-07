@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useLoader } from '@react-three/fiber';
 import { Text, useGLTF, useFBX } from '@react-three/drei';
+import { VRMLoader } from 'three-stdlib';
 import { Mesh, Vector3 } from 'three';
 import * as THREE from 'three';
 
@@ -260,7 +261,12 @@ const WizardModel: React.FC<WizardModelProps> = ({
   let scene: any = null;
   if (isValidModelPath) {
     try {
-      scene = useFBX(modelPath!);
+      if (modelPath!.toLowerCase().endsWith('.vrm')) {
+        const gltf = useLoader(VRMLoader, modelPath!);
+        scene = gltf.scene;
+      } else {
+        scene = useFBX(modelPath!);
+      }
       // Traverse and fix materials if needed
       scene.traverse((child: any) => {
         if (child.isMesh) {

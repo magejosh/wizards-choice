@@ -42,7 +42,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
   ancientDragon: {
     name: 'Ancient Dragon',
     type: 'dragon',
-    modelPath: '/assets/PyreSorcerer.fbx',
+    modelPath: '/assets/PyreSorcerer.vrm',
     description: 'A massive dragon that has lived for centuries, wielding the power of fire and commanding the skies.',
     baseStats: {
       health: 150,
@@ -122,7 +122,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
   eldritchHorror: {
     name: 'Eldritch Horror',
     type: 'horror',
-    modelPath: '/assets/HorrorNurse.fbx',
+    modelPath: '/assets/HorrorNurse.vrm',
     description: 'An incomprehensible being from beyond the void, warping reality with its mere presence.',
     baseStats: {
       health: 140,
@@ -202,7 +202,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
   natureGuardian: {
     name: 'Nature Guardian',
     type: 'guardian',
-    modelPath: '/assets/Witch.fbx',
+    modelPath: '/assets/Witch.vrm',
     description: 'A massive being of living wood and stone, protecting the natural world with its immense power.',
     baseStats: {
       health: 170,
@@ -281,7 +281,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
   stormElemental: {
     name: 'Storm Elemental',
     type: 'elemental',
-    modelPath: '/assets/Scarecrow.fbx',
+    modelPath: '/assets/Scarecrow.vrm',
     description: 'A being of pure lightning and wind, moving with incredible speed and striking with thunderous force.',
     baseStats: {
       health: 130,
@@ -360,7 +360,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
   abyssalLeviathan: {
     name: 'Abyssal Leviathan',
     type: 'leviathan',
-    modelPath: '/assets/Devil.fbx',
+    modelPath: '/assets/Devil.vrm',
     description: 'A massive creature from the depths of the ocean, wielding the power of water and darkness.',
     baseStats: {
       health: 160,

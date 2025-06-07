@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import { TextureLoader, Texture } from 'three';
+import { TextureLoader, Texture, MeshStandardMaterial } from 'three';
 import { Edges } from '@react-three/drei';
 
 type Vec3 = [number, number, number];
@@ -64,19 +64,17 @@ const HexTile: React.FC<HexTileProps> = ({ position, radius, height, type, textu
 
   // CylinderGeometry groups: 0 - side, 1 - top, 2 - bottom
   const materials = useMemo(() => {
-    const side = { color: '#333333' } as const;
-    const top = texture ? { map: texture } : { color: TILE_COLORS[type] };
-    const mat = [side, top, top];
-    return mat;
+    const side = new MeshStandardMaterial({ color: '#333333' });
+    const top = texture
+      ? new MeshStandardMaterial({ map: texture })
+      : new MeshStandardMaterial({ color: TILE_COLORS[type] });
+    return [side, top, top];
   }, [texture, type]);
 
   return (
-    <mesh position={position} rotation={[0, 0, 0]}>
+    <mesh position={position} rotation={[0, 0, 0]} material={materials}>
       <cylinderGeometry args={[radius, radius, height, 6]} />
-      {materials.map((props, idx) => (
-        <meshStandardMaterial key={idx} attach={`material-${idx}`} {...props} />
-      ))}
-      <Edges scale={1.02} color="#000" />
+      <Edges scale={1.02} color="#ffd700" />
     </mesh>
   );
 };

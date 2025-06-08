@@ -47,6 +47,8 @@ interface BattleArenaProps {
   enemyLevel?: number;
   combatState?: CombatState;
   onMove?: (coord: AxialCoord) => void;
+  selectingSummon?: boolean;
+  onSummonTile?: (coord: AxialCoord) => void;
 }
 
 const BattleArena: React.FC<BattleArenaProps> = ({
@@ -82,7 +84,9 @@ const BattleArena: React.FC<BattleArenaProps> = ({
   playerLevel,
   enemyLevel,
   combatState,
-  onMove
+  onMove,
+  selectingSummon,
+  onSummonTile
 }) => {
   // Track if we're on a mobile device
   const [isMobile, setIsMobile] = useState(false);
@@ -161,6 +165,8 @@ const BattleArena: React.FC<BattleArenaProps> = ({
               combatState={combatState}
               log={battleLog}
               onMove={onMove}
+              selectingSummon={selectingSummon}
+              onSummonTile={onSummonTile}
             />
           </div>
 
@@ -321,6 +327,8 @@ const BattleArena: React.FC<BattleArenaProps> = ({
               combatState={combatState}
               log={battleLog}
               onMove={onMove}
+              selectingSummon={selectingSummon}
+              onSummonTile={onSummonTile}
             />
           </div>
 

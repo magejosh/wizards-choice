@@ -420,7 +420,7 @@ function resolveQueuedEffects(state: CombatState): CombatState {
         continue; // Skip this effect, do not penalize player
       }
       newState = selectSpell(newState, effect.spell, effect.caster === 'player');
-      newState = executeSpellCast(newState, effect.caster === 'player', true);
+      newState = executeSpellCast(newState, effect.caster === 'player', true, effect.spawnCoord);
       console.log(`resolveQueuedEffects: Successfully resolved spell ${effect.spell.name} for ${caster}.`);
     } else if (effect.spellTier !== undefined) {
       // It's a mystic punch
@@ -499,6 +499,7 @@ export function queueAction(
   // Create the full effect
   const effect: QueuedEffect = {
     ...queuedEffect,
+    spawnCoord: queuedEffect.spawnCoord,
     id: `effect_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
     timestamp: Date.now(),
     wasResponded: false

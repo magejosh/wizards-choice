@@ -6,7 +6,8 @@ import { Environment, Stars, Text, OrbitControls } from '@react-three/drei';
 import SpellEffect3D from './effects/SpellEffect3D';
 import WizardModel from './WizardModel';
 import HexGrid, { TILE_COLORS } from './HexGrid';
-import { axialToWorld, axialDistance, AxialCoord } from '@/lib/utils/hexUtils';
+import { axialToWorld, axialDistance, AxialCoord, getAdjacentCoords } from '@/lib/utils/hexUtils';
+import { rebuildOccupancy, isTileOccupied } from '@/lib/combat/movementManager';
 import { moveEntity } from '@/lib/combat/phaseManager';
 import { Spell, ActiveEffect } from '../../lib/types/spell-types';
 import { CombatState, CombatLogEntry, CombatWizard } from '../../lib/types/combat-types';
@@ -39,6 +40,8 @@ interface BattleSceneProps {
   isMobile?: boolean;
   currentPhase?: string; // Current combat phase from the phase-based system
   onMove?: (coord: AxialCoord) => void;
+  selectingSummon?: boolean;
+  onSummonTile?: (coord: AxialCoord) => void;
 }
 
 // Create a separate component for the 3D scene content
@@ -50,6 +53,7 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
   const prevLogLength = useRef<number>(0);
   const [reachableTiles, setReachableTiles] = useState<AxialCoord[]>([]);
   const [selectedDest, setSelectedDest] = useState<AxialCoord | null>(null);
+  const [summonTiles, setSummonTiles] = useState<AxialCoord[]>([]);
   
   // Extract props - support both old and new formats
   const {
@@ -104,7 +108,14 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
   } as const;
 
   const handleTileClick = (coord: AxialCoord) => {
-    if (!onMove || !combatState) return;
+    if (!combatState) return;
+    if (props.selectingSummon && props.onSummonTile) {
+      if (!summonTiles.some(t => t.q === coord.q && t.r === coord.r)) return;
+      props.onSummonTile(coord);
+      setSummonTiles([]);
+      return;
+    }
+    if (!onMove) return;
     if (!reachableTiles.some(t => t.q === coord.q && t.r === coord.r)) return;
     setSelectedDest(coord);
     if (window.confirm('Move here?')) {
@@ -219,6 +230,18 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
     }
   }, [combatState?.currentPhase, combatState?.isPlayerTurn, combatState?.playerWizard.position]);
 
+  useEffect(() => {
+    if (!combatState || !props.selectingSummon) {
+      setSummonTiles([]);
+      return;
+    }
+    rebuildOccupancy(combatState);
+    const pos = combatState.playerWizard.position;
+    const adj = getAdjacentCoords(pos);
+    const valid = adj.filter(c => !isTileOccupied(c));
+    setSummonTiles(valid);
+  }, [props.selectingSummon, combatState]);
+
   // Play defeat animations when combat ends
   useEffect(() => {
     if (!combatState) return;
@@ -286,7 +309,7 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
           radius={1}
           height={0.2}
           textureMap={textureMap}
-          highlightedTiles={reachableTiles}
+          highlightedTiles={props.selectingSummon ? summonTiles : reachableTiles}
           onTileClick={handleTileClick}
         />
       </group>

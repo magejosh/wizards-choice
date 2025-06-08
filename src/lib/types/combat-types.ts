@@ -69,6 +69,8 @@ export interface QueuedEffect {
   spell: Spell | null; // null for mystic punch
   spellTier?: number; // for mystic punch
   target: 'player' | 'enemy';
+  /** Optional coordinate for summon effects */
+  spawnCoord?: import('../utils/hexUtils').AxialCoord;
   timestamp: number;
   wasResponded: boolean;
   responseEffect?: QueuedEffect;

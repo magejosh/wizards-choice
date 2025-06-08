@@ -15,6 +15,7 @@ import {
   executeSpellCast,
   applySpellEffect
 } from '../../lib/combat/spellExecutor';
+import { AxialCoord } from '@/lib/utils/hexUtils';
 import { initializeCombat } from '../../lib/combat/combatInitializer';
 import { discardCard, needsToDiscard } from '../../lib/combat/cardManager';
 import { PhaseManager } from '../../lib/combat/phaseManager';
@@ -57,6 +58,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
   const [isEnemyTurnIndicatorVisible, setIsEnemyTurnIndicatorVisible] = useState(false);
   // Use a custom state setter to ensure entries are always sorted
   const [battleLog, setLogEntries] = useState<CombatLogEntry[]>([]);
+  const [pendingSummonSpell, setPendingSummonSpell] = useState<Spell | null>(null);
 
   // Custom setter that ensures entries are always sorted by timestamp (newest first)
   const setBattleLog = (entries: CombatLogEntry[]) => {
@@ -447,6 +449,11 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       return;
     }
 
+    if (spell.type === 'summon') {
+      setPendingSummonSpell(spell);
+      return;
+    }
+
     setIsAnimating(true);
 
     try {
@@ -528,6 +535,76 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       // console.error("Error in spell selection:", error);
       setIsAnimating(false);
     }
+  };
+
+  const handleSummonTileSelect = (coord: AxialCoord) => {
+    if (!combatState || !pendingSummonSpell) return;
+
+    setIsAnimating(true);
+
+    try {
+      const validatedSpell: Spell = {
+        ...pendingSummonSpell,
+        effects: pendingSummonSpell.effects || [],
+        imagePath: pendingSummonSpell.imagePath || '/images/spells/default-placeholder.jpg'
+      };
+      const isResponse = combatState.currentPhase === 'response';
+      const updatedState = queueAction(
+        combatState,
+        {
+          caster: 'player',
+          spell: validatedSpell,
+          target: 'enemy',
+          spawnCoord: coord
+        },
+        isResponse
+      );
+      battleLogManager.addEntry({
+        turn: combatState.turn,
+        round: combatState.round,
+        actor: 'player',
+        action: isResponse ? 'cast_response' : 'queue_spell',
+        details: isResponse
+          ? `You responded with ${validatedSpell.name}`
+          : `You queued ${validatedSpell.name}`
+      });
+
+      setBattleLog(battleLogManager.getEntries());
+      updatedState.log = battleLogManager.getEntries();
+      setCombatState(updatedState);
+
+      if (combatState.currentPhase === 'action') {
+        if (updatedState.actionState.player.hasActed && updatedState.actionState.enemy.hasActed) {
+          setTimeout(() => {
+            const nextPhaseState = advancePhase(updatedState);
+            setCombatState(nextPhaseState);
+            setIsAnimating(false);
+          }, 1000);
+        } else if (updatedState.actionState.player.hasActed && !updatedState.actionState.enemy.hasActed && updatedState.firstActor === 'player') {
+          setTimeout(() => {
+            processEnemyAction(updatedState);
+          }, 1000);
+        } else {
+          setTimeout(() => {
+            setIsAnimating(false);
+          }, 500);
+        }
+      } else if (combatState.currentPhase === 'response') {
+        setTimeout(() => {
+          const nextPhaseState = advancePhase(updatedState);
+          setCombatState(nextPhaseState);
+          setIsAnimating(false);
+        }, 1000);
+      } else {
+        setTimeout(() => {
+          setIsAnimating(false);
+        }, 500);
+      }
+    } catch (error) {
+      setIsAnimating(false);
+    }
+
+    setPendingSummonSpell(null);
   };
 
   // Handle mystic punch selection
@@ -1399,6 +1476,8 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
             onMove={(coord) => {
               setCombatState(moveEntity(combatState, combatState.playerWizard.wizard.id, coord));
             }}
+            selectingSummon={pendingSummonSpell !== null}
+            onSummonTile={handleSummonTileSelect}
           />
 
           {/* Phase Tracker is now only in BattleArena component */}

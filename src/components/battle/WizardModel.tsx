@@ -2,10 +2,11 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
-import { Text, useGLTF, useFBX } from '@react-three/drei';
+import { Text, useGLTF, useFBX, Html } from '@react-three/drei';
 import { VRMLoader } from 'three-stdlib';
 import { Mesh, Vector3 } from 'three';
 import * as THREE from 'three';
+import { getModelRotationForUpAxis, UpAxis } from '@/lib/utils/modelUtils';
 
 interface WizardModelProps {
   position: [number, number, number];
@@ -228,6 +229,18 @@ const WizardModel: React.FC<WizardModelProps> = ({
   if (!isEnemy) {
     const { scene } = useGLTF(PLAYER_WIZARD_GLB_PATH);
 
+    // Debug: rotation presets for player model orientation
+    const rotationPresets: [number, number, number][] = [
+      [0, Math.PI / 3, 0],
+      [Math.PI / 2, Math.PI / 3, 0],
+      [0, Math.PI / 3, Math.PI / 2],
+      [0, -Math.PI / 2, 0],
+      [0, Math.PI / 2, 0],
+      [Math.PI, Math.PI / 3, 0],
+    ];
+    const [rotationIndex, setRotationIndex] = useState(0);
+    const handleNextRotation = () => setRotationIndex((i) => (i + 1) % rotationPresets.length);
+
     // Load animations
     const idleA = useFBX('/assets/anims/Idle.fbx');
     const idleB = useFBX('/assets/anims/Unarmed Idle.fbx');
@@ -284,19 +297,19 @@ const WizardModel: React.FC<WizardModelProps> = ({
     useEffect(() => {
       switch (internalAction) {
         case 'cast':
-          playClips(animations.cast, false);
+          playClips(Array.from(animations.cast), false);
           break;
         case 'dodge':
-          playClips(animations.dodge, false);
+          playClips(Array.from(animations.dodge), false);
           break;
         case 'die':
-          playClips(animations.die, false);
+          playClips(Array.from(animations.die), false);
           break;
         case 'throw':
-          playClips(animations.throw, false);
+          playClips(Array.from(animations.throw), false);
           break;
         default:
-          playClips(animations.idle, true);
+          playClips(Array.from(animations.idle), true);
       }
     }, [internalAction]);
 
@@ -312,7 +325,16 @@ const WizardModel: React.FC<WizardModelProps> = ({
 
     return (
       <group position={position}>
-        <primitive object={scene} scale={[1.81, 1.81, 1.81]} position={[0, 0.7, 0]} rotation={[0, Math.PI / 3, 0]} />
+        {/* Debug button: only show in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <Html position={[0, 2.5, 0]} center>
+            <button style={{ background: '#222', color: '#fff', padding: '4px 8px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }} onClick={handleNextRotation}>
+              Next Rotation
+            </button>
+            <div style={{ color: '#fff', fontSize: 10, marginTop: 2 }}>Rotation: [{rotationPresets[rotationIndex].map(n => n.toFixed(2)).join(', ')}]</div>
+          </Html>
+        )}
+        <primitive object={scene} scale={[1.81, 1.81, 1.81]} position={[0, 0.7, 0]} rotation={rotationPresets[rotationIndex]} />
         <group position={[0, 2, 0]}>
           <mesh position={[0, 0, 0]}>
             <boxGeometry args={[1.2, 0.15, 0.05]} />
@@ -409,19 +431,19 @@ const WizardModel: React.FC<WizardModelProps> = ({
     useEffect(() => {
       switch (internalAction) {
         case 'cast':
-          playClips(animations.cast, false);
+          playClips(Array.from(animations.cast), false);
           break;
         case 'dodge':
-          playClips(animations.dodge, false);
+          playClips(Array.from(animations.dodge), false);
           break;
         case 'die':
-          playClips(animations.die, false);
+          playClips(Array.from(animations.die), false);
           break;
         case 'throw':
-          playClips(animations.throw, false);
+          playClips(Array.from(animations.throw), false);
           break;
         default:
-          playClips(animations.idle, true);
+          playClips(Array.from(animations.idle), true);
       }
     }, [internalAction]);
 
@@ -441,7 +463,7 @@ const WizardModel: React.FC<WizardModelProps> = ({
           object={scene}
           scale={[1.17, 1.17, 1.17]}
           position={[0, -0.25, 0]}
-          rotation={[0, Math.PI / 2, 0]}
+          rotation={getModelRotationForUpAxis('Y', [0, Math.PI / 2, 0])}
         />
         <group position={[0, 2, 0]}>
           <mesh position={[0, 0, 0]}>

@@ -5,6 +5,7 @@ import { ElementType } from './element-types';
 import { Spell, ActiveEffect } from './spell-types';
 import { Wizard } from './wizard-types';
 import { AxialCoord } from '../utils/hexUtils';
+import { Minion } from './minion-types';
 
 /**
  * Combat state
@@ -88,21 +89,9 @@ export interface CombatWizard {
   equippedPotions: import('./equipment-types').Potion[];
   equippedSpellScrolls: import('./equipment-types').Equipment[];
   /** Position on the battlefield */
-  position?: AxialCoord;
-  /** Minions belonging to this wizard (legacy field, prefer playerMinions/enemyMinions) */
-  minions?: Minion[];
-}
-
-/** A summoned minion on the battlefield */
-export interface Minion {
-  id: string;
-  name: string;
-  owner: 'player' | 'enemy';
-  modelPath?: string;
-  health: number;
-  maxHealth: number;
   position: AxialCoord;
-  remainingDuration: number;
+  /** Minions controlled directly by this wizard */
+  minions: Minion[];
 }
 
 /**

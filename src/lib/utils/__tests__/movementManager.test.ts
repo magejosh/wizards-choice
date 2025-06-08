@@ -37,6 +37,8 @@ test('occupancy map detects occupied tiles', () => {
       position: { q: 1, r: 0 },
       minions: []
     },
+    playerMinions: [],
+    enemyMinions: [],
     turn: 1,
     round: 1,
     isPlayerTurn: true,

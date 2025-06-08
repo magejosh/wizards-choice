@@ -46,6 +46,9 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
   const [playerAnim, setPlayerAnim] = useState<'idle' | 'cast' | 'dodge' | 'die' | 'throw'>('idle');
   const [enemyAnim, setEnemyAnim] = useState<'idle' | 'cast' | 'dodge' | 'die' | 'throw'>('idle');
   const prevLogLength = useRef<number>(0);
+
+  const playerSummons = combatState?.playerWizard.activeEffects.filter(e => e.type === 'summon') || [];
+  const enemySummons = combatState?.enemyWizard.activeEffects.filter(e => e.type === 'summon') || [];
   
   // Extract props - support both old and new formats
   const { 
@@ -261,6 +264,23 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
           action={playerAnim}
         />
       </Suspense>
+
+      {playerSummons.flatMap((summon, sIdx) => {
+        const base = axialToWorld({ q: -2, r: 0 });
+        const count = summon.quantity || summon.value || 1;
+        return Array.from({ length: count }).map((_, i) => (
+          <Suspense fallback={null} key={`player-summon-${sIdx}-${i}`}> 
+            <WizardModel
+              position={[base[0] - 1 - i * 0.6, base[1], base[2]] as [number, number, number]}
+              color={theme.colors.primary.main}
+              health={1}
+              isActive={false}
+              modelPath={summon.modelPath || combatState?.playerWizard.wizard.modelPath}
+              action="idle"
+            />
+          </Suspense>
+        ));
+      })}
       
       {/* Enemy wizard */}
       <Suspense fallback={null}>
@@ -275,6 +295,25 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
           action={enemyAnim}
         />
       </Suspense>
+
+      {enemySummons.flatMap((summon, sIdx) => {
+        const base = axialToWorld({ q: 2, r: 0 });
+        const count = summon.quantity || summon.value || 1;
+        return Array.from({ length: count }).map((_, i) => (
+          <Suspense fallback={null} key={`enemy-summon-${sIdx}-${i}`}> 
+            <WizardModel
+              position={[base[0] + 1 + i * 0.6, base[1], base[2]] as [number, number, number]}
+              color={theme.colors.secondary.main}
+              health={1}
+              isEnemy
+              isActive={false}
+              modelPath={summon.modelPath || combatState?.enemyWizard.wizard.modelPath}
+              enemyVariant={Math.round(Math.random()) as 0 | 1}
+              action="idle"
+            />
+          </Suspense>
+        ));
+      })}
       
       {/* Render active spell effects - adjusted for tighter view */}
       {activeEffects.map((effect, index) => (

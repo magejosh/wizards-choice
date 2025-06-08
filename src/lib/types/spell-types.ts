@@ -29,13 +29,15 @@ export interface Spell {
  * Effect that a spell can have
  */
 export interface SpellEffect {
-  type: 'damage' | 'healing' | 'buff' | 'debuff' | 'control' | 'summon' | 'utility' | 'timeRewind' | 
-        'delay' | 'confusion' | 'damageBonus' | 'defense' | 'spellEcho' | 
+  type: 'damage' | 'healing' | 'buff' | 'debuff' | 'control' | 'summon' | 'utility' | 'timeRewind' |
+        'delay' | 'confusion' | 'damageBonus' | 'defense' | 'spellEcho' |
         'manaRestore' | 'statModifier' | 'statusEffect' | 'damageReduction';
   value: number;
   target: 'self' | 'enemy';
   element: ElementType;
   duration?: number;
+  /** Optional path to the model used for summoned entities */
+  modelPath?: string;
 }
 
 /**
@@ -44,12 +46,16 @@ export interface SpellEffect {
 export interface ActiveEffect {
   id?: string;
   name: string;
-  type: 'damage_over_time' | 'healing_over_time' | 'mana_drain' | 'mana_regen' | 'stun' | 'silence' | 'damageReduction' | 'buff';
+  type: 'damage_over_time' | 'healing_over_time' | 'mana_drain' | 'mana_regen' | 'stun' | 'silence' | 'damageReduction' | 'buff' | 'summon';
   value: number;
   duration: number; // In turns
   remainingDuration: number; // Remaining turns for the effect
   source?: 'player' | 'enemy';
   effect?: SpellEffect; // The original spell effect that created this active effect
+  /** Model path for summoned entities if applicable */
+  modelPath?: string;
+  /** Number of entities summoned */
+  quantity?: number;
 }
 
 /**

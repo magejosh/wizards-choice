@@ -926,10 +926,10 @@
     </effects>
     <list>any</list>
   </spell>
-  <spell id="spell_mirror_image_mar51ert" name="Mirror Image" type="buff" element="arcane" tier="3" manaCost="40" rarity="uncommon" imagePath="/images/spells/special/mirror-image.jpg">
+  <spell id="spell_mirror_image_mar51ert" name="Mirror Image" type="summon" element="arcane" tier="3" manaCost="40" rarity="uncommon" imagePath="/images/spells/special/mirror-image.jpg">
     <description>Creates illusory duplicates of yourself that confuse enemies and absorb attacks.</description>
     <effects>
-      <effect type="statModifier" value="-40" target="self" element="arcane" duration="3"/>
+      <effect type="summon" value="2" target="self" element="arcane" duration="3" modelPath="caster"/>
     </effects>
     <list>any</list>
   </spell>

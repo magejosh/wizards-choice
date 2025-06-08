@@ -151,6 +151,8 @@ const WizardStats: React.FC<WizardStatsProps> = ({
         return 'Stunned';
       case 'silence':
         return 'Silenced';
+      case 'summon':
+        return `Summon x${effect.quantity || effect.value}`;
       default:
         return effect.name || effect.type;
     }

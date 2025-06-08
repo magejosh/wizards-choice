@@ -275,6 +275,8 @@ export function getEffectName(effect: SpellEffect): string {
       } else {
         return 'Status Effect';
       }
+    case 'summon':
+      return 'Summon';
     default:
       return effect.type;
   }
@@ -444,6 +446,37 @@ export function applySpellEffect(
           details: `${activeEffect.name} applied to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'} for ${effect.duration} turns!`,
         }));
       }
+      break;
+    }
+
+    case 'summon': {
+      const activeEffect: ActiveEffect = {
+        id: `summon-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        name: 'Summon',
+        source: isPlayerCaster ? 'player' : 'enemy',
+        remainingDuration: effect.duration || 1,
+        duration: effect.duration || 1,
+        type: 'summon',
+        value: effect.value,
+        effect,
+        modelPath: effect.modelPath || newState[caster].wizard.modelPath,
+        quantity: effect.value,
+      };
+
+      newState[effectTarget] = {
+        ...newState[effectTarget],
+        activeEffects: [...newState[effectTarget].activeEffects, activeEffect],
+      };
+
+      newState.log.push(
+        createLogEntry({
+          turn: newState.turn,
+          round: newState.round,
+          actor: isPlayerCaster ? 'player' : 'enemy',
+          action: 'effect_applied',
+          details: `Summoned ${effect.value} illusion(s)!`,
+        })
+      );
       break;
     }
 

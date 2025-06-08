@@ -218,10 +218,11 @@ const WizardModel: React.FC<WizardModelProps> = ({
   position,
   color,
   health,
+  action = 'idle',
   isActive = false,
   isEnemy = false,
   enemyVariant = 0,
-  modelPath
+  modelPath,
 }) => {
   // Player: use GLB model
   if (!isEnemy) {

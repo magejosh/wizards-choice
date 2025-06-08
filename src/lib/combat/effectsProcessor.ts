@@ -30,6 +30,7 @@ export function processActiveEffects(
     'silence',
     'damageReduction',
     'buff',
+    'summon',
   ]);
 
   // Process each active effect

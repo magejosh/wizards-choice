@@ -281,6 +281,8 @@ export function getEffectName(effect: SpellEffect): string {
       } else {
         return 'Status Effect';
       }
+    case 'summon':
+      return 'Summon';
     default:
       return effect.type;
   }
@@ -454,49 +456,36 @@ export function applySpellEffect(
     }
 
     case 'summon': {
-      const owner = isPlayerCaster ? 'player' : 'enemy';
-      const minion = {
-        id: `minion-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        name: effect.minionName || 'Minion',
-        owner,
-        modelPath: effect.modelPath,
-        health: effect.health || 10,
-        maxHealth: effect.health || 10,
-        position: { q: 0, r: 0 } as import('../utils/hexUtils').AxialCoord,
+      const activeEffect: ActiveEffect = {
+        id: `summon-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        name: 'Summon',
+        source: isPlayerCaster ? 'player' : 'enemy',
         remainingDuration: effect.duration || 1,
-      } as Minion;
+        duration: effect.duration || 1,
+        type: 'summon',
+        value: effect.value,
+        effect,
+        modelPath:
+          effect.modelPath === 'caster' || !effect.modelPath
+            ? newState[caster].wizard.modelPath
+            : effect.modelPath,
+        quantity: effect.value,
+      };
 
-      const casterPos = newState[caster].position || { q: owner === 'player' ? -2 : 2, r: 0 };
-      const occupied = [
-        newState.playerWizard.position || { q: -2, r: 0 },
-        newState.enemyWizard.position || { q: 2, r: 0 },
-        ...newState.playerMinions.map(m => m.position),
-        ...newState.enemyMinions.map(m => m.position),
-      ];
-      const spawn = findUnoccupiedAdjacentHex(casterPos, occupied);
-      if (spawn) {
-        minion.position = spawn;
-        if (owner === 'player') {
-          newState.playerMinions = [...newState.playerMinions, minion];
-        } else {
-          newState.enemyMinions = [...newState.enemyMinions, minion];
-        }
-        newState.log.push(createLogEntry({
+      newState[effectTarget] = {
+        ...newState[effectTarget],
+        activeEffects: [...newState[effectTarget].activeEffects, activeEffect],
+      };
+
+      newState.log.push(
+        createLogEntry({
           turn: newState.turn,
           round: newState.round,
-          actor: owner,
-          action: 'summon',
-          details: `${owner === 'player' ? 'You' : 'Enemy'} summoned ${minion.name}!`,
-        }));
-      } else {
-        newState.log.push(createLogEntry({
-          turn: newState.turn,
-          round: newState.round,
-          actor: owner,
-          action: 'summon_failed',
-          details: 'No space to summon a minion!',
-        }));
-      }
+          actor: isPlayerCaster ? 'player' : 'enemy',
+          action: 'effect_applied',
+          details: `Summoned ${effect.value} illusion(s)!`,
+        })
+      );
       break;
     }
 

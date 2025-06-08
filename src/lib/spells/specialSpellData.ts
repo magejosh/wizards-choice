@@ -335,18 +335,19 @@ function createMirrorImageSpell(): SpecialSpell {
   return {
     id: 'spell_mirror_image',
     name: 'Mirror Image',
-    type: 'buff',
+    type: 'summon',
     element: 'arcane',
     tier: 3,
     manaCost: 40,
     description: 'Creates illusory duplicates of yourself that confuse enemies and absorb attacks.',
     effects: [
       {
-        type: 'statModifier',
-        value: -40, // Reduced damage from attacks
+        type: 'summon',
+        value: 2,
         duration: 3,
         target: 'self',
         element: 'arcane',
+        modelPath: 'caster'
       },
     ],
     rarity: 'uncommon',

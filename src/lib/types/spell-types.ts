@@ -38,7 +38,7 @@ export interface SpellEffect {
   duration?: number;
   /** Optional name for a summoned minion */
   minionName?: string;
-  /** Optional path to a 3D model for the minion */
+  /** Optional path to a 3D model for the minion or to indicate caster model */
   modelPath?: string;
   /** Health for the summoned minion */
   health?: number;
@@ -50,12 +50,17 @@ export interface SpellEffect {
 export interface ActiveEffect {
   id?: string;
   name: string;
-  type: 'damage_over_time' | 'healing_over_time' | 'mana_drain' | 'mana_regen' | 'stun' | 'silence' | 'damageReduction' | 'buff';
+  type: 'damage_over_time' | 'healing_over_time' | 'mana_drain' | 'mana_regen' |
+    'stun' | 'silence' | 'damageReduction' | 'buff' | 'summon';
   value: number;
   duration: number; // In turns
   remainingDuration: number; // Remaining turns for the effect
   source?: 'player' | 'enemy';
   effect?: SpellEffect; // The original spell effect that created this active effect
+  /** Model path for summoned entities if applicable */
+  modelPath?: string;
+  /** Number of entities summoned */
+  quantity?: number;
 }
 
 /**

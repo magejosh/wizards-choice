@@ -455,16 +455,21 @@ export function applySpellEffect(
 
     case 'summon': {
       const owner = isPlayerCaster ? 'player' : 'enemy';
-      const minion = {
+      const minion: Minion = {
         id: `minion-${Date.now()}-${Math.random().toString(36).slice(2)}`,
         name: effect.minionName || 'Minion',
         owner,
+        ownerId: isPlayerCaster
+          ? newState.playerWizard.wizard.id
+          : newState.enemyWizard.wizard.id,
         modelPath: effect.modelPath,
-        health: effect.health || 10,
-        maxHealth: effect.health || 10,
         position: { q: 0, r: 0 } as import('../utils/hexUtils').AxialCoord,
+        stats: {
+          health: effect.health || 10,
+          maxHealth: effect.health || 10,
+        },
         remainingDuration: effect.duration || 1,
-      } as Minion;
+      };
 
       const casterPos = newState[caster].position || { q: owner === 'player' ? -2 : 2, r: 0 };
       const occupied = [
@@ -553,7 +558,9 @@ function processMinionActions(state: CombatState, isPlayerCaster: boolean): Comb
     });
     minion.remainingDuration -= 1;
   }
-  const filtered = list.filter(m => m.remainingDuration > 0 && m.health > 0);
+  const filtered = list.filter(
+    m => m.remainingDuration > 0 && m.stats.health > 0
+  );
   if (isPlayerCaster) {
     newState.playerMinions = filtered;
   } else {

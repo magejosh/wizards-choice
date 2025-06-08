@@ -339,10 +339,9 @@ const WizardModel: React.FC<WizardModelProps> = ({
       return '#ff4444';
     };
 
-    console.log('Player GLB scene:', scene);
     return (
       <group position={position}>
-        <primitive object={scene} scale={[1.81, 1.81, 1.81]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} />
+        <primitive object={scene} scale={[1.81, 1.81, 1.81]} position={[0, 0.4, 0]} rotation={[-Math.PI / 2, Math.PI, 0]} />
         <group position={[0, 2, 0]}>
           <mesh position={[0, 0, 0]}>
             <boxGeometry args={[1.2, 0.15, 0.05]} />

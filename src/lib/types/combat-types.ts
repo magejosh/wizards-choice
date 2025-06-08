@@ -11,6 +11,10 @@ import { Wizard } from './wizard-types';
 export interface CombatState {
   playerWizard: CombatWizard;
   enemyWizard: CombatWizard;
+  /** Minions controlled by the player */
+  playerMinions: Minion[];
+  /** Minions controlled by the enemy */
+  enemyMinions: Minion[];
   turn: number;
   round: number;
   isPlayerTurn: boolean;
@@ -82,6 +86,22 @@ export interface CombatWizard {
   discardPile: Spell[];
   equippedPotions: import('./equipment-types').Potion[];
   equippedSpellScrolls: import('./equipment-types').Equipment[];
+  /** Position on the battlefield */
+  position?: import('../utils/hexUtils').AxialCoord;
+  /** Minions belonging to this wizard (legacy field, prefer playerMinions/enemyMinions) */
+  minions?: Minion[];
+}
+
+/** A summoned minion on the battlefield */
+export interface Minion {
+  id: string;
+  name: string;
+  owner: 'player' | 'enemy';
+  modelPath?: string;
+  health: number;
+  maxHealth: number;
+  position: import('../utils/hexUtils').AxialCoord;
+  remainingDuration: number;
 }
 
 /**

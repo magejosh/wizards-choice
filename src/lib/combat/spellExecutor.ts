@@ -1,10 +1,11 @@
 // src/lib/combat/spellExecutor.ts
-import { CombatState, Spell, SpellEffect, ActiveEffect } from '../types';
+import { CombatState, Spell, SpellEffect, ActiveEffect, Minion } from '../types';
 import { createLogEntry } from './battleLogManager';
 import { checkCombatStatus } from './combatStatusManager';
 import { discardCard } from './cardManager';
 import { advancePhase } from './phaseManager';
 import { calculateAndApplyDamage } from './damageCalculationUtils';
+import { findUnoccupiedAdjacentHex } from '../utils/hexUtils';
 
 /**
  * Select a spell for a wizard to cast
@@ -107,7 +108,7 @@ export function executeMysticPunch(
 
   // If this is during resolution phase, don't advance the turn
   if (isResolution) {
-    return newState;
+    return processMinionActions(newState, isPlayer);
   }
 
   // Mark the player as having acted in this phase
@@ -120,10 +121,12 @@ export function executeMysticPunch(
 
     // Check if both players have acted, and if so, advance to the next phase
     if (newState.actionState.player.hasActed && newState.actionState.enemy.hasActed) {
+      newState = processMinionActions(newState, isPlayer);
       return advancePhase(newState);
     }
   }
 
+  newState = processMinionActions(newState, isPlayer);
   return newState;
 }
 
@@ -227,6 +230,7 @@ export function executeSpellCast(
 
     // Check if both players have acted, and if so, advance to the next phase
     if (newState.actionState.player.hasActed && newState.actionState.enemy.hasActed) {
+      newState = processMinionActions(newState, isPlayer);
       return advancePhase(newState);
     }
   } else if (newState.currentPhase === 'response') {
@@ -238,10 +242,12 @@ export function executeSpellCast(
 
     // Check if both players have responded, and if so, advance to the next phase
     if (newState.actionState.player.hasResponded && newState.actionState.enemy.hasResponded) {
+      newState = processMinionActions(newState, isPlayer);
       return advancePhase(newState);
     }
   }
 
+  newState = processMinionActions(newState, isPlayer);
   return newState;
 }
 
@@ -447,6 +453,53 @@ export function applySpellEffect(
       break;
     }
 
+    case 'summon': {
+      const owner = isPlayerCaster ? 'player' : 'enemy';
+      const minion = {
+        id: `minion-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        name: effect.minionName || 'Minion',
+        owner,
+        modelPath: effect.modelPath,
+        health: effect.health || 10,
+        maxHealth: effect.health || 10,
+        position: { q: 0, r: 0 } as import('../utils/hexUtils').AxialCoord,
+        remainingDuration: effect.duration || 1,
+      } as Minion;
+
+      const casterPos = newState[caster].position || { q: owner === 'player' ? -2 : 2, r: 0 };
+      const occupied = [
+        newState.playerWizard.position || { q: -2, r: 0 },
+        newState.enemyWizard.position || { q: 2, r: 0 },
+        ...newState.playerMinions.map(m => m.position),
+        ...newState.enemyMinions.map(m => m.position),
+      ];
+      const spawn = findUnoccupiedAdjacentHex(casterPos, occupied);
+      if (spawn) {
+        minion.position = spawn;
+        if (owner === 'player') {
+          newState.playerMinions = [...newState.playerMinions, minion];
+        } else {
+          newState.enemyMinions = [...newState.enemyMinions, minion];
+        }
+        newState.log.push(createLogEntry({
+          turn: newState.turn,
+          round: newState.round,
+          actor: owner,
+          action: 'summon',
+          details: `${owner === 'player' ? 'You' : 'Enemy'} summoned ${minion.name}!`,
+        }));
+      } else {
+        newState.log.push(createLogEntry({
+          turn: newState.turn,
+          round: newState.round,
+          actor: owner,
+          action: 'summon_failed',
+          details: 'No space to summon a minion!',
+        }));
+      }
+      break;
+    }
+
     case 'damageReduction': {
       // Handle direct damageReduction effects (like Arcane Shield)
       if (effect.duration && effect.duration > 0) {
@@ -478,5 +531,33 @@ export function applySpellEffect(
     }
   }
 
+  return newState;
+}
+
+/**
+ * After the caster acts, let their minions perform a basic attack.
+ */
+function processMinionActions(state: CombatState, isPlayerCaster: boolean): CombatState {
+  let newState = { ...state };
+  const list = isPlayerCaster ? newState.playerMinions : newState.enemyMinions;
+  const targetKey = isPlayerCaster ? 'enemyWizard' : 'playerWizard';
+  const casterKey = isPlayerCaster ? 'playerWizard' : 'enemyWizard';
+  for (const minion of list) {
+    newState = calculateAndApplyDamage(newState, {
+      baseDamage: 5,
+      damageType: 'spell',
+      element: 'physical',
+      caster: casterKey,
+      target: targetKey,
+      sourceDescription: minion.name,
+    });
+    minion.remainingDuration -= 1;
+  }
+  const filtered = list.filter(m => m.remainingDuration > 0 && m.health > 0);
+  if (isPlayerCaster) {
+    newState.playerMinions = filtered;
+  } else {
+    newState.enemyMinions = filtered;
+  }
   return newState;
 }

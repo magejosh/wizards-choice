@@ -49,6 +49,9 @@ function parseXmlSpells(xmlText: string): Spell[] {
           target: e.target,
           element: e.element,
           duration: e.duration !== undefined ? parseInt(e.duration, 10) : undefined,
+          minionName: e.minionName,
+          modelPath: e.modelPath,
+          health: e.health !== undefined ? parseInt(e.health, 10) : undefined,
         }));
       }
       return { id, name, type, element, tier, manaCost, description, effects, imagePath, rarity } as Spell;
@@ -74,6 +77,9 @@ function parseXmlSpells(xmlText: string): Spell[] {
         target: e.getAttribute('target') as any,
         element: e.getAttribute('element') as any,
         duration: e.hasAttribute('duration') ? parseInt(e.getAttribute('duration')!, 10) : undefined,
+        minionName: e.getAttribute('minionName') || undefined,
+        modelPath: e.getAttribute('modelPath') || undefined,
+        health: e.hasAttribute('health') ? parseInt(e.getAttribute('health')!, 10) : undefined,
       }));
       return { id, name, type, element, tier, manaCost, description, effects, imagePath, rarity } as Spell;
     });

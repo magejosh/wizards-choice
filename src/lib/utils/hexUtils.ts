@@ -61,3 +61,33 @@ export function snapToHexCenter(position: [number, number, number], radius = 1):
   const rounded = roundAxial(axial.q, axial.r);
   return axialToWorld(rounded, radius);
 }
+
+/**
+ * Get the six axial coordinates adjacent to the given coordinate.
+ */
+export function getAdjacentCoords(coord: AxialCoord): AxialCoord[] {
+  const directions = [
+    { q: 1, r: 0 },
+    { q: 1, r: -1 },
+    { q: 0, r: -1 },
+    { q: -1, r: 0 },
+    { q: -1, r: 1 },
+    { q: 0, r: 1 },
+  ];
+  return directions.map(d => ({ q: coord.q + d.q, r: coord.r + d.r }));
+}
+
+/**
+ * Find an unoccupied adjacent hex around the origin.
+ * @param origin Starting coordinate
+ * @param occupied List of occupied coordinates
+ */
+export function findUnoccupiedAdjacentHex(origin: AxialCoord, occupied: AxialCoord[]): AxialCoord | null {
+  const adj = getAdjacentCoords(origin);
+  for (const c of adj) {
+    if (!occupied.some(o => o.q === c.q && o.r === c.r)) {
+      return c;
+    }
+  }
+  return null;
+}

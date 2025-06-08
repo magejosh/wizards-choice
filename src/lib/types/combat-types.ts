@@ -12,6 +12,10 @@ import { AxialCoord } from '../utils/hexUtils';
 export interface CombatState {
   playerWizard: CombatWizard;
   enemyWizard: CombatWizard;
+  /** Minions controlled by the player */
+  playerMinions: Minion[];
+  /** Minions controlled by the enemy */
+  enemyMinions: Minion[];
   turn: number;
   round: number;
   isPlayerTurn: boolean;
@@ -83,15 +87,22 @@ export interface CombatWizard {
   discardPile: Spell[];
   equippedPotions: import('./equipment-types').Potion[];
   equippedSpellScrolls: import('./equipment-types').Equipment[];
-  position: AxialCoord;
-  minions: CombatMinion[];
+  /** Position on the battlefield */
+  position?: AxialCoord;
+  /** Minions belonging to this wizard (legacy field, prefer playerMinions/enemyMinions) */
+  minions?: Minion[];
 }
 
-export interface CombatMinion {
+/** A summoned minion on the battlefield */
+export interface Minion {
   id: string;
   name: string;
-  isFlying: boolean;
+  owner: 'player' | 'enemy';
+  modelPath?: string;
+  health: number;
+  maxHealth: number;
   position: AxialCoord;
+  remainingDuration: number;
 }
 
 /**

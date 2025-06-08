@@ -5,6 +5,8 @@ import { checkCombatStatus } from './combatStatusManager';
 import { createLogEntry, battleLogManager } from './battleLogManager';
 import { selectSpell, executeSpellCast, executeMysticPunch } from './spellExecutor';
 import { INITIAL_HAND_SIZE, CARDS_PER_DRAW } from './combatInitializer';
+import { axialDistance, AxialCoord } from '../utils/hexUtils';
+import { rebuildOccupancy, isTileOccupied } from './movementManager';
 
 // Maximum hand size before requiring discard
 export const MAX_HAND_SIZE = 2;
@@ -578,6 +580,63 @@ export function queueAction(
     }
   }
 
+  return newState;
+}
+
+export function moveEntity(
+  state: CombatState,
+  entityId: string,
+  dest: AxialCoord
+): CombatState {
+  let newState = { ...state };
+  rebuildOccupancy(state);
+
+  const findEntity = () => {
+    if (state.playerWizard.wizard.id === entityId) {
+      return { owner: 'player', entity: state.playerWizard, isFlying: false };
+    }
+    if (state.enemyWizard.wizard.id === entityId) {
+      return { owner: 'enemy', entity: state.enemyWizard, isFlying: false };
+    }
+    const playerMinion = state.playerWizard.minions.find(m => m.id === entityId);
+    if (playerMinion) {
+      return { owner: 'player', entity: playerMinion, isFlying: playerMinion.isFlying };
+    }
+    const enemyMinion = state.enemyWizard.minions.find(m => m.id === entityId);
+    if (enemyMinion) {
+      return { owner: 'enemy', entity: enemyMinion, isFlying: enemyMinion.isFlying };
+    }
+    return null;
+  };
+
+  const info = findEntity();
+  if (!info) {
+    console.error(`moveEntity: entity ${entityId} not found`);
+    return state;
+  }
+
+  const currentPos = info.entity.position;
+  if (axialDistance(currentPos, dest) > 1) {
+    console.warn('moveEntity: destination out of range');
+    return state;
+  }
+
+  if (!info.isFlying && isTileOccupied(dest, entityId)) {
+    console.warn('moveEntity: tile occupied');
+    return state;
+  }
+
+  info.entity.position = dest;
+  rebuildOccupancy(newState);
+
+  battleLogManager.addEntry({
+    turn: state.turn,
+    round: state.round,
+    actor: info.owner,
+    action: 'move',
+    details: `${info.owner === 'player' ? 'Player' : 'Enemy'} moved to (${dest.q},${dest.r})`
+  });
+  newState.log = battleLogManager.getEntries();
   return newState;
 }
 

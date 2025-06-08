@@ -29,13 +29,19 @@ export interface Spell {
  * Effect that a spell can have
  */
 export interface SpellEffect {
-  type: 'damage' | 'healing' | 'buff' | 'debuff' | 'control' | 'summon' | 'utility' | 'timeRewind' | 
-        'delay' | 'confusion' | 'damageBonus' | 'defense' | 'spellEcho' | 
+  type: 'damage' | 'healing' | 'buff' | 'debuff' | 'control' | 'summon' | 'utility' | 'timeRewind' |
+        'delay' | 'confusion' | 'damageBonus' | 'defense' | 'spellEcho' |
         'manaRestore' | 'statModifier' | 'statusEffect' | 'damageReduction';
   value: number;
   target: 'self' | 'enemy';
   element: ElementType;
   duration?: number;
+  /** Optional name for a summoned minion */
+  minionName?: string;
+  /** Optional path to a 3D model for the minion */
+  modelPath?: string;
+  /** Health for the summoned minion */
+  health?: number;
 }
 
 /**

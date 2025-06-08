@@ -8,6 +8,7 @@ import {
   advancePhase,
   queueAction
 } from '../../lib/combat/phaseManager';
+import { moveEntity } from '../../lib/combat/phaseManager';
 import {
   selectSpell,
   executeMysticPunch,
@@ -1395,6 +1396,9 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
             playerLevel={playerLevel}
             enemyLevel={enemyLevel}
             combatState={combatState}
+            onMove={(coord) => {
+              setCombatState(moveEntity(combatState, combatState.playerWizard.wizard.id, coord));
+            }}
           />
 
           {/* Phase Tracker is now only in BattleArena component */}

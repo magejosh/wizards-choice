@@ -59,6 +59,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
   // Use a custom state setter to ensure entries are always sorted
   const [battleLog, setLogEntries] = useState<CombatLogEntry[]>([]);
   const [pendingSummonSpell, setPendingSummonSpell] = useState<Spell | null>(null);
+  const [selectingMove, setSelectingMove] = useState(false);
 
   // Custom setter that ensures entries are always sorted by timestamp (newest first)
   const setBattleLog = (entries: CombatLogEntry[]) => {
@@ -146,6 +147,25 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       }
     }
   }, [battleLog]);
+
+  // Exit move selection when it's no longer valid
+  useEffect(() => {
+    if (!combatState) {
+      setSelectingMove(false);
+      return;
+    }
+    if (
+      combatState.currentPhase !== 'action' ||
+      combatState.actionState.player.hasActed ||
+      !combatState.isPlayerTurn
+    ) {
+      setSelectingMove(false);
+    }
+  }, [
+    combatState?.currentPhase,
+    combatState?.actionState.player.hasActed,
+    combatState?.isPlayerTurn
+  ]);
 
   // Initialize combat once
   useEffect(() => {
@@ -1475,7 +1495,15 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
             combatState={combatState}
             onMove={(coord) => {
               setCombatState(moveEntity(combatState, combatState.playerWizard.wizard.id, coord));
+              setSelectingMove(false);
             }}
+            onStartMove={() => setSelectingMove(prev => !prev)}
+            canMove={
+              combatState.currentPhase === 'action' &&
+              !combatState.actionState.player.hasActed &&
+              !isAnimating
+            }
+            selectingMove={selectingMove}
             selectingSummon={pendingSummonSpell !== null}
             onSummonTile={handleSummonTileSelect}
           />

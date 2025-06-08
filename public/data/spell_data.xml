@@ -663,7 +663,7 @@
     </effects>
     <list>any</list>
   </spell>
-  <spell id="spell_titanic_manifestation_mar51err" name="Titanic Manifestation" type="buff" element="earth" tier="8" manaCost="310" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
+  <spell id="spell_titanic_manifestation_mar51err" name="Titanic Manifestation" type="summon" element="earth" tier="8" manaCost="310" rarity="common" imagePath="/images/spells/default-placeholder.jpg">
     <description>Manifests a titanic elemental being of immense power that fights alongside the caster.</description>
     <effects>
       <effect type="statModifier" value="-90" target="self" element="earth" duration="4"/>

@@ -343,4 +343,64 @@ export function craftPotion(
       potion
     }
   };
-} 
+}
+
+export function studyPotion(
+  wizard: Wizard,
+  potion: Potion,
+  grade: 'poor' | 'average' | 'excellent'
+): {
+  wizard: Wizard;
+  result: { success: boolean; message: string; discoveredRecipe?: PotionRecipe };
+} {
+  const updatedWizard = { ...wizard };
+  updatedWizard.potions = (updatedWizard.potions || []).filter(p => p.id !== potion.id);
+
+  const rarityMap: Record<string, number> = {
+    common: 1,
+    uncommon: 2,
+    rare: 3,
+    epic: 4,
+    legendary: 5,
+  };
+
+  const candidate = getAllPotionRecipes().find(
+    r => r.resultType === potion.type && r.resultTier === rarityMap[potion.rarity]
+  );
+
+  if (!candidate) {
+    return {
+      wizard: updatedWizard,
+      result: {
+        success: false,
+        message: 'You could not learn anything from this potion.',
+      },
+    };
+  }
+
+  const chanceMap: Record<'poor' | 'average' | 'excellent', number> = {
+    poor: 0.25,
+    average: 0.5,
+    excellent: 0.75,
+  };
+
+  if (Math.random() < chanceMap[grade]) {
+    const wiz = discoverRecipe(updatedWizard, candidate.id) || updatedWizard;
+    return {
+      wizard: wiz,
+      result: {
+        success: true,
+        message: `You learned the recipe for ${candidate.name}!`,
+        discoveredRecipe: candidate,
+      },
+    };
+  }
+
+  return {
+    wizard: updatedWizard,
+    result: {
+      success: false,
+      message: 'The study yielded no recipe.',
+    },
+  };
+}

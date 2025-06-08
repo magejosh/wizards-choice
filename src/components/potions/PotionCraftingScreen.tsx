@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import RuneSequenceMinigame, { RuneGrade } from '../minigames/RuneSequenceMinigame';
+import RuneSequenceMinigame from '../minigames/RuneSequenceMinigame';
+import PotionStudyMinigame from '../minigames/PotionStudyMinigame';
+import { RuneGrade } from '@/lib/types/minigame-types';
 import { useGameStateStore, getWizard } from '../../lib/game-state/gameStateStore';
-import { PotionRecipe, Ingredient } from '../../lib/types';
+import { PotionRecipe, Ingredient, Potion } from '../../lib/types';
 import { getCraftableRecipes, getDiscoveredRecipes } from '../../lib/features/potions/potionCrafting';
 import styles from './PotionCraftingScreen.module.css';
 
@@ -12,11 +14,11 @@ interface PotionCraftingScreenProps {
 }
 
 const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) => {
-  const { updatePlayerIngredients, updatePlayerPotions, experimentWithIngredients, craftPotion } = useGameStateStore();
+  const { updatePlayerIngredients, updatePlayerPotions, experimentWithIngredients, craftPotion, studyPotion: studyPotionAction } = useGameStateStore();
   const player = getWizard();
 
   // Local state
-  const [selectedTab, setSelectedTab] = useState<'brew' | 'experiment'>('brew');
+  const [selectedTab, setSelectedTab] = useState<'brew' | 'experiment' | 'study'>('brew');
   const [selectedRecipe, setSelectedRecipe] = useState<PotionRecipe | null>(null);
   const [selectedIngredients, setSelectedIngredients] = useState<Ingredient[]>([]);
   const [craftableRecipes, setCraftableRecipes] = useState<PotionRecipe[]>([]);
@@ -25,6 +27,9 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [showMinigame, setShowMinigame] = useState(false);
   const [pendingAction, setPendingAction] = useState<'craft' | 'experiment' | null>(null);
+  const [studyPotion, setStudyPotion] = useState<Potion | null>(null);
+  const [studyTimeLeft, setStudyTimeLeft] = useState<number>(0);
+  const [showStudyMinigame, setShowStudyMinigame] = useState(false);
 
   // Load recipes on component mount
   useEffect(() => {
@@ -52,6 +57,13 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
       setSelectedIngredients([...selectedIngredients, ingredient]);
     }
   };
+
+  // Countdown timer for studying
+  useEffect(() => {
+    if (studyTimeLeft <= 0) return;
+    const t = setTimeout(() => setStudyTimeLeft(studyTimeLeft - 1), 1000);
+    return () => clearTimeout(t);
+  }, [studyTimeLeft]);
 
   // Render ingredients list for experimentation
   const renderIngredientsList = () => {
@@ -144,6 +156,33 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
     setShowMinigame(true);
   };
 
+  const performStudy = (grade: RuneGrade) => {
+    if (!studyPotion) return;
+    const result = studyPotionAction(studyPotion.id, grade);
+    setResultMessage(result.message);
+    setIsSuccess(result.success);
+
+    if (result.success) {
+      const updatedPlayer = getWizard();
+      if (updatedPlayer) {
+        setCraftableRecipes(getCraftableRecipes(updatedPlayer));
+        setDiscoveredRecipes(getDiscoveredRecipes(updatedPlayer));
+      }
+    }
+    setStudyPotion(null);
+    setStudyTimeLeft(0);
+  };
+
+  // Start studying the selected potion
+  const handleStartStudy = () => {
+    if (!studyPotion) return;
+    setStudyTimeLeft(60);
+  };
+
+  const handleStudyMinigameStart = () => {
+    setShowStudyMinigame(true);
+  };
+
   // Render recipe list for brewing
   const renderRecipesList = () => {
     const recipes = selectedTab === 'brew' ? craftableRecipes : discoveredRecipes;
@@ -191,6 +230,43 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
     );
   };
 
+  // Render potion list for study
+  const renderPotionsList = () => {
+    if (!player.potions || player.potions.length === 0) {
+      return (
+        <div className={styles.potionCraftingEmptyMessage}>
+          You don't have any potions to study.
+        </div>
+      );
+    }
+
+    return (
+      <div className={styles.potionCraftingPotionsList}>
+        {player.potions.map(potion => {
+          const isSelected = studyPotion?.id === potion.id;
+          return (
+            <div
+              key={potion.id}
+              className={`${styles.potionCraftingPotion} ${isSelected ? styles.potionCraftingPotionSelected : ''}`}
+              onClick={() => {
+                if (studyTimeLeft > 0) return;
+                setStudyPotion(potion);
+              }}
+            >
+              <div className={styles.potionCraftingIngredientHeader}>
+                <span className={styles.potionCraftingIngredientName}>{potion.name}</span>
+                {potion.quantity && potion.quantity > 1 && (
+                  <span className={styles.potionCraftingIngredientCategory}>x{potion.quantity}</span>
+                )}
+              </div>
+              <div className={styles.potionCraftingIngredientDescription}>{potion.description}</div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div className={styles.potionCrafting}>
       <div className={styles.potionCraftingHeader}>
@@ -210,6 +286,12 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
           onClick={() => setSelectedTab('experiment')}
         >
           Experiment
+        </button>
+        <button
+          className={`${styles.potionCraftingTab} ${selectedTab === 'study' ? styles.potionCraftingTabActive : ''}`}
+          onClick={() => setSelectedTab('study')}
+        >
+          Study
         </button>
       </div>
 
@@ -256,7 +338,7 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
               )}
             </div>
           </div>
-        ) : (
+        ) : selectedTab === 'experiment' ? (
           <div className={styles.potionCraftingExperimentMode}>
             <div className={styles.potionCraftingIngredients}>
               <h2 className={styles.potionCraftingSectionTitle}>Your Ingredients</h2>
@@ -294,6 +376,60 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
               </p>
             </div>
           </div>
+        ) : (
+          <div className={styles.potionCraftingStudyMode}>
+            <div className={styles.potionCraftingIngredients}>
+              <h2 className={styles.potionCraftingSectionTitle}>Your Potions</h2>
+              {renderPotionsList()}
+            </div>
+
+            <div className={styles.potionCraftingStudyArea}>
+              <h2 className={styles.potionCraftingSectionTitle}>Study Station</h2>
+
+              <div
+                className={styles.potionCraftingStudySlot}
+                onClick={() => {
+                  if (studyTimeLeft > 0) {
+                    setStudyPotion(null);
+                    setStudyTimeLeft(0);
+                  }
+                }}
+              >
+                {studyPotion ? (
+                  <div>
+                    <p>{studyPotion.name}</p>
+                    {studyTimeLeft > 0 && (
+                      <p className={styles.potionCraftingTimer}>
+                        Studying... {studyTimeLeft}s
+                      </p>
+                    )}
+                    {studyTimeLeft === 0 && (
+                      <button
+                        className={styles.potionCraftingExperimentButton}
+                        onClick={handleStudyMinigameStart}
+                      >
+                        Analyze
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <p>Select a potion to study</p>
+                )}
+              </div>
+
+              <button
+                className={styles.potionCraftingExperimentButton}
+                onClick={handleStartStudy}
+                disabled={!studyPotion || studyTimeLeft > 0}
+              >
+                Study
+              </button>
+
+              <p className={styles.potionCraftingWarning}>
+                Studying consumes the potion.
+              </p>
+            </div>
+          </div>
         )}
 
         {resultMessage && (
@@ -320,6 +456,18 @@ const PotionCraftingScreen: React.FC<PotionCraftingScreenProps> = ({ onClose }) 
             onCancel={() => {
               setShowMinigame(false);
               setPendingAction(null);
+            }}
+          />
+        )}
+        {showStudyMinigame && (
+          <PotionStudyMinigame
+            sequenceLength={3}
+            onComplete={(grade: RuneGrade) => {
+              setShowStudyMinigame(false);
+              performStudy(grade);
+            }}
+            onCancel={() => {
+              setShowStudyMinigame(false);
             }}
           />
         )}

@@ -3,6 +3,7 @@ import { PotionRecipe } from "../../types/equipment-types";
 import {
   experimentWithIngredients as experimentHelper,
   craftPotion as craftHelper,
+  studyPotion as studyHelper,
 } from "../../features/potions/potionCrafting";
 
 export interface PotionActions {
@@ -18,6 +19,11 @@ export interface PotionActions {
     success: boolean;
     message: string;
     potion?: Potion;
+  };
+  studyPotion: (potionId: string, grade: 'poor' | 'average' | 'excellent') => {
+    success: boolean;
+    message: string;
+    discoveredRecipe?: PotionRecipe;
   };
 }
 
@@ -110,6 +116,37 @@ export const createPotionModule = (
     const player = get().gameState.player;
     if (!player) return { success: false, message: "No player loaded." };
     const { wizard: updatedWizard, result } = craftHelper(player, recipeId);
+    set((state: any) => {
+      const gameState = state.gameState;
+      const saveSlots = [...gameState.saveSlots];
+      const slotIndex = saveSlots.findIndex(
+        (s: any) => s.saveUuid === gameState.currentSaveSlot,
+      );
+      if (slotIndex >= 0) {
+        saveSlots[slotIndex] = {
+          ...saveSlots[slotIndex],
+          player: updatedWizard,
+          level: updatedWizard.level,
+          playerName: updatedWizard.name,
+        };
+      }
+      return {
+        gameState: {
+          ...gameState,
+          player: updatedWizard,
+          saveSlots,
+        },
+      };
+    });
+    return result;
+  },
+
+  studyPotion: (potionId, grade) => {
+    const player = get().gameState.player;
+    if (!player) return { success: false, message: 'No player loaded.' };
+    const potion = player.potions.find(p => p.id === potionId);
+    if (!potion) return { success: false, message: 'Potion not found.' };
+    const { wizard: updatedWizard, result } = studyHelper(player, potion, grade);
     set((state: any) => {
       const gameState = state.gameState;
       const saveSlots = [...gameState.saveSlots];

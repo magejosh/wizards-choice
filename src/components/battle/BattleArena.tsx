@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './BattleArena.module.css';
 import BattleScene from './BattleScene';
 import { CombatState } from '@/lib/types';
+import { AxialCoord } from '@/lib/utils/hexUtils';
 import WizardStats from './WizardStats';
 import BattleLog from './BattleLog';
 import { Spell, ActiveEffect } from '../../lib/types/spell-types';
@@ -45,6 +46,7 @@ interface BattleArenaProps {
   playerLevel?: number;
   enemyLevel?: number;
   combatState?: CombatState;
+  onMove?: (coord: AxialCoord) => void;
 }
 
 const BattleArena: React.FC<BattleArenaProps> = ({
@@ -79,7 +81,8 @@ const BattleArena: React.FC<BattleArenaProps> = ({
   playerName,
   playerLevel,
   enemyLevel,
-  combatState
+  combatState,
+  onMove
 }) => {
   // Track if we're on a mobile device
   const [isMobile, setIsMobile] = useState(false);
@@ -157,6 +160,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
               currentPhase={currentPhase}
               combatState={combatState}
               log={battleLog}
+              onMove={onMove}
             />
           </div>
 
@@ -316,6 +320,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
               currentPhase={currentPhase}
               combatState={combatState}
               log={battleLog}
+              onMove={onMove}
             />
           </div>
 

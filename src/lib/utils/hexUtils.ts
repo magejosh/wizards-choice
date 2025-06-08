@@ -61,3 +61,14 @@ export function snapToHexCenter(position: [number, number, number], radius = 1):
   const rounded = roundAxial(axial.q, axial.r);
   return axialToWorld(rounded, radius);
 }
+
+/**
+ * Calculate distance between two axial coordinates.
+ */
+export function axialDistance(a: AxialCoord, b: AxialCoord): number {
+  return (
+    Math.abs(a.q - b.q) +
+    Math.abs(a.q + a.r - b.q - b.r) +
+    Math.abs(a.r - b.r)
+  ) / 2;
+}

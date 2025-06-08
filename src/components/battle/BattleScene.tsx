@@ -6,7 +6,8 @@ import { Environment, Stars, Text, OrbitControls } from '@react-three/drei';
 import SpellEffect3D from './effects/SpellEffect3D';
 import WizardModel from './WizardModel';
 import HexGrid, { TILE_COLORS } from './HexGrid';
-import { axialToWorld } from '@/lib/utils/hexUtils';
+import { axialToWorld, axialDistance, AxialCoord } from '@/lib/utils/hexUtils';
+import { moveEntity } from '@/lib/combat/phaseManager';
 import { Spell, ActiveEffect } from '../../lib/types/spell-types';
 import { CombatState, CombatLogEntry, CombatWizard } from '../../lib/types/combat-types';
 
@@ -37,6 +38,7 @@ interface BattleSceneProps {
   animating?: boolean;
   isMobile?: boolean;
   currentPhase?: string; // Current combat phase from the phase-based system
+  onMove?: (coord: AxialCoord) => void;
 }
 
 // Create a separate component for the 3D scene content
@@ -46,9 +48,11 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
   const [playerAnim, setPlayerAnim] = useState<'idle' | 'cast' | 'dodge' | 'die' | 'throw'>('idle');
   const [enemyAnim, setEnemyAnim] = useState<'idle' | 'cast' | 'dodge' | 'die' | 'throw'>('idle');
   const prevLogLength = useRef<number>(0);
+  const [reachableTiles, setReachableTiles] = useState<AxialCoord[]>([]);
+  const [selectedDest, setSelectedDest] = useState<AxialCoord | null>(null);
   
   // Extract props - support both old and new formats
-  const { 
+  const {
     combatState,
     playerHealth: propsPlayerHealth,
     playerMaxHealth: propsPlayerMaxHealth,
@@ -56,7 +60,8 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
     enemyMaxHealth: propsEnemyMaxHealth,
     log: propsLog,
     animating = false,
-    isMobile = false
+    isMobile = false,
+    onMove
   } = props;
 
   // Use either props or fallback to combatState if available
@@ -97,6 +102,16 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
     dirt: '/tiles/dirt.png',
     water: '/tiles/water.png'
   } as const;
+
+  const handleTileClick = (coord: AxialCoord) => {
+    if (!onMove || !combatState) return;
+    if (!reachableTiles.some(t => t.q === coord.q && t.r === coord.r)) return;
+    setSelectedDest(coord);
+    if (window.confirm('Move here?')) {
+      onMove(coord);
+      setSelectedDest(null);
+    }
+  };
   
   // Process combat log to create visual effects
   useEffect(() => {
@@ -186,6 +201,24 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
     }
   }, [log, combatState]);
 
+  useEffect(() => {
+    if (!combatState) return;
+    if (combatState.currentPhase === 'action' && combatState.isPlayerTurn) {
+      const pos = combatState.playerWizard.position;
+      const neighbors: AxialCoord[] = [
+        { q: pos.q + 1, r: pos.r },
+        { q: pos.q - 1, r: pos.r },
+        { q: pos.q, r: pos.r + 1 },
+        { q: pos.q, r: pos.r - 1 },
+        { q: pos.q + 1, r: pos.r - 1 },
+        { q: pos.q - 1, r: pos.r + 1 }
+      ];
+      setReachableTiles(neighbors);
+    } else {
+      setReachableTiles([]);
+    }
+  }, [combatState?.currentPhase, combatState?.isPlayerTurn, combatState?.playerWizard.position]);
+
   // Play defeat animations when combat ends
   useEffect(() => {
     if (!combatState) return;
@@ -248,13 +281,20 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
       {/* Hexagonal battlefield overlay */}
       {/* Slightly above the platform to avoid z-fighting */}
       <group position={[0, -0.49, 0]}>
-        <HexGrid gridRadius={3} radius={1} height={0.2} textureMap={textureMap} />
+        <HexGrid
+          gridRadius={3}
+          radius={1}
+          height={0.2}
+          textureMap={textureMap}
+          highlightedTiles={reachableTiles}
+          onTileClick={handleTileClick}
+        />
       </group>
       
       {/* Player wizard */}
       <Suspense fallback={null}>
         <WizardModel
-          position={axialToWorld({ q: -2, r: 0 })}
+          position={axialToWorld(combatState ? combatState.playerWizard.position : { q: -2, r: 0 })}
           color={theme.colors.primary.main}
           health={playerHealth / playerMaxHealth}
           isActive={combatState ? (combatState.isPlayerTurn && combatState.status === 'active') : true}
@@ -265,7 +305,7 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
       {/* Enemy wizard */}
       <Suspense fallback={null}>
         <WizardModel
-          position={axialToWorld({ q: 2, r: 0 })}
+          position={axialToWorld(combatState ? combatState.enemyWizard.position : { q: 2, r: 0 })}
           color={theme.colors.secondary.main}
           isEnemy={true}
           health={enemyHealth / enemyMaxHealth}

@@ -772,7 +772,14 @@ export const MarketUI: React.FC<{ onClose: (attackInfo?: any) => void }> = ({ on
 
               <div className={itemGridStyles.itemGrid}>
                 {getDisplayItems().map((item: MarketItemType<any>, index: number) => {
-                  let itemType = selectedTab === 'spellScrolls' ? 'scroll' : selectedTab;
+                  let itemType =
+                    selectedTab === 'spellScrolls'
+                      ? 'scroll'
+                      : selectedTab === 'potions'
+                      ? 'potion'
+                      : selectedTab === 'ingredients'
+                      ? 'ingredient'
+                      : selectedTab;
                   return (
                     <MarketItemCard
                       key={index}

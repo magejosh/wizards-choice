@@ -20,7 +20,7 @@
     {
       "id": "spell_arcane_shield_mar51ero",
       "name": "Arcane Shield",
-      "type": "buff",
+      "type": "summon",
       "element": "arcane",
       "tier": 1,
       "manaCost": 30,
@@ -2182,7 +2182,7 @@
     {
       "id": "spell_titanic_manifestation_mar51err",
       "name": "Titanic Manifestation",
-      "type": "buff",
+      "type": "summon",
       "element": "earth",
       "tier": 8,
       "manaCost": 310,

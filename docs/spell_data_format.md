@@ -100,4 +100,27 @@ This document defines the XML format for all spell data in Wizard's Choice. All 
 
 - After editing and saving spells (via the CMX or any tool), the in-memory spell cache must be cleared using the `clearSpellCache` function from `src/lib/spells/spellData.ts`.
 - This ensures that the game reloads the latest spell data from the XML file and displays all updates immediately.
-- The CMX now calls this automatically after a successful save. 
+- The CMX now calls this automatically after a successful save.
+
+## Summoning Keyword Caveats
+
+Several high-powered damage spells describe "summoning" storms or disasters in
+their text. These do **not** create controllable allies and therefore remain
+`type: "damage"`. Spells with misleading wording include:
+
+- Wind Blast
+- Hurricane
+- Blizzard
+- Gale Force
+- Raging Thunderstorm
+- Apocalypse
+- Tsunami
+- Supercell Storm
+- Hurricane Apocalypse
+- Celestial Maelstrom
+- Eternal Winter
+- World-Ending Flame
+
+Only spells that actually produce an allied creature should use the
+`summon` type. For example, **Titanic Manifestation** is classified as a
+summon because it manifests an elemental being that fights alongside the caster.

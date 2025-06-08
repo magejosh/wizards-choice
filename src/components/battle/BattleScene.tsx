@@ -41,6 +41,7 @@ interface BattleSceneProps {
   currentPhase?: string; // Current combat phase from the phase-based system
   onMove?: (coord: AxialCoord) => void;
   selectingSummon?: boolean;
+  selectingMove?: boolean;
   onSummonTile?: (coord: AxialCoord) => void;
 }
 
@@ -115,13 +116,11 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
       setSummonTiles([]);
       return;
     }
+    if (!props.selectingMove) return;
     if (!onMove) return;
     if (!reachableTiles.some(t => t.q === coord.q && t.r === coord.r)) return;
-    setSelectedDest(coord);
-    if (window.confirm('Move here?')) {
-      onMove(coord);
-      setSelectedDest(null);
-    }
+    onMove(coord);
+    setSelectedDest(null);
   };
   
   // Process combat log to create visual effects
@@ -214,7 +213,11 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
 
   useEffect(() => {
     if (!combatState) return;
-    if (combatState.currentPhase === 'action' && combatState.isPlayerTurn) {
+    if (
+      combatState.currentPhase === 'action' &&
+      combatState.isPlayerTurn &&
+      props.selectingMove
+    ) {
       const pos = combatState.playerWizard.position;
       const neighbors: AxialCoord[] = [
         { q: pos.q + 1, r: pos.r },
@@ -228,7 +231,12 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
     } else {
       setReachableTiles([]);
     }
-  }, [combatState?.currentPhase, combatState?.isPlayerTurn, combatState?.playerWizard.position]);
+  }, [
+    props.selectingMove,
+    combatState?.currentPhase,
+    combatState?.isPlayerTurn,
+    combatState?.playerWizard.position
+  ]);
 
   useEffect(() => {
     if (!combatState || !props.selectingSummon) {
@@ -309,7 +317,13 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
           radius={1}
           height={0.2}
           textureMap={textureMap}
-          highlightedTiles={props.selectingSummon ? summonTiles : reachableTiles}
+          highlightedTiles={
+            props.selectingSummon
+              ? summonTiles
+              : props.selectingMove
+                ? reachableTiles
+                : []
+          }
           onTileClick={handleTileClick}
         />
       </group>

@@ -49,6 +49,9 @@ interface BattleArenaProps {
   onMove?: (coord: AxialCoord) => void;
   selectingSummon?: boolean;
   onSummonTile?: (coord: AxialCoord) => void;
+  onStartMove?: () => void;
+  canMove?: boolean;
+  selectingMove?: boolean;
 }
 
 const BattleArena: React.FC<BattleArenaProps> = ({
@@ -86,7 +89,10 @@ const BattleArena: React.FC<BattleArenaProps> = ({
   combatState,
   onMove,
   selectingSummon,
-  onSummonTile
+  onSummonTile,
+  onStartMove,
+  canMove,
+  selectingMove
 }) => {
   // Track if we're on a mobile device
   const [isMobile, setIsMobile] = useState(false);
@@ -166,6 +172,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
               log={battleLog}
               onMove={onMove}
               selectingSummon={selectingSummon}
+              selectingMove={selectingMove}
               onSummonTile={onSummonTile}
             />
           </div>
@@ -238,6 +245,17 @@ const BattleArena: React.FC<BattleArenaProps> = ({
               }}
             >
               Mystic Punch
+            </button>
+            <button
+              className={styles.mysticPunchButton}
+              onClick={onStartMove}
+              disabled={!canMove}
+              style={{
+                fontSize: window.innerWidth <= 380 ? '0.9rem' : '1rem',
+                padding: window.innerWidth <= 380 ? '0.4rem 0.6rem' : '0.5rem 1rem'
+              }}
+            >
+              {selectingMove ? 'Cancel Move' : 'Move'}
             </button>
             <button
               className={styles.skipTurnButton}
@@ -328,6 +346,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
               log={battleLog}
               onMove={onMove}
               selectingSummon={selectingSummon}
+              selectingMove={selectingMove}
               onSummonTile={onSummonTile}
             />
           </div>
@@ -368,6 +387,17 @@ const BattleArena: React.FC<BattleArenaProps> = ({
               }}
             >
               Mystic Punch
+            </button>
+            <button
+              className={styles.mysticPunchButton}
+              onClick={onStartMove}
+              disabled={!canMove}
+              style={{
+                fontSize: window.innerWidth <= 380 ? '0.9rem' : '1rem',
+                padding: window.innerWidth <= 380 ? '0.4rem 0.6rem' : '0.5rem 1rem'
+              }}
+            >
+              {selectingMove ? 'Cancel Move' : 'Move'}
             </button>
             <button
               className={styles.skipTurnButton}

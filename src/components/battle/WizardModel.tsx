@@ -229,17 +229,33 @@ const WizardModel: React.FC<WizardModelProps> = ({
   if (!isEnemy) {
     const { scene } = useGLTF(PLAYER_WIZARD_GLB_PATH);
 
-    // Debug: rotation presets for player model orientation
+    // Debug: expanded rotation presets for player model orientation (keep for future dev use)
     const rotationPresets: [number, number, number][] = [
-      [0, Math.PI / 3, 0],
-      [Math.PI / 2, Math.PI / 3, 0],
-      [0, Math.PI / 3, Math.PI / 2],
+      [Math.PI / 2, Math.PI / 3, Math.PI],
+      [Math.PI / 2, 0, Math.PI],
+      [Math.PI / 2, 0, 0],
+      [Math.PI / 2, Math.PI / 2, 0],
+      [Math.PI / 2, 0, -Math.PI / 2],
+      [0, 0, 0],
+      [0, Math.PI, 0],
+      [0, 0, Math.PI],
+      [0, Math.PI / 2, Math.PI / 2],
+      [Math.PI, 0, 0],
       [0, -Math.PI / 2, 0],
-      [0, Math.PI / 2, 0],
-      [Math.PI, Math.PI / 3, 0],
+      [0, 0, -Math.PI / 2],
+      [Math.PI / 2, Math.PI / 2, Math.PI / 2],
+      [Math.PI / 2, Math.PI, 0],
+      [Math.PI / 2, Math.PI, Math.PI / 2],
+      [Math.PI / 2, Math.PI, Math.PI],
+      [Math.PI / 2, Math.PI, -Math.PI / 2],
+      [Math.PI / 2, -Math.PI / 2, 0],
+      [Math.PI / 2, -Math.PI / 2, Math.PI / 2],
+      [Math.PI / 2, -Math.PI / 2, Math.PI],
+      [Math.PI / 2, -Math.PI / 2, -Math.PI / 2],
     ];
     const [rotationIndex, setRotationIndex] = useState(0);
     const handleNextRotation = () => setRotationIndex((i) => (i + 1) % rotationPresets.length);
+    // Debug switcher is disabled for now, but code is retained for future use.
 
     // Load animations
     const idleA = useFBX('/assets/anims/Idle.fbx');
@@ -323,18 +339,10 @@ const WizardModel: React.FC<WizardModelProps> = ({
       return '#ff4444';
     };
 
+    console.log('Player GLB scene:', scene);
     return (
       <group position={position}>
-        {/* Debug button: only show in development */}
-        {process.env.NODE_ENV === 'development' && (
-          <Html position={[0, 2.5, 0]} center>
-            <button style={{ background: '#222', color: '#fff', padding: '4px 8px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }} onClick={handleNextRotation}>
-              Next Rotation
-            </button>
-            <div style={{ color: '#fff', fontSize: 10, marginTop: 2 }}>Rotation: [{rotationPresets[rotationIndex].map(n => n.toFixed(2)).join(', ')}]</div>
-          </Html>
-        )}
-        <primitive object={scene} scale={[1.81, 1.81, 1.81]} position={[0, 0.7, 0]} rotation={rotationPresets[rotationIndex]} />
+        <primitive object={scene} scale={[1.81, 1.81, 1.81]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} />
         <group position={[0, 2, 0]}>
           <mesh position={[0, 0, 0]}>
             <boxGeometry args={[1.2, 0.15, 0.05]} />

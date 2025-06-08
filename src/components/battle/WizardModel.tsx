@@ -11,6 +11,8 @@ interface WizardModelProps {
   position: [number, number, number];
   color: string;
   health: number; // 0.0 to 1.0
+  /** Current action to play */
+  action?: 'idle' | 'cast' | 'dodge' | 'die' | 'throw';
   isActive?: boolean;
   isEnemy?: boolean;
   enemyVariant?: 0 | 1; // 0: original, 1: alternate
@@ -224,14 +226,92 @@ const WizardModel: React.FC<WizardModelProps> = ({
   // Player: use GLB model
   if (!isEnemy) {
     const { scene } = useGLTF(PLAYER_WIZARD_GLB_PATH);
+
+    // Load animations
+    const idleA = useFBX('/assets/anims/Idle.fbx');
+    const idleB = useFBX('/assets/anims/Unarmed Idle.fbx');
+    const idleC = useFBX('/assets/anims/Zombie Idle.fbx');
+    const idleD = useFBX('/assets/anims/Standing Idle 03.fbx');
+    const castA = useFBX('/assets/anims/Standing 2H Magic Attack 01.fbx');
+    const castB = useFBX('/assets/anims/Standing Idle to Magic Attack 04.fbx');
+    const castC = useFBX('/assets/anims/Standing 1H Cast Spell 01.fbx');
+    const dodgeA = useFBX('/assets/anims/Dodging.fbx');
+    const dodgeB = useFBX('/assets/anims/Dodging Right.fbx');
+    const dieA = useFBX('/assets/anims/Dying.fbx');
+    const dieB = useFBX('/assets/anims/Defeated.fbx');
+    const dieC = useFBX('/assets/anims/Standing React Death Forward.fbx');
+    const throwA = useFBX('/assets/anims/Throwing.fbx');
+
+    const mixer = useRef<THREE.AnimationMixer>();
+    const currentAction = useRef<THREE.AnimationAction>();
+    const [internalAction, setInternalAction] = useState(action || 'idle');
+
+    if (!mixer.current) {
+      mixer.current = new THREE.AnimationMixer(scene);
+    }
+
+    const animations = {
+      idle: [idleA.animations[0], idleB.animations[0], idleC.animations[0], idleD.animations[0]],
+      cast: [castA.animations[0], castB.animations[0], castC.animations[0]],
+      dodge: [dodgeA.animations[0], dodgeB.animations[0]],
+      die: [dieA.animations[0], dieB.animations[0], dieC.animations[0]],
+      throw: [throwA.animations[0]]
+    } as const;
+
+    const playClips = (clips: THREE.AnimationClip[], loop: boolean) => {
+      if (!mixer.current) return;
+      const clip = clips[Math.floor(Math.random() * clips.length)];
+      const actionObj = mixer.current.clipAction(clip);
+      actionObj.reset();
+      actionObj.fadeIn(0.1);
+      actionObj.setLoop(loop ? THREE.LoopRepeat : THREE.LoopOnce, loop ? Infinity : 1);
+      actionObj.clampWhenFinished = !loop;
+      actionObj.play();
+      if (currentAction.current && currentAction.current !== actionObj) {
+        currentAction.current.fadeOut(0.1);
+      }
+      currentAction.current = actionObj;
+      if (!loop) {
+        setTimeout(() => setInternalAction('idle'), clip.duration * 1000);
+      }
+    };
+
+    useEffect(() => {
+      setInternalAction(action || 'idle');
+    }, [action]);
+
+    useEffect(() => {
+      switch (internalAction) {
+        case 'cast':
+          playClips(animations.cast, false);
+          break;
+        case 'dodge':
+          playClips(animations.dodge, false);
+          break;
+        case 'die':
+          playClips(animations.die, false);
+          break;
+        case 'throw':
+          playClips(animations.throw, false);
+          break;
+        default:
+          playClips(animations.idle, true);
+      }
+    }, [internalAction]);
+
+    useFrame((_, delta) => {
+      mixer.current?.update(delta);
+    });
+
     const getHealthColor = () => {
       if (health > 0.6) return '#44ff44';
       if (health > 0.3) return '#ffff00';
       return '#ff4444';
     };
+
     return (
       <group position={position}>
-        <primitive object={scene} scale={[1.81, 1.81, 1.81]} position={[0, 0.7, 0]} rotation={[0, Math.PI/3, 0]} />
+        <primitive object={scene} scale={[1.81, 1.81, 1.81]} position={[0, 0.7, 0]} rotation={[0, Math.PI / 3, 0]} />
         <group position={[0, 2, 0]}>
           <mesh position={[0, 0, 0]}>
             <boxGeometry args={[1.2, 0.15, 0.05]} />
@@ -264,22 +344,6 @@ const WizardModel: React.FC<WizardModelProps> = ({
       if (modelPath!.toLowerCase().endsWith('.vrm')) {
         const gltf = useLoader(VRMLoader, modelPath!);
         scene = gltf.scene;
-        // Simple idle animation for VRM models (if no animations are present)
-        const [idleTime, setIdleTime] = useState(0);
-        useFrame((_, delta) => {
-          setIdleTime(t => t + delta);
-          if (scene) {
-            // Bob the whole model up and down
-            scene.position.y = Math.sin(idleTime * 2) * 0.05;
-            // Try to swing arms if humanoid bones are present
-            const leftArm = scene.getObjectByName('LeftUpperArm') || scene.getObjectByName('mixamorig:LeftArm');
-            const rightArm = scene.getObjectByName('RightUpperArm') || scene.getObjectByName('mixamorig:RightArm');
-            if (leftArm && rightArm) {
-              leftArm.rotation.z = Math.sin(idleTime * 2) * 0.1 - 0.2;
-              rightArm.rotation.z = -Math.sin(idleTime * 2) * 0.1 + 0.2;
-            }
-          }
-        });
       } else {
         scene = useFBX(modelPath!);
       }
@@ -288,6 +352,82 @@ const WizardModel: React.FC<WizardModelProps> = ({
     }
   }
   if (scene) {
+    // Reuse animation clips loaded for the player
+    const idleA = useFBX('/assets/anims/Idle.fbx');
+    const idleB = useFBX('/assets/anims/Unarmed Idle.fbx');
+    const idleC = useFBX('/assets/anims/Zombie Idle.fbx');
+    const idleD = useFBX('/assets/anims/Standing Idle 03.fbx');
+    const castA = useFBX('/assets/anims/Standing 2H Magic Attack 01.fbx');
+    const castB = useFBX('/assets/anims/Standing Idle to Magic Attack 04.fbx');
+    const castC = useFBX('/assets/anims/Standing 1H Cast Spell 01.fbx');
+    const dodgeA = useFBX('/assets/anims/Dodging.fbx');
+    const dodgeB = useFBX('/assets/anims/Dodging Right.fbx');
+    const dieA = useFBX('/assets/anims/Dying.fbx');
+    const dieB = useFBX('/assets/anims/Defeated.fbx');
+    const dieC = useFBX('/assets/anims/Standing React Death Forward.fbx');
+    const throwA = useFBX('/assets/anims/Throwing.fbx');
+
+    const mixer = useRef<THREE.AnimationMixer>();
+    const currentAction = useRef<THREE.AnimationAction>();
+    const [internalAction, setInternalAction] = useState(action || 'idle');
+
+    if (!mixer.current) {
+      mixer.current = new THREE.AnimationMixer(scene);
+    }
+
+    const animations = {
+      idle: [idleA.animations[0], idleB.animations[0], idleC.animations[0], idleD.animations[0]],
+      cast: [castA.animations[0], castB.animations[0], castC.animations[0]],
+      dodge: [dodgeA.animations[0], dodgeB.animations[0]],
+      die: [dieA.animations[0], dieB.animations[0], dieC.animations[0]],
+      throw: [throwA.animations[0]]
+    } as const;
+
+    const playClips = (clips: THREE.AnimationClip[], loop: boolean) => {
+      if (!mixer.current) return;
+      const clip = clips[Math.floor(Math.random() * clips.length)];
+      const actionObj = mixer.current.clipAction(clip);
+      actionObj.reset();
+      actionObj.fadeIn(0.1);
+      actionObj.setLoop(loop ? THREE.LoopRepeat : THREE.LoopOnce, loop ? Infinity : 1);
+      actionObj.clampWhenFinished = !loop;
+      actionObj.play();
+      if (currentAction.current && currentAction.current !== actionObj) {
+        currentAction.current.fadeOut(0.1);
+      }
+      currentAction.current = actionObj;
+      if (!loop) {
+        setTimeout(() => setInternalAction('idle'), clip.duration * 1000);
+      }
+    };
+
+    useEffect(() => {
+      setInternalAction(action || 'idle');
+    }, [action]);
+
+    useEffect(() => {
+      switch (internalAction) {
+        case 'cast':
+          playClips(animations.cast, false);
+          break;
+        case 'dodge':
+          playClips(animations.dodge, false);
+          break;
+        case 'die':
+          playClips(animations.die, false);
+          break;
+        case 'throw':
+          playClips(animations.throw, false);
+          break;
+        default:
+          playClips(animations.idle, true);
+      }
+    }, [internalAction]);
+
+    useFrame((_, delta) => {
+      mixer.current?.update(delta);
+    });
+
     const getHealthColor = () => {
       if (health > 0.6) return '#44ff44';
       if (health > 0.3) return '#ffff00';

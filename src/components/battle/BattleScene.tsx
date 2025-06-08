@@ -43,6 +43,8 @@ interface BattleSceneProps {
 const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
   const [damageNumbers, setDamageNumbers] = useState<DamageNumber[]>([]);
   const [activeEffects, setActiveEffects] = useState<VisualEffect[]>([]);
+  const [playerAnim, setPlayerAnim] = useState<'idle' | 'cast' | 'dodge' | 'die' | 'throw'>('idle');
+  const [enemyAnim, setEnemyAnim] = useState<'idle' | 'cast' | 'dodge' | 'die' | 'throw'>('idle');
   const prevLogLength = useRef<number>(0);
   
   // Extract props - support both old and new formats
@@ -111,6 +113,12 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
           color: '#ff4444',
           isHealing: false
         }]);
+
+        if (latestLog.target === 'enemy') {
+          setEnemyAnim('dodge');
+        } else {
+          setPlayerAnim('dodge');
+        }
         
         // Add visual effect based on spell type
         if (latestLog.action === 'spell_cast' && combatState && combatState[latestLog.actor === 'player' ? 'playerWizard' : 'enemyWizard'].selectedSpell) {
@@ -121,9 +129,23 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
               element: spell.element,
               position: latestLog.actor === 'player' ? [-3, 1, 0] : [3, 1, 0],
               target: latestLog.actor === 'player' ? 'enemy' : 'player',
-              lifetime: 30, // Reduced from 60 to 30 frames for faster completion
-              id: `spell-effect-${Date.now()}-${Math.random()}` // Add unique ID to help with rendering
+              lifetime: 30,
+              id: `spell-effect-${Date.now()}-${Math.random()}`
             }]);
+
+            if (latestLog.actor === 'player') {
+              if (spell.name === 'Potion Throw') {
+                setPlayerAnim('throw');
+              } else {
+                setPlayerAnim('cast');
+              }
+            } else {
+              if (spell.name === 'Potion Throw') {
+                setEnemyAnim('throw');
+              } else {
+                setEnemyAnim('cast');
+              }
+            }
           }
         }
       }
@@ -147,9 +169,15 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
               element: spell.element,
               position: targetPosition,
               target: latestLog.target === 'enemy' ? 'enemy' : 'player',
-              lifetime: 30, // Reduced from 60 to 30 frames for faster completion
-              id: `heal-effect-${Date.now()}-${Math.random()}` // Add unique ID to help with rendering
+              lifetime: 30,
+              id: `heal-effect-${Date.now()}-${Math.random()}`
             }]);
+
+            if (latestLog.actor === 'player') {
+              setPlayerAnim('cast');
+            } else {
+              setEnemyAnim('cast');
+            }
           }
         }
       }
@@ -157,6 +185,16 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
       prevLogLength.current = log.length;
     }
   }, [log, combatState]);
+
+  // Play defeat animations when combat ends
+  useEffect(() => {
+    if (!combatState) return;
+    if (combatState.status === 'playerWon') {
+      setEnemyAnim('die');
+    } else if (combatState.status === 'enemyWon') {
+      setPlayerAnim('die');
+    }
+  }, [combatState?.status]);
 
   // Animation frame handler - use even higher decay rate to ensure effects don't last too long
   useFrame(() => {
@@ -220,6 +258,7 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
           color={theme.colors.primary.main}
           health={playerHealth / playerMaxHealth}
           isActive={combatState ? (combatState.isPlayerTurn && combatState.status === 'active') : true}
+          action={playerAnim}
         />
       </Suspense>
       
@@ -233,6 +272,7 @@ const BattleSceneContent: React.FC<BattleSceneProps> = (props) => {
           isActive={combatState ? (!combatState.isPlayerTurn && combatState.status === 'active') : false}
           enemyVariant={Math.round(Math.random()) as 0 | 1}
           modelPath={combatState?.enemyWizard.wizard.modelPath}
+          action={enemyAnim}
         />
       </Suspense>
       

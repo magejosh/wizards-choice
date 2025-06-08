@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
+import { AxialCoord } from '@/lib/utils/hexUtils';
 import { TextureLoader, Texture, MeshStandardMaterial } from 'three';
 import { Edges } from '@react-three/drei';
 
@@ -19,6 +20,8 @@ interface HexGridProps {
   gridRadius?: number;
   height?: number;
   textureMap?: Partial<Record<TileType, string>>;
+  onTileClick?: (coord: AxialCoord) => void;
+  highlightedTiles?: AxialCoord[];
 }
 
 interface HexTileProps {
@@ -27,6 +30,9 @@ interface HexTileProps {
   height: number;
   type: TileType;
   textureMap?: Partial<Record<TileType, string>>;
+  coord: AxialCoord;
+  highlighted?: boolean;
+  onClick?: (coord: AxialCoord) => void;
 }
 
 const useOptionalTexture = (url?: string) => {
@@ -58,7 +64,7 @@ const useOptionalTexture = (url?: string) => {
   return texture;
 };
 
-const HexTile: React.FC<HexTileProps> = ({ position, radius, height, type, textureMap }) => {
+const HexTile: React.FC<HexTileProps> = ({ position, radius, height, type, textureMap, coord, highlighted = false, onClick }) => {
   const texturePath = textureMap?.[type];
   const texture = useOptionalTexture(texturePath);
 
@@ -72,17 +78,22 @@ const HexTile: React.FC<HexTileProps> = ({ position, radius, height, type, textu
   }, [texture, type]);
 
   return (
-    <mesh position={position} rotation={[0, 0, 0]} material={materials}>
+    <mesh
+      position={position}
+      rotation={[0, 0, 0]}
+      material={materials}
+      onPointerDown={() => onClick && onClick(coord)}
+    >
       <cylinderGeometry args={[radius, radius, height, 6]} />
-      <Edges scale={1.02} color="#ffd700" />
+      <Edges scale={1.02} color={highlighted ? '#00ffff' : '#ffd700'} />
     </mesh>
   );
 };
 
-const HexGrid: React.FC<HexGridProps> = ({ radius = 1, gridRadius = 2, height = 0.2, textureMap }) => {
+const HexGrid: React.FC<HexGridProps> = ({ radius = 1, gridRadius = 2, height = 0.2, textureMap, onTileClick, highlightedTiles = [] }) => {
   const types: TileType[] = Object.keys(TILE_COLORS) as TileType[];
   const tiles = useMemo(() => {
-    const arr: { pos: Vec3; type: TileType }[] = [];
+    const arr: { pos: Vec3; type: TileType; coord: AxialCoord }[] = [];
     for (let q = -gridRadius; q <= gridRadius; q++) {
       const r1 = Math.max(-gridRadius, -q - gridRadius);
       const r2 = Math.min(gridRadius, -q + gridRadius);
@@ -90,7 +101,7 @@ const HexGrid: React.FC<HexGridProps> = ({ radius = 1, gridRadius = 2, height = 
         const x = radius * Math.sqrt(3) * (q + r / 2);
         const z = radius * 1.5 * r;
         const type = types[Math.floor(Math.random() * types.length)];
-        arr.push({ pos: [x, 0, z], type });
+        arr.push({ pos: [x, 0, z], type, coord: { q, r } });
       }
     }
     return arr;
@@ -98,8 +109,18 @@ const HexGrid: React.FC<HexGridProps> = ({ radius = 1, gridRadius = 2, height = 
 
   return (
     <group>
-      {tiles.map(({ pos, type }, idx) => (
-        <HexTile key={idx} position={pos} radius={radius} height={height} type={type} textureMap={textureMap} />
+      {tiles.map(({ pos, type, coord }, idx) => (
+        <HexTile
+          key={idx}
+          position={pos}
+          radius={radius}
+          height={height}
+          type={type}
+          textureMap={textureMap}
+          coord={coord}
+          highlighted={highlightedTiles.some(t => t.q === coord.q && t.r === coord.r)}
+          onClick={onTileClick}
+        />
       ))}
     </group>
   );

@@ -64,6 +64,8 @@ export function initializeCombat(
       discardPile: [],   // Spells that have been cast/discarded
       equippedPotions: calculatedPlayerWizard.equippedPotions || [],
       equippedSpellScrolls: calculatedPlayerWizard.equippedSpellScrolls || [],
+      position: { q: -2, r: 0 },
+      minions: [],
     },
     enemyWizard: {
       wizard: calculatedEnemyWizard,
@@ -74,6 +76,8 @@ export function initializeCombat(
       hand: [],          // Current hand of spells
       drawPile: [],      // Spells that can be drawn
       discardPile: [],   // Spells that have been cast/discarded
+      position: { q: 2, r: 0 },
+      minions: [],
     },
     turn: 1,
     round: 1,

@@ -4,6 +4,7 @@
 import { ElementType } from './element-types';
 import { Spell, ActiveEffect } from './spell-types';
 import { Wizard } from './wizard-types';
+import { AxialCoord } from '../utils/hexUtils';
 
 /**
  * Combat state
@@ -82,6 +83,15 @@ export interface CombatWizard {
   discardPile: Spell[];
   equippedPotions: import('./equipment-types').Potion[];
   equippedSpellScrolls: import('./equipment-types').Equipment[];
+  position: AxialCoord;
+  minions: CombatMinion[];
+}
+
+export interface CombatMinion {
+  id: string;
+  name: string;
+  isFlying: boolean;
+  position: AxialCoord;
 }
 
 /**

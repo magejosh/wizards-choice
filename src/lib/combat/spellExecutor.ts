@@ -459,7 +459,10 @@ export function applySpellEffect(
         type: 'summon',
         value: effect.value,
         effect,
-        modelPath: effect.modelPath || newState[caster].wizard.modelPath,
+        modelPath:
+          effect.modelPath === 'caster' || !effect.modelPath
+            ? newState[caster].wizard.modelPath
+            : effect.modelPath,
         quantity: effect.value,
       };
 

@@ -140,7 +140,8 @@ export function executeMysticPunch(
 export function executeSpellCast(
   state: CombatState,
   isPlayer: boolean,
-  isResolution: boolean = false
+  isResolution: boolean = false,
+  spawnCoord?: AxialCoord
 ): CombatState {
   let newState = { ...state };
   const caster = isPlayer ? 'playerWizard' : 'enemyWizard';
@@ -193,7 +194,7 @@ export function executeSpellCast(
 
   // Apply all spell effects
   for (const effect of selectedSpell.effects) {
-    newState = applySpellEffect(newState, effect, isPlayer);
+    newState = applySpellEffect(newState, effect, isPlayer, spawnCoord);
   }
 
   // Check if combat has ended
@@ -289,7 +290,8 @@ export function getEffectName(effect: SpellEffect): string {
 export function applySpellEffect(
   state: CombatState,
   effect: SpellEffect,
-  isPlayerCaster: boolean
+  isPlayerCaster: boolean,
+  spawnCoord?: AxialCoord
 ): CombatState {
   let newState = { ...state };
   const caster = isPlayerCaster ? 'playerWizard' : 'enemyWizard';
@@ -507,7 +509,7 @@ export function applySpellEffect(
           ...newState.playerMinions.map(m => m.position),
           ...newState.enemyMinions.map(m => m.position),
         ];
-        const spawn = findUnoccupiedAdjacentHex(casterPos, occupied);
+        const spawn = spawnCoord || findUnoccupiedAdjacentHex(casterPos, occupied);
         if (spawn) {
           minion.position = spawn;
           if (owner === 'player') {

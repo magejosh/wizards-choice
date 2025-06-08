@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import { Text, useGLTF, useFBX, Html } from '@react-three/drei';
 import { VRMLoader } from 'three-stdlib';
@@ -88,7 +88,7 @@ const PrimitiveWizardModel: React.FC<{
       <mesh 
         ref={bodyRef} 
         position={[0, 0.1, 0]}
-        rotation={[0, isEnemy ? Math.PI : 0, 0]}
+        rotation={[0, Math.PI / 3, 0]}
       >
         {/* Robe */}
         <cylinderGeometry args={[0.4, 0.6, 1.2, 8]} />
@@ -102,7 +102,7 @@ const PrimitiveWizardModel: React.FC<{
       <mesh 
         ref={headRef}
         position={[0, 1.1, 0]}
-        rotation={[0, isEnemy ? Math.PI : 0, 0]}
+        rotation={[0, Math.PI / 3, 0]}
       >
         <sphereGeometry args={[0.3, 16, 16]} />
         <meshStandardMaterial 
@@ -228,120 +228,14 @@ const WizardModel: React.FC<WizardModelProps> = ({
   // Player: use GLB model
   if (!isEnemy) {
     const { scene } = useGLTF(PLAYER_WIZARD_GLB_PATH);
-
-    // Debug: expanded rotation presets for player model orientation (keep for future dev use)
-    const rotationPresets: [number, number, number][] = [
-      [Math.PI / 2, Math.PI / 3, Math.PI],
-      [Math.PI / 2, 0, Math.PI],
-      [Math.PI / 2, 0, 0],
-      [Math.PI / 2, Math.PI / 2, 0],
-      [Math.PI / 2, 0, -Math.PI / 2],
-      [0, 0, 0],
-      [0, Math.PI, 0],
-      [0, 0, Math.PI],
-      [0, Math.PI / 2, Math.PI / 2],
-      [Math.PI, 0, 0],
-      [0, -Math.PI / 2, 0],
-      [0, 0, -Math.PI / 2],
-      [Math.PI / 2, Math.PI / 2, Math.PI / 2],
-      [Math.PI / 2, Math.PI, 0],
-      [Math.PI / 2, Math.PI, Math.PI / 2],
-      [Math.PI / 2, Math.PI, Math.PI],
-      [Math.PI / 2, Math.PI, -Math.PI / 2],
-      [Math.PI / 2, -Math.PI / 2, 0],
-      [Math.PI / 2, -Math.PI / 2, Math.PI / 2],
-      [Math.PI / 2, -Math.PI / 2, Math.PI],
-      [Math.PI / 2, -Math.PI / 2, -Math.PI / 2],
-    ];
-    const [rotationIndex, setRotationIndex] = useState(0);
-    const handleNextRotation = () => setRotationIndex((i) => (i + 1) % rotationPresets.length);
-    // Debug switcher is disabled for now, but code is retained for future use.
-
-    // Load animations
-    const idleA = useFBX('/assets/anims/Idle.fbx');
-    const idleB = useFBX('/assets/anims/Unarmed Idle.fbx');
-    const idleC = useFBX('/assets/anims/Zombie Idle.fbx');
-    const idleD = useFBX('/assets/anims/Standing Idle 03.fbx');
-    const castA = useFBX('/assets/anims/Standing 2H Magic Attack 01.fbx');
-    const castB = useFBX('/assets/anims/Standing Idle to Magic Attack 04.fbx');
-    const castC = useFBX('/assets/anims/Standing 1H Cast Spell 01.fbx');
-    const dodgeA = useFBX('/assets/anims/Dodging.fbx');
-    const dodgeB = useFBX('/assets/anims/Dodging Right.fbx');
-    const dieA = useFBX('/assets/anims/Dying.fbx');
-    const dieB = useFBX('/assets/anims/Defeated.fbx');
-    const dieC = useFBX('/assets/anims/Standing React Death Forward.fbx');
-    const throwA = useFBX('/assets/anims/Throwing.fbx');
-
-    const mixer = useRef<THREE.AnimationMixer>();
-    const currentAction = useRef<THREE.AnimationAction>();
-    const [internalAction, setInternalAction] = useState(action || 'idle');
-
-    if (!mixer.current) {
-      mixer.current = new THREE.AnimationMixer(scene);
-    }
-
-    const animations = {
-      idle: [idleA.animations[0], idleB.animations[0], idleC.animations[0], idleD.animations[0]],
-      cast: [castA.animations[0], castB.animations[0], castC.animations[0]],
-      dodge: [dodgeA.animations[0], dodgeB.animations[0]],
-      die: [dieA.animations[0], dieB.animations[0], dieC.animations[0]],
-      throw: [throwA.animations[0]]
-    } as const;
-
-    const playClips = (clips: THREE.AnimationClip[], loop: boolean) => {
-      if (!mixer.current) return;
-      const clip = clips[Math.floor(Math.random() * clips.length)];
-      const actionObj = mixer.current.clipAction(clip);
-      actionObj.reset();
-      actionObj.fadeIn(0.1);
-      actionObj.setLoop(loop ? THREE.LoopRepeat : THREE.LoopOnce, loop ? Infinity : 1);
-      actionObj.clampWhenFinished = !loop;
-      actionObj.play();
-      if (currentAction.current && currentAction.current !== actionObj) {
-        currentAction.current.fadeOut(0.1);
-      }
-      currentAction.current = actionObj;
-      if (!loop) {
-        setTimeout(() => setInternalAction('idle'), clip.duration * 1000);
-      }
-    };
-
-    useEffect(() => {
-      setInternalAction(action || 'idle');
-    }, [action]);
-
-    useEffect(() => {
-      switch (internalAction) {
-        case 'cast':
-          playClips(Array.from(animations.cast), false);
-          break;
-        case 'dodge':
-          playClips(Array.from(animations.dodge), false);
-          break;
-        case 'die':
-          playClips(Array.from(animations.die), false);
-          break;
-        case 'throw':
-          playClips(Array.from(animations.throw), false);
-          break;
-        default:
-          playClips(Array.from(animations.idle), true);
-      }
-    }, [internalAction]);
-
-    useFrame((_, delta) => {
-      mixer.current?.update(delta);
-    });
-
-    const getHealthColor = () => {
-      if (health > 0.6) return '#44ff44';
-      if (health > 0.3) return '#ffff00';
-      return '#ff4444';
-    };
-
+    // Temporarily comment out all animation logic for debugging
+    // const mixer = useMemo(() => new THREE.AnimationMixer(scene), [scene]);
+    // const currentAction = useRef<THREE.AnimationAction>();
+    // const [internalAction, setInternalAction] = useState(action || 'idle');
+    // ... (animations, playClips, useEffect, useFrame, etc.)
     return (
       <group position={position}>
-        <primitive object={scene} scale={[1.81, 1.81, 1.81]} position={[0, 0.4, 0]} rotation={[-Math.PI / 2, Math.PI, 0]} />
+        <primitive object={scene} scale={[1.81, 1.81, 1.81]} position={[0, 0.4, 0]} rotation={[0, Math.PI / 3, 0]} />
         <group position={[0, 2, 0]}>
           <mesh position={[0, 0, 0]}>
             <boxGeometry args={[1.2, 0.15, 0.05]} />
@@ -349,7 +243,7 @@ const WizardModel: React.FC<WizardModelProps> = ({
           </mesh>
           <mesh position={[0, 0, 0.03]} scale={[health, 1, 1]}>
             <boxGeometry args={[1.2, 0.15, 0.05]} />
-            <meshStandardMaterial color={getHealthColor()} emissive={getHealthColor()} emissiveIntensity={0.5} roughness={0.3} />
+            <meshStandardMaterial color="#44ff44" emissive="#44ff44" emissiveIntensity={0.5} roughness={0.3} />
           </mesh>
           <Text
             position={[0, 0, 0.1]}
@@ -382,87 +276,11 @@ const WizardModel: React.FC<WizardModelProps> = ({
     }
   }
   if (scene) {
-    // Reuse animation clips loaded for the player
-    const idleA = useFBX('/assets/anims/Idle.fbx');
-    const idleB = useFBX('/assets/anims/Unarmed Idle.fbx');
-    const idleC = useFBX('/assets/anims/Zombie Idle.fbx');
-    const idleD = useFBX('/assets/anims/Standing Idle 03.fbx');
-    const castA = useFBX('/assets/anims/Standing 2H Magic Attack 01.fbx');
-    const castB = useFBX('/assets/anims/Standing Idle to Magic Attack 04.fbx');
-    const castC = useFBX('/assets/anims/Standing 1H Cast Spell 01.fbx');
-    const dodgeA = useFBX('/assets/anims/Dodging.fbx');
-    const dodgeB = useFBX('/assets/anims/Dodging Right.fbx');
-    const dieA = useFBX('/assets/anims/Dying.fbx');
-    const dieB = useFBX('/assets/anims/Defeated.fbx');
-    const dieC = useFBX('/assets/anims/Standing React Death Forward.fbx');
-    const throwA = useFBX('/assets/anims/Throwing.fbx');
-
-    const mixer = useRef<THREE.AnimationMixer>();
-    const currentAction = useRef<THREE.AnimationAction>();
-    const [internalAction, setInternalAction] = useState(action || 'idle');
-
-    if (!mixer.current) {
-      mixer.current = new THREE.AnimationMixer(scene);
-    }
-
-    const animations = {
-      idle: [idleA.animations[0], idleB.animations[0], idleC.animations[0], idleD.animations[0]],
-      cast: [castA.animations[0], castB.animations[0], castC.animations[0]],
-      dodge: [dodgeA.animations[0], dodgeB.animations[0]],
-      die: [dieA.animations[0], dieB.animations[0], dieC.animations[0]],
-      throw: [throwA.animations[0]]
-    } as const;
-
-    const playClips = (clips: THREE.AnimationClip[], loop: boolean) => {
-      if (!mixer.current) return;
-      const clip = clips[Math.floor(Math.random() * clips.length)];
-      const actionObj = mixer.current.clipAction(clip);
-      actionObj.reset();
-      actionObj.fadeIn(0.1);
-      actionObj.setLoop(loop ? THREE.LoopRepeat : THREE.LoopOnce, loop ? Infinity : 1);
-      actionObj.clampWhenFinished = !loop;
-      actionObj.play();
-      if (currentAction.current && currentAction.current !== actionObj) {
-        currentAction.current.fadeOut(0.1);
-      }
-      currentAction.current = actionObj;
-      if (!loop) {
-        setTimeout(() => setInternalAction('idle'), clip.duration * 1000);
-      }
-    };
-
-    useEffect(() => {
-      setInternalAction(action || 'idle');
-    }, [action]);
-
-    useEffect(() => {
-      switch (internalAction) {
-        case 'cast':
-          playClips(Array.from(animations.cast), false);
-          break;
-        case 'dodge':
-          playClips(Array.from(animations.dodge), false);
-          break;
-        case 'die':
-          playClips(Array.from(animations.die), false);
-          break;
-        case 'throw':
-          playClips(Array.from(animations.throw), false);
-          break;
-        default:
-          playClips(Array.from(animations.idle), true);
-      }
-    }, [internalAction]);
-
-    useFrame((_, delta) => {
-      mixer.current?.update(delta);
-    });
-
-    const getHealthColor = () => {
-      if (health > 0.6) return '#44ff44';
-      if (health > 0.3) return '#ffff00';
-      return '#ff4444';
-    };
+    // Temporarily comment out all animation logic for debugging
+    // const mixer = useMemo(() => new THREE.AnimationMixer(scene), [scene]);
+    // const currentAction = useRef<THREE.AnimationAction>();
+    // const [internalAction, setInternalAction] = useState(action || 'idle');
+    // ... (animations, playClips, useEffect, useFrame, etc.)
     return (
       <group position={position}>
         <ambientLight intensity={0.8} />
@@ -479,7 +297,7 @@ const WizardModel: React.FC<WizardModelProps> = ({
           </mesh>
           <mesh position={[0, 0, 0.03]} scale={[health, 1, 1]}>
             <boxGeometry args={[1.2, 0.15, 0.05]} />
-            <meshStandardMaterial color={getHealthColor()} emissive={getHealthColor()} emissiveIntensity={0.5} roughness={0.3} />
+            <meshStandardMaterial color="#44ff44" emissive="#44ff44" emissiveIntensity={0.5} roughness={0.3} />
           </mesh>
           <Text
             position={[0, 0, 0.1]}

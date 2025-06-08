@@ -1,4 +1,5 @@
-import { ElementType, Spell, SpellEffect } from '../types';
+import { ElementType } from '../../types/element-types';
+import { Spell, SpellEffect } from '../../types/spell-types';
 
 export interface EnemyArchetype {
   id: string;
@@ -29,7 +30,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
     specialAbility: 'Can summon undead minions',
     uniqueMechanic: 'Gains power when allies die',
     weakness: 'light',
-    resistance: 'dark',
+    resistance: 'shadow',
     baseStats: {
       healthMultiplier: 1.2,
       manaMultiplier: 1.3,
@@ -40,7 +41,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
       id: `spell_summon_undead_${Date.now()}`,
       name: 'Summon Undead Minion',
       type: 'summon',
-      element: 'dark',
+      element: 'shadow',
       tier: Math.min(Math.ceil(level / 3), 10),
       manaCost: 25 + level * 2,
       description: 'Summons an undead minion to fight for you.',
@@ -49,11 +50,12 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
           type: 'summon',
           value: 1,
           target: 'self',
-          element: 'dark',
+          element: 'shadow',
           duration: 3
         }
       ],
-      imagePath: '/images/spells/necromancer-summon.jpg'
+      imagePath: '/images/spells/necromancer-summon.jpg',
+      rarity: 'rare'
     }),
     getThematicSpells: (level: number): Spell[] => {
       const spells: Spell[] = [];
@@ -63,8 +65,8 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
       spells.push({
         id: `spell_death_bolt_${Date.now()}`,
         name: 'Death Bolt',
-        type: 'damage',
-        element: 'dark',
+        type: 'attack',
+        element: 'shadow',
         tier: Math.min(Math.ceil(level / 3), 10),
         manaCost: 20 + level,
         description: 'A bolt of dark energy that saps life force.',
@@ -73,24 +75,25 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
             type: 'damage',
             value: baseValue,
             target: 'enemy',
-            element: 'dark'
+            element: 'shadow'
           },
           {
             type: 'healing',
             value: baseValue * 0.3,
             target: 'self',
-            element: 'dark'
+            element: 'shadow'
           }
         ],
-        imagePath: '/images/spells/necromancer-bolt.jpg'
+        imagePath: '/images/spells/necromancer-bolt.jpg',
+        rarity: 'uncommon'
       });
 
       // Soul Drain
       spells.push({
         id: `spell_soul_drain_${Date.now()}`,
         name: 'Soul Drain',
-        type: 'damage',
-        element: 'dark',
+        type: 'attack',
+        element: 'shadow',
         tier: Math.min(Math.ceil(level / 3), 10),
         manaCost: 30 + level * 2,
         description: 'Drains the target\'s soul, dealing damage and healing yourself.',
@@ -99,16 +102,17 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
             type: 'damage',
             value: baseValue * 1.5,
             target: 'enemy',
-            element: 'dark'
+            element: 'shadow'
           },
           {
             type: 'healing',
             value: baseValue * 0.5,
             target: 'self',
-            element: 'dark'
+            element: 'shadow'
           }
         ],
-        imagePath: '/images/spells/necromancer-drain.jpg'
+        imagePath: '/images/spells/necromancer-drain.jpg',
+        rarity: 'uncommon'
       });
 
       return spells;
@@ -133,21 +137,22 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
     getSpecialSpell: (level: number): Spell => ({
       id: `spell_time_rewind_${Date.now()}`,
       name: 'Time Rewind',
-      type: 'utility',
+      type: 'buff',
       element: 'arcane',
       tier: Math.min(Math.ceil(level / 3), 10),
       manaCost: 40 + level * 3,
       description: 'Rewinds time to undo the last action.',
       effects: [
         {
-          type: 'timeRewind',
+          type: 'buff',
           value: 1,
           target: 'self',
           element: 'arcane',
           duration: 1
         }
       ],
-      imagePath: '/images/spells/timeweaver-rewind.jpg'
+      imagePath: '/images/spells/timeweaver-rewind.jpg',
+      rarity: 'rare'
     }),
     getThematicSpells: (level: number): Spell[] => {
       const spells: Spell[] = [];
@@ -157,42 +162,44 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
       spells.push({
         id: `spell_time_stop_${Date.now()}`,
         name: 'Time Stop',
-        type: 'control',
+        type: 'buff',
         element: 'arcane',
         tier: Math.min(Math.ceil(level / 3), 10),
         manaCost: 30 + level * 2,
         description: 'Freezes time briefly, delaying enemy actions.',
         effects: [
           {
-            type: 'delay',
+            type: 'buff',
             value: 2,
             target: 'enemy',
             element: 'arcane',
             duration: 1
           }
         ],
-        imagePath: '/images/spells/timeweaver-stop.jpg'
+        imagePath: '/images/spells/timeweaver-stop.jpg',
+        rarity: 'uncommon'
       });
 
       // Temporal Echo
       spells.push({
         id: `spell_temporal_echo_${Date.now()}`,
         name: 'Temporal Echo',
-        type: 'damage',
+        type: 'debuff',
         element: 'arcane',
         tier: Math.min(Math.ceil(level / 3), 10),
         manaCost: 25 + level * 2,
         description: 'Creates an echo of your last spell.',
         effects: [
           {
-            type: 'spellEcho',
+            type: 'debuff',
             value: 1,
             target: 'self',
             element: 'arcane',
             duration: 1
           }
         ],
-        imagePath: '/images/spells/timeweaver-echo.jpg'
+        imagePath: '/images/spells/timeweaver-echo.jpg',
+        rarity: 'uncommon'
       });
 
       return spells;
@@ -206,8 +213,8 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
     theme: 'combat',
     specialAbility: 'Enhanced mystic punch and weapon-based spells',
     uniqueMechanic: 'Gains temporary buffs when using weapon attacks',
-    weakness: 'ranged',
-    resistance: 'physical',
+    weakness: 'air',
+    resistance: 'earth',
     baseStats: {
       healthMultiplier: 1.5,
       manaMultiplier: 0.8,
@@ -218,20 +225,21 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
       id: `spell_weapon_enhancement_${Date.now()}`,
       name: 'Weapon Enhancement',
       type: 'buff',
-      element: 'physical',
+      element: 'earth',
       tier: Math.min(Math.ceil(level / 3), 10),
       manaCost: 20 + level,
       description: 'Enhances your weapon with magical power.',
       effects: [
         {
-          type: 'damageBonus',
+          type: 'buff',
           value: 10 + level,
           target: 'self',
-          element: 'physical',
+          element: 'earth',
           duration: 3
         }
       ],
-      imagePath: '/images/spells/battlemage-enhance.jpg'
+      imagePath: '/images/spells/battlemage-enhance.jpg',
+      rarity: 'rare'
     }),
     getThematicSpells: (level: number): Spell[] => {
       const spells: Spell[] = [];
@@ -241,8 +249,8 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
       spells.push({
         id: `spell_blade_storm_${Date.now()}`,
         name: 'Blade Storm',
-        type: 'damage',
-        element: 'physical',
+        type: 'attack',
+        element: 'earth',
         tier: Math.min(Math.ceil(level / 3), 10),
         manaCost: 25 + level * 2,
         description: 'Creates a storm of magical blades.',
@@ -251,10 +259,11 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
             type: 'damage',
             value: baseValue * 1.2,
             target: 'enemy',
-            element: 'physical'
+            element: 'earth'
           }
         ],
-        imagePath: '/images/spells/battlemage-storm.jpg'
+        imagePath: '/images/spells/battlemage-storm.jpg',
+        rarity: 'uncommon'
       });
 
       // Combat Surge
@@ -262,27 +271,28 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
         id: `spell_combat_surge_${Date.now()}`,
         name: 'Combat Surge',
         type: 'buff',
-        element: 'physical',
+        element: 'earth',
         tier: Math.min(Math.ceil(level / 3), 10),
         manaCost: 30 + level * 2,
         description: 'Grants temporary combat prowess.',
         effects: [
           {
-            type: 'damageBonus',
+            type: 'buff',
             value: 15 + level,
             target: 'self',
-            element: 'physical',
+            element: 'earth',
             duration: 2
           },
           {
-            type: 'defense',
+            type: 'buff',
             value: 5 + level,
             target: 'self',
-            element: 'physical',
+            element: 'earth',
             duration: 2
           }
         ],
-        imagePath: '/images/spells/battlemage-surge.jpg'
+        imagePath: '/images/spells/battlemage-surge.jpg',
+        rarity: 'uncommon'
       });
 
       return spells;
@@ -296,8 +306,8 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
     theme: 'illusion',
     specialAbility: 'Can create mirror images and confuse enemies',
     uniqueMechanic: 'Gains advantage when enemy is confused',
-    weakness: 'true_sight',
-    resistance: 'mental',
+    weakness: 'light',
+    resistance: 'arcane',
     baseStats: {
       healthMultiplier: 0.9,
       manaMultiplier: 1.2,
@@ -321,7 +331,8 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
           duration: 3
         }
       ],
-      imagePath: '/images/spells/illusionist-mirror.jpg'
+      imagePath: '/images/spells/illusionist-mirror.jpg',
+      rarity: 'rare'
     }),
     getThematicSpells: (level: number): Spell[] => {
       const spells: Spell[] = [];
@@ -331,29 +342,30 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
       spells.push({
         id: `spell_confusion_${Date.now()}`,
         name: 'Confusion',
-        type: 'control',
-        element: 'mental',
+        type: 'debuff',
+        element: 'arcane',
         tier: Math.min(Math.ceil(level / 3), 10),
         manaCost: 20 + level,
         description: 'Confuses the target, making them attack randomly.',
         effects: [
           {
-            type: 'confusion',
+            type: 'debuff',
             value: 1,
             target: 'enemy',
-            element: 'mental',
+            element: 'arcane',
             duration: 2
           }
         ],
-        imagePath: '/images/spells/illusionist-confusion.jpg'
+        imagePath: '/images/spells/illusionist-confusion.jpg',
+        rarity: 'uncommon'
       });
 
       // Phantasmal Force
       spells.push({
         id: `spell_phantasmal_force_${Date.now()}`,
         name: 'Phantasmal Force',
-        type: 'damage',
-        element: 'mental',
+        type: 'attack',
+        element: 'arcane',
         tier: Math.min(Math.ceil(level / 3), 10),
         manaCost: 30 + level * 2,
         description: 'Creates a powerful illusion that causes real damage.',
@@ -362,10 +374,11 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
             type: 'damage',
             value: baseValue * 1.3,
             target: 'enemy',
-            element: 'mental'
+            element: 'arcane'
           }
         ],
-        imagePath: '/images/spells/illusionist-phantasm.jpg'
+        imagePath: '/images/spells/illusionist-phantasm.jpg',
+        rarity: 'uncommon'
       });
 
       return spells;
@@ -380,7 +393,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
     specialAbility: 'Can throw potions with various effects',
     uniqueMechanic: 'Gains resources when potions are used',
     weakness: 'fire',
-    resistance: 'poison',
+    resistance: 'nature',
     baseStats: {
       healthMultiplier: 1.0,
       manaMultiplier: 1.1,
@@ -390,8 +403,8 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
     getSpecialSpell: (level: number): Spell => ({
       id: `spell_potion_throw_${Date.now()}`,
       name: 'Potion Throw',
-      type: 'damage',
-      element: 'poison',
+      type: 'attack',
+      element: 'nature',
       tier: Math.min(Math.ceil(level / 3), 10),
       manaCost: 20 + level,
       description: 'Throws a damaging potion at the enemy.',
@@ -400,11 +413,12 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
           type: 'damage',
           value: 15 + level * 2,
           target: 'enemy',
-          element: 'poison',
+          element: 'nature',
           duration: 2
         }
       ],
-      imagePath: '/images/spells/alchemist-potion.jpg'
+      imagePath: '/images/spells/alchemist-potion.jpg',
+      rarity: 'rare'
     }),
     getThematicSpells: (level: number): Spell[] => {
       const spells: Spell[] = [];
@@ -414,8 +428,8 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
       spells.push({
         id: `spell_acid_splash_${Date.now()}`,
         name: 'Acid Splash',
-        type: 'damage',
-        element: 'poison',
+        type: 'attack',
+        element: 'nature',
         tier: Math.min(Math.ceil(level / 3), 10),
         manaCost: 15 + level,
         description: 'Splashes acid on the target, dealing damage over time.',
@@ -424,11 +438,12 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
             type: 'damage',
             value: baseValue * 0.8,
             target: 'enemy',
-            element: 'poison',
+            element: 'nature',
             duration: 2
           }
         ],
-        imagePath: '/images/spells/alchemist-acid.jpg'
+        imagePath: '/images/spells/alchemist-acid.jpg',
+        rarity: 'uncommon'
       });
 
       // Healing Elixir
@@ -436,7 +451,7 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
         id: `spell_healing_elixir_${Date.now()}`,
         name: 'Healing Elixir',
         type: 'healing',
-        element: 'poison',
+        element: 'nature',
         tier: Math.min(Math.ceil(level / 3), 10),
         manaCost: 25 + level * 2,
         description: 'Creates a healing elixir that restores health over time.',
@@ -445,11 +460,12 @@ export const enemyArchetypes: Record<string, EnemyArchetype> = {
             type: 'healing',
             value: baseValue * 1.2,
             target: 'self',
-            element: 'poison',
+            element: 'nature',
             duration: 3
           }
         ],
-        imagePath: '/images/spells/alchemist-heal.jpg'
+        imagePath: '/images/spells/alchemist-heal.jpg',
+        rarity: 'uncommon'
       });
 
       return spells;

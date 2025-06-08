@@ -6,7 +6,7 @@ import { ElementType } from './element-types';
 /**
  * Types of spells in the game
  */
-export type SpellType = 'attack' | 'healing' | 'debuff' | 'buff' | 'reaction';
+export type SpellType = 'attack' | 'healing' | 'debuff' | 'buff' | 'reaction' | 'summon';
 
 /**
  * A spell in the game

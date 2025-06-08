@@ -4,6 +4,7 @@ import { createPotionModule, PotionActions } from "../modules/potionModule";
 import { GameState, SaveSlot } from "../../types/game-types";
 import { Wizard, Ingredient, PotionRecipe, Potion } from "../../types";
 import { getAllPotionRecipes } from "../../features/potions/potionRecipes";
+import * as potionGenerator from "../../features/procedural/potionGenerator";
 
 type TestStore = PotionActions & { gameState: GameState };
 
@@ -123,4 +124,18 @@ test("craftPotion consumes ingredients and adds potion", () => {
   const state = store.getState().gameState.player!;
   expect(state.potions.length).toBe(1);
   expect(state.ingredients?.length).toBe(0);
+});
+
+test("studyPotion learns recipe and consumes potion", () => {
+  const wizard = createTestWizard(recipe);
+  const potion = potionGenerator.generateHealthPotion(recipe.resultTier);
+  wizard.potions = [potion];
+  const store = createTestStore(wizard);
+  jest.spyOn(Math, 'random').mockReturnValue(0);
+  const result = store.getState().studyPotion(potion.id, 'excellent');
+  expect(result.success).toBe(true);
+  const state = store.getState().gameState.player!;
+  expect(state.potions.length).toBe(0);
+  expect(state.discoveredRecipes?.some((r) => r.id === recipe.id)).toBe(true);
+  (Math.random as jest.Mock).mockRestore();
 });

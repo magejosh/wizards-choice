@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './RuneSequenceMinigame.module.css';
-
-export type RuneGrade = 'poor' | 'average' | 'excellent';
+import { RuneGrade } from '@/lib/types/minigame-types';
 
 interface RuneSequenceMinigameProps {
   sequenceLength: number;

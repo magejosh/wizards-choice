@@ -665,17 +665,17 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       // Update the combat state
       setCombatState(newState);
 
-      // Check if both player and enemy have acted
-      if (newState.actionState.player.hasActed && newState.actionState.enemy.hasActed) {
+      // If executeMysticPunch already advanced the phase, stop animating
+      if (newState.currentPhase !== combatState.currentPhase) {
+        setIsAnimating(false);
+      } else if (newState.actionState.player.hasActed && newState.actionState.enemy.hasActed) {
         // Both have acted, advance to the next phase (should be response phase)
-            setTimeout(() => {
+        setTimeout(() => {
           const nextPhaseState = advancePhase(newState);
           setCombatState(nextPhaseState);
-                setIsAnimating(false);
-            }, 1000);
-      }
-      // If player acted first and enemy hasn't acted yet, process enemy action
-      else if (newState.actionState.player.hasActed &&
+          setIsAnimating(false);
+        }, 1000);
+      } else if (newState.actionState.player.hasActed &&
                !newState.actionState.enemy.hasActed &&
                newState.firstActor === 'player') {
         setTimeout(() => {
@@ -683,9 +683,9 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         }, 1000);
       } else {
         setTimeout(() => {
-            setIsAnimating(false);
+          setIsAnimating(false);
         }, 500);
-          }
+      }
     } catch (error) {
       // console.error("Error executing mystic punch:", error);
       setIsAnimating(false);
@@ -747,22 +747,19 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
       setCombatState(newState);
 
-      // Check if both player and enemy have acted (in action phase)
-      // or if we need to advance to next phase (in response phase)
-      if (combatState.currentPhase === 'action') {
+      // If skipTurn already advanced the phase, simply stop animating
+      if (newState.currentPhase !== combatState.currentPhase) {
+        setIsAnimating(false);
+      } else if (combatState.currentPhase === 'action') {
         if (newState.actionState.player.hasActed && newState.actionState.enemy.hasActed) {
           // Both have acted, advance to the next phase
-      setTimeout(() => {
+          setTimeout(() => {
             const nextPhaseState = advancePhase(newState);
             setCombatState(nextPhaseState);
             setIsAnimating(false);
           }, 1000);
-        }
-        // If player acted first and enemy hasn't acted yet, process enemy action
-        else if (newState.actionState.player.hasActed &&
-                 !newState.actionState.enemy.hasActed &&
-                 newState.firstActor === 'player') {
-        setTimeout(() => {
+        } else if (newState.actionState.player.hasActed && !newState.actionState.enemy.hasActed && newState.firstActor === 'player') {
+          setTimeout(() => {
             processEnemyAction(newState);
           }, 1000);
         } else {
@@ -1096,8 +1093,10 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         // Update the state to reflect the enemy's action
         setCombatState(queuedState);
 
-        // If both player and enemy have acted, advance to the next phase
-        if (queuedState.actionState.player.hasActed && queuedState.actionState.enemy.hasActed) {
+        // If queueAction already advanced the phase, no further action is needed
+        if (queuedState.currentPhase !== state.currentPhase) {
+          setIsAnimating(false);
+        } else if (queuedState.actionState.player.hasActed && queuedState.actionState.enemy.hasActed) {
           setTimeout(() => {
             const nextPhaseState = advancePhase(queuedState);
             setCombatState(nextPhaseState);
@@ -1138,8 +1137,10 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         // Update the state to reflect the enemy's skipped turn
         setCombatState(skipState);
 
-        // If both player and enemy have acted, advance to the next phase
-        if (skipState.actionState.player.hasActed && skipState.actionState.enemy.hasActed) {
+        // If skipTurn already advanced the phase, stop here
+        if (skipState.currentPhase !== state.currentPhase) {
+          setIsAnimating(false);
+        } else if (skipState.actionState.player.hasActed && skipState.actionState.enemy.hasActed) {
           setTimeout(() => {
             const nextPhaseState = advancePhase(skipState);
             setCombatState(nextPhaseState);
@@ -1186,6 +1187,13 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
   // Helper for post-action phase advancement and enemy action
   const handlePostPlayerAction = (newState, phaseType) => {
+    // If the phase has already changed (e.g. queueAction/skipTurn advanced it),
+    // simply stop animating and allow the PhaseManager to handle further logic
+    if (newState.currentPhase !== phaseType) {
+      setIsAnimating(false);
+      return;
+    }
+
     if (phaseType === 'action') {
       if (newState.actionState.player.hasActed && newState.actionState.enemy.hasActed) {
         setTimeout(() => {

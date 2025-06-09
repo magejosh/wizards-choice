@@ -45,7 +45,10 @@ export function useMixamoClips(
       }
 
       try {
-        return SkeletonUtils.retargetClip(skinned, sourceSkinned, fbx.animations[0]);
+        return SkeletonUtils.retargetClip(skinned, sourceSkinned, fbx.animations[0], {
+          hip: 'mixamorig:Hips',
+          preservePosition: false,
+        });
       } catch (e) {
         console.warn('Failed to retarget clip', e);
         return undefined;

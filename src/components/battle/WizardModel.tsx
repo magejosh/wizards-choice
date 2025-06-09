@@ -7,6 +7,7 @@ import { VRMLoader } from 'three-stdlib';
 import { Mesh, Vector3 } from 'three';
 import * as THREE from 'three';
 import { getModelRotationForUpAxis, UpAxis } from '@/lib/utils/modelUtils';
+import { useMixamoClips } from '@/hooks/useMixamoClips';
 
 interface WizardModelProps {
   position: [number, number, number];
@@ -228,48 +229,32 @@ const WizardModel: React.FC<WizardModelProps> = ({
   // Player: use GLB model
   if (!isEnemy) {
     const { scene } = useGLTF(PLAYER_WIZARD_GLB_PATH);
-    // Disable animations on player model for now
-    // const idleFBX = useFBX('/assets/anims/Unarmed Idle.fbx');
-    // const mixer = useMemo(() => new THREE.AnimationMixer(scene), [scene]);
+    const clips = useMixamoClips(scene, {
+      idle: '/assets/anims/Idle.fbx',
+      cast: '/assets/anims/Standing 1H Cast Spell 01.fbx',
+      die: '/assets/anims/Dying.fbx',
+    });
+    const mixer = useMemo(() => new THREE.AnimationMixer(scene), [scene]);
 
-    // useEffect(() => {
-    //   // Apply coordinate system transformation to the scene before animation
-    //   scene.traverse((child) => {
-    //     if (child instanceof THREE.Bone) {
-    //       // Apply transformation matrix to convert Z-up bones to Y-up
-    //       const matrix = new THREE.Matrix4().makeRotationX(-Math.PI / 2);
-    //       child.matrix.premultiply(matrix);
-    //       child.matrixAutoUpdate = false;
-    //     }
-    //   });
-      
-    //   if (idleFBX.animations && idleFBX.animations.length > 0) {
-    //     const idleClip = idleFBX.animations[0];
-    //     const action = mixer.clipAction(idleClip);
-    //     action.play();
-    //     return () => {
-    //       action.stop();
-    //       // Reset matrix auto update on cleanup
-    //       scene.traverse((child) => {
-    //         if (child instanceof THREE.Bone) {
-    //           child.matrixAutoUpdate = true;
-    //         }
-    //       });
-    //     };
-    //   }
-    // }, [mixer, idleFBX, scene]);
+    useEffect(() => {
+      const clip = clips[action || 'idle'] || clips.idle;
+      if (!clip) return;
+      const act = mixer.clipAction(clip);
+      act.reset().play();
+      return () => act.stop();
+    }, [action, clips, mixer]);
 
-    // useFrame((_, delta) => {
-    //   mixer.update(delta);
-    // });
+    useFrame((_, delta) => {
+      mixer.update(delta);
+    });
 
     return (
       <group position={position}>
-        <primitive 
-          object={scene} 
-          scale={[1.81, 1.81, 1.81]} 
-          position={[0, 0.7, 0]} 
-          rotation={[0, Math.PI / 3, 0]} 
+        <primitive
+          object={scene}
+          scale={[1.81, 1.81, 1.81]}
+          position={[0, 0.7, 0]}
+          rotation={[0, Math.PI / 3, 0]}
         />
         <group position={[0, 2, 0]}>
           <mesh position={[0, 0, 0]}>
@@ -311,34 +296,20 @@ const WizardModel: React.FC<WizardModelProps> = ({
     }
   }
   if (scene) {
-    // Enable animations step by step for VRM models
+    const clips = useMixamoClips(scene, {
+      idle: '/assets/anims/Idle.fbx',
+      cast: '/assets/anims/Standing 1H Cast Spell 01.fbx',
+      die: '/assets/anims/Dying.fbx',
+    });
     const mixer = useMemo(() => new THREE.AnimationMixer(scene), [scene]);
-    const currentAction = useRef<THREE.AnimationAction>();
-    const [internalAction, setInternalAction] = useState(action || 'idle');
 
-    // Animation management
     useEffect(() => {
-      // Check what animations are available in the VRM model
-      console.log('VRM Scene loaded:', scene);
-      console.log('Available animations:', scene.animations);
-      
-      if (scene.animations && scene.animations.length > 0) {
-        console.log('Found built-in animations:', scene.animations.length);
-        const firstAnimation = scene.animations[0];
-        const action = mixer.clipAction(firstAnimation);
-        action.play();
-        currentAction.current = action;
-      } else {
-        console.log('No built-in animations found in VRM model - keeping static');
-      }
-      
-      const timeout = setTimeout(() => {
-        if (action && action !== internalAction) {
-          setInternalAction(action);
-        }
-      }, 100);
-      return () => clearTimeout(timeout);
-    }, [action, internalAction, scene, mixer]);
+      const clip = clips[action || 'idle'] || clips.idle;
+      if (!clip) return;
+      const act = mixer.clipAction(clip);
+      act.reset().play();
+      return () => act.stop();
+    }, [action, clips, mixer]);
 
     useFrame((_, delta) => {
       mixer.update(delta);

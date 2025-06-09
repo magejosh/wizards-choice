@@ -169,6 +169,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
 
   // Initialize combat once
   useEffect(() => {
+    const init = async () => {
     if (isInitialized) return;
 
     // Check if we're coming from wizard's study (valid entry point)
@@ -193,7 +194,7 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
     }
     // console.log("Player wizard for battle:", playerWizard.name, "Level:", playerWizard.level);
     const difficulty = gameState.settings.difficulty as 'easy' | 'normal' | 'hard';
-    const rawEnemy = generateEnemy(playerWizard.level, difficulty);
+    const rawEnemy = await generateEnemy(playerWizard.level, difficulty);
     const enemyWizard = {
       ...rawEnemy,
       modelPath: rawEnemy.modelPath,
@@ -286,6 +287,8 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       // Let the InitiativeRoll component generate random values
       setShowInitiativeRoll(true);
     }
+    };
+    init();
   }, []);
 
   // Update battle log when combat state changes

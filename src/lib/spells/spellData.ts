@@ -54,7 +54,8 @@ function parseXmlSpells(xmlText: string): Spell[] {
           health: e.health !== undefined ? parseInt(e.health, 10) : undefined,
         }));
       }
-      return { id, name, type, element, tier, manaCost, description, effects, imagePath, rarity } as Spell;
+      const lists = node.list ? (Array.isArray(node.list) ? node.list : [node.list]) : ['any'];
+      return { id, name, type, element, tier, manaCost, description, effects, imagePath, rarity, lists } as Spell;
     });
   } else {
     // Client-side: use DOMParser
@@ -81,7 +82,9 @@ function parseXmlSpells(xmlText: string): Spell[] {
         modelPath: e.getAttribute('modelPath') || undefined,
         health: e.hasAttribute('health') ? parseInt(e.getAttribute('health')!, 10) : undefined,
       }));
-      return { id, name, type, element, tier, manaCost, description, effects, imagePath, rarity } as Spell;
+      const lists = Array.from(node.getElementsByTagName('list')).map(n => n.textContent || '').filter(Boolean);
+      if (lists.length === 0) lists.push('any');
+      return { id, name, type, element, tier, manaCost, description, effects, imagePath, rarity, lists } as Spell;
     });
   }
 }
@@ -148,6 +151,16 @@ export async function getSpellsByType(type: SpellType): Promise<Spell[]> {
 export async function getSpellByName(name: string): Promise<Spell | undefined> {
   const spells = await loadSpellsFromXML();
   return spells.find(s => s.name.toLowerCase() === name.toLowerCase());
+}
+
+export async function getSpellById(id: string): Promise<Spell | undefined> {
+  const spells = await loadSpellsFromXML();
+  return spells.find(s => s.id === id);
+}
+
+export async function getSpellsByList(listName: string): Promise<Spell[]> {
+  const spells = await loadSpellsFromXML();
+  return spells.filter(s => (s.lists || []).includes(listName));
 }
 
 export function clearSpellCache() {

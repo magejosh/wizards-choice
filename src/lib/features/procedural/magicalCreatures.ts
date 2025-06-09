@@ -1,4 +1,5 @@
-import { Spell, ElementType, SpellType } from '../../types';
+import { Spell, ElementType } from '../../types';
+import { getSpellsByList } from '../../spells/spellData';
 
 export interface MagicalCreature {
   name: string;
@@ -28,7 +29,7 @@ export interface MagicalCreature {
       element?: ElementType;
     };
   };
-  thematicSpells: Spell[];
+  getThematicSpells: () => Promise<Spell[]>;
   lootTable: {
     common: string[];
     uncommon: string[];
@@ -66,51 +67,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
         element: 'fire',
       },
     },
-    thematicSpells: [
-      {
-        id: 'dragon_breath',
-        name: 'Dragon Breath',
-        type: 'attack',
-        element: 'fire',
-        tier: 8,
-        manaCost: 60,
-        description: 'A devastating cone of fire that burns everything in its path.',
-        effects: [
-          {
-            type: 'damage',
-            value: 80,
-            target: 'enemy',
-            element: 'fire',
-          },
-          {
-            type: 'debuff',
-            value: 30,
-            duration: 3,
-            target: 'enemy',
-            element: 'fire',
-          },
-        ],
-        imagePath: '/images/spells/default-placeholder.jpg',
-      },
-      {
-        id: 'wing_blast',
-        name: 'Wing Blast',
-        type: 'attack',
-        element: 'air',
-        tier: 6,
-        manaCost: 40,
-        description: 'A powerful gust of wind created by the dragon\'s massive wings.',
-        effects: [
-          {
-            type: 'damage',
-            value: 50,
-            target: 'enemy',
-            element: 'air',
-          },
-        ],
-        imagePath: '/images/spells/default-placeholder.jpg',
-      },
-    ],
+    getThematicSpells: async () => getSpellsByList('ancientDragon'),
     lootTable: {
       common: ['Dragon Scale', 'Dragon Claw', 'Dragon Fang'],
       uncommon: ['Dragon Wing', 'Dragon Tail', 'Dragon Heart'],
@@ -146,51 +103,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
         element: 'arcane',
       },
     },
-    thematicSpells: [
-      {
-        id: 'void_blast',
-        name: 'Void Blast',
-        type: 'attack',
-        element: 'arcane',
-        tier: 8,
-        manaCost: 70,
-        description: 'A blast of pure void energy that erases matter from existence.',
-        effects: [
-          {
-            type: 'damage',
-            value: 90,
-            target: 'enemy',
-            element: 'arcane',
-          },
-          {
-            type: 'debuff',
-            value: 30,
-            duration: 2,
-            target: 'enemy',
-            element: 'arcane',
-          },
-        ],
-        imagePath: '/images/spells/default-placeholder.jpg',
-      },
-      {
-        id: 'portal_strike',
-        name: 'Portal Strike',
-        type: 'attack',
-        element: 'arcane',
-        tier: 6,
-        manaCost: 45,
-        description: 'Creates a portal that strikes the enemy from an unexpected angle.',
-        effects: [
-          {
-            type: 'damage',
-            value: 60,
-            target: 'enemy',
-            element: 'arcane',
-          },
-        ],
-        imagePath: '/images/spells/default-placeholder.jpg',
-      },
-    ],
+    getThematicSpells: async () => getSpellsByList('eldritchHorror'),
     lootTable: {
       common: ['Void Shard', 'Eldritch Fragment', 'Dark Essence'],
       uncommon: ['Void Crystal', 'Eldritch Eye', 'Dark Matter'],
@@ -225,51 +138,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
         element: 'earth',
       },
     },
-    thematicSpells: [
-      {
-        id: 'growing_vines',
-        name: 'Growing Vines',
-        type: 'attack',
-        element: 'earth',
-        tier: 7,
-        manaCost: 50,
-        description: 'Summons massive vines that constrict and damage the enemy.',
-        effects: [
-          {
-            type: 'damage',
-            value: 40,
-            target: 'enemy',
-            element: 'earth',
-          },
-          {
-            type: 'debuff',
-            value: 20,
-            duration: 3,
-            target: 'enemy',
-            element: 'earth',
-          },
-        ],
-        imagePath: '/images/spells/default-placeholder.jpg',
-      },
-      {
-        id: 'stone_blast',
-        name: 'Stone Blast',
-        type: 'attack',
-        element: 'earth',
-        tier: 5,
-        manaCost: 35,
-        description: 'Hurls massive boulders at the enemy.',
-        effects: [
-          {
-            type: 'damage',
-            value: 45,
-            target: 'enemy',
-            element: 'earth',
-          },
-        ],
-        imagePath: '/images/spells/default-placeholder.jpg',
-      },
-    ],
+    getThematicSpells: async () => getSpellsByList('natureGuardian'),
     lootTable: {
       common: ['Wood Shard', 'Stone Fragment', 'Leaf Essence'],
       uncommon: ['Ancient Wood', 'Living Stone', 'Forest Essence'],
@@ -304,51 +173,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
         element: 'air',
       },
     },
-    thematicSpells: [
-      {
-        id: 'lightning_strike',
-        name: 'Lightning Strike',
-        type: 'attack',
-        element: 'air',
-        tier: 7,
-        manaCost: 55,
-        description: 'A powerful bolt of lightning that can chain between enemies.',
-        effects: [
-          {
-            type: 'damage',
-            value: 70,
-            target: 'enemy',
-            element: 'air',
-          },
-          {
-            type: 'debuff',
-            value: 25,
-            duration: 2,
-            target: 'enemy',
-            element: 'air',
-          },
-        ],
-        imagePath: '/images/spells/default-placeholder.jpg',
-      },
-      {
-        id: 'wind_slash',
-        name: 'Wind Slash',
-        type: 'attack',
-        element: 'air',
-        tier: 5,
-        manaCost: 30,
-        description: 'A cutting blast of wind that can strike multiple times.',
-        effects: [
-          {
-            type: 'damage',
-            value: 40,
-            target: 'enemy',
-            element: 'air',
-          },
-        ],
-        imagePath: '/images/spells/default-placeholder.jpg',
-      },
-    ],
+    getThematicSpells: async () => getSpellsByList('stormElemental'),
     lootTable: {
       common: ['Storm Shard', 'Wind Essence', 'Lightning Fragment'],
       uncommon: ['Storm Crystal', 'Wind Core', 'Lightning Essence'],
@@ -384,58 +209,7 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
         element: 'water',
       },
     },
-    thematicSpells: [
-      {
-        id: 'tidal_wave',
-        name: 'Tidal Wave',
-        type: 'attack',
-        element: 'water',
-        tier: 8,
-        manaCost: 65,
-        description: 'A massive wave of water that crashes down on the enemy.',
-        effects: [
-          {
-            type: 'damage',
-            value: 85,
-            target: 'enemy',
-            element: 'water',
-          },
-          {
-            type: 'debuff',
-            value: 35,
-            duration: 3,
-            target: 'enemy',
-            element: 'water',
-          },
-        ],
-        imagePath: '/images/spells/default-placeholder.jpg',
-      },
-      {
-        id: 'abyssal_darkness',
-        name: 'Abyssal Darkness',
-        type: 'attack',
-        element: 'shadow',
-        tier: 6,
-        manaCost: 40,
-        description: 'Creates a sphere of darkness that drains the enemy\'s strength.',
-        effects: [
-          {
-            type: 'damage',
-            value: 55,
-            target: 'enemy',
-            element: 'shadow',
-          },
-          {
-            type: 'debuff',
-            value: 20,
-            duration: 2,
-            target: 'enemy',
-            element: 'shadow',
-          },
-        ],
-        imagePath: '/images/spells/default-placeholder.jpg',
-      },
-    ],
+    getThematicSpells: async () => getSpellsByList('abyssalLeviathan'),
     lootTable: {
       common: ['Abyssal Shard', 'Ocean Essence', 'Dark Water'],
       uncommon: ['Abyssal Crystal', 'Ocean Core', 'Dark Tide'],
@@ -444,4 +218,4 @@ export const magicalCreatures: Record<string, MagicalCreature> = {
       legendary: ['Abyssal Soul', 'Ocean Spirit', 'Dark Leviathan Heart'],
     },
   },
-}; 
+};

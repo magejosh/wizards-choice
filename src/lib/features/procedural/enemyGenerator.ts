@@ -76,7 +76,7 @@ function getSpellScale(level: number): number {
  * @param theme Optional theme for the enemy wizard (element or specialty)
  * @returns A procedurally generated enemy wizard
  */
-function generateEnemyWizard(playerLevel: number, difficulty: 'easy' | 'normal' | 'hard', theme?: string): Enemy {
+async function generateEnemyWizard(playerLevel: number, difficulty: 'easy' | 'normal' | 'hard', theme?: string): Promise<Enemy> {
   // Always use the key as the archetype property for robust mapping in the UI
   const archetypeKeys = Object.keys(enemyArchetypes);
   const archetypeKey = archetypeKeys[Math.floor(Math.random() * archetypeKeys.length)];
@@ -97,10 +97,9 @@ function generateEnemyWizard(playerLevel: number, difficulty: 'easy' | 'normal' 
   const mana = Math.round(baseMana * (1 + level * 0.1) * difficultyMultiplier);
 
   // Generate spells based on archetype
-  const spells: Spell[] = [
-    archetype.getSpecialSpell(level),
-    ...archetype.getThematicSpells(level)
-  ];
+  const specialSpell = await archetype.getSpecialSpell(level);
+  const thematicSpells = await archetype.getThematicSpells(level);
+  const spells: Spell[] = [specialSpell, ...thematicSpells];
 
   // Generate equipment based on archetype
   const equipment: Record<string, Equipment | undefined> = {};
@@ -204,7 +203,7 @@ function addEquipment(wizard: Wizard, level: number, archetype: any): void {
 /**
  * Generate a random magical creature based on player level and difficulty
  */
-function generateMagicalCreature(playerLevel: number, difficulty: 'easy' | 'normal' | 'hard', theme?: string): Enemy {
+async function generateMagicalCreature(playerLevel: number, difficulty: 'easy' | 'normal' | 'hard', theme?: string): Promise<Enemy> {
   const creatureKey = Object.keys(magicalCreatures)[Math.floor(Math.random() * Object.keys(magicalCreatures).length)];
   const creature = magicalCreatures[creatureKey];
   const level = Math.max(1, playerLevel + Math.floor(Math.random() * 3) - 1);
@@ -239,7 +238,8 @@ function generateMagicalCreature(playerLevel: number, difficulty: 'easy' | 'norm
     };
   };
 
-  const spells: Spell[] = creature.thematicSpells.map(scaleCreatureSpell);
+  const rawSpells = await creature.getThematicSpells();
+  const spells: Spell[] = rawSpells.map(scaleCreatureSpell);
 
   // Calculate rewards based on difficulty and level
   const goldReward = Math.floor(150 * difficultyMultiplier * (1 + level * 0.1));
@@ -275,13 +275,13 @@ function generateMagicalCreature(playerLevel: number, difficulty: 'easy' | 'norm
 /**
  * Generate a random enemy (either wizard or magical creature)
  */
-export function generateEnemy(playerLevel: number, difficulty: 'easy' | 'normal' | 'hard', theme?: string): Enemy {
+export async function generateEnemy(playerLevel: number, difficulty: 'easy' | 'normal' | 'hard', theme?: string): Promise<Enemy> {
   // The chance of a magical creature starts at 30% and increases by 0.1 percentage points per level, capping at 50%
   const baseCreatureChance = 0.3;
   const maxCreatureChance = 0.5;
   const creatureChance = Math.min(baseCreatureChance + 0.001 * (playerLevel - 1), maxCreatureChance);
   const isWizard = Math.random() >= creatureChance;
-  return isWizard ? generateEnemyWizard(playerLevel, difficulty, theme) : generateMagicalCreature(playerLevel, difficulty, theme);
+  return isWizard ? await generateEnemyWizard(playerLevel, difficulty, theme) : await generateMagicalCreature(playerLevel, difficulty, theme);
 }
 
 function generateThematicSpells(elements: string[], level: number): Spell[] {

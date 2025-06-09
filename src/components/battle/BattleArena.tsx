@@ -265,7 +265,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
                 padding: window.innerWidth <= 380 ? '0.4rem 0.6rem' : '0.5rem 1rem'
               }}
             >
-              Skip Turn
+              {currentPhase === 'response' ? 'Skip Phase' : 'Skip Turn'}
             </button>
             <button
               className={styles.mysticPunchButton}
@@ -407,7 +407,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
                 padding: window.innerWidth <= 380 ? '0.4rem 0.6rem' : '0.5rem 1rem'
               }}
             >
-              Skip Turn
+              {currentPhase === 'response' ? 'Skip Phase' : 'Skip Turn'}
             </button>
             <button
               className={styles.mysticPunchButton}

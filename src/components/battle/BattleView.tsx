@@ -788,10 +788,29 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
           }, 500);
         }
       } else if (combatState.currentPhase === 'response') {
-        // In response phase, advance to the next phase
+        // In response phase, check if we can advance before doing so
         setTimeout(() => {
-          const nextPhaseState = advancePhase(newState);
-          setCombatState(nextPhaseState);
+          // Use the validatePhaseState logic - check if both players have responded or have no reaction spells
+          const canAdvance = 
+            (newState.actionState.player.hasResponded && newState.actionState.enemy.hasResponded) ||
+            (newState.effectQueue.length === 0) ||
+            // If player hasn't responded but has no reaction spells they can cast
+            (!newState.actionState.player.hasResponded && 
+             newState.playerWizard.hand.filter(spell => 
+               spell.type === 'reaction' && spell.manaCost <= newState.playerWizard.currentMana
+             ).length === 0 &&
+             // And enemy has also responded or has no reaction spells
+             (newState.actionState.enemy.hasResponded ||
+              newState.enemyWizard.hand.filter(spell => 
+                spell.type === 'reaction' && spell.manaCost <= newState.enemyWizard.currentMana
+              ).length === 0));
+
+          if (canAdvance) {
+            const nextPhaseState = advancePhase(newState);
+            setCombatState(nextPhaseState);
+          } else {
+            console.log('Cannot advance from response phase - players still have reaction options available');
+          }
           setIsAnimating(false);
         }, 1000);
       } else {
@@ -1232,8 +1251,27 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
       }
     } else if (phaseType === 'response') {
       setTimeout(() => {
-        const nextPhaseState = advancePhase(newState);
-        setCombatState(nextPhaseState);
+        // Check if we can advance from response phase before doing so
+        const canAdvance = 
+          (newState.actionState.player.hasResponded && newState.actionState.enemy.hasResponded) ||
+          (newState.effectQueue.length === 0) ||
+          // If player hasn't responded but has no reaction spells they can cast
+          (!newState.actionState.player.hasResponded && 
+           newState.playerWizard.hand.filter(spell => 
+             spell.type === 'reaction' && spell.manaCost <= newState.playerWizard.currentMana
+           ).length === 0 &&
+           // And enemy has also responded or has no reaction spells
+           (newState.actionState.enemy.hasResponded ||
+            newState.enemyWizard.hand.filter(spell => 
+              spell.type === 'reaction' && spell.manaCost <= newState.enemyWizard.currentMana
+            ).length === 0));
+
+        if (canAdvance) {
+          const nextPhaseState = advancePhase(newState);
+          setCombatState(nextPhaseState);
+        } else {
+          console.log('Cannot advance from response phase - players still have reaction options available');
+        }
         setIsAnimating(false);
       }, 1000);
     } else {

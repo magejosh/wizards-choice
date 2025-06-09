@@ -858,14 +858,19 @@ export class PhaseManager {
     if (combatState.effectQueue.length === 0) {
       console.log('No effects in queue, skipping response phase entirely');
       setTimeout(() => {
-        const nextPhaseState = advancePhase(combatState);
-        this.setCombatState(nextPhaseState);
+        // Check if we can actually advance the phase
+        if (validatePhaseState(combatState, 'response')) {
+          const nextPhaseState = advancePhase(combatState);
+          this.setCombatState(nextPhaseState);
+        } else {
+          console.log('Cannot advance from response phase - players still need to respond');
+        }
       }, 500);
       return;
     }
 
     // Create a local copy of the state to track changes
-    let updatedState = { ...combatState };
+    let updatedState = { ...combatState } as CombatState;
     let needToAdvancePhase = false;
 
     // Check if player has any reaction spells they can cast
@@ -897,6 +902,9 @@ export class PhaseManager {
         if (updatedState.actionState.enemy.hasResponded) {
           needToAdvancePhase = true;
         }
+      } else {
+        // Player has reaction spells available - wait for player input
+        console.log(`Player has ${playerReactionSpells.length} reaction spells available - waiting for player input`);
       }
     }
 
@@ -956,8 +964,13 @@ export class PhaseManager {
             // If both players have responded or skipped, advance to resolve phase
             if (stateAfterEnemyResponse.actionState.player.hasResponded) {
               setTimeout(() => {
-                const nextPhaseState = advancePhase(stateAfterEnemyResponse);
-                this.setCombatState(nextPhaseState);
+                // Only advance if validation passes
+                if (validatePhaseState(stateAfterEnemyResponse, 'response')) {
+                  const nextPhaseState = advancePhase(stateAfterEnemyResponse);
+                  this.setCombatState(nextPhaseState);
+                } else {
+                  console.log('Cannot advance from response phase - validation failed');
+                }
               }, 1000);
             }
           }, 1500);
@@ -972,9 +985,14 @@ export class PhaseManager {
     // If we need to advance the phase, do it after a short delay
     if (needToAdvancePhase) {
       setTimeout(() => {
-        console.log('Both players have responded or skipped, advancing to resolve phase');
-        const nextPhaseState = advancePhase(updatedState);
-        this.setCombatState(nextPhaseState);
+        console.log('Both players have responded or skipped, attempting to advance to resolve phase');
+        // Only advance if validation passes
+        if (validatePhaseState(updatedState, 'response')) {
+          const nextPhaseState = advancePhase(updatedState);
+          this.setCombatState(nextPhaseState);
+        } else {
+          console.log('Cannot advance from response phase - players still have actions available');
+        }
       }, 1000);
     }
   }

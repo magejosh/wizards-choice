@@ -30,13 +30,22 @@ export function useMixamoClips(
 
   return useMemo(() => {
     const skinned = findSkinnedMesh(scene);
-    if (!skinned) {
+    if (!skinned || !skinned.skeleton || !skinned.skeleton.bones?.length) {
       return {} as Record<keyof MixamoActions, THREE.AnimationClip | undefined>;
     }
-    const retarget = (fbx: any) =>
-      fbx.animations && fbx.animations[0]
-        ? SkeletonUtils.retargetClip(skinned, fbx, fbx.animations[0])
-        : undefined;
+
+    const retarget = (fbx: any) => {
+      if (!fbx?.animations || !fbx.animations[0]) {
+        return undefined;
+      }
+
+      try {
+        return SkeletonUtils.retargetClip(skinned, fbx, fbx.animations[0]);
+      } catch (e) {
+        console.warn('Failed to retarget clip', e);
+        return undefined;
+      }
+    };
     return {
       idle: retarget(idle),
       cast: retarget(cast),

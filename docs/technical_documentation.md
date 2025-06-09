@@ -415,6 +415,9 @@ Special handling is implemented for 'finger' slots (rings):
 - The player has two ring slots, `finger1` and `finger2`.
 - When equipping a ring, the system checks for an empty slot. If both are filled, the first slot (`finger1`) is replaced, and the previously equipped ring is returned to inventory.
 - Unequipping a ring requires specifying which slot to remove from.
+- Enemy wizards now use the same slot keys (`hand`, `body`, `neck`, `finger1`,
+  `finger2`) when generated. This ensures their equipment bonuses are included
+  when `calculateWizardStats` is called.
 
 This logic is implemented in both the state management (wizardModule.ts) and the UI (EquipmentScreen.tsx), ensuring robust and consistent behavior.
 

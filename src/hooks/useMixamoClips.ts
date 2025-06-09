@@ -39,8 +39,13 @@ export function useMixamoClips(
         return undefined;
       }
 
+      const sourceSkinned = findSkinnedMesh(fbx);
+      if (!sourceSkinned?.skeleton?.bones?.length) {
+        return undefined;
+      }
+
       try {
-        return SkeletonUtils.retargetClip(skinned, fbx, fbx.animations[0]);
+        return SkeletonUtils.retargetClip(skinned, sourceSkinned, fbx.animations[0]);
       } catch (e) {
         console.warn('Failed to retarget clip', e);
         return undefined;

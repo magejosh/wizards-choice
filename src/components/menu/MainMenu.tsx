@@ -20,7 +20,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
   onStartNewGame,
   onContinueGame
 }) => {
-  const { gameState, updateSettings, migrateSaveData, loadAllSaveSlots, deleteSaveSlot } = useGameStateStore();
+  const { gameState, updateSettings, saveGame, migrateSaveData, loadAllSaveSlots, deleteSaveSlot } = useGameStateStore();
   const { settings, saveSlots } = gameState;
 
   // State for modals
@@ -102,6 +102,8 @@ const MainMenu: React.FC<MainMenuProps> = ({
   const handleSaveSettings = () => {
     console.log('Saving settings:', localSettings);
     updateSettings(localSettings);
+    // Persist settings to storage so they aren't lost when loading a game
+    saveGame();
     setShowSettings(false);
   };
 

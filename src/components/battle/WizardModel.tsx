@@ -21,7 +21,7 @@ interface WizardModelProps {
   modelPath?: string;
 }
 
-const PLAYER_WIZARD_GLB_PATH = '/assets/player-wizard-01.glb';
+const PLAYER_WIZARD_GLB_PATH = '/assets/player-wizard-01a.glb';
 
 const PrimitiveWizardModel: React.FC<{
   position: [number, number, number];

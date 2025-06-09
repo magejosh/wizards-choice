@@ -12,8 +12,8 @@ This document summarizes the current status of each spell effect type available 
 | **healing**          | Yes          | Direct healing                                                                      |
 | **buff**             | Yes          | Healing over time/stat boost                                                        |
 | **debuff**           | Yes          | Damage over time/stat penalty                                                       |
-| **control**          | No           | Not implemented                                                                     |
-| **summon**           | No           | Not implemented                                                                     |
+| **control**          | No           | Planned - will allow taking control of enemy minions |
+| **summon**           | Yes          | Creates minions on the battlefield |
 | **utility**          | No           | Not implemented                                                                     |
 | **timeRewind**       | No           | Not implemented                                                                     |
 | **delay**            | No           | Not implemented                                                                     |
@@ -42,8 +42,8 @@ This document summarizes the current status of each spell effect type available 
 ### Partially Implemented
 - **statModifier**: Used for buffs/debuffs, but not as a standalone effect. In `getEffectName`, it is mapped to "Damage Reduction" or "Power Boost".
 
-### Not Implemented
-- **control, summon, utility, timeRewind, delay, confusion, spellEcho**: No code found that processes or applies these effects.
+-### Not Implemented
+- **control, utility, timeRewind, delay, confusion, spellEcho**: No code found that processes or applies these effects.
 - **damageBonus, defense**: Exist as stats in equipment or AI logic, but not as spell effects in combat.
 
 ---
@@ -84,14 +84,14 @@ Here is a step-by-step review of each spell effect type listed in the dropdown (
 ---
 
 ### 5. **control**
-- **Status:** Not directly implemented.
-- **What it does:** No direct handling found in combat code. May be a placeholder for future effects like stun, silence, etc.
+- **Status:** Not implemented.
+- **What it does:** Planned effect to take control of enemy minions for a duration.
 
 ---
 
 ### 6. **summon**
-- **Status:** Not implemented.
-- **What it does:** No code found that processes or applies a "summon" effect.
+- **Status:** Implemented.
+- **What it does:** Creates minions for the caster or transforms the caster into minions depending on `modelPath`.
 
 ---
 
@@ -169,8 +169,8 @@ Here is a step-by-step review of each spell effect type listed in the dropdown (
 | healing          | Yes          | Direct healing                                                                      |
 | buff             | Yes          | Healing over time/stat boost                                                        |
 | debuff           | Yes          | Damage over time/stat penalty                                                       |
-| control          | No           | Not implemented                                                                     |
-| summon           | No           | Not implemented                                                                     |
+| control          | No           | Planned - will allow taking control of enemy minions |
+| summon           | Yes          | Creates minions on the battlefield |
 | utility          | No           | Not implemented                                                                     |
 | timeRewind       | No           | Not implemented                                                                     |
 | delay            | No           | Not implemented                                                                     |
@@ -186,6 +186,6 @@ Here is a step-by-step review of each spell effect type listed in the dropdown (
 ---
 
 **Conclusion:**  
-Only a subset of the dropdown spell effects are actually hooked up in the combat code. The rest are either placeholders or only referenced in equipment or AI logic, not as spell effects. If you want to add support for any of the unimplemented types, new logic will need to be added to the combat resolution and effect processing code.
+Only a subset of the dropdown spell effects are actually hooked up in the combat code. `summon` is now functional but effects like `control`, `mana_drain`, `stun`, and `silence` remain unimplemented. Adding them will require new logic in `spellExecutor.ts` and `effectsProcessor.ts` as outlined in `docs/spell_effects_refactor_plan.md`.
 
 Let me know if you want a breakdown of how to implement any of the missing effect types, or if you want this summary added to documentation.

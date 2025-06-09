@@ -136,6 +136,8 @@ test("studyPotion learns recipe and consumes potion", () => {
   expect(result.success).toBe(true);
   const state = store.getState().gameState.player!;
   expect(state.potions.length).toBe(0);
-  expect(state.discoveredRecipes?.some((r) => r.id === recipe.id)).toBe(true);
+  const learnedId = result.discoveredRecipe?.id;
+  expect(learnedId).toBeDefined();
+  expect(state.discoveredRecipes?.some((r) => r.id === learnedId)).toBe(true);
   (Math.random as jest.Mock).mockRestore();
 });

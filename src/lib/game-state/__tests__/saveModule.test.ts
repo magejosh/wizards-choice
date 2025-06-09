@@ -67,12 +67,12 @@ beforeEach(() => {
   global.localStorage = new MemoryStorage();
 });
 
-test('initializes multiple save slots', () => {
+test('initializes multiple save slots', async () => {
   const store = createTestStore();
   const { initializeNewGame, getSaveSlots } = store.getState();
 
-  initializeNewGame('Alice', 0);
-  initializeNewGame('Bob', 1);
+  await initializeNewGame('Alice', 0);
+  await initializeNewGame('Bob', 1);
 
   const slots = getSaveSlots();
   expect(slots[0].playerName).toBe('Alice');
@@ -81,13 +81,12 @@ test('initializes multiple save slots', () => {
   expect(slots[1].isEmpty).toBe(false);
 });
 
-test('save and load different slots without overwriting', () => {
+test('save and load different slots without overwriting', async () => {
   const store = createTestStore();
   const actions = store.getState();
-  actions.initializeNewGame('Alice', 0);
+  await actions.initializeNewGame('Alice', 0);
   const slot0Uuid = store.getState().gameState.saveSlots[0].saveUuid;
-
-  actions.initializeNewGame('Bob', 1);
+  await actions.initializeNewGame('Bob', 1);
   const slot1Uuid = store.getState().gameState.saveSlots[1].saveUuid;
 
   // Update Bob to level 2 and save

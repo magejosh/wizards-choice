@@ -1,12 +1,42 @@
 // src/lib/spells/spellData.ts
 import { Spell, SpellEffect, SpellType } from '../types';
 import { ElementType } from '../types/element-types';
+import fs from 'fs/promises';
+import path from 'path';
 
 // XML spell loader utility
 let spellCache: Spell[] = [];
 let spellLoadPromise: Promise<Spell[]> | null = null;
 
 const STRICT_DUPLICATE_CHECK = false; // Set to true to throw on duplicate spell names
+
+function getServerXmlPath() {
+  return path.join(process.cwd(), 'public', 'data', 'spell_data.xml');
+}
+
+function parseAndValidate(xmlText: string): Spell[] {
+  const spells: Spell[] = parseXmlSpells(xmlText);
+  const nameSet = new Set<string>();
+  const duplicateNames: string[] = [];
+  const filteredSpells: Spell[] = [];
+  for (const spell of spells) {
+    if (!spell.id || !spell.name) throw new Error('Spell missing id or name');
+    const lowerName = spell.name.toLowerCase();
+    if (nameSet.has(lowerName)) {
+      duplicateNames.push(spell.name);
+      if (STRICT_DUPLICATE_CHECK) throw new Error('Duplicate spell name: ' + spell.name);
+      continue;
+    }
+    nameSet.add(lowerName);
+    filteredSpells.push(spell);
+  }
+  if (duplicateNames.length > 0) {
+    console.warn(
+      `[Spell Loader] Skipped duplicate spell names: ${duplicateNames.join(', ')}. Only the first occurrence of each name was loaded.`
+    );
+  }
+  return filteredSpells;
+}
 
 function getSpellDataUrl() {
   if (typeof window === 'undefined') {
@@ -92,40 +122,25 @@ function parseXmlSpells(xmlText: string): Spell[] {
 export async function loadSpellsFromXML(): Promise<Spell[]> {
   if (spellCache.length > 0) return spellCache;
   if (spellLoadPromise) return spellLoadPromise;
-  const url = getSpellDataUrl();
-  spellLoadPromise = fetch(url)
-    .then(async (res) => {
+  const loader = async () => {
+    let xmlText: string;
+    if (typeof window === 'undefined') {
+      const filePath = getServerXmlPath();
+      xmlText = await fs.readFile(filePath, 'utf8');
+    } else {
+      const url = getSpellDataUrl();
+      const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to load spell_data.xml');
-      const xmlText = await res.text();
-      const spells: Spell[] = parseXmlSpells(xmlText);
-      // Validation: unique names/IDs, enums, required fields
-      const nameSet = new Set<string>();
-      const duplicateNames: string[] = [];
-      const filteredSpells: Spell[] = [];
-      for (const spell of spells) {
-        if (!spell.id || !spell.name) throw new Error('Spell missing id or name');
-        const lowerName = spell.name.toLowerCase();
-        if (nameSet.has(lowerName)) {
-          duplicateNames.push(spell.name);
-          if (STRICT_DUPLICATE_CHECK) throw new Error('Duplicate spell name: ' + spell.name);
-          // Skip this duplicate
-          continue;
-        }
-        nameSet.add(lowerName);
-        filteredSpells.push(spell);
-      }
-      if (duplicateNames.length > 0) {
-        console.warn(
-          `[Spell Loader] Skipped duplicate spell names: ${duplicateNames.join(', ')}. Only the first occurrence of each name was loaded.`
-        );
-      }
-      spellCache = filteredSpells;
-      return filteredSpells;
-    })
-    .catch((err) => {
-      spellLoadPromise = null;
-      throw err;
-    });
+      xmlText = await res.text();
+    }
+    const spells = parseAndValidate(xmlText);
+    spellCache = spells;
+    return spells;
+  };
+  spellLoadPromise = loader().catch((err) => {
+    spellLoadPromise = null;
+    throw err;
+  });
   return spellLoadPromise;
 }
 

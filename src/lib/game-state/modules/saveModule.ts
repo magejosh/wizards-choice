@@ -16,7 +16,7 @@ export interface SaveState {
 export interface SaveActions {
   saveGame: () => void;
   loadGame: (saveUuid: string) => boolean;
-  initializeNewGame: (playerName: string, slotId: number) => void;
+  initializeNewGame: (playerName: string, slotId: number) => Promise<void>;
   resetState: () => void;
   updateSaveSlot: (saveUuid: string, data: Partial<SaveSlot>) => void;
   deleteSaveSlot: (saveUuid: string) => void;

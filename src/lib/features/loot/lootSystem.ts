@@ -40,6 +40,20 @@ function getAllowedRarities(level: number): Rarity[] {
   return ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 }
 
+function maybeUpgradeRarity(
+  rarity: Rarity,
+  difficulty: 'easy' | 'normal' | 'hard',
+): Rarity {
+  const currentIndex = rarityTiers.indexOf(rarity);
+  if (currentIndex === rarityTiers.length - 1) return rarity;
+
+  let chance = 0;
+  if (difficulty === 'normal') chance = 0.05;
+  if (difficulty === 'hard') chance = 0.1;
+
+  return Math.random() < chance ? rarityTiers[currentIndex + 1] : rarity;
+}
+
 /**
  * Represents a loot drop from defeating an enemy
  */
@@ -89,13 +103,13 @@ export async function generateLoot(
         ? archetypeIngredientPools[enemyWizard.archetype ?? '']
         : creatureIngredientPools[enemyWizard.archetype ?? ''];
       const allowed = getAllowedRarities(enemyWizard.level);
-      finalIngredients.push(
-        generateRandomIngredient(
-          enemyWizard.level,
-          categories,
-          allowed as IngredientRarity[],
-        ),
+      const fallback = generateRandomIngredient(
+        enemyWizard.level,
+        categories,
+        allowed as IngredientRarity[],
       );
+      fallback.rarity = maybeUpgradeRarity(fallback.rarity as Rarity, difficulty);
+      finalIngredients.push(fallback);
     }
   }
 
@@ -162,10 +176,10 @@ function calculateGoldReward(
   }
   switch (difficulty) {
     case 'easy':
-      baseGold *= 1.2;
+      baseGold *= 1.5;
       break;
     case 'hard':
-      baseGold *= 0.8;
+      baseGold *= 0.5;
       break;
   }
   return Math.floor(baseGold);
@@ -226,11 +240,11 @@ function generateEquipmentLoot(
       const enemyEquipment = Object.values(enemyWizard.equipment).filter(item => item !== undefined);
 
       if (enemyEquipment.length > 0) {
-        const randomEnemyEquipment = enemyEquipment[
+        const randomEnemyEquipment = { ...(enemyEquipment[
           Math.floor(Math.random() * enemyEquipment.length)
-        ];
-
-        lootEquipment.push(randomEnemyEquipment as Equipment);
+        ] as Equipment) };
+        randomEnemyEquipment.rarity = maybeUpgradeRarity(randomEnemyEquipment.rarity as Rarity, difficulty);
+        lootEquipment.push(randomEnemyEquipment);
       }
     } else {
       // Generate procedural equipment based on enemy level
@@ -239,7 +253,11 @@ function generateEquipmentLoot(
 
       // Generate 1-2 equipment pieces for magical creatures
       const equipmentCount = Math.random() < 0.3 ? 2 : 1;
-      lootEquipment.push(...generateLootEquipment(enemyWizard.level, equipmentCount, minRarity));
+      const generated = generateLootEquipment(enemyWizard.level, equipmentCount, minRarity);
+      generated.forEach(eq => {
+        eq.rarity = maybeUpgradeRarity(eq.rarity as Rarity, difficulty);
+      });
+      lootEquipment.push(...generated);
     }
   }
 
@@ -308,13 +326,16 @@ function generateIngredientLoot(
       : creatureIngredientPools[enemyWizard.archetype ?? ''];
     const allowed = getAllowedRarities(enemyWizard.level);
     for (let i = 0; i < ingredientDropCount; i++) {
-      lootIngredients.push(
-        generateRandomIngredient(
-          enemyWizard.level,
-          categories,
-          allowed as IngredientRarity[],
-        ),
+      const ingredient = generateRandomIngredient(
+        enemyWizard.level,
+        categories,
+        allowed as IngredientRarity[],
       );
+      ingredient.rarity = maybeUpgradeRarity(
+        ingredient.rarity as Rarity,
+        difficulty,
+      );
+      lootIngredients.push(ingredient);
     }
   }
 
@@ -372,11 +393,15 @@ async function generateScrollLoot(
   if (Math.random() < scrollDropChance) {
     try {
       // Generate a scroll appropriate for the enemy's level
-      scrolls.push(await generateRandomSpellScroll(enemyWizard.level));
+      const first = await generateRandomSpellScroll(enemyWizard.level);
+      first.rarity = maybeUpgradeRarity(first.rarity as Rarity, difficulty);
+      scrolls.push(first);
 
       // Higher level enemies have a small chance to drop an additional scroll
       if (enemyWizard.level >= 10 && Math.random() < 0.2) {
-        scrolls.push(await generateRandomSpellScroll(enemyWizard.level));
+        const extra = await generateRandomSpellScroll(enemyWizard.level);
+        extra.rarity = maybeUpgradeRarity(extra.rarity as Rarity, difficulty);
+        scrolls.push(extra);
       }
     } catch (err) {
       console.error('Failed to generate scroll loot', err);

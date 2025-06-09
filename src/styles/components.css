@@ -128,6 +128,20 @@
   position: relative; /* Ensure this is present for absolute positioning of children */
 }
 
+/* Background image for the study scene */
+.wizard-study__background-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/images/wizards_study/wizards-study.png');
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
 .wizard-study__background-customization {
   position: absolute;
   top: 5px;

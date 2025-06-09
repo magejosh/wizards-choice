@@ -28,11 +28,23 @@ This document outlines the new approach for post-battle loot generation and the 
 
 ## Task List
 
-- [ ] Refactor scroll generation to use async spell loading and prevent loot errors.
-- [ ] Ensure generateLoot always awards at least one gold or ingredient.
-- [ ] Base scroll generation on the enemy's level instead of the player's level.
-- [ ] Expand loot tables with market unlock level milestones.
-- [ ] Implement archetype/creature specific ingredient pools.
+- [x] Refactor scroll generation to use async spell loading and prevent loot errors.
+- [x] Ensure generateLoot always awards at least one gold or ingredient.
+- [x] Base scroll generation on the enemy's level instead of the player's level.
+- [x] Expand loot tables with market unlock level milestones.
+- [x] Implement archetype/creature specific ingredient pools.
 - [ ] Update existing tests and add new tests for guaranteed loot.
-- [ ] Document any new data structures or helper functions.
+- [x] Document any new data structures or helper functions.
+
+## Helper Functions
+
+### `getAllowedRarities(level)`
+Returns an array of loot rarities that can appear for a given enemy level. The
+thresholds mirror market unlock milestones (1–5 common, 5–10 adds uncommon,
+10–15 adds rare, 15–20 adds epic, 20+ allows legendary).
+
+### `archetypeIngredientPools` and `creatureIngredientPools`
+Mappings that bias ingredient generation based on the defeated enemy's
+archetype or creature type. These arrays feed into `generateRandomIngredient`
+to produce thematic drops.
 

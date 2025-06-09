@@ -238,14 +238,35 @@ export function generateCoreIngredient(tier: number = 1): Ingredient {
  * @param playerLevel The player's level
  * @returns A random ingredient with tier based on player level
  */
-export function generateRandomIngredient(playerLevel: number): Ingredient {
+export function generateRandomIngredient(
+  playerLevel: number,
+  categories?: IngredientCategory[],
+  allowedRarities?: IngredientRarity[],
+): Ingredient {
   // Calculate the maximum tier based on player level
-  const maxTier = Math.min(Math.ceil(playerLevel / 5), 5);
+  let maxTier = Math.min(Math.ceil(playerLevel / 5), 5);
+
+  if (allowedRarities && allowedRarities.length > 0) {
+    const rarityMap: Record<IngredientRarity, number> = {
+      common: 1,
+      uncommon: 2,
+      rare: 3,
+      epic: 4,
+      legendary: 5,
+    };
+    const highest = allowedRarities[allowedRarities.length - 1];
+    maxTier = Math.min(maxTier, rarityMap[highest]);
+  }
+
   const tier = Math.max(1, Math.floor(Math.random() * maxTier) + 1);
-  
+
   // Get a random ingredient category
-  const ingredientCategories: IngredientCategory[] = ['herb', 'crystal', 'essence', 'fungus', 'catalyst', 'core'];
-  const randomCategory = ingredientCategories[Math.floor(Math.random() * ingredientCategories.length)];
+  const ingredientCategories: IngredientCategory[] =
+    categories && categories.length > 0
+      ? categories
+      : ['herb', 'crystal', 'essence', 'fungus', 'catalyst', 'core'];
+  const randomCategory =
+    ingredientCategories[Math.floor(Math.random() * ingredientCategories.length)];
   
   // Generate the ingredient based on category
   switch (randomCategory) {

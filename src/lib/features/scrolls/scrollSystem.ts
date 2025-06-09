@@ -41,7 +41,7 @@ export function createSpellScroll(spell: Spell): SpellScroll {
  * @param playerLevel The current level of the player
  * @returns A randomly generated spell scroll
  */
-export function generateRandomSpellScroll(playerLevel: number): SpellScroll {
+export async function generateRandomSpellScroll(playerLevel: number): Promise<SpellScroll> {
   // Determine max tier based on player level
   const maxTier = Math.min(Math.ceil(playerLevel / 3), 10);
   
@@ -52,14 +52,14 @@ export function generateRandomSpellScroll(playerLevel: number): SpellScroll {
   
   if (isSpecialSpell) {
     // Get a random special spell
-    const specialSpells = getAllSpecialSpells();
+    const specialSpells = await getAllSpecialSpells();
     spell = specialSpells[Math.floor(Math.random() * specialSpells.length)];
   } else {
     // Get a random tier up to the max tier
     const tier = Math.max(1, Math.ceil(Math.random() * maxTier));
     
     // Get spells for that tier
-    const spellsForTier = getSpellsByTier(tier);
+    const spellsForTier = await getSpellsByTier(tier);
     
     // Select a random spell from that tier
     spell = spellsForTier[Math.floor(Math.random() * spellsForTier.length)];
@@ -74,13 +74,13 @@ export function generateRandomSpellScroll(playerLevel: number): SpellScroll {
  * @param level The market/player level to use for generating appropriate scrolls
  * @returns Array of spell scrolls
  */
-export function generateScrollsForMarket(count: number, level: number): SpellScroll[] {
+export async function generateScrollsForMarket(count: number, level: number): Promise<SpellScroll[]> {
   const scrolls: SpellScroll[] = [];
-  
+
   for (let i = 0; i < count; i++) {
-    scrolls.push(generateRandomSpellScroll(level));
+    scrolls.push(await generateRandomSpellScroll(level));
   }
-  
+
   return scrolls;
 }
 

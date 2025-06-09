@@ -193,3 +193,10 @@ Additional guidelines:
 - [ ] Implement multiple difficulty levels
 - [ ] Balance spell system
 - [ ] Package game for deployment to vercel & docker
+
+### Loot System Overhaul Tasks
+- [ ] Fix loot scroll generation bug (async special scrolls)
+- [ ] Guarantee a minimum gold or ingredient drop from every victory
+- [ ] Base loot scaling primarily on the defeated enemy and market unlock levels
+- [ ] Add archetype and creature specific ingredient lists
+- [ ] Update tests for new loot rules

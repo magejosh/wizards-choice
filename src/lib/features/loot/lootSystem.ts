@@ -37,18 +37,29 @@ export async function generateLoot(
   const ingredients = generateIngredientLoot(playerWizard, enemyWizard, isWizardEnemy, difficulty);
 
   // Generate spell scroll loot
-  const scrolls = generateScrollLoot(playerWizard, enemyWizard, isWizardEnemy, difficulty);
+  const scrolls = await generateScrollLoot(playerWizard, enemyWizard, isWizardEnemy, difficulty);
 
   // Set experience to 0 since we're using calculateExperienceGained in combatStatusManager.ts instead
   const experience = 0;
   const goldAmount = calculateGoldReward(enemyWizard.level, isWizardEnemy, difficulty);
 
+  // Ensure at least one gold or ingredient is awarded
+  const finalIngredients = ingredients;
+  let finalGold = goldAmount;
+  if (finalGold <= 0 && finalIngredients.length === 0) {
+    if (Math.random() < 0.5) {
+      finalGold = 1;
+    } else {
+      finalIngredients.push(generateRandomIngredient(enemyWizard.level));
+    }
+  }
+
   return {
     equipment,
-    ingredients,
+    ingredients: finalIngredients,
     scrolls,
     experience,
-    gold: goldAmount,
+    gold: finalGold,
   };
 }
 
@@ -274,12 +285,12 @@ function generateIngredientLoot(
  * @param difficulty The game difficulty
  * @returns Array of spell scroll loot
  */
-function generateScrollLoot(
+async function generateScrollLoot(
   playerWizard: Wizard,
   enemyWizard: Wizard,
   isWizardEnemy: boolean,
   difficulty: 'easy' | 'normal' | 'hard'
-): SpellScroll[] {
+): Promise<SpellScroll[]> {
   const scrolls: SpellScroll[] = [];
 
   // Determine chance to drop scrolls
@@ -315,12 +326,12 @@ function generateScrollLoot(
 
   // Check if we should drop a scroll
   if (Math.random() < scrollDropChance) {
-    // Generate a scroll appropriate for the player's level
-    scrolls.push(generateRandomSpellScroll(playerWizard.level));
+    // Generate a scroll appropriate for the enemy's level
+    scrolls.push(await generateRandomSpellScroll(enemyWizard.level));
 
     // Higher level enemies have a small chance to drop an additional scroll
     if (enemyWizard.level >= 10 && Math.random() < 0.2) {
-      scrolls.push(generateRandomSpellScroll(playerWizard.level));
+      scrolls.push(await generateRandomSpellScroll(enemyWizard.level));
     }
   }
 

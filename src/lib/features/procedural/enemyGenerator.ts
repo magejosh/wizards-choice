@@ -173,24 +173,24 @@ function generateRandomWizardName(theme: string): string {
  * Adds equipment to a wizard based on their level and archetype
  */
 function addEquipment(wizard: Wizard, level: number, archetype: any): void {
-  // Add wand with theme-appropriate bonuses
-  wizard.equipment.wand = generateProceduralEquipment(level, 'hand');
-  
+  // Add weapon with theme-appropriate bonuses
+  wizard.equipment.hand = generateProceduralEquipment(level, 'hand');
+
   // Add robe with theme-appropriate bonuses
-  wizard.equipment.robe = generateProceduralEquipment(level, 'body');
-  
+  wizard.equipment.body = generateProceduralEquipment(level, 'body');
+
   // Add amulet if high enough level
   if (level >= 3) {
-    wizard.equipment.amulet = generateProceduralEquipment(level, 'neck');
+    wizard.equipment.neck = generateProceduralEquipment(level, 'neck');
   }
-  
+
   // Add rings if high enough level
   if (level >= 5) {
-    wizard.equipment.ring1 = generateProceduralEquipment(level, 'finger');
+    wizard.equipment.finger1 = generateProceduralEquipment(level, 'finger');
   }
-  
+
   if (level >= 10) {
-    wizard.equipment.ring2 = generateProceduralEquipment(level, 'finger');
+    wizard.equipment.finger2 = generateProceduralEquipment(level, 'finger');
   }
   
   // Add archetype-specific equipment bonuses

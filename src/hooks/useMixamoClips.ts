@@ -9,7 +9,7 @@ export interface MixamoActions {
   die: string;
 }
 
-function findSkinnedMesh(root: THREE.Object3D | undefined) {
+export function findSkinnedMesh(root: THREE.Object3D | undefined) {
   let skinned: THREE.SkinnedMesh | undefined;
   if (!root) return skinned;
   root.traverse(obj => {

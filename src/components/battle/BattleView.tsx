@@ -405,7 +405,6 @@ const BattleView: React.FC<BattleViewProps> = ({ onReturnToWizardStudy }) => {
         let lootMessage = "You found: ";
         const foundItems: string[] = [];
         if (lootDrop.gold && lootDrop.gold > 0) foundItems.push(`${lootDrop.gold} gold`);
-        if (lootDrop.spells.length > 0) foundItems.push(...lootDrop.spells.map(s => s.name));
         if (lootDrop.equipment.length > 0) foundItems.push(...lootDrop.equipment.map(e => e.name));
         if (lootDrop.ingredients.length > 0) foundItems.push(...lootDrop.ingredients.map(i => i.name));
         if (lootDrop.scrolls.length > 0) foundItems.push(...lootDrop.scrolls.map(s => s.name));

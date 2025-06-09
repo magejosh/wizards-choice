@@ -171,6 +171,12 @@ function calculateGoldReward(
   difficulty: 'easy' | 'normal' | 'hard'
 ): number {
   let baseGold = enemyLevel * 5; // Base gold
+
+  // Boost early-game gold on easy difficulty
+  if (enemyLevel < 5 && difficulty === 'easy') {
+    baseGold *= 2;
+  }
+
   if (isWizardEnemy) {
     baseGold *= 1.2;
   }
@@ -231,6 +237,11 @@ function generateEquipmentLoot(
         equipmentDropChance = 0.3; // 30% chance
         break;
     }
+  }
+
+  // Reduce early-game equipment drops on easy difficulty
+  if (difficulty === 'easy' && enemyWizard.level < 5) {
+    equipmentDropChance *= 0.5;
   }
 
   // Roll for equipment drop
@@ -316,6 +327,12 @@ function generateIngredientLoot(
         ingredientDropCount = Math.floor(Math.random() * 2) + 1; // 1-2 ingredients
         break;
     }
+  }
+
+  // Reduce early-game ingredient drops on easy difficulty
+  if (difficulty === 'easy' && enemyWizard.level < 5) {
+    ingredientDropCount = Math.max(1, Math.floor(ingredientDropCount / 2));
+    ingredientDropChance *= 0.8;
   }
 
   // Roll for ingredient drops

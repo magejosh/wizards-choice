@@ -22,7 +22,8 @@ export interface Spell {
   effects: SpellEffect[];
   imagePath: string;
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  list?: string | string[];
+  /** Names of spell lists this spell belongs to */
+  lists?: string[];
 }
 
 /**

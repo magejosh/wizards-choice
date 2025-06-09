@@ -27,13 +27,7 @@ export async function getAllSpecialSpells(): Promise<Spell[]> {
  */
 export async function getSpellsByList(listType: string): Promise<Spell[]> {
   const spells = await getAllSpells();
-  // If the spell has a 'list' property as an array or string, check for match
-  return spells.filter(spell => {
-    if (Array.isArray((spell as any).list)) {
-      return (spell as any).list.includes(listType);
-    }
-    return (spell as any).list === listType;
-  });
+  return spells.filter(spell => (spell.lists || []).includes(listType));
 }
 
 /**

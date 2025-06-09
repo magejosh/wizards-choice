@@ -25,6 +25,10 @@ This document outlines the new approach for post-battle loot generation and the 
    - **Enemy wizards**: higher chance for spell scrolls and equipment pieces.
    - **Magical creatures**: more ingredients and potions, especially ones that fit the creature's theme (blood, venom, scales, etc.).
 5. **Archetype Bias** – Loot tables can weight certain ingredients or items that make sense for the specific archetype or creature type (e.g., fire drakes drop fiery glands).
+6. **Difficulty Influence** –
+   - Easy: highest drop counts and 50% more gold.
+   - Normal: standard loot with a 5% chance for items to upgrade one rarity tier.
+   - Hard: reduced gold to 50% and a 10% chance for items to upgrade one rarity tier.
 
 ## Task List
 
@@ -47,4 +51,8 @@ thresholds mirror market unlock milestones (1–5 common, 5–10 adds uncommon,
 Mappings that bias ingredient generation based on the defeated enemy's
 archetype or creature type. These arrays feed into `generateRandomIngredient`
 to produce thematic drops.
+
+### `maybeUpgradeRarity(rarity, difficulty)`
+Given an item's current rarity and the selected difficulty, this helper adds a small
+chance to increase the rarity by one tier (5% on Normal, 10% on Hard).
 

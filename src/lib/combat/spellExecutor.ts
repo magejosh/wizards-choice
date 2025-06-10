@@ -1,11 +1,17 @@
 // src/lib/combat/spellExecutor.ts
-import { CombatState, Spell, SpellEffect, ActiveEffect, Minion } from '../types';
-import { createLogEntry } from './battleLogManager';
-import { checkCombatStatus } from './combatStatusManager';
-import { discardCard } from './cardManager';
-import { advancePhase } from './phaseManager';
-import { calculateAndApplyDamage } from './damageCalculationUtils';
-import { findUnoccupiedAdjacentHex } from '../utils/hexUtils';
+import {
+  CombatState,
+  Spell,
+  SpellEffect,
+  ActiveEffect,
+  Minion,
+} from "../types";
+import { createLogEntry } from "./battleLogManager";
+import { checkCombatStatus } from "./combatStatusManager";
+import { discardCard } from "./cardManager";
+import { advancePhase } from "./phaseManager";
+import { calculateAndApplyDamage } from "./damageCalculationUtils";
+import { findUnoccupiedAdjacentHex } from "../utils/hexUtils";
 
 /**
  * Select a spell for a wizard to cast
@@ -17,7 +23,7 @@ import { findUnoccupiedAdjacentHex } from '../utils/hexUtils';
 export function selectSpell(
   state: CombatState,
   spell: Spell | null,
-  isPlayer: boolean
+  isPlayer: boolean,
 ): CombatState {
   const newState = { ...state };
 
@@ -48,59 +54,68 @@ export function executeMysticPunch(
   state: CombatState,
   spellTier: number,
   isPlayer: boolean,
-  isResolution: boolean = false
+  isResolution: boolean = false,
 ): CombatState {
   let newState = { ...state };
-  const caster = isPlayer ? 'playerWizard' : 'enemyWizard';
-  const target = isPlayer ? 'enemyWizard' : 'playerWizard';
+  const caster = isPlayer ? "playerWizard" : "enemyWizard";
+  const target = isPlayer ? "enemyWizard" : "playerWizard";
 
   // Calculate base damage based on spell tier
-  const baseDamage = 2 + (spellTier * 3);
+  const baseDamage = 2 + spellTier * 3;
 
   // Apply Bleed Effect if present
   const bleedEffect = newState[caster].wizard.combatStats?.bleedEffect || 0;
   if (bleedEffect > 0) {
     const bleedActiveEffect = {
-      name: 'Bleed',
-      type: 'damage_over_time' as const,
+      name: "Bleed",
+      type: "damage_over_time" as const,
       value: bleedEffect,
       duration: 3,
       remainingDuration: 3,
-      source: (isPlayer ? 'player' : 'enemy') as 'player' | 'enemy',
+      source: (isPlayer ? "player" : "enemy") as "player" | "enemy",
     };
     newState[target] = {
       ...newState[target],
       activeEffects: [...newState[target].activeEffects, bleedActiveEffect],
     };
-    newState.log.push(createLogEntry({
-      turn: newState.turn,
-      round: newState.round,
-      actor: isPlayer ? 'player' : 'enemy',
-      action: 'effect_applied',
-      details: `Bleed applied to ${isPlayer ? 'enemy' : 'you'} for 3 turns!`,
-    }));
+    newState.log.push(
+      createLogEntry({
+        turn: newState.turn,
+        round: newState.round,
+        actor: isPlayer ? "player" : "enemy",
+        action: "effect_applied",
+        details: `Bleed applied to ${isPlayer ? "enemy" : "you"} for 3 turns!`,
+      }),
+    );
   }
 
   // Use standardized damage calculation system
   newState = calculateAndApplyDamage(newState, {
     baseDamage,
-    damageType: 'mysticPunch',
-    element: 'physical',
+    damageType: "mysticPunch",
+    element: "physical",
     caster,
     target,
-    sourceDescription: 'Mystic Punch',
+    sourceDescription: "Mystic Punch",
   });
 
   // If combat has ended, return immediately
-  if (newState.status !== 'active') {
-    console.log(`Combat ended: ${newState.status}, target health: ${newState[target].currentHealth}`);
+  if (newState.status !== "active") {
+    console.log(
+      `Combat ended: ${newState.status}, target health: ${newState[target].currentHealth}`,
+    );
     return newState;
   }
 
   // If the selectedSpell is not null, discard it using the card handler
   if (newState[caster].selectedSpell) {
     const selectedSpell = newState[caster].selectedSpell;
-    newState = discardCard(newState, selectedSpell.id, isPlayer, 'mystic_punch');
+    newState = discardCard(
+      newState,
+      selectedSpell.id,
+      isPlayer,
+      "mystic_punch",
+    );
 
     // Clear selected spell after discarding
     newState[caster].selectedSpell = null;
@@ -112,7 +127,7 @@ export function executeMysticPunch(
   }
 
   // Mark the player as having acted in this phase
-  if (newState.currentPhase === 'action') {
+  if (newState.currentPhase === "action") {
     if (isPlayer) {
       newState.actionState.player.hasActed = true;
     } else {
@@ -120,7 +135,10 @@ export function executeMysticPunch(
     }
 
     // Check if both players have acted, and if so, advance to the next phase
-    if (newState.actionState.player.hasActed && newState.actionState.enemy.hasActed) {
+    if (
+      newState.actionState.player.hasActed &&
+      newState.actionState.enemy.hasActed
+    ) {
       newState = processMinionActions(newState, isPlayer);
       return advancePhase(newState);
     }
@@ -141,30 +159,32 @@ export function executeSpellCast(
   state: CombatState,
   isPlayer: boolean,
   isResolution: boolean = false,
-  spawnCoord?: AxialCoord
+  spawnCoord?: AxialCoord,
 ): CombatState {
   let newState = { ...state };
-  const caster = isPlayer ? 'playerWizard' : 'enemyWizard';
+  const caster = isPlayer ? "playerWizard" : "enemyWizard";
 
   // Get the selected spell
   const selectedSpell = newState[caster].selectedSpell;
 
   // If no spell is selected, log and return unchanged state
   if (!selectedSpell) {
-    console.error(`No spell selected for ${isPlayer ? 'player' : 'enemy'}`);
+    console.error(`No spell selected for ${isPlayer ? "player" : "enemy"}`);
     return newState;
   }
 
   // Check if caster has enough mana
   if (newState[caster].currentMana < selectedSpell.manaCost) {
-    newState.log.push(createLogEntry({
-      turn: newState.turn,
-      round: newState.round,
-      actor: isPlayer ? 'player' : 'enemy',
-      action: 'cast_failed',
-      details: `${isPlayer ? 'You' : 'Enemy'} tried to cast ${selectedSpell.name} but didn't have enough mana!`,
-      spellName: selectedSpell.name,
-    }));
+    newState.log.push(
+      createLogEntry({
+        turn: newState.turn,
+        round: newState.round,
+        actor: isPlayer ? "player" : "enemy",
+        action: "cast_failed",
+        details: `${isPlayer ? "You" : "Enemy"} tried to cast ${selectedSpell.name} but didn't have enough mana!`,
+        spellName: selectedSpell.name,
+      }),
+    );
 
     // Clear selected spell
     newState[caster] = {
@@ -182,23 +202,31 @@ export function executeSpellCast(
   };
 
   // Log spell cast
-  newState.log.push(createLogEntry({
-    turn: newState.turn,
-    round: newState.round,
-    actor: isPlayer ? 'player' : 'enemy',
-    action: 'spell_cast',
-    details: `${isPlayer ? 'You' : 'Enemy'} cast ${selectedSpell.name}!`,
-    spellName: selectedSpell.name,
-    mana: -selectedSpell.manaCost,
-  }));
+  newState.log.push(
+    createLogEntry({
+      turn: newState.turn,
+      round: newState.round,
+      actor: isPlayer ? "player" : "enemy",
+      action: "spell_cast",
+      details: `${isPlayer ? "You" : "Enemy"} cast ${selectedSpell.name}!`,
+      spellName: selectedSpell.name,
+      mana: -selectedSpell.manaCost,
+    }),
+  );
 
   // Apply all spell effects
   for (const effect of selectedSpell.effects) {
-    newState = applySpellEffect(newState, effect, isPlayer, spawnCoord);
+    newState = applySpellEffect(
+      newState,
+      effect,
+      isPlayer,
+      spawnCoord,
+      selectedSpell,
+    );
   }
 
   // Check if combat has ended
-  if (newState.status !== 'active') {
+  if (newState.status !== "active") {
     console.log(`Combat ended: ${newState.status}`);
     return newState;
   }
@@ -207,9 +235,11 @@ export function executeSpellCast(
   if (newState[caster].selectedSpell) {
     const selectedSpellId = newState[caster].selectedSpell.id;
     // Check if the spell is in hand before trying to discard it
-    const spellInHand = newState[caster].hand.find(spell => spell.id === selectedSpellId);
+    const spellInHand = newState[caster].hand.find(
+      (spell) => spell.id === selectedSpellId,
+    );
     if (spellInHand) {
-      newState = discardCard(newState, selectedSpellId, isPlayer, 'spell_cast');
+      newState = discardCard(newState, selectedSpellId, isPlayer, "spell_cast");
     }
 
     // Clear selected spell
@@ -222,7 +252,7 @@ export function executeSpellCast(
   }
 
   // Mark the player as having acted in this phase
-  if (newState.currentPhase === 'action') {
+  if (newState.currentPhase === "action") {
     if (isPlayer) {
       newState.actionState.player.hasActed = true;
     } else {
@@ -230,11 +260,14 @@ export function executeSpellCast(
     }
 
     // Check if both players have acted, and if so, advance to the next phase
-    if (newState.actionState.player.hasActed && newState.actionState.enemy.hasActed) {
+    if (
+      newState.actionState.player.hasActed &&
+      newState.actionState.enemy.hasActed
+    ) {
       newState = processMinionActions(newState, isPlayer);
       return advancePhase(newState);
     }
-  } else if (newState.currentPhase === 'response') {
+  } else if (newState.currentPhase === "response") {
     if (isPlayer) {
       newState.actionState.player.hasResponded = true;
     } else {
@@ -242,7 +275,10 @@ export function executeSpellCast(
     }
 
     // Check if both players have responded, and if so, advance to the next phase
-    if (newState.actionState.player.hasResponded && newState.actionState.enemy.hasResponded) {
+    if (
+      newState.actionState.player.hasResponded &&
+      newState.actionState.enemy.hasResponded
+    ) {
       newState = processMinionActions(newState, isPlayer);
       return advancePhase(newState);
     }
@@ -266,21 +302,21 @@ export function executeSpellCast(
  */
 export function getEffectName(effect: SpellEffect): string {
   switch (effect.type) {
-    case 'statModifier':
+    case "statModifier":
       if (effect.value < 0) {
-        return 'Damage Reduction';
+        return "Damage Reduction";
       } else {
-        return 'Power Boost';
+        return "Power Boost";
       }
-    case 'statusEffect':
-      if (effect.target === 'self' && effect.value > 0) {
-        return 'Healing Over Time';
-      } else if (effect.target === 'enemy' && effect.value > 0) {
-        return 'Damage Over Time';
+    case "statusEffect":
+      if (effect.target === "self" && effect.value > 0) {
+        return "Healing Over Time";
+      } else if (effect.target === "enemy" && effect.value > 0) {
+        return "Damage Over Time";
       } else if (effect.value === 1) {
-        return 'Time Warp';
+        return "Time Warp";
       } else {
-        return 'Status Effect';
+        return "Status Effect";
       }
     default:
       return effect.type;
@@ -291,77 +327,95 @@ export function applySpellEffect(
   state: CombatState,
   effect: SpellEffect,
   isPlayerCaster: boolean,
-  spawnCoord?: AxialCoord
+  spawnCoord?: AxialCoord,
+  spell?: Spell,
 ): CombatState {
   let newState = { ...state };
-  const caster = isPlayerCaster ? 'playerWizard' : 'enemyWizard';
-  const effectTarget = effect.target === 'self'
-    ? (isPlayerCaster ? 'playerWizard' : 'enemyWizard')
-    : (isPlayerCaster ? 'enemyWizard' : 'playerWizard');
+  const caster = isPlayerCaster ? "playerWizard" : "enemyWizard";
+  const effectTarget =
+    effect.target === "self"
+      ? isPlayerCaster
+        ? "playerWizard"
+        : "enemyWizard"
+      : isPlayerCaster
+        ? "enemyWizard"
+        : "playerWizard";
 
   switch (effect.type) {
-    case 'damage':
+    case "damage":
       // Use standardized damage calculation system
       newState = calculateAndApplyDamage(newState, {
         baseDamage: effect.value,
-        damageType: 'spell',
-        element: effect.element || 'arcane',
+        damageType: "spell",
+        element: effect.element || "arcane",
         caster,
         target: effectTarget,
-        sourceDescription: `spell ${effect.element || ''} damage`,
+        sourceDescription: `spell ${effect.element || ""} damage`,
       });
       break;
 
-    case 'healing':
+    case "healing":
       // Apply healing
       const maxHealth = newState[effectTarget].wizard.maxHealth;
       newState[effectTarget] = {
         ...newState[effectTarget],
-        currentHealth: Math.min(maxHealth, newState[effectTarget].currentHealth + Math.round(effect.value)),
+        currentHealth: Math.min(
+          maxHealth,
+          newState[effectTarget].currentHealth + Math.round(effect.value),
+        ),
       };
 
       // Add to combat log
-      newState.log.push(createLogEntry({
-        turn: newState.turn,
-        round: newState.round,
-        actor: isPlayerCaster ? 'player' : 'enemy',
-        action: 'healing',
-        details: `${Math.round(effect.value)} healing to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'}!`,
-        healing: Math.round(effect.value)
-      }));
+      newState.log.push(
+        createLogEntry({
+          turn: newState.turn,
+          round: newState.round,
+          actor: isPlayerCaster ? "player" : "enemy",
+          action: "healing",
+          details: `${Math.round(effect.value)} healing to ${effectTarget === "playerWizard" ? "you" : "enemy"}!`,
+          healing: Math.round(effect.value),
+        }),
+      );
       break;
 
-    case 'manaRestore':
+    case "manaRestore":
       // Apply mana restoration
       const maxMana = newState[effectTarget].wizard.maxMana;
       newState[effectTarget] = {
         ...newState[effectTarget],
-        currentMana: Math.min(maxMana, newState[effectTarget].currentMana + Math.round(effect.value)),
+        currentMana: Math.min(
+          maxMana,
+          newState[effectTarget].currentMana + Math.round(effect.value),
+        ),
       };
 
       // Add to combat log
-      newState.log.push(createLogEntry({
-        turn: newState.turn,
-        round: newState.round,
-        actor: isPlayerCaster ? 'player' : 'enemy',
-        action: 'mana_restore',
-        details: `${Math.round(effect.value)} mana restored to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'}!`,
-        mana: Math.round(effect.value)
-      }));
-      break;
-
-    case 'statusEffect': {
-      // Handle Time Warp extra-turn effect first
-      if (effect.value === 1 && effect.duration === 1) {
-        const actorName = isPlayerCaster ? 'player' : 'enemy';
-
-        newState.log.push(createLogEntry({
+      newState.log.push(
+        createLogEntry({
           turn: newState.turn,
           round: newState.round,
-          actor: actorName,
-          action: 'effect_applied',
-          details: `Time warped! ${actorName === 'player' ? 'You' : 'Enemy'} will get an extra turn!`
-        }));
+          actor: isPlayerCaster ? "player" : "enemy",
+          action: "mana_restore",
+          details: `${Math.round(effect.value)} mana restored to ${effectTarget === "playerWizard" ? "you" : "enemy"}!`,
+          mana: Math.round(effect.value),
+        }),
+      );
+      break;
+
+    case "statusEffect": {
+      // Handle Time Warp extra-turn effect first
+      if (effect.value === 1 && effect.duration === 1) {
+        const actorName = isPlayerCaster ? "player" : "enemy";
+
+        newState.log.push(
+          createLogEntry({
+            turn: newState.turn,
+            round: newState.round,
+            actor: actorName,
+            action: "effect_applied",
+            details: `Time warped! ${actorName === "player" ? "You" : "Enemy"} will get an extra turn!`,
+          }),
+        );
 
         newState.extraTurn = { for: actorName };
         break;
@@ -369,69 +423,74 @@ export function applySpellEffect(
 
       let newActiveEffect: ActiveEffect | null = null;
 
-      if (effect.target === 'self' && effect.value > 0) {
+      if (effect.target === "self" && effect.value > 0) {
         // Healing over time on self
         newActiveEffect = {
           id: `hot-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-          name: 'Healing Over Time',
-          source: isPlayerCaster ? 'player' : 'enemy',
+          name: "Healing Over Time",
+          source: isPlayerCaster ? "player" : "enemy",
           remainingDuration: effect.duration || 1,
           duration: effect.duration || 1,
-          type: 'healing_over_time',
+          type: "healing_over_time",
           value: effect.value,
-          effect
+          effect,
         };
-      } else if (effect.target === 'enemy' && effect.value > 0) {
+      } else if (effect.target === "enemy" && effect.value > 0) {
         // Damage over time on enemy
         newActiveEffect = {
           id: `dot-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-          name: 'Damage Over Time',
-          source: isPlayerCaster ? 'player' : 'enemy',
+          name: "Damage Over Time",
+          source: isPlayerCaster ? "player" : "enemy",
           remainingDuration: effect.duration || 1,
           duration: effect.duration || 1,
-          type: 'damage_over_time',
+          type: "damage_over_time",
           value: effect.value,
-          effect
+          effect,
         };
       }
 
       if (newActiveEffect) {
         newState[effectTarget] = {
           ...newState[effectTarget],
-          activeEffects: [...newState[effectTarget].activeEffects, newActiveEffect],
+          activeEffects: [
+            ...newState[effectTarget].activeEffects,
+            newActiveEffect,
+          ],
         };
 
-        newState.log.push(createLogEntry({
-          turn: newState.turn,
-          round: newState.round,
-          actor: isPlayerCaster ? 'player' : 'enemy',
-          action: 'effect_applied',
-          details: `${newActiveEffect.name} applied to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'} for ${effect.duration} turns!`,
-        }));
+        newState.log.push(
+          createLogEntry({
+            turn: newState.turn,
+            round: newState.round,
+            actor: isPlayerCaster ? "player" : "enemy",
+            action: "effect_applied",
+            details: `${newActiveEffect.name} applied to ${effectTarget === "playerWizard" ? "you" : "enemy"} for ${effect.duration} turns!`,
+          }),
+        );
       }
       break;
     }
 
-    case 'statModifier': {
+    case "statModifier": {
       // Handle duration-based stat modifiers (buffs/debuffs)
       if (effect.duration && effect.duration > 0) {
-        let effectType: ActiveEffect['type'];
+        let effectType: ActiveEffect["type"];
         let effectName: string;
-        
+
         if (effect.value < 0) {
           // Negative values are damage reduction/shields
-          effectType = 'damageReduction';
-          effectName = 'Damage Reduction';
+          effectType = "damageReduction";
+          effectName = "Damage Reduction";
         } else {
           // Positive values are buffs
-          effectType = 'buff';
-          effectName = 'Buff';
+          effectType = "buff";
+          effectName = "Buff";
         }
 
         const activeEffect: ActiveEffect = {
           id: `mod-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
           name: effectName,
-          source: isPlayerCaster ? 'player' : 'enemy',
+          source: isPlayerCaster ? "player" : "enemy",
           remainingDuration: effect.duration,
           duration: effect.duration,
           type: effectType,
@@ -441,60 +500,76 @@ export function applySpellEffect(
 
         newState[effectTarget] = {
           ...newState[effectTarget],
-          activeEffects: [...newState[effectTarget].activeEffects, activeEffect],
-        };
-
-        newState.log.push(createLogEntry({
-          turn: newState.turn,
-          round: newState.round,
-          actor: isPlayerCaster ? 'player' : 'enemy',
-          action: 'effect_applied',
-          details: `${activeEffect.name} applied to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'} for ${effect.duration} turns!`,
-        }));
-      }
-      break;
-    }
-
-    case 'summon': {
-      if (effect.modelPath === 'caster') {
-        const activeEffect: ActiveEffect = {
-          id: `summon-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-          name: 'Summon',
-          source: isPlayerCaster ? 'player' : 'enemy',
-          remainingDuration: effect.duration || 1,
-          duration: effect.duration || 1,
-          type: 'summon',
-          value: effect.value,
-          effect,
-          modelPath: newState[caster].wizard.modelPath,
-          quantity: effect.value,
-        };
-
-        newState[effectTarget] = {
-          ...newState[effectTarget],
-          activeEffects: [...newState[effectTarget].activeEffects, activeEffect],
+          activeEffects: [
+            ...newState[effectTarget].activeEffects,
+            activeEffect,
+          ],
         };
 
         newState.log.push(
           createLogEntry({
             turn: newState.turn,
             round: newState.round,
-            actor: isPlayerCaster ? 'player' : 'enemy',
-            action: 'effect_applied',
-            details: `Summoned ${effect.value} illusion(s)!`,
-          })
+            actor: isPlayerCaster ? "player" : "enemy",
+            action: "effect_applied",
+            details: `${activeEffect.name} applied to ${effectTarget === "playerWizard" ? "you" : "enemy"} for ${effect.duration} turns!`,
+          }),
         );
-      } else {
-        const owner = isPlayerCaster ? 'player' : 'enemy';
+      }
+      break;
+    }
+
+    case "summon": {
+      const owner = isPlayerCaster ? "player" : "enemy";
+      const casterLevel = newState[caster].wizard.level || 1;
+      const casterModel = newState[caster].wizard.modelPath;
+      const quantity = Math.max(1, Math.round(effect.value || 1));
+
+      const casterPos = newState[caster].position || {
+        q: owner === "player" ? -2 : 2,
+        r: 0,
+      };
+      const occupied = [
+        newState.playerWizard.position || { q: -2, r: 0 },
+        newState.enemyWizard.position || { q: 2, r: 0 },
+        ...newState.playerMinions.map((m) => m.position),
+        ...newState.enemyMinions.map((m) => m.position),
+      ];
+
+      const getUndeadModelForLevel = (lvl: number) => {
+        if (lvl >= 100) return { path: "/assets/Mummy.vrm", name: "Mummy" };
+        if (lvl >= 50)
+          return { path: "/assets/AlienSkeleton.vrm", name: "Alien Skeleton" };
+        if (lvl >= 25) return { path: "/assets/Zombie.vrm", name: "Zombie" };
+        if (lvl >= 10) return { path: "/assets/Skull.vrm", name: "Skull" };
+        if (lvl >= 5) return { path: "/assets/Skelly.vrm", name: "Skelly" };
+        return { path: "/assets/Ghost.vrm", name: "Ghost" };
+      };
+
+      for (let i = 0; i < quantity; i++) {
+        let modelPath = effect.modelPath;
+        let name = effect.minionName || "Minion";
+
+        if (modelPath === "caster") {
+          modelPath = casterModel;
+          name = "Illusion";
+        }
+
+        if (!modelPath && spell?.id === "spell_summon_undead") {
+          const undead = getUndeadModelForLevel(casterLevel);
+          modelPath = undead.path;
+          name = undead.name;
+        }
+
         const minion: Minion = {
           id: `minion-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-          name: effect.minionName || 'Minion',
+          name,
           owner,
           ownerId: isPlayerCaster
             ? newState.playerWizard.wizard.id
             : newState.enemyWizard.wizard.id,
-          modelPath: effect.modelPath,
-          position: { q: 0, r: 0 } as import('../utils/hexUtils').AxialCoord,
+          modelPath,
+          position: { q: 0, r: 0 } as import("../utils/hexUtils").AxialCoord,
           stats: {
             health: effect.health || 10,
             maxHealth: effect.health || 10,
@@ -502,17 +577,12 @@ export function applySpellEffect(
           remainingDuration: effect.duration || 1,
         };
 
-        const casterPos = newState[caster].position || { q: owner === 'player' ? -2 : 2, r: 0 };
-        const occupied = [
-          newState.playerWizard.position || { q: -2, r: 0 },
-          newState.enemyWizard.position || { q: 2, r: 0 },
-          ...newState.playerMinions.map(m => m.position),
-          ...newState.enemyMinions.map(m => m.position),
-        ];
-        const spawn = spawnCoord || findUnoccupiedAdjacentHex(casterPos, occupied);
+        const spawn =
+          spawnCoord || findUnoccupiedAdjacentHex(casterPos, occupied);
         if (spawn) {
           minion.position = spawn;
-          if (owner === 'player') {
+          occupied.push(spawn);
+          if (owner === "player") {
             newState.playerMinions = [...newState.playerMinions, minion];
           } else {
             newState.enemyMinions = [...newState.enemyMinions, minion];
@@ -522,9 +592,9 @@ export function applySpellEffect(
               turn: newState.turn,
               round: newState.round,
               actor: owner,
-              action: 'summon',
-              details: `${owner === 'player' ? 'You' : 'Enemy'} summoned ${minion.name}!`,
-            })
+              action: "summon",
+              details: `${owner === "player" ? "You" : "Enemy"} summoned ${minion.name}!`,
+            }),
           );
         } else {
           newState.log.push(
@@ -532,41 +602,46 @@ export function applySpellEffect(
               turn: newState.turn,
               round: newState.round,
               actor: owner,
-              action: 'summon_failed',
-              details: 'No space to summon a minion!',
-            })
+              action: "summon_failed",
+              details: "No space to summon a minion!",
+            }),
           );
         }
       }
       break;
     }
 
-    case 'damageReduction': {
+    case "damageReduction": {
       // Handle direct damageReduction effects (like Arcane Shield)
       if (effect.duration && effect.duration > 0) {
         const activeEffect: ActiveEffect = {
           id: `dmgred-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-          name: 'Damage Reduction',
-          source: isPlayerCaster ? 'player' : 'enemy',
+          name: "Damage Reduction",
+          source: isPlayerCaster ? "player" : "enemy",
           remainingDuration: effect.duration,
           duration: effect.duration,
-          type: 'damageReduction',
+          type: "damageReduction",
           value: effect.value,
           effect,
         };
 
         newState[effectTarget] = {
           ...newState[effectTarget],
-          activeEffects: [...newState[effectTarget].activeEffects, activeEffect],
+          activeEffects: [
+            ...newState[effectTarget].activeEffects,
+            activeEffect,
+          ],
         };
 
-        newState.log.push(createLogEntry({
-          turn: newState.turn,
-          round: newState.round,
-          actor: isPlayerCaster ? 'player' : 'enemy',
-          action: 'effect_applied',
-          details: `${activeEffect.name} applied to ${effectTarget === 'playerWizard' ? 'you' : 'enemy'} for ${effect.duration} turns!`,
-        }));
+        newState.log.push(
+          createLogEntry({
+            turn: newState.turn,
+            round: newState.round,
+            actor: isPlayerCaster ? "player" : "enemy",
+            action: "effect_applied",
+            details: `${activeEffect.name} applied to ${effectTarget === "playerWizard" ? "you" : "enemy"} for ${effect.duration} turns!`,
+          }),
+        );
       }
       break;
     }
@@ -578,16 +653,19 @@ export function applySpellEffect(
 /**
  * After the caster acts, let their minions perform a basic attack.
  */
-function processMinionActions(state: CombatState, isPlayerCaster: boolean): CombatState {
+function processMinionActions(
+  state: CombatState,
+  isPlayerCaster: boolean,
+): CombatState {
   let newState = { ...state };
   const list = isPlayerCaster ? newState.playerMinions : newState.enemyMinions;
-  const targetKey = isPlayerCaster ? 'enemyWizard' : 'playerWizard';
-  const casterKey = isPlayerCaster ? 'playerWizard' : 'enemyWizard';
+  const targetKey = isPlayerCaster ? "enemyWizard" : "playerWizard";
+  const casterKey = isPlayerCaster ? "playerWizard" : "enemyWizard";
   for (const minion of list) {
     newState = calculateAndApplyDamage(newState, {
       baseDamage: 5,
-      damageType: 'spell',
-      element: 'physical',
+      damageType: "spell",
+      element: "physical",
       caster: casterKey,
       target: targetKey,
       sourceDescription: minion.name,
@@ -595,7 +673,7 @@ function processMinionActions(state: CombatState, isPlayerCaster: boolean): Comb
     minion.remainingDuration -= 1;
   }
   const filtered = list.filter(
-    m => m.remainingDuration > 0 && m.stats.health > 0
+    (m) => m.remainingDuration > 0 && m.stats.health > 0,
   );
   if (isPlayerCaster) {
     newState.playerMinions = filtered;

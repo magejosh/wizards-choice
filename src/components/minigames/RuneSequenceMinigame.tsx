@@ -18,6 +18,7 @@ const RuneSequenceMinigame: React.FC<RuneSequenceMinigameProps> = ({
   const [sequence, setSequence] = useState<number[]>([]);
   const [showSequence, setShowSequence] = useState(true);
   const [highlightIndex, setHighlightIndex] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [playerInput, setPlayerInput] = useState<number[]>([]);
   const [errors, setErrors] = useState(0);
   const [startTime, setStartTime] = useState<number>(0);
@@ -45,6 +46,8 @@ const RuneSequenceMinigame: React.FC<RuneSequenceMinigameProps> = ({
   // handle rune click
   const handleClick = (index: number) => {
     if (showSequence) return;
+    setActiveIndex(index);
+    setTimeout(() => setActiveIndex(null), 200);
     const nextStep = playerInput.length;
     if (sequence[nextStep] !== index) {
       setErrors(e => e + 1);
@@ -75,7 +78,11 @@ const RuneSequenceMinigame: React.FC<RuneSequenceMinigameProps> = ({
             <button
               key={i}
               className={`${styles.runeButton} ${
-                highlightIndex === i ? styles.highlight : ''
+                highlightIndex === i
+                  ? styles.highlight
+                  : activeIndex === i
+                  ? styles.clicked
+                  : ''
               }`}
               onClick={() => handleClick(i)}
             >

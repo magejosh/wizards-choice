@@ -9,7 +9,7 @@ export interface MixamoActions {
   die: string;
 }
 
-function findSkinnedMesh(root: THREE.Object3D | undefined) {
+export function findSkinnedMesh(root: THREE.Object3D | undefined) {
   let skinned: THREE.SkinnedMesh | undefined;
   if (!root) return skinned;
   root.traverse(obj => {
@@ -45,7 +45,12 @@ export function useMixamoClips(
       }
 
       try {
-        return SkeletonUtils.retargetClip(skinned, sourceSkinned, fbx.animations[0]);
+
+        return SkeletonUtils.retargetClip(skinned, sourceSkinned, fbx.animations[0], {
+          hip: 'mixamorig:Hips',
+          preservePosition: false,
+        });
+ main
       } catch (e) {
         console.warn('Failed to retarget clip', e);
         return undefined;

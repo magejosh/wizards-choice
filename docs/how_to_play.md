@@ -113,10 +113,19 @@ Spell scrolls provide an opportunity to learn new spells or use powerful spells 
   - Hard: 5 points
 
 #### Spending Level-Up Points
-- **Max Health**: 1 point per +1 Health
-- **Max Mana**: 1 point per +1 Mana
-- **Mana Regen**: 10 points per +1 Mana Regen per round
-- **New Spell**: 1 point per tier of spell. 
+- Spend points on any attribute to permanently increase its value:
+  - Strength
+  - Agility
+  - Vitality (boosts health and regeneration)
+  - Endurance (boosts health)
+  - Perception
+  - Reaction
+  - Resistance
+  - Willpower (improves regeneration)
+  - Intelligence (increases mana)
+  - Wisdom (increases mana and regen)
+  - Control
+  - Focus
 
 ### Spell Progression Tech Tree
 

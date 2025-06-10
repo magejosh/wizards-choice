@@ -7,7 +7,8 @@ import { VRMLoader } from 'three-stdlib';
 import { Mesh, Vector3 } from 'three';
 import * as THREE from 'three';
 import { getModelRotationForUpAxis, UpAxis } from '@/lib/utils/modelUtils';
-import { useMixamoClips } from '@/hooks/useMixamoClips';
+import { useMixamoClips, findSkinnedMesh } from '@/hooks/useMixamoClips';
+ main
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface WizardModelProps {
@@ -244,20 +245,24 @@ const WizardModel: React.FC<WizardModelProps> = ({
   // Player: use GLB model
   if (!isEnemy) {
     const { scene } = useGLTF(PLAYER_WIZARD_GLB_PATH);
+    const skinned = useMemo(() => findSkinnedMesh(scene), [scene]);
     const clips = useMixamoClips(scene, {
       idle: '/assets/anims/Idle.fbx',
       cast: '/assets/anims/Standing 1H Cast Spell 01.fbx',
       die: '/assets/anims/Dying.fbx',
     });
-    const mixer = useMemo(() => new THREE.AnimationMixer(scene), [scene]);
+    const mixer = useMemo(
+      () => new THREE.AnimationMixer(skinned || scene),
+      [scene, skinned]
+    );
 
     useEffect(() => {
       const clip = clips[action || 'idle'] || clips.idle;
       if (!clip) return;
-      const act = mixer.clipAction(clip);
+      const act = mixer.clipAction(clip, skinned || undefined);
       act.reset().play();
       return () => act.stop();
-    }, [action, clips, mixer]);
+    }, [action, clips, mixer, skinned]);
 
     useFrame((_, delta) => {
       mixer.update(delta);
@@ -311,20 +316,24 @@ const WizardModel: React.FC<WizardModelProps> = ({
     }
   }
   if (scene) {
+    const skinned = useMemo(() => findSkinnedMesh(scene), [scene]);
     const clips = useMixamoClips(scene, {
       idle: '/assets/anims/Idle.fbx',
       cast: '/assets/anims/Standing 1H Cast Spell 01.fbx',
       die: '/assets/anims/Dying.fbx',
     });
-    const mixer = useMemo(() => new THREE.AnimationMixer(scene), [scene]);
+    const mixer = useMemo(
+      () => new THREE.AnimationMixer(skinned || scene),
+      [scene, skinned]
+    );
 
     useEffect(() => {
       const clip = clips[action || 'idle'] || clips.idle;
       if (!clip) return;
-      const act = mixer.clipAction(clip);
+      const act = mixer.clipAction(clip, skinned || undefined);
       act.reset().play();
       return () => act.stop();
-    }, [action, clips, mixer]);
+    }, [action, clips, mixer, skinned]);
 
     useFrame((_, delta) => {
       mixer.update(delta);

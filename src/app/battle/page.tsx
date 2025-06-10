@@ -1,5 +1,8 @@
 'use client';
 
+// Prevent static pre-rendering since this page relies on browser-only APIs
+export const dynamic = 'force-dynamic';
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import BattleView from '../../components/battle/BattleView';

@@ -99,10 +99,19 @@
 - The spell data XML file is always located at `/public/data/spell_data.xml` in the project and loaded at runtime from `/data/spell_data.xml` (the URL path). There is only one file; the `/public` directory is served as the web root.
 
 ### Wizard Stats & Progression
-- Level-up points can enhance:
-  - Max Health: 1 point per +1 Health
-  - Max Mana: 1 point per +1 Mana
-  - Mana Regen: 10 points per +1 Mana Regen per round
+- Level-up points can be spent on any of these attributes:
+  - Strength
+  - Agility
+  - Vitality (increases max health and regeneration)
+  - Endurance (raises max health)
+  - Perception
+  - Reaction
+  - Resistance
+  - Willpower (improves regeneration)
+  - Intelligence (raises max mana)
+  - Wisdom (raises max mana and regen)
+  - Control
+  - Focus
 
 ### Wizard's Study (Hub)
 - Central hub for selecting next duel (wizard or magical creature)

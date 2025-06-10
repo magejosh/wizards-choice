@@ -838,6 +838,21 @@ flowchart TD
 - **equipmentMaxHealth/equipmentMaxMana**: Sum of all currently equipped item bonuses
 - **totalMaxHealth/totalMaxMana**: Used for display and combat; sum of all above
 
+### Attribute Upgrade Flow
+
+```mermaid
+flowchart TD
+    Gain[Gain Level-Up Points] --> Open[Open Attribute Upgrade Screen]
+    Open --> Choose[Choose Attribute]
+    Choose --> Confirm[Spend Points]
+    Confirm --> Update[Update Attribute Value]
+    Update --> Recalc[Recalculate Stats]
+    Recalc --> Save[Persist to Save Slot]
+```
+
+The attribute screen allows players to convert level-up points into permanent
+stat increases that update the wizard's saved data.
+
 ### Equipment System (updated)
 
 ```mermaid

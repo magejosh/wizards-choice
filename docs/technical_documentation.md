@@ -12,15 +12,16 @@
 9. [Combat Utilities](#combat-utilities)
 10. [3D Battle System](#3d-battle-system)
 11. [Equipment System](#equipment-system)
-12. [Inventory System](#inventory-system)
-13. [UI Components](#ui-components)
-14. [Best Practices](#best-practices)
-15. [Deployment Guide](#deployment-guide)
-16. [Admin Guide](#admin-guide)
-17. [Future Development](#future-development)
-18. [Market System](#market-system)
-19. [Market Attack System](#market-attack-system)
-20. [Spell Progression Tech Tree System](#spell-progression-tech-tree-system)
+12. [Attribute System](#attribute-system)
+13. [Inventory System](#inventory-system)
+14. [UI Components](#ui-components)
+15. [Best Practices](#best-practices)
+16. [Deployment Guide](#deployment-guide)
+17. [Admin Guide](#admin-guide)
+18. [Future Development](#future-development)
+19. [Market System](#market-system)
+20. [Market Attack System](#market-attack-system)
+21. [Spell Progression Tech Tree System](#spell-progression-tech-tree-system)
 
 ## Introduction
 
@@ -422,6 +423,29 @@ Special handling is implemented for 'finger' slots (rings):
 This logic is implemented in both the state management (wizardModule.ts) and the UI (EquipmentScreen.tsx), ensuring robust and consistent behavior.
 
 For a visual overview, see the process map in [process_maps.md](process_maps.md#equipment-slot-handling-process).
+
+## Attribute System
+
+The attribute system lets players allocate level-up points to improve specific
+stats. Each attribute is stored on the `Wizard` object and persists in the save
+slot. Vitality and endurance increase `progressionMaxHealth`, while
+intelligence and wisdom increase `progressionMaxMana`. Vitality and willpower
+also boost health and mana regeneration between battles.
+
+Attributes:
+
+- **Strength**
+- **Agility**
+- **Vitality**
+- **Endurance**
+- **Perception**
+- **Reaction**
+- **Resistance**
+- **Willpower**
+- **Intelligence**
+- **Wisdom**
+- **Control**
+- **Focus**
 
 ## Inventory System
 

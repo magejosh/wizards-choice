@@ -8,6 +8,7 @@ import { Mesh, Vector3 } from 'three';
 import * as THREE from 'three';
 import { getModelRotationForUpAxis, UpAxis } from '@/lib/utils/modelUtils';
 import { useMixamoClips } from '@/hooks/useMixamoClips';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface WizardModelProps {
   position: [number, number, number];
@@ -226,6 +227,20 @@ const WizardModel: React.FC<WizardModelProps> = ({
   enemyVariant = 0,
   modelPath,
 }) => {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <PrimitiveWizardModel
+        position={position}
+        color={color}
+        health={health}
+        isActive={isActive}
+        isEnemy={isEnemy}
+        variant={enemyVariant}
+      />
+    );
+  }
   // Player: use GLB model
   if (!isEnemy) {
     const { scene } = useGLTF(PLAYER_WIZARD_GLB_PATH);

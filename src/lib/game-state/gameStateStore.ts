@@ -6,7 +6,7 @@ import { persist } from "zustand/middleware";
 import { GameState, GameProgress, SaveSlot } from "../types/game-types";
 import { MarketData } from "../types/market-types";
 import { Wizard } from "../types/wizard-types";
-import { generateDefaultWizardAsync } from "../wizard/wizardUtils";
+import { generateDefaultWizard, generateDefaultWizardAsync } from "../wizard/wizardUtils";
 import {
   initializeMarkets,
   refreshMarketInventory,
@@ -30,9 +30,9 @@ import { createPotionModule, PotionActions } from "./modules/potionModule";
 // Import uuid for generating unique IDs
 import { v4 as uuidv4 } from "uuid";
 
-// Get initial state with placeholder data
-const getInitialState = async (): Promise<{ gameState: GameState }> => {
-  const defaultWizard = await generateDefaultWizardAsync("");
+// Get initial state with placeholder data synchronously
+const getInitialState = (): { gameState: GameState } => {
+  const defaultWizard = generateDefaultWizard("");
   const defaultMarkets = initializeMarkets();
 
   // Defensive: Validate and recover market inventory structure
@@ -673,4 +673,16 @@ export function dedupeAndMergePotions(potions) {
     }
   }
   return Array.from(map.values());
+}
+
+// Load full starter wizard data asynchronously after initial store setup
+if (typeof window !== "undefined") {
+  generateDefaultWizardAsync("")
+    .then((wizard) => {
+      const { gameState, updateWizard } = useGameStateStore.getState();
+      if (!gameState.player?.spells || gameState.player.spells.length === 0) {
+        updateWizard(wizard);
+      }
+    })
+    .catch((err) => console.error("Failed to load starter wizard", err));
 }

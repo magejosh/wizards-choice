@@ -7,58 +7,35 @@ function isSpell(spell: unknown): spell is import('../types').Spell {
 }
 
 /**
- * Generates a default wizard with starting stats (ASYNC)
- * @param name The name of the wizard
- * @returns A new wizard object with default stats
+ * Generates a default wizard with basic stats synchronously.
+ * Spell data is loaded asynchronously elsewhere.
  */
-export async function generateDefaultWizardAsync(name: string): Promise<Wizard> {
-  // Get all spells from XML
-  const allSpells = await getAllSpells();
-  // Always select the three intended starter spells by name
-  const starterNames = ["Firebolt", "Arcane Shield", "Minor Healing"];
-  const starterSpells = starterNames.map(n => allSpells.find(s => s.name === n)).filter(isSpell);
-  if (starterSpells.length !== 3) throw new Error("One or more starter spells missing from XML");
-  // Add two more random tier 1 spells (excluding the three core)
-  const tier1Spells = allSpells.filter(s => s.tier === 1 && !starterNames.includes(s.name));
-  const shuffled = tier1Spells.sort(() => Math.random() - 0.5);
-  const extraSpells = shuffled.slice(0, 2);
-  const defaultSpells: import('../types').Spell[] = [...starterSpells, ...extraSpells];
-  // Equipped spells are always the three core starter spells
-  const equippedSpells: import('../types').Spell[] = starterSpells;
-  // Create a default deck
-  const defaultDeckId = `deck_default_${Date.now()}`;
-  const defaultDeck = {
-    id: defaultDeckId,
-    name: 'Starter Deck',
-    spells: defaultSpells,
-    dateCreated: new Date().toISOString(),
-    lastModified: new Date().toISOString()
-  };
+export function generateDefaultWizard(name: string): Wizard {
   return {
     id: `wizard_${Date.now()}`,
     name: name || 'Unnamed Wizard',
     level: 1,
     experience: 0,
-    experienceToNextLevel: 100, // Level 1 * 100
-    health: 100, // Deprecated, kept for compatibility
-    mana: 100,   // Deprecated, kept for compatibility
-    maxHealth: 100, // Deprecated, kept for compatibility
-    maxMana: 100,   // Deprecated, kept for compatibility
-    manaRegen: 1, // Base mana regen equals player level
-    spells: defaultSpells,
-    equippedSpells: equippedSpells,
-    equipment: {}, // No equipment at start
-    inventory: [], // No items in inventory at start
-    potions: [], // No potions at start
-    equippedPotions: [], // No equipped potions at start
-    equippedSpellScrolls: [], // No equipped spell scrolls at start
-    ingredients: [], // No ingredients at start
-    discoveredRecipes: [], // No discovered recipes at start
+    experienceToNextLevel: 100,
+    health: 100,
+    mana: 100,
+    maxHealth: 100,
+    maxMana: 100,
+    manaRegen: 1,
+    spells: [],
+    equippedSpells: [],
+    equipment: {},
+    inventory: [],
+    potions: [],
+    equippedPotions: [],
+    equippedSpellScrolls: [],
+    ingredients: [],
+    discoveredRecipes: [],
     levelUpPoints: 0,
-    gold: 100, // Starting gold
+    gold: 100,
     skillPoints: 0,
-    decks: [defaultDeck],
-    activeDeckId: defaultDeckId,
+    decks: [],
+    activeDeckId: null,
     baseMaxHealth: 100,
     progressionMaxHealth: 0,
     equipmentMaxHealth: 0,
@@ -67,6 +44,41 @@ export async function generateDefaultWizardAsync(name: string): Promise<Wizard> 
     progressionMaxMana: 0,
     equipmentMaxMana: 0,
     totalMaxMana: 100,
+  };
+}
+
+/**
+ * Generates a default wizard with starting stats (ASYNC)
+ * @param name The name of the wizard
+ * @returns A new wizard object with default stats
+ */
+export async function generateDefaultWizardAsync(name: string): Promise<Wizard> {
+  const baseWizard = generateDefaultWizard(name);
+  const allSpells = await getAllSpells();
+  const starterNames = ["Firebolt", "Arcane Shield", "Minor Healing"];
+  const starterSpells = starterNames
+    .map(n => allSpells.find(s => s.name === n))
+    .filter(isSpell);
+  if (starterSpells.length !== 3) throw new Error("One or more starter spells missing from XML");
+  const tier1Spells = allSpells.filter(s => s.tier === 1 && !starterNames.includes(s.name));
+  const shuffled = tier1Spells.sort(() => Math.random() - 0.5);
+  const extraSpells = shuffled.slice(0, 2);
+  const defaultSpells: import('../types').Spell[] = [...starterSpells, ...extraSpells];
+  const equippedSpells: import('../types').Spell[] = starterSpells;
+  const defaultDeckId = `deck_default_${Date.now()}`;
+  const defaultDeck = {
+    id: defaultDeckId,
+    name: 'Starter Deck',
+    spells: defaultSpells,
+    dateCreated: new Date().toISOString(),
+    lastModified: new Date().toISOString(),
+  };
+  return {
+    ...baseWizard,
+    spells: defaultSpells,
+    equippedSpells,
+    decks: [defaultDeck],
+    activeDeckId: defaultDeckId,
   };
 }
 

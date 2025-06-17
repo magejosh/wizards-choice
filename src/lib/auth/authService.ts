@@ -76,7 +76,7 @@ export const authService = {
       
       // Reset the game state store
       const gameStore = useGameStateStore.getState();
-      gameStore.resetState();
+      await gameStore.resetState();
       
       // Load user's game state if it exists
       const savedGameState = await dbService.loadGameState(user.id);
@@ -147,7 +147,7 @@ export const authService = {
     }
     
     // Reset game state to initial values
-    useGameStateStore.getState().resetState();
+    await useGameStateStore.getState().resetState();
   },
   
   /**

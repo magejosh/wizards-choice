@@ -17,7 +17,7 @@ export interface SaveActions {
   saveGame: () => void;
   loadGame: (saveUuid: string) => boolean;
   initializeNewGame: (playerName: string, slotId: number) => Promise<void>;
-  resetState: () => void;
+  resetState: () => Promise<void>;
   updateSaveSlot: (saveUuid: string, data: Partial<SaveSlot>) => void;
   deleteSaveSlot: (saveUuid: string) => void;
   getSaveSlots: () => SaveSlot[];
@@ -590,9 +590,9 @@ export const createSaveModule = (set: Function, get: Function): SaveActions => (
     }
   },
 
-  resetState: () => {
+  resetState: async () => {
     // Reset to a default state with empty save slots
-    const initialGameState = getInitialGameState('', 0);
+    const initialGameState = await getInitialGameState('', 0);
 
     // Reset all save slots to empty with new UUIDs
     initialGameState.saveSlots = Array(3).fill(null).map((_, i) => ({
@@ -609,23 +609,8 @@ export const createSaveModule = (set: Function, get: Function): SaveActions => (
 
     // Clear all localStorage entries for save slots
     try {
-      // Clear Zustand persisted store
-      localStorage.removeItem('wizards-choice-game-state');
-
-      // Clear individual save slots (old format)
-      for (let i = 0; i < 3; i++) {
-        localStorage.removeItem(`wizardsChoice_saveSlot_${i}`);
-      }
-
-      // Clear any save slots in new format
-      // This is a simplification - in a real app, we might need to enumerate all keys
-      const allKeys = Object.keys(localStorage);
-      const saveKeys = allKeys.filter(key => key.startsWith('wizardsChoice_save_'));
-      saveKeys.forEach(key => localStorage.removeItem(key));
-
-      // Clear any other game-related data
-      localStorage.removeItem('wizardsChoice_currentSaveSlot');
-      localStorage.removeItem('wizardsChoice_gameState');
+      // Remove everything related to the game
+      localStorage.clear();
 
       console.log('All save data has been cleared from localStorage');
     } catch (error) {

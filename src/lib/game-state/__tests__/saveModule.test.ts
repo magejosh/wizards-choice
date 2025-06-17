@@ -115,3 +115,19 @@ test('save and load different slots without overwriting', async () => {
   expect(stateAfterLoad1.gameState.player?.level).toBe(2);
   expect(stateAfterLoad1.gameState.saveSlots[0].level).toBe(1);
 });
+
+test('resetState clears storage and resets slots', async () => {
+  const store = createTestStore();
+  const actions = store.getState();
+
+  await actions.initializeNewGame('Alice', 0);
+  expect(global.localStorage.length).toBeGreaterThan(0);
+
+  await actions.resetState();
+
+  const state = store.getState().gameState;
+  expect(global.localStorage.length).toBe(0);
+  expect(state.saveSlots.length).toBe(3);
+  expect(state.saveSlots.every((s) => s.isEmpty)).toBe(true);
+  expect(state.currentSaveSlot).toBe(state.saveSlots[0].saveUuid);
+});

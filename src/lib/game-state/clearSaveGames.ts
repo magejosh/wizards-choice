@@ -1,7 +1,7 @@
 // Function to clear save games from local storage
 import { useGameStateStore } from './gameStateStore';
 
-export const clearSaveGames = () => {
+export const clearSaveGames = async () => {
   console.log('Clearing all save games...');
 
   try {
@@ -26,7 +26,7 @@ export const clearSaveGames = () => {
     localStorage.removeItem('wizardsChoice_gameState');
 
     // Reset the store state last
-    resetState();
+    await resetState();
 
     console.log('All save data has been cleared');
     return true;

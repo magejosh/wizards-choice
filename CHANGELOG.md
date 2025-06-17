@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2025-06-17
+- **Done: Reset State Fix**
+  - Awaited initial game state generation when resetting
+  - Local storage is fully cleared and slots reinitialize correctly
+
 ## 2025-04-05
 - **Done: Fixed Loot System Gold Application Bug**
   - **Root Cause Fixed**: The `applyLoot` function was missing gold handling, causing loot errors when players tried to collect rewards after winning battles

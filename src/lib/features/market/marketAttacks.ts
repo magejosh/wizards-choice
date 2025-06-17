@@ -1,5 +1,5 @@
 import { Wizard, Ingredient, IngredientRarity } from '../../types';
-import { generateDefaultWizard } from '../../wizard/wizardUtils';
+import { generateDefaultWizardAsync } from '../../wizard/wizardUtils';
 import { generateRandomIngredient } from '../procedural/ingredientGenerator';
 import { getSpellsByElement, getSpellsByTier } from '../../spells/spellData';
 
@@ -49,11 +49,11 @@ export function shouldMarketAttackOccur(
  * @param difficulty The game difficulty
  * @returns A specialized thief/bandit wizard
  */
-export function generateMarketAttacker(
+export async function generateMarketAttacker(
   playerLevel: number,
   marketLevel: number,
   difficulty: 'easy' | 'normal' | 'hard'
-): Wizard {
+): Promise<Wizard> {
   // Bandit level is based on market level and player level
   const banditLevelBase = Math.floor((marketLevel + playerLevel) / 2);
   
@@ -82,7 +82,7 @@ export function generateMarketAttacker(
   const fullName = `${randomName} (Level ${banditLevel})`;
   
   // Create base bandit wizard
-  const bandit = generateDefaultWizard(fullName);
+  const bandit = await generateDefaultWizardAsync(fullName);
   
   // Adjust stats based on level and difficulty
   bandit.level = banditLevel;

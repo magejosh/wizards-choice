@@ -245,8 +245,8 @@ const WizardModel: React.FC<WizardModelProps> = ({
     const skinned = useMemo(() => findSkinnedMesh(scene), [scene]);
     const clips = useMixamoClips(scene, descriptor.animations);
     const mixer = useMemo(
-      () => new THREE.AnimationMixer(skinned || sceneObj),
-      [sceneObj, skinned]
+      () => new THREE.AnimationMixer(skinned || scene),
+      [scene, skinned]
     );
 
     useEffect(() => {

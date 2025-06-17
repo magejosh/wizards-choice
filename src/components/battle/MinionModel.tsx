@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { useLoader } from "@react-three/fiber";
-import { useFBX } from "@react-three/drei";
-import { VRMLoader } from "three-stdlib";
+import React from "react";
+import { useModel } from "@/lib/utils/modelLoader";
 
 interface MinionModelProps {
   position: [number, number, number];
@@ -16,29 +14,12 @@ const MinionModel: React.FC<MinionModelProps> = ({
   modelPath,
   isEnemy = false,
 }) => {
-  let scene: any = null;
-  if (modelPath) {
-    try {
-      if (modelPath.toLowerCase().endsWith(".vrm")) {
-        const gltf = useLoader(VRMLoader, modelPath);
-        scene = gltf.scene;
-      } else {
-        scene = useFBX(modelPath);
-      }
-    } catch {
-      scene = null;
-    }
-  }
+  const { scene } = modelPath ? useModel(modelPath) : { scene: null } as any;
 
   if (scene) {
     return (
       <group position={position}>
-        <primitive
-          object={scene}
-          scale={[1, 1, 1]}
-          position={[0, -0.25, 0]}
-          rotation={[0, Math.PI / 2, 0]}
-        />
+        <primitive object={scene} position={[0, -0.25, 0]} />
       </group>
     );
   }

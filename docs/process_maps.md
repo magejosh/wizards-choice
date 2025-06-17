@@ -909,3 +909,16 @@ flowchart TD
 - The spell data XML file is always located at `/public/data/spell_data.xml` in the project.
 - At runtime, it is loaded from `/data/spell_data.xml` (the URL path).
 - There is only one file; the `/public` directory is served as the web root.
+
+## Model Loader Workflow
+
+```mermaid
+flowchart TD
+    Start[Request Model] --> CheckCache{Cached?}
+    CheckCache -- Yes --> Clone[Clone Cached]
+    CheckCache -- No --> Load[Load From Path]
+    Load --> Normalize[Apply Descriptor]
+    Normalize --> Cache[Store in Cache]
+    Cache --> Clone
+    Clone --> Return[Return Scene]
+```

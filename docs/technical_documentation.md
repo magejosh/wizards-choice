@@ -310,9 +310,13 @@ The battle system provides an immersive 3D experience using Three.js via React T
    - Implements hover animations for active wizards
    - Renders dynamic health bars with color-coded health percentages
    - Provides visual feedback for wizard state (active, damaged, etc.)
-   - Orients wizards to face each other in the battle arena
+ - Orients wizards to face each other in the battle arena
 
-4. **SpellEffect3D**: Creates dynamic spell effects based on spell type and element.
+4. **ModelLoader Utility**: Centralized 3D asset loader.
+   - Reads a per-model descriptor for scale, up axis, and base rotation
+   - Caches loaded models and returns cloned instances
+   - Ensures consistent orientation across devices
+5. **SpellEffect3D**: Creates dynamic spell effects based on spell type and element.
    - Renders unique 3D effects for different spell types:
      - Attack spells: Projectiles with particle trails
      - Defense spells: Shield-like barriers

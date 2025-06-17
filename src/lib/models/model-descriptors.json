@@ -1,0 +1,23 @@
+{
+  "player-wizard": {
+    "path": "/assets/player-wizard-01a.glb",
+    "upAxis": "Y",
+    "scale": 1.81,
+    "baseRotation": [3.1416, -1.0472, 0],
+    "animations": {
+      "idle": "/assets/anims/Idle.fbx",
+      "cast": "/assets/anims/Standing 1H Cast Spell 01.fbx",
+      "die": "/assets/anims/Dying.fbx"
+    }
+  },
+  "default-enemy": {
+    "upAxis": "Z",
+    "scale": 1.17,
+    "baseRotation": [0, 1.5708, 0],
+    "animations": {
+      "idle": "/assets/anims/Idle.fbx",
+      "cast": "/assets/anims/Standing 1H Cast Spell 01.fbx",
+      "die": "/assets/anims/Dying.fbx"
+    }
+  }
+}

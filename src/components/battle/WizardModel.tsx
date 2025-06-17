@@ -1,13 +1,12 @@
 'use client';
 
 import React, { useRef, useState, useEffect, useMemo } from 'react';
-import { useFrame, useLoader } from '@react-three/fiber';
-import { Text, useGLTF, useFBX, Html } from '@react-three/drei';
-import { VRMLoader } from 'three-stdlib';
+import { useFrame } from '@react-three/fiber';
+import { Text } from '@react-three/drei';
 import { Mesh, Vector3 } from 'three';
 import * as THREE from 'three';
-import { getModelRotationForUpAxis, UpAxis } from '@/lib/utils/modelUtils';
 import { useMixamoClips, findSkinnedMesh } from '@/hooks/useMixamoClips';
+import { useModel } from '@/lib/utils/modelLoader';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface WizardModelProps {
@@ -22,7 +21,6 @@ interface WizardModelProps {
   modelPath?: string;
 }
 
-const PLAYER_WIZARD_GLB_PATH = '/assets/player-wizard-01a.glb';
 
 const PrimitiveWizardModel: React.FC<{
   position: [number, number, number];
@@ -243,16 +241,12 @@ const WizardModel: React.FC<WizardModelProps> = ({
   }
   // Player: use GLB model
   if (!isEnemy) {
-    const { scene } = useGLTF(PLAYER_WIZARD_GLB_PATH);
+    const { scene, descriptor } = useModel('player-wizard');
     const skinned = useMemo(() => findSkinnedMesh(scene), [scene]);
-    const clips = useMixamoClips(scene, {
-      idle: '/assets/anims/Idle.fbx',
-      cast: '/assets/anims/Standing 1H Cast Spell 01.fbx',
-      die: '/assets/anims/Dying.fbx',
-    });
+    const clips = useMixamoClips(scene, descriptor.animations);
     const mixer = useMemo(
-      () => new THREE.AnimationMixer(skinned || scene),
-      [scene, skinned]
+      () => new THREE.AnimationMixer(skinned || sceneObj),
+      [sceneObj, skinned]
     );
 
     useEffect(() => {
@@ -269,12 +263,7 @@ const WizardModel: React.FC<WizardModelProps> = ({
 
     return (
       <group position={position}>
-        <primitive
-          object={scene}
-          scale={[1.81, 1.81, 1.81]}
-          position={[0, 0.7, 0]}
-          rotation={[Math.PI, -Math.PI / 3, 0]}
-        />
+        <primitive object={scene} position={[0, 0.7, 0]} />
         <group position={[0, 2, 0]}>
           <mesh position={[0, 0, 0]}>
             <boxGeometry args={[1.2, 0.15, 0.05]} />
@@ -301,29 +290,23 @@ const WizardModel: React.FC<WizardModelProps> = ({
   }
   // Enemy: use custom model if provided, otherwise primitive model
   const isValidModelPath = typeof modelPath === 'string' && modelPath.trim().length > 0;
-  let scene: any = null;
+  let sceneObj: any = null;
+  let descriptor: any = null;
   if (isValidModelPath) {
-    try {
-      if (modelPath!.toLowerCase().endsWith('.vrm')) {
-        const gltf = useLoader(VRMLoader, modelPath!);
-        scene = gltf.scene;
-      } else {
-        scene = useFBX(modelPath!);
-      }
-    } catch {
-      scene = null;
-    }
+    const loaded = useModel(modelPath!);
+    sceneObj = loaded.scene;
+    descriptor = loaded.descriptor;
   }
-  if (scene) {
-    const skinned = useMemo(() => findSkinnedMesh(scene), [scene]);
-    const clips = useMixamoClips(scene, {
+  if (sceneObj) {
+    const skinned = useMemo(() => findSkinnedMesh(sceneObj), [sceneObj]);
+    const clips = useMixamoClips(sceneObj, descriptor?.animations || {
       idle: '/assets/anims/Idle.fbx',
       cast: '/assets/anims/Standing 1H Cast Spell 01.fbx',
       die: '/assets/anims/Dying.fbx',
     });
     const mixer = useMemo(
-      () => new THREE.AnimationMixer(skinned || scene),
-      [scene, skinned]
+      () => new THREE.AnimationMixer(skinned || sceneObj),
+      [sceneObj, skinned]
     );
 
     useEffect(() => {
@@ -341,12 +324,7 @@ const WizardModel: React.FC<WizardModelProps> = ({
     return (
       <group position={position}>
         <ambientLight intensity={0.8} />
-        <primitive
-          object={scene}
-          scale={[1.17, 1.17, 1.17]}
-          position={[0, -0.25, 0]}
-          rotation={getModelRotationForUpAxis('Y', [0, Math.PI / 2, 0])}
-        />
+        <primitive object={sceneObj} position={[0, -0.25, 0]} />
         <group position={[0, 2, 0]}>
           <mesh position={[0, 0, 0]}>
             <boxGeometry args={[1.2, 0.15, 0.05]} />

@@ -20,9 +20,14 @@ export function findSkinnedMesh(root: THREE.Object3D | undefined) {
   return skinned;
 }
 
+export interface AnimationRetargeterOptions {
+  fallback?: Record<keyof MixamoActions, THREE.AnimationClip>;
+}
+
 export function useMixamoClips(
   scene: THREE.Object3D | undefined,
-  actions: MixamoActions
+  actions: MixamoActions,
+  options: AnimationRetargeterOptions = {}
 ) {
   const idle = useFBX(actions.idle);
   const cast = useFBX(actions.cast);
@@ -31,7 +36,8 @@ export function useMixamoClips(
   return useMemo(() => {
     const skinned = findSkinnedMesh(scene);
     if (!skinned || !skinned.skeleton || !skinned.skeleton.bones?.length) {
-      return {} as Record<keyof MixamoActions, THREE.AnimationClip | undefined>;
+      console.warn('Mixamo retargeting skipped: target skeleton missing');
+      return options.fallback || ({} as Record<keyof MixamoActions, THREE.AnimationClip | undefined>);
     }
 
     const retarget = (fbx: any) => {
@@ -54,10 +60,17 @@ export function useMixamoClips(
         return undefined;
       }
     };
-    return {
+    const clips = {
       idle: retarget(idle),
       cast: retarget(cast),
       die: retarget(die),
     } as Record<keyof MixamoActions, THREE.AnimationClip | undefined>;
-  }, [scene, idle, cast, die]);
+
+    if (Object.values(clips).some(c => !c) && options.fallback) {
+      console.warn('Skeleton mismatch detected, using fallback animations');
+      return options.fallback;
+    }
+
+    return clips;
+  }, [scene, idle, cast, die, options.fallback]);
 }

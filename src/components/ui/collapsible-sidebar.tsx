@@ -107,7 +107,7 @@ export const MobileSidebar = ({
         animate={{
           width: animate ? (open ? "300px" : "60px") : "60px",
         }}
-        style={{ height: 'calc(100vh - 61px)' }}
+        style={{ height: 'calc(100dvh - 61px)', height: 'calc(100vh - 61px)' }}
         data-state={open ? "open" : "closed"}
         {...props}
       >
@@ -136,7 +136,7 @@ export const DesktopSidebar = ({
         animate={{
           width: animate ? (open ? "300px" : "60px") : "300px",
         }}
-        style={{ height: 'calc(100vh - 60px)' }}
+        style={{ height: 'calc(100dvh - 60px)', height: 'calc(100vh - 60px)' }}
         {...props}
       >
         {children}

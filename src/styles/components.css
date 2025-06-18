@@ -5,7 +5,8 @@
   display: flex;
   flex-direction: column;
   width: 97%;
-  height: 100vh;
+  height: 100dvh;
+  height: 100vh; /* Fallback for older browsers */
   background-color: #1d1a2e; /* Dark blue/purple background */
   color: #ffffff;
   padding: 2px;
@@ -91,7 +92,8 @@
   flex: 1;
   gap: 2px;
   overflow: hidden;
-  height: calc(100vh - 60px); /* Adjust height to fill the viewport minus header */
+  height: calc(100dvh - 60px);
+  height: calc(100vh - 60px); /* Fallback for older browsers */
   box-sizing: border-box; /* Ensure padding is included in width calculation */
 }
 
@@ -609,7 +611,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: 100vh; /* Fallback */
   background-color: #1a1a2e; /* Dark blue/purple background */
   background-image: url('/images/main-menu-bg.jpg');
   background-size: cover;
@@ -986,7 +989,8 @@
 
 /* Make sidebar scrollable */
 .wizard-study__sidebar {
-  height: calc(100vh - 60px);
+  height: calc(100dvh - 60px);
+  height: calc(100vh - 60px); /* Fallback */
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #3a3a5c #13132b;
@@ -1243,7 +1247,8 @@ div.wizard-study__player-stats:nth-of-type(2) {
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .wizard-study__content {
-    height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
+    height: calc(100vh - 60px); /* Fallback */
   }
 
   /* Force right alignment and correct border for mobile sidebar component */

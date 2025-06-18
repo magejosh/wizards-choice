@@ -1,5 +1,6 @@
 .battle-page {
-  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: 100vh; /* Fallback */
   background-color: #0f0f1a;
   padding: 1rem;
   position: relative;
@@ -9,7 +10,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100dvh;
+  height: 100vh; /* Fallback */
   color: #ffffff;
   font-family: 'Cinzel', serif;
   font-size: 1.5rem;

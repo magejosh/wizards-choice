@@ -327,7 +327,8 @@ const MainMenu: React.FC<MainMenuProps> = ({
   return (
     <div className="main-menu" style={{
       overflow: 'auto',
-      height: '100vh',
+      height: '100dvh',
+      height: '100vh', // Fallback
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'flex-start'

@@ -517,7 +517,8 @@ The Wizard's Study should maintain its current layout and styling:
   display: flex;
   flex-direction: column;
   width: 97%;
-  height: 100vh;
+  height: 100dvh;
+  height: 100vh; /* Fallback for older browsers */
   background-color: #1d1a2e;
   color: #ffffff;
   padding: 2px;
@@ -646,7 +647,8 @@ The Deck Builder should maintain its current layout and styling:
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
+  height: 100vh; /* Fallback for older browsers */
   background-color: #0c0c1d;
   color: #ffffff;
   padding: 20px;
@@ -742,6 +744,7 @@ All UI components must be responsive:
 - Adjust font sizes, padding, and margins for different screen sizes
 - Use CSS Grid and Flexbox for responsive layouts
 - Test on various screen sizes and orientations
+- Use `100dvh` for full-screen containers with `100vh` as a fallback to avoid mobile browser UI issues
 
 ### Mobile Adjustments
 ```css

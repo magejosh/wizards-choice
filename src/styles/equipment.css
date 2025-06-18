@@ -3,7 +3,8 @@
   display: flex;
   flex-direction: column;
   width: 95%;
-  height: 100vh;
+  height: 100dvh;
+  height: 100vh; /* Fallback */
   background-color: var(--ui-background);
   color: var(--ui-text);
   padding: 4px;

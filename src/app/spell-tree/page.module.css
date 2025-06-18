@@ -1,6 +1,7 @@
 .container {
   padding: 2rem;
-  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: 100vh; /* Fallback */
   background: #121212;
   color: #fff;
   display: flex;
@@ -39,7 +40,8 @@
 
 .treeContainer {
   width: 100%;
-  height: calc(100vh - 400px);
+  height: calc(100dvh - 400px);
+  height: calc(100vh - 400px); /* Fallback */
   background: #1a1a1a;
   border-radius: 8px;
   overflow: hidden;
@@ -94,7 +96,8 @@
   }
   
   .treeContainer {
-    height: calc(100vh - 350px);
+    height: calc(100dvh - 350px);
+    height: calc(100vh - 350px); /* Fallback */
   }
   
   .spellDetails {
@@ -113,6 +116,7 @@
   }
   
   .treeContainer {
-    height: calc(100vh - 300px);
+    height: calc(100dvh - 300px);
+    height: calc(100vh - 300px); /* Fallback */
   }
 } 

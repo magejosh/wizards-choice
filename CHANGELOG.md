@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2025-06-18
+- **Done: Improved Mobile Screen Scaling**
+  - Replaced `100vh` heights with `100dvh` plus fallback across main layouts
+  - Documented the new approach in UI design standards
+
 ## 2025-06-17
 - **Done: Reset State Fix**
   - Awaited initial game state generation when resetting

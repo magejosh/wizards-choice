@@ -168,7 +168,8 @@
 .battleLog {
   width: 15rem;
   flex: 0 0 auto;
-  height: calc(100vh - 2rem);
+  height: calc(100dvh - 2rem);
+  height: calc(100vh - 2rem); /* Fallback */
   background: rgba(0, 0, 0, 0.7);
   border-radius: 0.625rem;
   display: flex;
@@ -362,7 +363,8 @@
   gap: 0.5rem;
   padding: 0.75rem;
   padding-right: 0.75rem;
-  max-height: calc(100vh - 5rem);
+  max-height: calc(100dvh - 5rem);
+  max-height: calc(100vh - 5rem); /* Fallback */
   min-height: 10rem;
 }
 
@@ -857,7 +859,8 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
+  height: 100vh; /* Fallback */
   background: rgba(0, 0, 0, 0.8);
   z-index: 1000;
   display: flex;

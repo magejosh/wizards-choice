@@ -13,7 +13,8 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      height: '100vh',
+      height: '100dvh',
+      height: '100vh', // Fallback
       width: '100vw',
       background: '#161630',
       position: 'fixed',

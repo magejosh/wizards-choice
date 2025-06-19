@@ -3,7 +3,8 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
+  height: 100vh; /* Fallback */
   background-color: #0c0c1d;
   color: #ffffff;
   padding: 20px;
